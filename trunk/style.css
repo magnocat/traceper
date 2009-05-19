@@ -1,0 +1,60 @@
+body {
+	padding:0px;
+	margin:0px;	
+	overflow-y:hidden;
+}
+
+#wrap{
+/*	min-width:640px;
+	min-height:480px;
+*/	position:absolute;
+	width:100%;
+	height:100%;	
+}
+#sideBar{
+	width:25%;
+	height:100%;
+	background: #fff;
+	position:relative;
+	float:left;
+	z-index:100;
+
+}
+#sideBar > * {
+/*	margin:10px;
+*/
+}
+#map{	
+	height:100%;
+	width:72%;
+	position:relative;
+	float:left;
+	
+}
+#footer{
+	text-align:center;
+	min-width:150px;
+	border:1px solid #00F;
+	vertical-align: bottom;
+}
+#logo{
+	height:60px;
+	width:20%;
+}
+
+#lists{
+	overflow: auto;	
+	min-height:62%;
+}
+#bar{
+	height:100%;
+	background: #EEEEFF;
+	z-index: 100;
+	float:left;
+	width:20px;	
+	position:relative;
+}
+#bar:HOVER {
+	cursor: pointer;
+	background-color: #DDEEFF;
+}
