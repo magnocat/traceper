@@ -16,7 +16,7 @@ class WebClientManager extends Manager
 	private $actionPrefix = NULL;
 	private $tablePrefix = NULL;	
 	private $elementCountInAPage = 10;
-	private $elementCountInLocationsPage = 100;
+	private $elementCountInLocationsPage = 50;
 	
 	public function __construct($dbc, $actionPrefix, $tablePrefix, $elementCountInAPage, $elementCountInLocationsPage) 
 	{
@@ -39,14 +39,19 @@ class WebClientManager extends Manager
 				break;
 			case $this->actionPrefix . "GetUserList":
 				
-				$out = $this->getUserList($reqArray);
+				$out = $this->getUserList($reqArray, $this->elementCountInAPage);
 				
 				break;
 			case $this->actionPrefix . "SearchUser":
 				
 				$out = $this->searchUser($reqArray);
 				
-				break;			
+				break;		
+			case $this->actionPrefix . "UpdateUserList":
+				
+				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage);
+				
+				break;		
 			default:
 				
 				$out = UNSUPPORTED_ACTION;
@@ -77,7 +82,7 @@ class WebClientManager extends Manager
 		
 	
 	//TODO: merging getUserList and getLocations
-	private function getUserList($reqArray) 
+	private function getUserList($reqArray, $elementCountInAPage) 
 	{
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
@@ -87,7 +92,7 @@ class WebClientManager extends Manager
 			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
 				$pageNo = (int) $reqArray['pageNo'];
 			}
-			$offset = ($pageNo - 1) * $this->elementCountInAPage;
+			$offset = ($pageNo - 1) * $elementCountInAPage;
 		
 			$sql = 'SELECT
 						Id, username, latitude, longitude, altitude, realname, deviceId, dataArrivedTime
@@ -96,7 +101,7 @@ class WebClientManager extends Manager
 					ORDER BY
 						username	
 					LIMIT ' . $offset . ',' 
-							. $this->elementCountInAPage;
+							. $elementCountInAPage;
 							
 			if (isset($reqArray['trackedUser']) && $reqArray['trackedUser'] != null) 
 			{
@@ -115,7 +120,7 @@ class WebClientManager extends Manager
 			}	
 						
 			$sqlItemCount = 'SELECT
-								ceil(count(Id)/'.$this->elementCountInAPage.')
+								ceil(count(Id)/'.$elementCountInAPage.')
 							 FROM '
 						 		. $this->tablePrefix .'_users';
 					 							 		
