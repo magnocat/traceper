@@ -1,21 +1,21 @@
 
-function TrackerOperator(url, map, period){
+function TrackerOperator(url, map, interval){
 	
 	TRACKER = this;	
 	MAP = map;
 	this.language = "en";
-	this.periodGetLocations = period;
 	this.ajaxUrl = url;
 	this.actionAuthenticateUser = "WebClientAuthenticateUser";
 	this.actionGetUserList = "WebClientGetUserList";	
 	this.actionSearchUser = "WebClientSearchUser";
-	this.userListPageNo = 0;
-	// updateUserListPageNo's first value is 2 because first page is already fetched.
-	this.updateUserListPageNo = 2;
+	this.actionUpdateUserList = "WebClientUpdateUserList";
+	this.userListPageNo = 0;	
 	this.userListPageCount = 0;
+	this.updateUserListPageNo = 0;
+	this.updateUserListPageCount = 0;
 	this.searchPageNo = 0;
 	this.searchPageCount = 0;
-	this.updateInterval = 3000;
+	this.updateInterval = interval;
 	this.started = false;
 	
 	this.users = [];
@@ -51,49 +51,11 @@ function TrackerOperator(url, map, period){
 	{		
 		var params = "action=" + TRACKER.actionGetUserList + "&pageNo=" + pageNo;
 		TRACKER.ajaxReq(params, function(result){			
-			
 			TRACKER.userListPageNo = TRACKER.getPageNo(result);
 			TRACKER.userListPageCount = TRACKER.getPageCount(result);
-			var str = "<ul>";	
-				
-			$(result).find("page").find("user").each(function(){
-				
-				var user = $(this);
-				
-				var userId = $(user).find("Id").text();
-				var username = $(user).find("username").text();
-				var latitude = $(user).find("location").attr('latitude');
-				var longitude = $(user).find("location").attr('longitude');
-				var point = new GLatLng(latitude, longitude);
-				
-				str += "<li><a href='javascript:TRACKER.trackUser("+ userId +")'>"+ username +"</a></li>";
 			
-				if (typeof TRACKER.users[userId] == "undefined") 
-				{					
-					TRACKER.users[userId] = new TRACKER.User( {username:username,
-															   realname:$(user).find("realname").text(),
-															   latitude:latitude,
-															   longitude:longitude,
-															   time:$(user).find("time").text(),
-															   message:$(user).find("message").text(),
-															   deviceId:$(user).find("deviceId").text(),
-															   gmarker:new GMarker(point),
-															});
-					
-					
-					
-					MAP.addOverlay(TRACKER.users[userId].gmarker);
-				}
-				else
-				{
-					var point = new GLatLng($(user).find("location").attr('latitude'), $(user).find("location").attr('longitude'));
-					
-					TRACKER.users[userId].gmarker.setLatLng(point);					
-				}
-				
-			});
+			var str = TRACKER.processXML(result);
 			
-			str += "</ul>";
 			str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.userListPageCount, TRACKER.userListPageNo, 3);
 			$('#users').html(str);
 			
@@ -109,55 +71,24 @@ function TrackerOperator(url, map, period){
 	this.updateUserList = function(){
 		// this function is called after the first page is fetched by TRACKER.getUserList function
 		// so pageNo's first value is 2
-		var params = "action=" + TRACKER.actionGetUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
+		var params = "action=" + TRACKER.actionUpdateUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
 		//alert("in update user data");
 		TRACKER.ajaxReq(params, function(result){
 			TRACKER.updateUserListPageNo = TRACKER.getPageNo(result);
+			TRACKER.updateUserListPageCount = TRACKER.getPageNo(result);
+			TRACKER.processXML(result);
 			
-			$(result).find("page").find("user").each(function(){
-				
-				var user = $(this);
-				
-				var userId = $(user).find("Id").text();
-				var username = $(user).find("username").text();
-				var latitude = $(user).find("location").attr('latitude');
-				var longitude = $(user).find("location").attr('longitude');
-				var point = new GLatLng(latitude, longitude);
-						
-				if (typeof TRACKER.users[userId] == "undefined") 
-				{					
-					TRACKER.users[userId] = new TRACKER.User( {username:username,
-															   realname:$(user).find("realname").text(),
-															   latitude:latitude,
-															   longitude:longitude,
-															   time:$(user).find("time").text(),
-															   message:$(user).find("message").text(),
-															   deviceId:$(user).find("deviceId").text(),
-															   gmarker:new GMarker(point),
-															});					
-					
-					MAP.addOverlay(TRACKER.users[userId].gmarker);
-				}
-				else
-				{
-					var point = new GLatLng($(user).find("location").attr('latitude'), $(user).find("location").attr('longitude'));
-					
-					TRACKER.users[userId].gmarker.setLatLng(point);					
-				}				
-			});
 			// to fetched all data reguarly updateUserListPageNo must be resetted.
 			if (TRACKER.updateUserListPageNo >= TRACKER.userListPageCount){
 				TRACKER.updateUserListPageNo = 1;
 			}
 			else{
 				TRACKER.updateUserListPageNo++;
-			}
-			
-			
+			}			
 		});
 		// set time out again
 		setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
-	}
+	};
 
 	this.searchUser = function(string, pageNo)
 	{
@@ -165,49 +96,12 @@ function TrackerOperator(url, map, period){
 		
 		TRACKER.ajaxReq(params, function(result){
 			TRACKER.searchPageNo = TRACKER.getPageNo(result);
-			TRACKER.searchPageCount = TRACKER.getPageCount(result);
+			TRACKER.searchPageCount = TRACKER.getPageCount(result);			
 			
-			//alert(TRACKER.searchPageNo);
-			var str = "<ul>";	
+			var str = TRACKER.processXML(result);
 			
-			$(result).find("page").find("user").each(function(){
-				var user = $(this);
-				
-				var userId = $(user).find("Id").text();
-				var username = $(user).find("username").text();
-				var latitude = $(user).find("location").attr('latitude');
-				var longitude = $(user).find("location").attr('longitude');
-				var point = new GLatLng(latitude, longitude);
-				
-				str += "<li><a href='javascript:TRACKER.trackUser("+ userId +")'>"+ username +"</a></li>";
-			
-				if (typeof TRACKER.users[userId] == "undefined") 
-				{					
-					TRACKER.users[userId] = new TRACKER.User( {username:username,
-															   realname:$(user).find("realname").text(),
-															   latitude:latitude,
-															   longitude:longitude,
-															   time:$(user).find("time").text(),
-															   message:$(user).find("message").text(),
-															   deviceId:$(user).find("deviceId").text(),
-															   gmarker:new GMarker(point),
-															});
-					
-					
-					
-					MAP.addOverlay(TRACKER.users[userId].gmarker);
-				}
-				else
-				{
-					var point = new GLatLng($(user).find("location").attr('latitude'), $(user).find("location").attr('longitude'));
-					
-					TRACKER.users[userId].gmarker.setLatLng(point);					
-				}				
-						
-			});
-			str += "</ul>";
 			str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("'+ string +'", %d)',TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
-			$('#searchResults').html(str);	
+			$('#search #results').html(str);	
 		
 		});	
 	};	
@@ -216,24 +110,74 @@ function TrackerOperator(url, map, period){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
 		TRACKER.users[userId].gmarker.openInfoWindowHtml(TRACKER.users[userId].username + '<br/>'+ TRACKER.users[userId].realname);
 		
-	}
+	};
+	
+	this.processXML = function(xml)
+	{
+		var str = "<ul>";	
+		
+		$(xml).find("page").find("user").each(function(){
+			
+			var user = $(this);			
+			var userId = $(user).find("Id").text();
+			var username = $(user).find("username").text();
+			var latitude = $(user).find("location").attr('latitude');
+			var longitude = $(user).find("location").attr('longitude');
+			var point = new GLatLng(latitude, longitude);
+			
+			str += "<li><a href='javascript:TRACKER.trackUser("+ userId +")'>"+ username +"</a></li>";
+		
+			if (typeof TRACKER.users[userId] == "undefined") 
+			{					
+				TRACKER.users[userId] = new TRACKER.User( {username:username,
+														   realname:$(user).find("realname").text(),
+														   latitude:latitude,
+														   longitude:longitude,
+														   time:$(user).find("time").text(),
+														   message:$(user).find("message").text(),
+														   deviceId:$(user).find("deviceId").text(),
+														   gmarker:new GMarker(point),
+														});
+				
+				
+				
+				MAP.addOverlay(TRACKER.users[userId].gmarker);
+			}
+			else
+			{
+				var point = new GLatLng($(user).find("location").attr('latitude'), $(user).find("location").attr('longitude'));
+				
+				TRACKER.users[userId].gmarker.setLatLng(point);					
+			}				
+					
+		});
+		str += "</ul>";
+		return str;		
+	};
 	
 	
 	this.ajaxReq = function(params, callback)
-	{		
+	{	
+			
 		$.ajax({
 			type: 'POST',
 			url: TRACKER.ajaxUrl,
 			data: params,
 			dataType: 'xml',
 			timeout:100000,
-			beforeSend: function(){  },
-			success: callback,
+			beforeSend: function(){ $("#loading").show(); },
+			success: function(result){ 
+							$("#loading").hide(); 							
+							callback(result); 
+					}, 
 			failure: function(result) {								
-						alert("Failure in ajax.");						
+					$("#loading").hide();
+					alert("Failure in ajax.");						
 			},
-			error: function(par1, par2, par3){			
-						alert("Error in ajax..")
+			error: function(par1, par2, par3){
+				//alert(par1.responseText);		
+					$("#loading").hide();
+					alert("Error in ajax..")
 			}
 		});
 	};	
@@ -323,5 +267,4 @@ function TrackerOperator(url, map, period){
 		
 		return "<div class='pageNumbers'>" +  result + "</div>";
 	};
-
 }
