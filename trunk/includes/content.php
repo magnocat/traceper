@@ -4,7 +4,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>traceper - open source online tracking system</title>
+		<title id='pageTitle'>traceper tracking system</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source online tracking system" />
@@ -27,10 +27,13 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 
 	<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery/jquery-ui/js/jquery-ui-1.7.1.custom.min.js"></script>
-	<script type="text/javascript" src="js/TrackerOperator.js"></script>	
-	<script type="text/javascript" src="js/bindings.js"></script>
-	<script type="text/javascript" src="js/LanguageOperator.js"></script>	
+	<script type="text/javascript" src="js/TrackerOperator.js"></script>
+	<script type="text/javascript" src="js/LanguageOperator.js"></script>		
+	<script type="text/javascript" src="js/bindings.js"></script>	
 	<script type="text/javascript">		
+		var langOp = new LanguageOperator(); 
+		langOp.load("en"); 	
+				
 		$(document).ready( function(){
 			var map;
 			try 
@@ -48,8 +51,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
    			catch (e) {
 				
 			}   
-			var langOp = new LanguageOperator(); 
-			langOp.load("en"); 			
+			
 			bindElements(langOp, trackerOp);
 		});	
 	</script>	
@@ -63,7 +65,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 	 						<div id='logo'></div>
 	 						<div id='littleMenu'>
 	 							<a href='#touLink'>Terms of use</a>&nbsp;&nbsp;&nbsp;
-								<a href='#auLink'>About us</a>
+								<a href='#auLink'>About</a>
 							</div>
 							<div id='lists'>							
 								<div class='title'>Users</div>	
@@ -79,7 +81,8 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 							</div>	
 						<div id='loading'>Loading</div>																								
 				</div>										
-				<div id='map'>MAP</div>	
+				<div id='map'>MAP</div>
+				<div style='position:absolute; left:150px; top:20px;'><img src='images/logo_trans.png'  /></div>	
 						
 										
 	</div>	
