@@ -17,6 +17,7 @@ function TrackerOperator(url, map, interval){
 	this.searchPageCount = 0;
 	this.updateInterval = interval;
 	this.started = false;
+	this.trackedUserId = 0;
 	
 	this.users = [];
 	
@@ -69,8 +70,6 @@ function TrackerOperator(url, map, interval){
 	};
 	
 	this.updateUserList = function(){
-		// this function is called after the first page is fetched by TRACKER.getUserList function
-		// so pageNo's first value is 2
 		var params = "action=" + TRACKER.actionUpdateUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
 		//alert("in update user data");
 		TRACKER.ajaxReq(params, function(result){
@@ -85,7 +84,7 @@ function TrackerOperator(url, map, interval){
 			else{
 				TRACKER.updateUserListPageNo++;
 			}			
-		});
+		}, true);
 		// set time out again
 		setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
 	};
@@ -99,9 +98,18 @@ function TrackerOperator(url, map, interval){
 			TRACKER.searchPageCount = TRACKER.getPageCount(result);			
 			
 			var str = TRACKER.processXML(result);
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("' + string + '", %d)', TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
+			}
+			else {
+				str = "no match found";
+			}
 			
-			str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("'+ string +'", %d)',TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
-			$('#search #results').html(str);	
+			$('#search #results').html(str);
+			//TODO: use language operator
+			$('#lists .title').html("Search Results");
+			$('#users').slideUp(function(){ $('#search').slideDown(); });
+				
 		
 		});	
 	};	
@@ -110,12 +118,21 @@ function TrackerOperator(url, map, interval){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
 		TRACKER.users[userId].gmarker.openInfoWindowHtml(TRACKER.users[userId].username + '<br/>'+ TRACKER.users[userId].realname);
 		
+		$('#user' + TRACKER.trackedUserId).removeClass('trackedUser');
+		if (TRACKER.trackedUserId == userId) {
+			TRACKER.trackedUserId = 0;			
+		}
+		else {
+			TRACKER.trackedUserId = userId;
+		
+		}
+		$('#user'+ TRACKER.trackedUserId ).addClass('trackedUser');
+		
 	};
 	
 	this.processXML = function(xml)
 	{
-		var str = "<ul>";	
-		
+		var list = "";
 		$(xml).find("page").find("user").each(function(){
 			
 			var user = $(this);			
@@ -125,7 +142,7 @@ function TrackerOperator(url, map, interval){
 			var longitude = $(user).find("location").attr('longitude');
 			var point = new GLatLng(latitude, longitude);
 			
-			str += "<li><a href='javascript:TRACKER.trackUser("+ userId +")'>"+ username +"</a></li>";
+			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ username +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{					
@@ -151,12 +168,18 @@ function TrackerOperator(url, map, interval){
 			}				
 					
 		});
-		str += "</ul>";
-		return str;		
+		
+		if (list != "") {
+			list = "<ul>" + list + "</ul>"; 
+		}
+		else {
+			list = null;
+		}
+		return list;		
 	};
 	
 	
-	this.ajaxReq = function(params, callback)
+	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
 			
 		$.ajax({
@@ -165,7 +188,11 @@ function TrackerOperator(url, map, interval){
 			data: params,
 			dataType: 'xml',
 			timeout:100000,
-			beforeSend: function(){ $("#loading").show(); },
+			beforeSend: function()
+						{ 	if (!notShowLoadingInfo) {
+								$("#loading").show();
+							} 
+						},
 			success: function(result){ 
 							$("#loading").hide(); 							
 							callback(result); 
