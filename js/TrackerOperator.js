@@ -1,5 +1,5 @@
 
-function TrackerOperator(url, map, interval){
+function TrackerOperator(url, map, interval, langOperator){
 	
 	TRACKER = this;	
 	MAP = map;
@@ -72,6 +72,13 @@ function TrackerOperator(url, map, interval){
 	this.updateUserList = function(){
 		var params = "action=" + TRACKER.actionUpdateUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
 		//alert("in update user data");
+		
+		if (TRACKER.trackedUserId != 0)
+		{
+			params+= "&trackedUser=" + TRACKER.trackedUserId;
+		}
+				
+		
 		TRACKER.ajaxReq(params, function(result){
 			TRACKER.updateUserListPageNo = TRACKER.getPageNo(result);
 			TRACKER.updateUserListPageCount = TRACKER.getPageNo(result);
@@ -102,12 +109,11 @@ function TrackerOperator(url, map, interval){
 				str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("' + string + '", %d)', TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
 			}
 			else {
-				str = "no match found";
+				str = langOperator.noMatchFound;
 			}
 			
 			$('#search #results').html(str);
-			//TODO: use language operator
-			$('#lists .title').html("Search Results");
+			$('#lists .title').html(langOperator.searchResultsTitle);
 			$('#users').slideUp(function(){ $('#search').slideDown(); });
 				
 		
@@ -145,7 +151,12 @@ function TrackerOperator(url, map, interval){
 			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ username +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
-			{					
+			{		
+				var blueIcon = new GIcon(G_DEFAULT_ICON);
+				blueIcon.image = "images/person.png";
+				markerOptions = { icon:blueIcon };
+
+			
 				TRACKER.users[userId] = new TRACKER.User( {username:username,
 														   realname:$(user).find("realname").text(),
 														   latitude:latitude,
@@ -153,7 +164,7 @@ function TrackerOperator(url, map, interval){
 														   time:$(user).find("time").text(),
 														   message:$(user).find("message").text(),
 														   deviceId:$(user).find("deviceId").text(),
-														   gmarker:new GMarker(point),
+														   gmarker:new GMarker(point, markerOptions),
 														});
 				
 				
