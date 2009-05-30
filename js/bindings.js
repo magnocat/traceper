@@ -1,4 +1,5 @@
-function bindElements(languageOperator, trackerOp) 
+
+function bindElements(langOperator, trackerOp) 
 {	 		
 	$('#searchButton').click(function(){
 		trackerOp.searchUser($('#searchBox').attr('value'), 1);					
@@ -28,7 +29,7 @@ function bindElements(languageOperator, trackerOp)
 	});
 
 	$("a[href=#returnToUserList]").click(function(){
-		$('#lists .title').html("Users");
+		$('#lists .title').html(langOperator.usersTitle);
 		$('#search').slideUp(function(){ $('#users').slideDown(); });
 	});
 	
@@ -45,12 +46,16 @@ function bindElements(languageOperator, trackerOp)
 				}
 	});	
 	
-	if (languageOperator.lang != "en"){
-		changeLanguage(languageOperator);
+
+	if (languageOperator.lang != "en")
+	{
+		changeLanguage(langOperator);
 	}
 	
 };	
 
-function changeLanguage(languageOperator){
+function changeLanguage(langOperator){
+	//$('#pageTitle').html(languageOperator.mark);
+
 	
 }
