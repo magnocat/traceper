@@ -7,47 +7,44 @@
 *	Begin:		Tuesday, April 21, 2009  11:27
 *
 *********************************************/
-
 define("IN_PHP", true);
 
 require_once("includes/config.php");
+require_once("includes/content.php");
 
 $dbc = NULL;  // database connectivity;
-
-if (isset($_POST['action']) && !empty($_POST['action'])) {
-	$action = $_POST['action'];	
-}
-else {	
-	die(FAILED);
-}
-
 $out = NULL;
 
-//FIXME: Bu yazýlýmý kullananlar ile takip edilen kullanýcýlarýn verilerin
-// ayný tablo da mý farklý tablo da mý tutulmalý ?
-// eðer ayný tablo kullanýlacaksa WebClientManager daki sorgulamalar kontrol edilmeli
- 
-if (strpos($action, WEB_CLIENT_ACTION_PREFIX) == 0)
+if (isset($_POST['action']) && !empty($_POST['action'])) 
 {
-	require_once('classes/WebClientManager.php');
-	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
-	$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, ELEMENT_COUNT_IN_LIST_PAGE, ELEMENT_COUNT_IN_LOCATIONS_PAGE);
-	$out = $wcm->process($_POST);
+	$action = $_POST['action'];	
+	if (strpos($action, WEB_CLIENT_ACTION_PREFIX) == 0)
+	{
+		require_once('classes/WebClientManager.php');
+		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
+		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, ELEMENT_COUNT_IN_LIST_PAGE, ELEMENT_COUNT_IN_LOCATIONS_PAGE);
+		$out = $wcm->process($_POST);
+	}
+	else if (strpos($action, DEVICE_ACTION_PREFIX) == 0)
+	{
+		require_once ('classes/DeviceManager.php');
+		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
+		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX);
+		$out = $dm->process($_POST);
+	}
 }
-else if (strpos($action, DEVICE_ACTION_PREFIX) == 0)
-{
-	require_once ('classes/DeviceManager.php');
-	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
-	$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX);
-	$out = $dm->process($_POST);
+else {	
+	$out = getContent($_SERVER['PHP_SELF'], UPDATE_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY);	
 }
-else 
-{
-	$out = FAILED;
-}
+
+
+
+//FIXME: Bu yazï¿½lï¿½mï¿½ kullananlar ile takip edilen kullanï¿½cï¿½larï¿½n verilerin
+// aynï¿½ tablo da mï¿½ farklï¿½ tablo da mï¿½ tutulmalï¿½ ?
+// eï¿½er aynï¿½ tablo kullanï¿½lacaksa WebClientManager daki sorgulamalar kontrol edilmeli
 
 echo $out;
-
+//error_log($out, 3, "log.txt");
 ///////////////////////////////////////////////////
 function getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName ){	
 	if ($dbc == NULL) {
