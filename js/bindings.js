@@ -1,7 +1,14 @@
-function bindElements(languageOperator) 
+function bindElements(languageOperator, trackerOp) 
 {	 		
 	$('#searchButton').click(function(){
 		trackerOp.searchUser($('#searchBox').attr('value'), 1);					
+	});
+	$('#searchBox').keydown(function(ev){
+		if (ev.keyCode == 13) {
+			trackerOp.searchUser($('#searchBox').attr('value'), 1);
+		}
+	}).focus(function(){
+		$(this).select();
 	});
 				
 	$("#aboutus, #termsofuse").dialog({							
@@ -21,6 +28,7 @@ function bindElements(languageOperator)
 	});
 
 	$("a[href=#returnToUserList]").click(function(){
+		$('#lists .title').html("Users");
 		$('#search').slideUp(function(){ $('#users').slideDown(); });
 	});
 	
