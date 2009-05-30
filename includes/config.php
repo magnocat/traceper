@@ -23,9 +23,10 @@ $dbPassword = "21236161";
 $dbName = "test";
 
 error_reporting(E_ALL); // edit if you know what you do
-/**
- * This is the number of elements in user and search list page  
- */
+
+define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y6UmQXNMhTgFS-OpJG3vTTQzF67ve7Li8eh_g");
+
+/* This is the number of elements in user and search list page  */
 define ("ELEMENT_COUNT_IN_LIST_PAGE", 10); 
 /**
  * This is the number of elements when updating user data in background
