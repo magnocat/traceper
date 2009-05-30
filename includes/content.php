@@ -1,5 +1,5 @@
 <?php
-function getContent($callbackURL, $updateUserListInterval) {
+function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -10,9 +10,9 @@ function getContent($callbackURL, $updateUserListInterval) {
 		<meta name="description" content="open source online tracking system" />
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		
- <!--    <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y6UmQXNMhTgFS-OpJG3vTTQzF67ve7Li8eh_g">
+     <script type="text/javascript" src="http://www.google.com/jsapi?key=<?php echo $apiKey; ?>">
    </script>
-   --> 
+    
       <script type="text/javascript" charset="utf-8">
    
         google.load("maps", "2.x");
@@ -50,7 +50,7 @@ function getContent($callbackURL, $updateUserListInterval) {
 			}   
 			var langOp = new LanguageOperator(); 
 			langOp.load("en"); 			
-			bindElements();
+			bindElements(langOp, trackerOp);
 		});	
 	</script>	
 	
