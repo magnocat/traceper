@@ -12,20 +12,12 @@ function bindElements(langOperator, trackerOp)
 		$(this).select();
 	});
 				
-	$("#aboutus, #termsofuse").dialog({							
-				autoOpen: false,
-				modal:true,
-				buttons: {
-					Ok: function() {
-							$(this).dialog('close');
-						}
-				}				
-	});
+
 	$("a[href=#touLink]").click(function(){
-			$('#termsofuse').dialog( 'open');	
+			$('#termsofuse').modal();	
 	});
 	$("a[href=#auLink], #logo").click(function(){
-			$('#aboutus').dialog( 'open');
+			$('#aboutus').modal();
 	});
 
 	$("a[href=#returnToUserList]").click(function(){
@@ -47,7 +39,7 @@ function bindElements(langOperator, trackerOp)
 	});	
 	
 
-	if (languageOperator.lang != "en")
+	if (langOperator.lang != "en")
 	{
 		changeLanguage(langOperator);
 	}
@@ -55,7 +47,14 @@ function bindElements(langOperator, trackerOp)
 };	
 
 function changeLanguage(langOperator){
-	//$('#pageTitle').html(languageOperator.mark);
 
+	$('title').text(langOperator.mark);
+	$("a[href=#auLink]").html(langOperator.aboutTitle);
+	$("a[href=#touLink]").html(langOperator.termsOfUseTitle);
+	$("#lists .title").html(langOperator.usersTitle);
+	$("a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
+	$("#aboutus").html(langOperator.about);
+	$("#termsofuse").html(langOperator.termsofuse);
+	$("#loading").html(langOperator.loading);
 	
 }
