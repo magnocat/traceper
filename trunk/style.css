@@ -101,6 +101,8 @@ a {
 	width:60%;	
 }
 #searchButton{
+	vertical-align:text-bottom;
+	cursor:pointer;
 }
 .pageNumbers{
 	text-align:center;	
