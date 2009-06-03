@@ -1,17 +1,18 @@
 
-alert("in en.js");
-
 LAN_OPERATOR.addIndexes({
-			mark:'Tracepe r Tracking System',
-			error_1:'\u0130\u015Flemde bir hata olu\u015Ftu.',
-			error_2:'Ayn\u0131 isme sahip eleman zaten bulunmaktadır.',	
+			mark:'Traceper Tracking System',
 			termsOfUseTitle:'Terms of use',		
 			aboutTitle:'About',
 			usersTitle:'Users',
 			searchResultsTitle:'Search Results',
 			returnToUserListLink:'&laquo; Return to user list',
 			loading:'Loading',
-			noMatchFound:'no match found'
-			//about:'',
-			//termsofuse:''
+			noMatchFound:'no match found',
+			realname:'Name',
+			time:'Last connection time:',
+			deviceId:'Device id',
+			latitude:'Latitude',
+			longitude:'Longitude',
+			about:'about...',
+			termsofuse:'termsofuse'
 		});
