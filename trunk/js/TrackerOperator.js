@@ -1,8 +1,9 @@
 
-function TrackerOperator(url, map, interval, langOperator){
+function TrackerOperator(url, map, interval, langOp){
 	
 	TRACKER = this;	
 	MAP = map;
+	this.langOperator = langOp;
 	this.language = "en";
 	this.ajaxUrl = url;
 	this.actionAuthenticateUser = "WebClientAuthenticateUser";
@@ -58,7 +59,10 @@ function TrackerOperator(url, map, interval, langOperator){
 			var str = TRACKER.processXML(result);
 			
 			str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.userListPageCount, TRACKER.userListPageNo, 3);
-			$('#users').html(str);
+			$('#users').slideUp(function(){
+				$('#users').html(str);
+				$('#users').slideDown();				
+			});
 			
 			if (TRACKER.started == false) {
 				TRACKER.started == true;
@@ -109,20 +113,21 @@ function TrackerOperator(url, map, interval, langOperator){
 				str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("' + string + '", %d)', TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
 			}
 			else {
-				str = langOperator.noMatchFound;
-			}
+				str = TRACKER.langOperator.noMatchFound;
+			}		
 			
-			$('#search #results').html(str);
-			$('#lists .title').html(langOperator.searchResultsTitle);
-			$('#users').slideUp(function(){ $('#search').slideDown(); });
-				
+			$('#lists .title').html(TRACKER.langOperator.searchResultsTitle);
+			$('#search, #users').slideUp(function(){
+					$('#search #results').html(str);
+					$('#search').slideDown();
+				});
 		
 		});	
 	};	
 	
 	this.trackUser = function(userId){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
-		TRACKER.users[userId].gmarker.openInfoWindowHtml(TRACKER.users[userId].username + '<br/>'+ TRACKER.users[userId].realname);
+		TRACKER.openMarkerInfoWindow(userId);
 		
 		$('#user' + TRACKER.trackedUserId).removeClass('trackedUser');
 		if (TRACKER.trackedUserId == userId) {
@@ -135,6 +140,15 @@ function TrackerOperator(url, map, interval, langOperator){
 		$('#user'+ TRACKER.trackedUserId ).addClass('trackedUser');
 		
 	};
+	
+	this.openMarkerInfoWindow = function(userId){
+		TRACKER.users[userId].gmarker.openInfoWindowHtml('<b>' + TRACKER.users[userId].username + '</b>'
+														+ '<br/>' + TRACKER.langOperator.realname + ": "+TRACKER.users[userId].realname  
+														+ '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
+														+ '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
+														+ '<br/>' + TRACKER.langOperator.latitude + ": " + TRACKER.users[userId].latitude  
+														+ '<br/>' + TRACKER.langOperator.longitude + ": " + TRACKER.users[userId].longitude);
+	}
 	
 	this.processXML = function(xml)
 	{
@@ -152,9 +166,12 @@ function TrackerOperator(url, map, interval, langOperator){
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
-				var blueIcon = new GIcon(G_DEFAULT_ICON);
-				blueIcon.image = "images/person.png";
-				markerOptions = { icon:blueIcon };
+				var personIcon = new GIcon(G_DEFAULT_ICON);
+				personIcon.image = "images/person.png";
+				personIcon.iconSize = new GSize(32,32);
+				personIcon.shadow = null;
+				markerOptions = { icon:personIcon };
+				
 
 			
 				TRACKER.users[userId] = new TRACKER.User( {username:username,
@@ -166,7 +183,9 @@ function TrackerOperator(url, map, interval, langOperator){
 														   deviceId:$(user).find("deviceId").text(),
 														   gmarker:new GMarker(point, markerOptions),
 														});
-				
+				GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
+  						TRACKER.openMarkerInfoWindow(userId);	
+  				});
 				
 				
 				MAP.addOverlay(TRACKER.users[userId].gmarker);
