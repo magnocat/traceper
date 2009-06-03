@@ -122,7 +122,7 @@ class DeviceManager extends Manager
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL     
 			&& isset($reqArray['username']) && $reqArray['username'] != NULL 
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL 
-			&& isset($reqArray['im']) && $reqArray['im'] != NULL 				
+	//		&& isset($reqArray['im']) && $reqArray['im'] != NULL 				
 			)
 		{
 			
@@ -130,14 +130,14 @@ class DeviceManager extends Manager
 			$email = $this->checkVariable($reqArray['email']);					
 			$username = $this->checkVariable($reqArray['username']);
 			$password = $this->checkVariable($reqArray['password']);
-			$im = $this->checkVariable($reqArray['im']);	
+	//		$im = $this->checkVariable($reqArray['im']);	
 			
 			$sql = sprintf("INSERT INTO "
 								. $this->tablePrefix ."_users
-								  (username, password, realname, email, im ) 
+								  (username, password, realname, email ) 
 							VALUES
-							('%s',      '%s',      '%s',      '%s',   '%s');",
-							 $username,	$password, $realname, $email, $im);
+							('%s',      '%s',      '%s',      '%s');",
+							 $username,	$password, $realname, $email);
 			$out = FAILED;
 			
 			if ($this->dbc->query($sql)) {
