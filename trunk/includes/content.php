@@ -1,10 +1,10 @@
 <?php
-function getContent($callbackURL, $updateUserListInterval, $apiKey) {
+function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title id='pageTitle'>traceper tracking system</title>
+		<title>Traceper Tracking System</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source online tracking system" />
@@ -23,16 +23,20 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
    
       </script>
       
-	  <link type="text/css" href="js/jquery/jquery-ui/css/smoothness/jquery-ui-1.7.1.custom.css" rel="stylesheet" />
+	  <link type="text/css" href="js/jquery/plugins/simplemodal/css/basic.css" rel="stylesheet" />
+	  <!--[if lt IE 7]>
+		<link type='text/css' href='js/jquery/plugins/simplemodal/css/basic_ie.css' rel='stylesheet' media='screen' />
+	  <![endif]-->
+
 
 	<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="js/jquery/jquery-ui/js/jquery-ui-1.7.1.custom.min.js"></script>
+	<script type="text/javascript" src="js/jquery/plugins/simplemodal/jquery.simplemodal.js"></script>
 	<script type="text/javascript" src="js/TrackerOperator.js"></script>
 	<script type="text/javascript" src="js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="js/bindings.js"></script>	
 	<script type="text/javascript">		
 		var langOp = new LanguageOperator(); 
-		langOp.load("en"); 	
+		langOp.load("<?php echo $language ?>"); 	
 				
 		$(document).ready( function(){
 			var map;
@@ -44,7 +48,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
    					map.setCenter(new GLatLng(39.504041,35.024414), 4);
 					map.setUIToDefault();					
 					map.setMapType(G_HYBRID_MAP);			   	
-   					var trackerOp = new TrackerOperator('<?php echo $callbackURL; ?>', map, <?php echo $updateUserListInterval; ?>);			
+   					var trackerOp = new TrackerOperator('<?php echo $callbackURL; ?>', map, <?php echo $updateUserListInterval; ?>, langOp);			
 					trackerOp.getUserList(1); 	
    				}
 			}
@@ -70,7 +74,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 							<div id='lists'>							
 								<div class='title'>Users</div>	
 								<div id='searchArea'>						
-									<input type='text' id='searchBox' /><input type='button' id='searchButton' value='search'/>
+									<input type='text' id='searchBox' /><img src='images/search.png' id='searchButton'  />
 								</div>
 								<div id="users">																
 								</div>
@@ -82,12 +86,13 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey) {
 						<div id='loading'>Loading</div>																								
 				</div>										
 				<div id='map'>MAP</div>
+		<!--		
 				<div style='position:absolute; left:150px; top:20px;'><img src='images/logo_trans.png'  /></div>	
-						
+		-->				
 										
 	</div>	
 	<div id='aboutus'>
-		<div class='title'><a href='http://traceper.com/'>traceper</a></div>
+		
 		
 	</div>
 	<div id='termsofuse'>Terms of use</div>		
