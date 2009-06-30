@@ -26,27 +26,23 @@ function bindElements(langOperator, trackerOp)
 	});
 	
 	$("#bar").click(function ()	{	
-				if ($('#sideBar').css('display') == "none")
+				if ($('#sideBar > #content').css('display') == "none")
 				{
-					$('#sideBar').animate({width:'25%'});
-					$('#map').css('width','72%');
+					$('#sideBar > #content').animate({width:'20%'});
+					$('#map').animate({width:'80%'});
 				}	
 				else 
 				{
-					$('#sideBar').animate({width:'0%'}, function(){ $('#sideBar').hide(); });
-					$('#map').css('width','98%');
+					$('#sideBar > #content').animate({width:'0%'}, function(){ $('#sideBar > #content').hide(); });
+					$('#map').animate({width:'90%'});
+					//$('#map').css('margin-left', '15px');
 				}
 	});	
 	
 
-	if (langOperator.lang != "en")
-	{
-		changeLanguage(langOperator);
-	}
-	
 };	
 
-function changeLanguage(langOperator){
+function setLanguage(langOperator){
 
 	$('title').text(langOperator.mark);
 	$("a[href=#auLink]").html(langOperator.aboutTitle);
@@ -55,6 +51,6 @@ function changeLanguage(langOperator){
 	$("a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
 	$("#aboutus").html(langOperator.about);
 	$("#termsofuse").html(langOperator.termsofuse);
-	$("#loading").html(langOperator.loading);
+//	$("#loading p").html(langOperator.loading);
 	
 }

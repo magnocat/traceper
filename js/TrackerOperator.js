@@ -31,6 +31,7 @@ function TrackerOperator(url, map, interval, langOp){
 		var deviceId;
 		var message;
 		var gmarker;
+		var infoWindowIsOpened = false;
 		
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -58,11 +59,16 @@ function TrackerOperator(url, map, interval, langOp){
 			
 			var str = TRACKER.processXML(result);
 			
-			str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.userListPageCount, TRACKER.userListPageNo, 3);
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.userListPageCount, TRACKER.userListPageNo, 3);
+			}
+			else {
+				str = TRACKER.langOperator.noMatchFound;				
+			}
 			$('#users').slideUp(function(){
-				$('#users').html(str);
-				$('#users').slideDown();				
-			});
+									$('#users').html(str);
+									$('#users').slideDown();
+								});
 			
 			if (TRACKER.started == false) {
 				TRACKER.started == true;
@@ -102,27 +108,32 @@ function TrackerOperator(url, map, interval, langOp){
 
 	this.searchUser = function(string, pageNo)
 	{
-		var params = "action=" + TRACKER.actionSearchUser + "&search=" + string + "&pageNo=" + pageNo;
-		
-		TRACKER.ajaxReq(params, function(result){
-			TRACKER.searchPageNo = TRACKER.getPageNo(result);
-			TRACKER.searchPageCount = TRACKER.getPageCount(result);			
+		if (string.length >= 2) {
+			var params = "action=" + TRACKER.actionSearchUser + "&search=" + string + "&pageNo=" + pageNo;
 			
-			var str = TRACKER.processXML(result);
-			if (str != null) {
-				str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("' + string + '", %d)', TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
-			}
-			else {
-				str = TRACKER.langOperator.noMatchFound;
-			}		
-			
-			$('#lists .title').html(TRACKER.langOperator.searchResultsTitle);
-			$('#search, #users').slideUp(function(){
+			TRACKER.ajaxReq(params, function(result){
+				TRACKER.searchPageNo = TRACKER.getPageNo(result);
+				TRACKER.searchPageCount = TRACKER.getPageCount(result);
+				
+				var str = TRACKER.processXML(result);
+				if (str != null) {
+					str += TRACKER.writePageNumbers('javascript:TRACKER.searchUser("' + string + '", %d)', TRACKER.searchPageCount, TRACKER.searchPageNo, 3);
+				}
+				else {
+					str = TRACKER.langOperator.noMatchFound;
+				}
+				
+				$('#lists .title').html(TRACKER.langOperator.searchResultsTitle);
+				$('#search, #users').slideUp(function(){
 					$('#search #results').html(str);
 					$('#search').slideDown();
 				});
-		
-		});	
+				
+			});
+		}
+		else {
+			alert(TRACKER.langOperator.searchStringIsTooShort);
+		}	
 	};	
 	
 	this.trackUser = function(userId){
@@ -148,6 +159,10 @@ function TrackerOperator(url, map, interval, langOp){
 														+ '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
 														+ '<br/>' + TRACKER.langOperator.latitude + ": " + TRACKER.users[userId].latitude  
 														+ '<br/>' + TRACKER.langOperator.longitude + ": " + TRACKER.users[userId].longitude);
+	}
+	
+	this.closeMarkerInfoWindow = function (userId) {
+		TRACKER.users[userId].gmarker.closeInfoWindow();
 	}
 	
 	this.processXML = function(xml)
@@ -186,15 +201,38 @@ function TrackerOperator(url, map, interval, langOp){
 				GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
   						TRACKER.openMarkerInfoWindow(userId);	
   				});
+  				
+				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
+					TRACKER.users[userId].infoWindowIsOpened = true;
+  				});
 				
+  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
+  					TRACKER.users[userId].infoWindowIsOpened = false;
+  				});
 				
 				MAP.addOverlay(TRACKER.users[userId].gmarker);
 			}
 			else
 			{
-				var point = new GLatLng($(user).find("location").attr('latitude'), $(user).find("location").attr('longitude'));
+				var latitude = $(user).find("location").attr('latitude');
+				var longitude = $(user).find("location").attr('longitude');
+				var time = $(user).find("time").text();
+				var deviceId = $(user).find("deviceId").text();
+				var point = new GLatLng(latitude, longitude);
 				
 				TRACKER.users[userId].gmarker.setLatLng(point);					
+				TRACKER.users[userId].latitude = latitude;
+				TRACKER.users[userId].longitude = longitude;
+				TRACKER.users[userId].time = time;
+				TRACKER.users[userId].deviceId = deviceId;
+				
+				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
+				TRACKER.closeMarkerInfoWindow(userId);
+				
+				if (isWindowOpen == true) {
+					TRACKER.openMarkerInfoWindow(userId);
+				}
+				
 			}				
 					
 		});
