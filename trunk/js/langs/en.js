@@ -6,13 +6,14 @@ LAN_OPERATOR.addIndexes({
 			usersTitle:'Users',
 			searchResultsTitle:'Search Results',
 			returnToUserListLink:'&laquo; Return to user list',
-			loading:'Loading',
+//			loading:'Loading',
 			noMatchFound:'no match found',
 			realname:'Name',
-			time:'Last connection time:',
+			time:'Time',
 			deviceId:'Device id',
 			latitude:'Latitude',
 			longitude:'Longitude',
+			searchStringIsTooShort:'Please write a longer word to search',
 			about:'about...',
 			termsofuse:'termsofuse'
 		});
