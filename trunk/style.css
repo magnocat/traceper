@@ -2,7 +2,7 @@ body {
 	padding:0px;
 	margin:0px;	
 	overflow-y:hidden;
-	font-size:17px;
+	font-size:16px;
 	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
 	letter-spacing:2px;
 	color:#777;
@@ -18,23 +18,30 @@ a {
 	height:100%;	
 }
 #sideBar{
-	width:25%;
+	width:20%;
 	height:100%;
 	background: #fff;
-	position:relative;
 	float:left;
-	z-index:100;
-	
+	z-index:100;	
 }
-#sideBar > * {
-	margin:10px;
+#sideBar > #content > *  {
+	margin:5px;
+}
+#sideBar > #bar{
+	height:100%;
+	background: #EEEEFF;
+	z-index: 150;
+	float:left;
+	width:15px;	
+	cursor:pointer;
+}
+#sideBar > #bar:HOVER {
+	background-color: #DDEEFF;
 }
 #map{	
 	height:100%;
-	width:72%;
-	position:relative;
-	float:left;
-	border-left:2px solid #EEF;
+	width:80%;
+	float:right;
 }
 
 #logo{
@@ -46,36 +53,25 @@ a {
 	overflow: auto;	
 	height:70%;
 }
-#bar{
-	height:100%;
-	background: #EEEEFF;
-	z-index: 100;
-	float:left;
-	width:15px;	
-	position:relative;
-}
-#bar:HOVER {
-	cursor: pointer;
-	background-color: #DDEEFF;
-}
+
 #loading {	
-	position:fixed;	
-	width:inherit;
-	bottom:0px;
-	text-align:center;
-	padding:10px 0px;
-	margin:0px;
+	position:fixed;
+	width:100%;	
+	top:0px;
 	z-index:100;
-	background: #FFF;
 	display:none;	
+	padding:10px;
+	margin:0px;
+	background:url(images/ajax-loader.gif) no-repeat center;	
 }
+
 #users{  }
 #search{ display: none; }
 #lists {
 	margin-top:20px;
 }
-.title, #loading {
-	font-size:30px;	
+.title {
+	font-size:18px;	
 }
 #lists ul {
 	list-style:none;
@@ -110,8 +106,14 @@ a {
 .pageNumbers a{
 	padding-right:5px;
 }
-#littleMenu{
-	position:relative;
-	top:-15px;
-	text-align: center;
+#footer{
+	width:inherit;
+	position:fixed;
+	bottom:0px;
+	font-size:10px;
+	text-align:center;
+	z-index: 100;
+}
+#aboutus, #termsofuse {
+	display:none;
 }
