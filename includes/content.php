@@ -4,7 +4,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Traceper Tracking System</title>
+		<title></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source online tracking system" />
@@ -39,6 +39,7 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 		langOp.load("<?php echo $language ?>"); 	
 				
 		$(document).ready( function(){
+			setLanguage(langOp);	
 			var map;
 			try 
 			{
@@ -47,7 +48,8 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
    					map = new GMap2(document.getElementById("map"));
    					map.setCenter(new GLatLng(39.504041,35.024414), 4);
 					map.setUIToDefault();					
-					map.setMapType(G_HYBRID_MAP);			   	
+					map.setMapType(G_HYBRID_MAP);	
+	   	
    					var trackerOp = new TrackerOperator('<?php echo $callbackURL; ?>', map, <?php echo $updateUserListInterval; ?>, langOp);			
 					trackerOp.getUserList(1); 	
    				}
@@ -63,39 +65,41 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 	</head>
 	<body  onunload="GUnload();" >
 	
-	<div id='wrap'>		
-				<div id='bar'></div>					
-				<div id='sideBar'>	 				
-	 						<div id='logo'></div>
-	 						<div id='littleMenu'>
-	 							<a href='#touLink'>Terms of use</a>&nbsp;&nbsp;&nbsp;
-								<a href='#auLink'>About</a>
-							</div>
+	<div id='wrap'>										
+				<div id='sideBar'>	
+				<!-- 
+					<div id='bar'></div>
+				-->	<div id='content'>						
+	 						<div id='logo'></div>	 						
 							<div id='lists'>							
-								<div class='title'>Users</div>	
+								<div class='title'></div>	
 								<div id='searchArea'>						
 									<input type='text' id='searchBox' /><img src='images/search.png' id='searchButton'  />
 								</div>
 								<div id="users">																
 								</div>
 								<div id='search'>
-									<a href='#returnToUserList'> &laquo; Return to user list</a>	
+									<a href='#returnToUserList'></a>	
 									<div id='results'></div>								
 								</div>							
-							</div>	
-						<div id='loading'>Loading</div>																								
-				</div>										
-				<div id='map'>MAP</div>
+							</div>
+							<div id='footer'>
+	 							<a href='#touLink'></a> |
+								<a href='#auLink'></a>
+							</div>
+					</div>																															
+				</div>
+				<div id='map'>MAP</div>	
+				<div id='loading'></div>	
+												
+				
 		<!--		
 				<div style='position:absolute; left:150px; top:20px;'><img src='images/logo_trans.png'  /></div>	
 		-->				
 										
 	</div>	
-	<div id='aboutus'>
-		
-		
-	</div>
-	<div id='termsofuse'>Terms of use</div>		
+	<div id='aboutus'></div>
+	<div id='termsofuse'></div>		
 	</body>
 </html>
 <?php
