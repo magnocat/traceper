@@ -132,7 +132,7 @@ class WebClientManager extends Manager
 	private function searchUser($reqArray) 
 	{
 		$out = MISSING_PARAMETER;
-		if (isset($reqArray['search']) && $reqArray['search'] != NULL)
+		if (isset($reqArray['search']) && $reqArray['search'] != NULL && strlen($reqArray['search']) >= 2)
 		{
 			$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true)

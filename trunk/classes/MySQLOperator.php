@@ -49,7 +49,7 @@ class MySQLOperator
 			return false;
 		}
 		else {
-			mysql_query("set names latin5",$this->dbLink);
+			mysql_query("set names utf8",$this->dbLink);
 			return true;
 		}
 		unset ($this->dbHost, $this->dbUsername, $this->dbPassword, $this->dbName);		
@@ -82,7 +82,7 @@ class MySQLOperator
 	/****************************
 	 * Method to run SQL queries
 	 ****************************/
-	function  query($sql)
+	function query($sql)
 	{	
 		if (!$this->dbLink)	
 			$this->connect();
@@ -155,5 +155,11 @@ class MySQLOperator
 		$row = mysql_fetch_row($this->query($sql));
 		
 		return $row[0];
-	}		
+	}
+
+	function getAffectedRows()
+	{
+		return mysql_affected_rows($this->dbLink);
+	}
+	
 }
