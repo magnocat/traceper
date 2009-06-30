@@ -102,8 +102,12 @@ class DeviceManager extends Manager
 
 
 			$out = FAILED;
-			if ($this->dbc->query($sql)) {
+			if ($this->dbc->query($sql)) {				
 				$out = SUCCESS;
+				
+				if ($this->dbc->getAffectedRows() !== 1) {
+					$out = UNAUTHORIZED_ACCESS;
+				}
 			}
 		}
 		else {
