@@ -1,0 +1,119 @@
+body {
+	padding:0px;
+	margin:0px;	
+	overflow-y:hidden;
+	font-size:16px;
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	letter-spacing:2px;
+	color:#777;
+	overflow-x:hidden;	
+}
+a {
+   color: #0066ff;
+   text-decoration: none;
+}
+#wrap{
+	position:absolute;
+	width:100%;
+	height:100%;	
+}
+#sideBar{
+	width:20%;
+	height:100%;
+	background: #fff;
+	float:left;
+	z-index:100;	
+}
+#sideBar > #content > *  {
+	margin:5px;
+}
+#sideBar > #bar{
+	height:100%;
+	background: #EEEEFF;
+	z-index: 150;
+	float:left;
+	width:15px;	
+	cursor:pointer;
+}
+#sideBar > #bar:HOVER {
+	background-color: #DDEEFF;
+}
+#map{	
+	height:100%;
+	width:80%;
+	float:right;
+}
+
+#logo{
+	height:115px;
+	background: url("images/logo.png") no-repeat center;
+	cursor:pointer;		
+}
+#lists{
+	overflow: auto;	
+	height:70%;
+}
+
+#loading {	
+	position:fixed;
+	width:100%;	
+	top:0px;
+	z-index:100;
+	display:none;	
+	padding:10px;
+	margin:0px;
+	background:url(images/ajax-loader.gif) no-repeat center;	
+}
+
+#users{  }
+#search{ display: none; }
+#lists {
+	margin-top:20px;
+}
+.title {
+	font-size:18px;	
+}
+#lists ul {
+	list-style:none;
+	display:block;
+	line-height:23px;
+	padding:0px;	
+}
+#lists li a{
+	padding:3px;
+	display:block;
+}
+#lists li a:hover{
+	background:#E0E0E0;
+}
+.trackedUser {
+	background:#D0D0D0;
+}
+#searchArea{
+	text-align:center;
+	margin:5px;
+}
+#searchBox{
+	width:60%;	
+}
+#searchButton{
+	vertical-align:text-bottom;
+	cursor:pointer;
+}
+.pageNumbers{
+	text-align:center;	
+}
+.pageNumbers a{
+	padding-right:5px;
+}
+#footer{
+	width:inherit;
+	position:fixed;
+	bottom:0px;
+	font-size:10px;
+	text-align:center;
+	z-index: 100;
+}
+#aboutus, #termsofuse {
+	display:none;
+}
