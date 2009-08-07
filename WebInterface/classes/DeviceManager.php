@@ -15,11 +15,17 @@ class DeviceManager extends Manager
 	private $actionPrefix;
 	private $tablePrefix = NULL;	
 	private $locationResolution = 6;
+	private $gpsMinDataSentInterval = 60000;
+	private $gpsMinDistanceInterval = 100;
 	
-	public function __construct($dbc, $actionPrefix, $tablePrefix) {
+	public function __construct($dbc, $actionPrefix, $tablePrefix, $gpsMinDataSentInterval,
+	 							$gpsMinDistanceInterval) 
+	{
 		$this->dbc = $dbc;
 		$this->actionPrefix = $actionPrefix;
 		$this->tablePrefix = $tablePrefix;
+		$this->gpsMinDataSentInterval = $gpsMinDataSentInterval;
+		$this->gpsMinDistanceInterval = $gpsMinDistanceInterval;
 		
 	}
 	/**
@@ -36,7 +42,8 @@ class DeviceManager extends Manager
 			{
 				case $this->actionPrefix . "TakeMyLocation":
 					
-					$out = $this->updateUserLocation($reqArray);										
+					$result = $this->updateUserLocation($reqArray);	
+					$out = $this->prepareXML($result);									
 				
 					break;
 				case $this->actionPrefix . "RegisterMe":
@@ -189,6 +196,20 @@ class DeviceManager extends Manager
 			$out = MISSING_PARAMETER;
 		}
 		return $out;				
+		
+	}
+	
+	private function prepareXML($result)
+	{
+		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+				.'<response>'
+					.'<actionResult  value="'.$result.'"/>'
+					.'<settings>'
+						.'<minDataSentInterval value="'. $this->gpsMinDataSentInterval .'"/>'
+						.'<minDistanceInterval value="'. $this->gpsMinDistanceInterval . '"/>'
+					.'</settings>'
+				.'</response>';
+		return $out;
 		
 	}
 }

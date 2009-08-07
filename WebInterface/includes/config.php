@@ -46,6 +46,14 @@ define ("UPDATE_USER_LIST_INTERVAL", 5000);
  * This is the prefix of table in mysql database, edit it according to your needs.
  */
 define ("STAFF_TRACKER_TABLE_PREFIX", "tracker"); 
+/**
+ * Device minimum data sent time interval in ms 
+ */
+define("GPS_MIN_DATA_SENT_INTERVAL", 60000);
+/**
+ * Device minimum data sent distance interval in meters 
+ */
+define("GPS_MIN_DISTANCE_INTERVAL", 100);
 
 
 define ("WEB_CLIENT_ACTION_PREFIX", "WebClient"); //editing is not recommended 
