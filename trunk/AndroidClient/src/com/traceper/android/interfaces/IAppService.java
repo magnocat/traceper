@@ -22,12 +22,19 @@ public interface IAppService {
 	
 	
 	public String getUsername();
+	
 	public boolean isNetworkConnected();
+	
 	public boolean isUserAuthenticated();
+	
 	public Long getLastLocationSentTime();
+	
 	public void exit();
+	
 	public int registerUser(String username, String password, String email, String realname);
+	
 	public int authenticateUser(String username, String password);
+	
 	public void setAuthenticationServerAddress(String address);
 	
 }

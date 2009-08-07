@@ -2,12 +2,20 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.SAXException;
 
 import android.app.Service;
 import android.content.Intent;
@@ -16,16 +24,19 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
+import com.traceper.android.tools.XMLHandler;
 
-public class AppService extends Service implements IAppService {
+public class AppService extends Service implements IAppService{
 
 	private ConnectivityManager conManager = null; 
 	private LocationManager locationManager = null;
@@ -44,6 +55,11 @@ public class AppService extends Service implements IAppService {
 	private String password;
 	private String authenticationServerAddress;
 	private Long lastLocationSentTime;
+	
+	private LocationHandler locationHandler;
+	private int minDataSentInterval = Configuration.MIN_GPS_DATA_SEND_INTERVAL;
+	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
+	private XMLHandler xmlHandler;
 	
 	
 	public class IMBinder extends Binder {
@@ -64,11 +80,10 @@ public class AppService extends Service implements IAppService {
 		locationManager.setTestProviderStatus(LocationManager.GPS_PROVIDER,
 		           LocationProvider.AVAILABLE, null, System.currentTimeMillis()); 
         
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Configuration.MIN_GPS_DATA_SEND_INTERVAL, Configuration.MIN_GPS_DISTANCE_INTERVAL, 
-					new LocationHandler());	
-
-    	
         deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+        
+        xmlHandler = new XMLHandler();
+        locationHandler = new LocationHandler();
     
     }
 
@@ -133,10 +148,10 @@ public class AppService extends Service implements IAppService {
 						"&deviceId=" + this.deviceId + 
 						"&";
 		
-		int httpRes = this.sendHttpRequest(params);	
-		httpRes = this.evaluateResult(httpRes);
-		if (httpRes == HTTP_RESPONSE_SUCCESS)
-		{
+		String httpRes = this.sendHttpRequest(params);	
+		int result = this.evaluateResult(httpRes);
+		if (result == HTTP_RESPONSE_SUCCESS)
+		{			
 			lastLocationSentTime = System.currentTimeMillis();
 			Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 			i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
@@ -144,11 +159,16 @@ public class AppService extends Service implements IAppService {
 			sendBroadcast(i);
 			Log.i("broadcast sent", "sendLocationData broadcast sent");			
 		}
-		return httpRes;	
+		return result;	
 	}
 
 	public boolean isNetworkConnected() {
-		return conManager.getActiveNetworkInfo().isConnected();
+		boolean connected = false;
+		NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
+		if (networkInfo != null) {
+			connected = networkInfo.isConnected();
+		}		
+		return connected; 
 	}
 	
 	public void onDestroy() {
@@ -156,7 +176,7 @@ public class AppService extends Service implements IAppService {
 		super.onDestroy();
 	}
 	
-	private int sendHttpRequest(String params)
+	private String sendHttpRequest(String params)
 	{		
 		URL url;
 		String result = new String();
@@ -198,16 +218,18 @@ public class AppService extends Service implements IAppService {
 			e.printStackTrace();
 		}	
 		
-		int response;
-		if (result.length() == 0) {
-			response = HTTP_REQUEST_FAILED;
+		String response = null;
+		if (result.length() != 0) {
+			response = result;
+//			response = HTTP_REQUEST_FAILED;
 		}
 		else {
-			try {
-				response = Integer.parseInt(result);
-			}catch(NumberFormatException ex) {
-				response = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
-			}
+			
+//			try {
+//				response = Integer.parseInt(result);
+//			}catch(NumberFormatException ex) {
+//				response = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
+//			}
 		}		
 		return response;
 	}
@@ -233,7 +255,7 @@ public class AppService extends Service implements IAppService {
 						"&realname=" + realname + 
 						"&";
 		
-		int result = this.sendHttpRequest(params);		
+		String result = this.sendHttpRequest(params);		
 		
 		return this.evaluateResult(result);
 	}
@@ -246,9 +268,26 @@ public class AppService extends Service implements IAppService {
 		int result = this.sendLocationData(this.username, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		
 		if (result == HTTP_RESPONSE_SUCCESS) 
-		{
+		{			
+			this.isUserAuthenticated = true;
+			this.minDataSentInterval = xmlHandler.getGpsMinDataSentInterval();
+			this.minDistanceInterval = xmlHandler.getGpsMinDistanceInterval();
 			
-			this.isUserAuthenticated = true;			          
+			Thread locationUpdates = new Thread() {
+			      public void run() {
+			          Looper.prepare();
+			          
+			          locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+								locationHandler);				       
+			          
+			          Looper.loop();
+			      }
+			
+			};		      
+						  
+			locationUpdates.start();
+			
+						
 		}
 		else {
 			this.isUserAuthenticated = false;
@@ -256,37 +295,59 @@ public class AppService extends Service implements IAppService {
 		return result;
 	}	
 	
-	private int evaluateResult(int result)
+	private int evaluateResult(String result)
 	{
-		switch (result)
-		{
-			case HTTP_RESPONSE_SUCCESS:
-				Log.i("HTTP_RESPONSE", "successfull.");
-				break;
-			case HTTP_REQUEST_FAILED:
-				Log.w("HTTP_RESPONSE", "failed: http request failed.");
-				break;
-			case HTTP_RESPONSE_ERROR_MISSING_PARAMETER:
-				Log.w("HTTP_RESPONSE", "failed: http request failed.");
-				break;
-			case HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS:
-				Log.w("HTTP_RESPONSE", "failed: unauthorized access");				
-				break;
-			case HTTP_RESPONSE_ERROR_UNKNOWN:
-				Log.w("HTTP_RESPONSE", "failed: unknown error");
-				break;
-			case HTTP_RESPONSE_ERROR_UNSUPPORTED_ACTION:
-				Log.w("HTTP_RESPONSE", "failed: unsupported action");
-				break;
-			case HTTP_RESPONSE_ERROR_USERNAME_EXISTS:
-				Log.w("HTTP_RESPONSE", "failed registration: username alread exists");
-				break;
-			default:
-				result = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
-				Log.w("HTTP_RESPONSE", "failed: unknown response returned from server");
-				break;
+		int iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
+		if (result == null){
+			iresult = HTTP_REQUEST_FAILED;
 		}
-		return result;
+		else {
+			SAXParser sp;
+			try {
+				sp = SAXParserFactory.newInstance().newSAXParser();
+				sp.parse(new ByteArrayInputStream(result.getBytes()), xmlHandler);
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			} catch (FactoryConfigurationError e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}		
+			
+			iresult = xmlHandler.getActionResult();
+			switch (iresult)
+			{
+				case HTTP_RESPONSE_SUCCESS:
+					Log.i("HTTP_RESPONSE", "successfull.");
+					break;
+				case HTTP_REQUEST_FAILED:
+					Log.w("HTTP_RESPONSE", "failed: http request failed.");
+					break;
+				case HTTP_RESPONSE_ERROR_MISSING_PARAMETER:
+					Log.w("HTTP_RESPONSE", "failed: http request failed.");
+					break;
+				case HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS:
+					Log.w("HTTP_RESPONSE", "failed: unauthorized access");				
+					break;
+				case HTTP_RESPONSE_ERROR_UNKNOWN:
+					Log.w("HTTP_RESPONSE", "failed: unknown error");
+					break;
+				case HTTP_RESPONSE_ERROR_UNSUPPORTED_ACTION:
+					Log.w("HTTP_RESPONSE", "failed: unsupported action");
+					break;
+				case HTTP_RESPONSE_ERROR_USERNAME_EXISTS:
+					Log.w("HTTP_RESPONSE", "failed registration: username alread exists");
+					break;
+				default:
+					iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
+					Log.w("HTTP_RESPONSE", "failed: unknown response returned from server");
+					break;
+			}			
+		}
+		
+		return iresult;
 	}
 
 	public void setAuthenticationServerAddress(String address) {
@@ -301,7 +362,36 @@ public class AppService extends Service implements IAppService {
 		public void onLocationChanged(Location loc){	
 			if (loc != null) {
 				Log.i("location listener", "onLocationChanged");
-				AppService.this.sendLocationData(AppService.this.username, AppService.this.password, loc);							
+				AppService.this.sendLocationData(AppService.this.username, AppService.this.password, loc);	
+				
+				int dataSentInterval = AppService.this.xmlHandler.getGpsMinDataSentInterval();
+				int distanceInterval = AppService.this.xmlHandler.getGpsMinDistanceInterval();
+				
+				if (dataSentInterval != AppService.this.minDataSentInterval ||
+					distanceInterval != AppService.this.minDistanceInterval)
+				{
+					AppService.this.minDataSentInterval = dataSentInterval;
+					AppService.this.minDistanceInterval = distanceInterval;
+					
+					locationManager.removeUpdates(locationHandler);
+					Thread locationUpdates = new Thread() {
+					      public void run() {
+					          Looper.prepare();
+					          
+							  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 
+									  								 minDataSentInterval, 
+									  								 minDistanceInterval, 
+									  								 locationHandler);			       
+					          
+					          Looper.loop();
+					      }
+					
+					};		      
+								  
+					locationUpdates.start();
+					
+				}
+				
 			}
 		}
 		public void onProviderDisabled(String provider){
@@ -315,4 +405,5 @@ public class AppService extends Service implements IAppService {
 		}	
 		
 	}
+
 }
