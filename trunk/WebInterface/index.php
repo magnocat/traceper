@@ -29,7 +29,8 @@ if (isset($_POST['action']) && !empty($_POST['action']))
 	{
 		require_once ('classes/DeviceManager.php');
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
-		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX);
+		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
+								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
 		$out = $dm->process($_POST);
 	}
 }
