@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,11 +19,11 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
@@ -72,13 +73,13 @@ public class AppService extends Service implements IAppService{
     {   	
  //       mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-        conManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     	
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         
-        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true);
-		locationManager.setTestProviderStatus(LocationManager.GPS_PROVIDER,
-		           LocationProvider.AVAILABLE, null, System.currentTimeMillis()); 
+//        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true);
+//		locationManager.setTestProviderStatus(LocationManager.GPS_PROVIDER,
+//		           LocationProvider.AVAILABLE, null, System.currentTimeMillis()); 
         
         deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
         
@@ -190,6 +191,7 @@ public class AppService extends Service implements IAppService{
 			PrintWriter out = new PrintWriter(connection.getOutputStream());			
 			out.println(params);
 			out.close();
+			
 			// if the / character is not written to end of the address, 
 			// it arises temp or permanent moved error, adding / character may solve this problem
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
@@ -210,6 +212,8 @@ public class AppService extends Service implements IAppService{
 				}
 				in.close();	
 			}
+			
+			
 		} 
 		catch (MalformedURLException e) {
 			e.printStackTrace();
