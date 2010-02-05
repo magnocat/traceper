@@ -48,8 +48,8 @@ class DeviceManager extends Manager
 					break;
 				case $this->actionPrefix . "RegisterMe":
 				
-					$out = $this->registerUser($reqArray);
-				
+					$result = $this->registerUser($reqArray);
+					$out = $this->prepareXML($result);
 					break;
 				case $this->actionPrefix . "UnregisterMe":
 				    //this action is not supported, may
