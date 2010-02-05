@@ -5,7 +5,7 @@ body {
 	font-size:16px;
 	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
 	letter-spacing:2px;
-	color:#777;
+	color:#555;
 	overflow-x:hidden;	
 }
 a {
@@ -23,6 +23,14 @@ a {
 	background: #fff;
 	float:left;
 	z-index:100;	
+}
+#footer{
+	position:absolute;
+	width:20%;
+	bottom:3px;
+	font-size:12px;
+	text-align:center;
+	z-index: 100;
 }
 #sideBar > #content > *  {
 	margin:5px;
@@ -44,8 +52,8 @@ a {
 	float:right;
 }
 
-#logo{
-	height:115px;
+#logo, .logo{
+	height:70px;
 	background: url("images/logo.png") no-repeat center;
 	cursor:pointer;		
 }
@@ -106,14 +114,7 @@ a {
 .pageNumbers a{
 	padding-right:5px;
 }
-#footer{
-	width:inherit;
-	position:fixed;
-	bottom:0px;
-	font-size:10px;
-	text-align:center;
-	z-index: 100;
-}
-#aboutus, #termsofuse {
-	display:none;
+
+#aboutus, #termsofuse {	
+	margin:15px;
 }
