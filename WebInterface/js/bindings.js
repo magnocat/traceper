@@ -1,6 +1,7 @@
 
 function bindElements(langOperator, trackerOp) 
 {	 		
+	
 	$('#searchButton').click(function(){
 		trackerOp.searchUser($('#searchBox').attr('value'), 1);					
 	});
@@ -12,13 +13,7 @@ function bindElements(langOperator, trackerOp)
 		$(this).select();
 	});
 				
-
-	$("a[href=#touLink]").click(function(){
-			$('#termsofuse').modal();	
-	});
-	$("a[href=#auLink], #logo").click(function(){
-			$('#aboutus').modal();
-	});
+	$("a[href=#auLink], #logo").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
 	$("a[href=#returnToUserList]").click(function(){
 		$('#lists .title').html(langOperator.usersTitle);
@@ -35,7 +30,6 @@ function bindElements(langOperator, trackerOp)
 				{
 					$('#sideBar > #content').animate({width:'0%'}, function(){ $('#sideBar > #content').hide(); });
 					$('#map').animate({width:'90%'});
-					//$('#map').css('margin-left', '15px');
 				}
 	});	
 	
@@ -43,14 +37,12 @@ function bindElements(langOperator, trackerOp)
 };	
 
 function setLanguage(langOperator){
-
-	$('title').text(langOperator.mark);
-	$("a[href=#auLink]").html(langOperator.aboutTitle);
-	$("a[href=#touLink]").html(langOperator.termsOfUseTitle);
+	
+	$('title').text(langOperator.mark);	
+	$('a[href=#auLink]').html(langOperator.aboutTitle);
 	$("#lists .title").html(langOperator.usersTitle);
 	$("a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
-	$("#aboutus").html(langOperator.about);
-	$("#termsofuse").html(langOperator.termsofuse);
+	$("#aboutus").html(langOperator.aboutus);
 //	$("#loading p").html(langOperator.loading);
 	
 }
