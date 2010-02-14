@@ -4,10 +4,10 @@
 <td width="65%">
 traceper cep telefonları üzerinden çalışan bir GPS takip sistemidir. traceper *ücretsizdir*, *açık kaynak kodludur*, *basittir* ve *herhangi bir GPS vericisine ihtiyaç duymaz*, sadece GPS özelliği olan cep telefonlarını kullanır. (yakın zamanda tüm cep telefonlarının GPS özelliği olacağını düşünüyoruz.)   
 
-Şimdi traceper hakkında biraz bilgi verelim, traceper da iki tane yazılım bulunmaktadır. Bunlardan bir tanesi cep telefonlarında çalışan ve GPS verisini sunucuya ayarlanabilen
-aralıklarla gönderir, diğeri ise web uygulaması olup <a href="http://code.google.com/apis/maps/">Google Maps API</a>, PHP, MySQL, Javascript, Ajax kullanarak geliştirimiştir ve  kullanıcıların nerede olduğunu google map üzerinde gösterir. 
+Şimdi traceper hakkında biraz bilgi verelim, traceper da iki tane yazılım bulunmaktadır. Bunlardan bir tanesi cep telefonlarında çalışır ve GPS verisini sunucuya ayarlanabilen
+aralıklarla gönderir, diğeri ise web uygulaması olup <a href="http://code.google.com/apis/maps/">Google Maps API</a>, PHP, MySQL, Javascript, Ajax kullanarak geliştirilmiştir ve  kullanıcıların nerede olduğunu google map üzerinde gösterir. 
 
-Cep telefonlarında çalışan uygulama <a href="http://www.android.com/">Android</a> işletim sistemi için yazılmış olup diğer platformlarda(J2ME) çalışan versiyonlarının yazılması planlanmaktadır.
+Cep telefonlarında çalışan uygulama <a href="http://www.android.com/">Android</a> işletim sistemi için yazılmış olup diğer platformlarda(J2ME) çalışan versiyonlarının da yazılması planlanmaktadır.
 </td>
 <td width="35%" align="center">
 <img src="http://farm3.static.flickr.com/2780/4326989313_96a065fd8b_o.png" />
@@ -16,7 +16,7 @@ Cep telefonlarında çalışan uygulama <a href="http://www.android.com/">Androi
 </table>
 
 === Özellikler ===
- traceper iki yazılımdan oluştur, birisi web uygulaması,diğeri ise Android İstemcisidir.
+ traceper iki yazılımdan oluştur, birisi web uygulaması,diğeri ise Android istemcisidir.
  ==== Web Uygulaması ====
  * Kullanıcıların listesini ve yeryüzünde nerede olduğunu gösterebilme
  [http://www.flickr.com/photos/38235533@N05/4327692370/in/set-72157623216889001/ http://farm3.static.flickr.com/2794/4327692370_d81d706e64_m.jpg]
