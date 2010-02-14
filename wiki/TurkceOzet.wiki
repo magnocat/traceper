@@ -83,9 +83,9 @@ Martin Lundstrom'a <a href="http://traceper.netmate.biz">traceper web uygulamas�
 
 
 === Destek ===
-Bu yazılımın kullanımı veya değişimi hakkında bilgiye ihtiyacınız olursa sahip olduğumuz
+Bu yazılımın kullanımı veya geliştirilmesi hakkında bilgiye ihtiyacınız olursa sahip olduğumuz
 tüm bilgileri sizinle paylaşmaya hazırız, bu yüzden iletişime geçmek için
-tereddüt yaşamayınız, <a href='mailto:ahmetmermerkaya@gmail.com'>contact us</a>
+tereddüt yaşamayınız.
 
 === Lisans ===
 Bu yazılım ücretsizdir, haber vermeden dağıtılabilir veya değiştirilebilir.
