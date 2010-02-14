@@ -2,7 +2,7 @@
 <table>
 <tr>
 <td width="65%">
-traceper cep telefonları üzerinden GPS takip sistemidir. traceper *ücretsizdir*, *açık kaynak kodludur*, *basittir* ve *herhangi bir GPS vericisine ihtiyaç duymaz*, sadece GPS özelliği olan cep telefonlarını kullanır ve biz de yakın zamanda tüm cep telefonlarının GPS özelliği olacağını düşünüyoruz.   
+traceper cep telefonları üzerinden çalışan bir GPS takip sistemidir. traceper *ücretsizdir*, *açık kaynak kodludur*, *basittir* ve *herhangi bir GPS vericisine ihtiyaç duymaz*, sadece GPS özelliği olan cep telefonlarını kullanır ve biz de yakın zamanda tüm cep telefonlarının GPS özelliği olacağını düşünüyoruz.   
 
 Şimdi traceper hakkında biraz bilgi verelim, traceper da iki tane yazılım bulunmaktadır. Bunlardan bir tanesi cep telefonlarında çalışan ve GPS verisini sunucuya ayarlanabilen
 aralıklarla gönderir, diğeri ise web uygulaması olup <a href="http://code.google.com/apis/maps/">Google Maps API</a>, PHP, MySQL, Javascript, Ajax kullanarak geliştirimiştir ve  kullanıcıların nerede olduğunu google map üzerinde gösterir. 
