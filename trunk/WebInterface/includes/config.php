@@ -43,6 +43,11 @@ define ("ELEMENT_COUNT_IN_LOCATIONS_PAGE", 50);
  */
 define ("UPDATE_USER_LIST_INTERVAL", 5000); 
 /**
+ * After all users info taken, only users whose location changed are taken from the
+ * server in every QUERY_UPDATED_USER_LIST_INTERVAL seconds
+ */
+define("QUERYING_UPDATED_USER_LIST_INTERVAL", 30000);
+/**
  * This is the prefix of table in mysql database, edit it according to your needs.
  */
 define ("STAFF_TRACKER_TABLE_PREFIX", "tracker"); 

@@ -1,5 +1,5 @@
 <?php
-function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
+function getContent($callbackURL, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language) {
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -9,13 +9,14 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source GPS tracking system" />
 		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="shortcut icon" href="images/icon.png" type="image/x-icon"/>
 		
      <script type="text/javascript" src="http://www.google.com/jsapi?key=<?php echo $apiKey; ?>">
    </script>
     
       <script type="text/javascript" charset="utf-8">
    
-        google.load("maps", "2.x");
+        google.load("maps", "2.x",{"other_params":"sensor=true"});
    
    //     google.load("jquery", "1.3.1");
 		
@@ -43,12 +44,14 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 				if (GBrowserIsCompatible()) 
 				{
    					map = new GMap2(document.getElementById("map"));
-   					map.setCenter(new GLatLng(39.504041,35.024414), 4);
+   					map.setCenter(new GLatLng(39.504041,35.024414), 3);
 					map.setUIToDefault();					
 					map.setMapType(G_HYBRID_MAP);	
+					map.enableRotation();
 	   	
-   					var trackerOp = new TrackerOperator('<?php echo $callbackURL; ?>', map, <?php echo $updateUserListInterval; ?>, langOp);			
+   					var trackerOp = new TrackerOperator('<?php echo $callbackURL; ?>', map, <?php echo $updateUserListInterval; ?>, <?php echo $queryIntervalForChangedUsers; ?>, langOp);			
 					trackerOp.getUserList(1); 	
+
    				}
 			}
    			catch (e) {
@@ -62,8 +65,10 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 	</head>
 	<body  onunload="GUnload();" >
 	
-	<div id='wrap'>										
-				<div id='sideBar'>	
+	<div id='wrap'>	
+				<div class='logo_inFullMap'></div>										
+				<div id='sideBar'>						
+					<div id='bar'></div>
 					<div id='content'>						
 	 						<div id='logo'></div>	 						
 							<div id='lists'>							
@@ -80,12 +85,13 @@ function getContent($callbackURL, $updateUserListInterval, $apiKey, $language) {
 								<div id='footer'>							
 									<a href='#auLink'></a>								
 								</div>					
-							</div>
-							
-					</div>																															
+							</div>							
+					</div>																																				
 				</div>
 				<div id='map'>MAP</div>	
-				<div id='loading'></div>			
+				<div id='infoBottomBar'></div>
+				<div id='loading'></div>	
+						
 										
 	</div>
 	<div style="display:none;">	
