@@ -13,7 +13,7 @@ function bindElements(langOperator, trackerOp)
 		$(this).select();
 	});
 				
-	$("a[href=#auLink], #logo").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
+	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
 	$("a[href=#returnToUserList]").click(function(){
 		$('#lists .title').html(langOperator.usersTitle);
@@ -23,13 +23,23 @@ function bindElements(langOperator, trackerOp)
 	$("#bar").click(function ()	{	
 				if ($('#sideBar > #content').css('display') == "none")
 				{
-					$('#sideBar > #content').animate({width:'20%'});
-					$('#map').animate({width:'80%'});
+					$('.logo_inFullMap').fadeOut().animate({left:'10px'});
+					$('#sideBar > #content').fadeIn('slow');
+					$('#sideBar').animate({width:'25%'}, function(){  $('#bar').css('background','#EEEEFF url("images/left.png") no-repeat center') });
+					$('#map').animate({width:'75%'});
+					
 				}	
 				else 
 				{
-					$('#sideBar > #content').animate({width:'0%'}, function(){ $('#sideBar > #content').hide(); });
-					$('#map').animate({width:'90%'});
+					$('.logo_inFullMap').fadeIn().animate({left:'80px'});
+					$('#sideBar > #content').fadeOut('slow');
+					$('#sideBar').animate({width:'20px'}, 
+									function(){ $('#sideBar > #content').hide();
+											    $('#bar').css('background','#EEEEFF url("images/right.png") no-repeat center');
+									});
+					$('#map').animate({width:'99%'});
+					
+					
 				}
 	});	
 	
