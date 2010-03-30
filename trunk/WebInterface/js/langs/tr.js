@@ -20,5 +20,6 @@ LAN_OPERATOR.addIndexes({
 			wasHere:'burdaydı.',
 			previousPoint:'<< Önceki nokta',
 			nextPoint:'Sonraki nokta >>',
-			noMorePastDataAvailable:'Bu kullan\u0131c\u0131 i\u00E7in daha eski bulunduğu noktalar veritabanında mevcut değildir'
+			noMorePastDataAvailable:'Bu kullan\u0131c\u0131 i\u00E7in daha eski bulunduğu noktalar veritabanında mevcut değildir',
+			clearTraceLines:'Doğruları temizle'
 		});

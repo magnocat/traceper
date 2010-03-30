@@ -21,5 +21,6 @@ LAN_OPERATOR.addIndexes({
 			wasHere:'was here.',
 			previousPoint:'<< Previous point',
 			nextPoint:'Next point >>',
-			noMorePastDataAvailable:'There is no more past point data available for this user'
+			noMorePastDataAvailable:'There is no more past point data available for this user',
+			clearTraceLines:'Clear lines'
 		});
