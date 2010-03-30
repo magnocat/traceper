@@ -203,14 +203,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			userId != TRACKER.traceLineDrawedUserId &&
 			typeof TRACKER.users[TRACKER.traceLineDrawedUserId].polyline != "undefined")
 		{			
-			TRACKER.users[TRACKER.traceLineDrawedUserId].polyline.hide();
-			var len = TRACKER.users[TRACKER.traceLineDrawedUserId].pastPointsGMarker.length;
-			
-			for (var i = 1; i < len; i++) { 
-				if (TRACKER.users[TRACKER.traceLineDrawedUserId].pastPointsGMarker[i] != null) {
-					TRACKER.users[TRACKER.traceLineDrawedUserId].pastPointsGMarker[i].hide();
-				}
-			}
+			TRACKER.clearTraceLines(TRACKER.traceLineDrawedUserId);
 		}		
 		if (typeof TRACKER.users[userId].polyline == "undefined" ||
 			pageNo > TRACKER.pastPointsPageNo ) 
@@ -231,8 +224,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			
 			});
 		}
-		else {
-			
+		else {			
 			TRACKER.users[userId].polyline.show();
 			
 			for (var i in TRACKER.users[userId].pastPointsGMarker) { 
@@ -242,7 +234,23 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			}
 		}		
 		TRACKER.traceLineDrawedUserId = userId;
-	}
+	};
+	
+	this.clearTraceLines = function (userId)
+	{
+		if (typeof TRACKER.users[userId].polyline != 'undefined')
+		{
+			TRACKER.users[userId].polyline.hide();
+			var len = TRACKER.users[userId].pastPointsGMarker.length;
+
+			for (var i = 1; i < len; i++) { 
+				if (TRACKER.users[userId].pastPointsGMarker[i] != null) {
+					TRACKER.users[userId].pastPointsGMarker[i].hide();
+					TRACKER.users[userId].pastPointsGMarker[i].closeInfoWindow();
+				}
+			}
+		}
+	};
 	
 	this.openMarkerInfoWindow = function(userId){
 		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'
@@ -257,7 +265,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 																+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
 										   							+ TRACKER.langOperator.previousPoint 
 										   						+'</a>'
-										   						+'|'	
+										   						+'|'
 														   		+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
 														   			+ TRACKER.langOperator.zoom 
 														   		+'</a>'														   		
@@ -272,7 +280,8 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
-	}
+	};
+	
 	this.zoomPoint = function (latitude, longitude) {
 				
 		var zoomlevel = MAP.getZoom();
@@ -309,8 +318,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			TRACKER.maxZoomlevel[latitude] = [];
 			G_SATELLITE_MAP.getMaxZoomAtLatLng(ltlng, function(response) {
 				if (response && response['status'] == G_GEO_SUCCESS) {
-					TRACKER.maxZoomlevel[latitude][longitude] = response['zoom'];
-					
+					TRACKER.maxZoomlevel[latitude][longitude] = response['zoom'];					
 				}
 				MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
 				
@@ -341,33 +349,42 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			var point = new GLatLng(latitude, longitude);
 			pastPoints.push(point);
 			var gmarker = new GMarker(point);
-			var previousGMarkerIndex = index + 1; // it is reverse because 
-			var nextGMarkerIndex = index - 1;    // as index decreases, the current point gets closer
-			GEvent.addListener(gmarker, "click", function() {
-					gmarker.openInfoWindowHtml("<div>" 
-												  + "<b>" + TRACKER.users[userId].username + "</b> " 
-												  + TRACKER.langOperator.wasHere 
-												  + '<br/>' + TRACKER.langOperator.time + ": " + time
-												  + '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
-												+ "</div>"
-												+ "<div style='float:right'>"
-													+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
-									   					+ TRACKER.langOperator.previousPoint 
-									   				+'</a>'
-									   				+'|'
-									   				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
-										   				+ TRACKER.langOperator.zoom 
-										   			+'</a>'														   		
-										   			+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
-										   				+'(' + TRACKER.langOperator.zoomMax
-										   				+')'
-										   			+'</a>'
-										   			+'|'
-									   				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
-								   						+ TRACKER.langOperator.nextPoint 
-								   					+'</a>'
-									   
-												+"</div>");	
+			
+			GEvent.addListener(gmarker, "click", function(){
+				
+				var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
+				var previousGMarkerIndex = tr + 1; // it is reverse because 
+				var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+				// attention similar function is used in 
+				// processXML function				
+				gmarker.openInfoWindowHtml("<div>" 
+						  					+ "<b>" + TRACKER.users[userId].username + "</b> " 
+						  						+ TRACKER.langOperator.wasHere 
+						  						+ '<br/>' + TRACKER.langOperator.time + ": " + time
+						  						+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
+						  					+ "</div>"
+						  					+ "<div style='float:right'>"
+											+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+							   					+ TRACKER.langOperator.previousPoint 
+							   				+'</a>'
+							   				+'|'
+							   				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+					   							+ TRACKER.langOperator.clearTraceLines
+					   						+'</a>'
+						   					+'|'
+							   				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+								   				+ TRACKER.langOperator.zoom 
+								   			+'</a>'														   		
+								   			+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+								   				+'(' + TRACKER.langOperator.zoomMax
+								   				+')'
+								   			+'</a>'
+								   			+'|'
+							   				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+						 						+ TRACKER.langOperator.nextPoint 
+						 					+'</a>'
+							   
+										+"</div>");	
 			});
 			index++;
 			MAP.addOverlay(gmarker);			
@@ -399,7 +416,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	 */
 	this.showPointGMarkerInfoWin = function(gMarkerIndex, userId){
 		if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined" ||	
-			typeof  TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
+			typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
 		{ 
 			var reqPageNo = TRACKER.pastPointsPageNo + 1;
 			TRACKER.drawTraceLine(userId, reqPageNo, function(){
@@ -407,7 +424,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 				// past point in database
 				if (typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") {
 					// the statement below add a new element to array with null value
-					// it is useful when understand there is no previous point 
+					// it is useful when understanding no previous point exists
 					// but it is required to check value if it is null when hiding or
 					// showing markers...
 					TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] = null;
@@ -415,8 +432,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 				}
 				else {
 					GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");
-				}
-				
+				}			
 				
 			});
 		}
@@ -427,22 +443,13 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			if (userId != TRACKER.traceLineDrawedUserId) {
 				TRACKER.drawTraceLine(userId);
 			}
-			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");
-			
+			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
 		}
 	}
-	/*
-	 * 
-	 */
-	this.showInfoBar = function(info) {
-		$('#infoBottomBar').text(info).slideDown('slow', function(){
-			setTimeout(function(){
-				$('#infoBottomBar').slideUp('slow');
-			}, 1000);
-			
-		});
-	}
-	
+	/**
+	 * this function process XML returned when actions are search user, get user list, update list,
+	 * updated list...
+	 */	
 	this.processXML = function(xml)
 	{
 		var list = "";
@@ -464,8 +471,6 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 				personIcon.iconSize = new GSize(32,32);
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
-				
-
 			
 				TRACKER.users[userId] = new TRACKER.User( {username:username,
 														   realname:$(user).find("realname").text(),
@@ -498,9 +503,64 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 				var longitude = $(user).find("location").attr('longitude');
 				var time = $(user).find("time").text();
 				var deviceId = $(user).find("deviceId").text();
-				var point = new GLatLng(latitude, longitude);
+				var point = new GLatLng(latitude, longitude);				
+				TRACKER.users[userId].gmarker.setLatLng(point);
 				
-				TRACKER.users[userId].gmarker.setLatLng(point);					
+				if ((TRACKER.users[userId].latitude != latitude ||
+					 TRACKER.users[userId].longitude != longitude) &&
+					 typeof TRACKER.users[userId].polyline != "undefined")
+				{
+					var gmarker = new GMarker(new GLatLng(TRACKER.users[userId].latitude, 
+														  TRACKER.users[userId].longitude));
+					TRACKER.users[userId].polyline.insertVertex(0, point);
+					var oldlatitude = TRACKER.users[userId].latitude;
+					var oldlongitude = TRACKER.users[userId].longitude;
+					
+					GEvent.addListener(gmarker, "click", function(){
+						// attention similar function is used in 
+						// processUserPastLocationsXML function
+						var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
+						var previousGMarkerIndex = tr + 1; // it is reverse because 
+						var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+						
+						gmarker.openInfoWindowHtml("<div>" 
+													  + "<b>" + TRACKER.users[userId].username + "</b> " 
+													  + TRACKER.langOperator.wasHere 
+													  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
+													  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
+													+ "</div>"
+													+ "<div style='float:right'>"
+														+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+										   					+ TRACKER.langOperator.previousPoint 
+										   				+'</a>'
+										   				+'|'
+										   				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+									   						+ TRACKER.langOperator.clearTraceLines
+									   					+'</a>'
+										   				+'|'
+										   				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ oldlatitude +','+ oldlongitude +')">'
+											   				+ TRACKER.langOperator.zoom 
+											   			+'</a>'														   		
+											   			+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ oldlatitude +','+ oldlongitude +')">'
+											   				+'(' + TRACKER.langOperator.zoomMax
+											   				+')'
+											   			+'</a>'
+											   			+'|'
+										   				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+									 						+ TRACKER.langOperator.nextPoint 
+									 					+'</a>'					   
+													+"</div>");	
+					});
+					
+					TRACKER.users[userId].pastPointsGMarker.splice(1,0, gmarker);					
+					MAP.addOverlay(gmarker);
+					
+					if (TRACKER.traceLineDrawedUserId != userId) {
+						// if traceline is not visible, hide the marker
+						gmarker.hide();
+					}
+					
+				}
 				TRACKER.users[userId].latitude = latitude;
 				TRACKER.users[userId].longitude = longitude;
 				TRACKER.users[userId].time = time;
@@ -524,11 +584,10 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			list = null;
 		}
 		return list;		
-	};
-	
-	
-	
-	
+	};	
+	/**
+	 * this a general ajax request function, it is used whenever any ajax request is made 
+	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
 			
@@ -567,7 +626,17 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		return $(xml).find("page").attr("pageCount");
 	};
 
-	
+	/**
+	 * this function shows info and then hides it with slide effects
+	 */
+	this.showInfoBar = function(info) {
+		$('#infoBottomBar').text(info).slideDown('slow', function(){
+			setTimeout(function(){
+				$('#infoBottomBar').slideUp('slow');
+			}, 1000);
+			
+		});
+	 }
 	this.writePageNumbers = function(pageName, pageCount, currentPage, len)
 	{
 		var length = 3;
