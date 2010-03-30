@@ -17,6 +17,8 @@ class WebClientManager extends Manager
 	private $tablePrefix = NULL;	
 	private $elementCountInAPage = 10;
 	private $elementCountInLocationsPage = 50;
+	private $dataFetchedTime;
+	private $pastPointsFetchedUserId = NULL;
 	
 	public function __construct($dbc, $actionPrefix, $tablePrefix, $elementCountInAPage, $elementCountInLocationsPage) 
 	{
@@ -27,7 +29,7 @@ class WebClientManager extends Manager
 		$this->elementCountInLocationsPage = $elementCountInLocationsPage;	
 	}
 	
-	public function process($reqArray) 
+	public function process($reqArray, $dataFetchedTime="") 
 	{
 		$out = NULL;
 		switch($reqArray['action']) 
@@ -39,7 +41,7 @@ class WebClientManager extends Manager
 				break;
 			case $this->actionPrefix . "GetUserList":
 				
-				$out = $this->getUserList($reqArray, $this->elementCountInAPage);
+				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				
 				break;
 			case $this->actionPrefix . "SearchUser":
@@ -48,10 +50,19 @@ class WebClientManager extends Manager
 				
 				break;		
 			case $this->actionPrefix . "UpdateUserList":
-				
-				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage);
+				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage,"userListReq");
 				
 				break;		
+			case $this->actionPrefix . "GetUpdatedUserList":	
+				$this->dataFetchedTime = &$dataFetchedTime;				
+				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage,"updatedUserListReq");
+				
+				break;
+			case $this->actionPrefix . "GetUserPastPoints":
+				
+				$out = $this->getUserPastPoints($reqArray,  $this->elementCountInLocationsPage);
+				
+				break;				
 			default:
 				
 				$out = UNSUPPORTED_ACTION;
@@ -81,8 +92,7 @@ class WebClientManager extends Manager
 	}
 		
 	
-	//TODO: merging getUserList and getLocations
-	private function getUserList($reqArray, $elementCountInAPage) 
+	private function getUserList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
 	{
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
@@ -90,41 +100,84 @@ class WebClientManager extends Manager
 			$out = FAILED;
 			$pageNo = 1;
 			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
-				$pageNo = (int) $reqArray['pageNo'];
+					$pageNo = (int) $reqArray['pageNo'];
 			}
 			$offset = ($pageNo - 1) * $elementCountInAPage;
-		
-			$sql = 'SELECT
-						Id, username, latitude, longitude, altitude, realname, deviceId, dataArrivedTime
-					FROM '
-						. $this->tablePrefix .'_users
-					ORDER BY
-						username	
-					LIMIT ' . $offset . ',' 
-							. $elementCountInAPage;
+			
+			$sqlItemCount = null;
+			if ($req == 'updatedUserListReq')
+			{
+				$sql = 'SELECT
+							Id, username, latitude, longitude, altitude, 
+							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, (unix_timestamp(dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif
+						FROM '
+							. $this->tablePrefix .'_users
+						WHERE
+							unix_timestamp(dataArrivedTime) >= '. $this->dataFetchedTime .'
+						ORDER BY
+							timeDif 
+							DESC	
+						LIMIT '. $offset .',' 
+							   .$elementCountInAPage;
+				
+				$sqlPageCount = 'SELECT
+									ceil(count(Id)/'.$elementCountInAPage.')
+								 FROM '
+							 		. $this->tablePrefix .'_users
+							 	WHERE 
+							 		unix_timestamp(dataArrivedTime) >= ' . $this->dataFetchedTime;
 							
+			}
+			else //if ($req == 'userListReq') 
+			{
+				// this is the user list showing in left pane
+				
+				$sql = 'SELECT
+							Id, username, latitude, longitude, altitude, 
+							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, null
+						FROM '
+							. $this->tablePrefix .'_users
+						ORDER BY
+							username 
+						LIMIT ' . $offset . ',' 
+								. $elementCountInAPage;
+							
+				$sqlPageCount = 'SELECT
+									ceil(count(Id)/'.$elementCountInAPage.')
+								 FROM '
+							 		. $this->tablePrefix .'_users';
+			}				
 			if (isset($reqArray['trackedUser']) && $reqArray['trackedUser'] != null) 
 			{
-				$sql = sprintf('(' 
+				$trackedUser = (int) $reqArray['trackedUser'];				
+				
+				$sql =			'(' 
 								  . $sql . 
 								')
 								union
 								( SELECT 
-									Id, username, latitude, longitude, altitude, realname, deviceId, dataArrivedTime
+									Id, username, latitude, longitude, altitude, 
+									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, null
 								  FROM '
 									. $this->tablePrefix .'_users
 								  WHERE 
-						 			Id = %d
-						 		  LIMIT 1
-						 		 )', $reqArray['trackedUser']);	
+						 			Id = '. $trackedUser .'						 		  
+						 			LIMIT 1
+						 		 )' ;	
 			}	
-						
-			$sqlItemCount = 'SELECT
-								ceil(count(Id)/'.$elementCountInAPage.')
-							 FROM '
-						 		. $this->tablePrefix .'_users';
-					 							 		
-			$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount));
+			
+			$pageCount = $this->dbc->getUniqueField($sqlPageCount);
+			// data fetched time is used only in updated User list req so it is 
+			// updated only when $req == 'updatedUserListReq'		 							 								
+			if ($req == 'updatedUserListReq' 
+				&& $pageNo == $pageCount
+				&& $pageCount != 0) 
+			{
+				$this->dataFetchedTime = time();
+			}
+			
+			$out = $this->prepareXML($sql, $pageNo, $pageCount);
+			
 		}
 		return $out;		
 	}
@@ -147,7 +200,8 @@ class WebClientManager extends Manager
 			
 				$sql = //sprintf(
 							'SELECT 
-									Id, username, latitude, longitude, altitude, realname, deviceId, dataArrivedTime
+									Id, username, latitude, longitude, altitude, 
+									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 								FROM '
 									. $this->tablePrefix .'_users								
 								WHERE
@@ -175,40 +229,120 @@ class WebClientManager extends Manager
 		return $out;
 	}
 	
-	private function prepareXML($sql, $pageNo, $pageCount)
-	{		
-		$result = $this->dbc->query($sql);
-		$str = NULL;
-		
-		if ($result)
-		{			
-			while ( $row = $this->dbc->fetchObject($result) )
-			{
-				$row->Id = isset($row->Id) ? $row->Id : null;
-				$row->username = isset($row->username) ? $row->username : null;
-				$row->realname = isset($row->realname) ? $row->realname : null;
-				$row->latitude = isset($row->latitude) ? $row->latitude : null;
-				$row->longitude = isset($row->longitude) ? $row->longitude : null;
-				$row->altitude = isset($row->altitude) ? $row->altitude : null;
-				$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
-				$row->message = isset($row->message) ? $row->message : null;
-				$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+	private function getUserPastPoints($reqArray, $elementCountInAPage)
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['userId']) && !empty($reqArray['userId']))	{
+			
+			
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true){
+				$userId = (int) $reqArray['userId'];
+				$this->pastPointsFetchedUserId = $userId;
+				$pageNo = 1;
+				if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
+					$pageNo = (int) $reqArray['pageNo'];
+				}
+				$offset = ($pageNo - 1) * $elementCountInAPage;
+				$offset++;  // to not get the last location
+				$sql = 'SELECT 
+							longitude, latitude, deviceId, 
+							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+						 FROM ' . $this->tablePrefix .'_user_was_here
+						 WHERE 
+						 	userId = '. $userId . '
+						 ORDER BY 
+						 	Id DESC
+						 LIMIT '. $offset . ','
+								. $elementCountInAPage;
 								
-				$str .= '<user>'
-							. '<Id>'. $row->Id .'</Id>'
-							. '<username>' . $row->username . '</username>'
-							. '<realname>' . $row->realname . '</realname>'
-							. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
-							. '<time>' . $row->dataArrivedTime . '</time>'
-							. '<message>' . $row->message . '</message>'
-							. '<deviceId>' . $row->deviceId . '</deviceId>'
-						.'</user>';
+				// subtract 1 to not get the last location into consideration								
+				$sqlItemCount = 'SELECT 
+									ceil((count(Id)-1)/ '.$elementCountInAPage .')
+								 FROM '. $this->tablePrefix .'_user_was_here
+								 wHERE 
+								 	userId = '. $userId . '' ;				
 				
+				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount), "userPastLocations");
+			}
+		}
+		return $out;
+	}
+	
+	/**
+	 * this function generates xml that is used when getting user list or user past locations
+	 * params: $type may be "userList" or "userPastLocations"
+	 */
+	private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
+	{		
+		$result = NULL;
+		// if page count equal to 0 then there is no need to run query
+		if ($pageCount >= $pageNo && $pageCount != 0) {
+			$result = $this->dbc->query($sql);			
+		}
+				
+		$str = NULL;
+		$userId = NULL;
+		if ($result != NULL )
+		{			
+			if ($type == "userList") 
+			{
+				while ( $row = $this->dbc->fetchObject($result) )
+				{
+					$row->Id = isset($row->Id) ? $row->Id : null;
+					$row->username = isset($row->username) ? $row->username : null;
+					$row->realname = isset($row->realname) ? $row->realname : null;
+					$row->latitude = isset($row->latitude) ? $row->latitude : null;
+					$row->longitude = isset($row->longitude) ? $row->longitude : null;
+					$row->altitude = isset($row->altitude) ? $row->altitude : null;
+					$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
+					$row->message = isset($row->message) ? $row->message : null;
+					$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+
+					$str .= '<user>'
+					. '<Id>'. $row->Id .'</Id>'
+					. '<username>' . $row->username . '</username>'
+					. '<realname>' . $row->realname . '</realname>'
+					. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
+					. '<time>' . $row->dataArrivedTime . '</time>'
+					. '<message>' . $row->message . '</message>'
+					. '<deviceId>' . $row->deviceId . '</deviceId>'
+					.'</user>';
+
+				}
+			}
+			else if ($type == "userPastLocations") 
+			{
+				
+				while ( $row = $this->dbc->fetchObject($result) )
+				{
+					$row->latitude = isset($row->latitude) ? $row->latitude : null;
+					$row->longitude = isset($row->longitude) ? $row->longitude : null;
+					$row->altitude = isset($row->altitude) ? $row->altitude : null;
+					$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
+					$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+					
+					$str .= '<location latitude="'.$row->latitude.'"  longitude="'. $row->longitude .'" altitude="'.$row->altitude.'" >'
+								.'<time>'. $row->dataArrivedTime .'</time>'
+								.'<deviceId>'. $row->deviceId .'</deviceId>'
+							.'</location>';
+				}
+						
 			}		
 		}
 		header("Content-type: application/xml; charset=utf-8");
-		$out = '<?xml version="1.0" encoding="UTF-8"?>
-				<page pageNo="'.$pageNo.'" pageCount="' . $pageCount . '">'					
+		
+		$pageNo = $pageCount == 0 ? 0 : $pageNo;
+		
+		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
+		
+		if ($this->pastPointsFetchedUserId != NULL) {
+			$pageStr .= ' userId="'.$this->pastPointsFetchedUserId.'"';
+		}
+		
+		
+		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+				.'<page '. $pageStr . ' >'					
 					. $str
 			   .'</page>';
 

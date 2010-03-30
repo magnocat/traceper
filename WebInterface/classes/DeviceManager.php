@@ -104,12 +104,22 @@ class DeviceManager extends Manager
 								AND 
 								password = '%s'
 							LIMIT 1;", 
-						   $latitude, $longitude, $altitude, $deviceId, $username, $password,
-						   $latitude, $longitude, $altitude );
+						   $latitude, $longitude, $altitude, $deviceId, $username, $password);
 
+			$sqlWasHere = sprintf('INSERT INTO '
+									. $this->tablePrefix . '_user_was_here
+										(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
+	    							SELECT Id, %f, %f, %f, NOW(), "%s" 
+									FROM '. $this->tablePrefix.'_users 
+									WHERE username = "%s" 
+										  AND 
+										  password = "%s"
+									LIMIT 1',
+									$latitude, $longitude, $altitude, $deviceId, $username, $password);			   
 
 			$out = FAILED;
-			if ($this->dbc->query($sql)) {				
+			if ($this->dbc->query($sql)) {	
+				$this->dbc->query($sqlWasHere);			
 				$out = SUCCESS;
 				
 				if ($this->dbc->getAffectedRows() !== 1) {
