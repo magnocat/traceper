@@ -23,7 +23,11 @@ if (isset($_POST['action']) && !empty($_POST['action']))
 		require_once('classes/WebClientManager.php');
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, ELEMENT_COUNT_IN_LIST_PAGE, ELEMENT_COUNT_IN_LOCATIONS_PAGE);
-		$out = $wcm->process($_POST);
+		session_start();
+		if (!isset($_SESSION["dataFetchedTime"])){
+			$_SESSION["dataFetchedTime"] = time();
+		}
+		$out = $wcm->process($_POST, &$_SESSION["dataFetchedTime"]);
 	}
 	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
 	{
@@ -35,13 +39,13 @@ if (isset($_POST['action']) && !empty($_POST['action']))
 	}
 }
 else {	
-	$out = getContent($_SERVER['PHP_SELF'], UPDATE_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
+	$out = getContent($_SERVER['PHP_SELF'], UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
 }
 
 
 
 //FIXME: Bu yaz�l�m� kullananlar ile takip edilen kullan�c�lar�n verilerin
-// ayn� tablo da m� farkl� tablo da m� tutulmal� ?
+// aynı tablo da m� farkl� tablo da m� tutulmal� ?
 // e�er ayn� tablo kullan�lacaksa WebClientManager daki sorgulamalar kontrol edilmeli
 
 echo $out;
