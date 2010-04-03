@@ -440,7 +440,9 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
-			if (userId != TRACKER.traceLineDrawedUserId) {
+			if (userId != TRACKER.traceLineDrawedUserId ||
+				TRACKER.users[userId].polyline.isHidden() == true) 
+			{				
 				TRACKER.drawTraceLine(userId);
 			}
 			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
