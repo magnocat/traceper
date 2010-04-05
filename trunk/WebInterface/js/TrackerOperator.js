@@ -418,6 +418,9 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined" ||	
 			typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
 		{ 
+			if (gMarkerIndex == "1") {
+				TRACKER.pastPointsPageNo = 0;
+			}
 			var reqPageNo = TRACKER.pastPointsPageNo + 1;
 			TRACKER.drawTraceLine(userId, reqPageNo, function(){
 				// if it goes into this if statement it means that there is no available
