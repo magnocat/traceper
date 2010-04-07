@@ -35,7 +35,6 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	 */
 	this.getUserListInterval = interval;
 	this.started = false;
-	this.trackedUserId = 0;
 	/**
 	 * if all users are getted from the server, then this variable is set to true
 	 */
@@ -116,10 +115,10 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			
 		}
 		
-		if (TRACKER.trackedUserId != 0)
-		{
-			params+= "&trackedUser=" + TRACKER.trackedUserId;
-		}
+//		if (TRACKER.trackedUserId != 0)
+//		{
+//			params+= "&trackedUser=" + TRACKER.trackedUserId;
+//		}
 
 		// set time out again
 		TRACKER.timer = setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
@@ -184,15 +183,15 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
 		TRACKER.openMarkerInfoWindow(userId);
 		
-		$('#user' + TRACKER.trackedUserId).removeClass('trackedUser');
-		if (TRACKER.trackedUserId == userId) {
-			TRACKER.trackedUserId = 0;			
-		}
-		else {
-			TRACKER.trackedUserId = userId;
-		
-		}
-		$('#user'+ TRACKER.trackedUserId ).addClass('trackedUser');
+//		$('#user' + TRACKER.trackedUserId).removeClass('trackedUser');
+//		if (TRACKER.trackedUserId == userId) {
+//			TRACKER.trackedUserId = 0;			
+//		}
+//		else {
+//			TRACKER.trackedUserId = userId;
+//		
+//		}
+//		$('#user'+ TRACKER.trackedUserId ).addClass('trackedUser');
 		
 	};
 	
@@ -515,6 +514,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 					 TRACKER.users[userId].longitude != longitude) &&
 					 typeof TRACKER.users[userId].polyline != "undefined")
 				{
+					//these "if" is for creating new gmarker when user polyline is already drawed  
 					var gmarker = new GMarker(new GLatLng(TRACKER.users[userId].latitude, 
 														  TRACKER.users[userId].longitude));
 					TRACKER.users[userId].polyline.insertVertex(0, point);
