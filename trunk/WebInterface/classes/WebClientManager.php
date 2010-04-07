@@ -146,25 +146,26 @@ class WebClientManager extends Manager
 									ceil(count(Id)/'.$elementCountInAPage.')
 								 FROM '
 							 		. $this->tablePrefix .'_users';
-			}				
-			if (isset($reqArray['trackedUser']) && $reqArray['trackedUser'] != null) 
-			{
-				$trackedUser = (int) $reqArray['trackedUser'];				
-				
-				$sql =			'(' 
-								  . $sql . 
-								')
-								union
-								( SELECT 
-									Id, username, latitude, longitude, altitude, 
-									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, null
-								  FROM '
-									. $this->tablePrefix .'_users
-								  WHERE 
-						 			Id = '. $trackedUser .'						 		  
-						 			LIMIT 1
-						 		 )' ;	
 			}	
+						
+//			if (isset($reqArray['trackedUser']) && $reqArray['trackedUser'] != null) 
+//			{
+//				$trackedUser = (int) $reqArray['trackedUser'];				
+//				
+//				$sql =			'(' 
+//								  . $sql . 
+//								')
+//								union
+//								( SELECT 
+//									Id, username, latitude, longitude, altitude, 
+//									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, null
+//								  FROM '
+//									. $this->tablePrefix .'_users
+//								  WHERE 
+//						 			Id = '. $trackedUser .'						 		  
+//						 			LIMIT 1
+//						 		 )' ;	
+//			}	
 			
 			$pageCount = $this->dbc->getUniqueField($sqlPageCount);
 			// data fetched time is used only in updated User list req so it is 
