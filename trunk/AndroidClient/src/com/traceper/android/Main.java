@@ -16,6 +16,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,11 +28,11 @@ import com.traceper.android.services.AppService;
 
 public class Main extends Activity 
 {
-	private static final int ADD_NEW_FRIEND_ID = Menu.FIRST;
+	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
-
+	private Button takePhoto;
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
 			
@@ -78,7 +81,14 @@ public class Main extends Activity
 	{		
 		super.onCreate(savedInstanceState);   
 		setContentView(R.layout.main);
-		
+		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
+		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
+		takePhoto.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Intent i = new Intent(Main.this, CameraController.class);
+				startActivity(i);
+			}
+		});
 		lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
 
     }
@@ -106,8 +116,10 @@ public class Main extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) {		
 		boolean result = super.onCreateOptionsMenu(menu);		
 
+//		menu.add(0, TAKE_PICTURE_ID, 0, R.string.take_photo).setIcon(android.R.drawable.ic_menu_camera);
 		
-		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);		
+		
+		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);	
 		
 		return result;
 	}
@@ -118,10 +130,10 @@ public class Main extends Activity
 
 		switch(item.getItemId()) 
 		{	  
-			case ADD_NEW_FRIEND_ID:
+			case TAKE_PICTURE_ID:
 			{
-			//	Intent i = new Intent(FriendList.this, AddFriend.class);
-			//	startActivity(i);
+				Intent i = new Intent(Main.this, CameraController.class);
+				startActivity(i);
 				return true;
 			}		
 			case EXIT_APP_ID:
@@ -142,7 +154,7 @@ public class Main extends Activity
 	
 	public String getFormattedDate(Long time) 
 	{
-		DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		DateFormat df = new SimpleDateFormat("dd MMM yyyy HH:mm");
 		return df.format(new Date(time));
 	}
 }
