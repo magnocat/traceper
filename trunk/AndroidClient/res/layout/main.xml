@@ -33,5 +33,13 @@
     		android:textSize="18px" 
     		android:text="zaman"   	
     	/>
+    	<Button 
+    		android:id="@+id/take_upload_photo_button" 
+    		android:text="Take and upload photo"
+    		android:textSize="15px"
+    		android:layout_width="wrap_content" 
+    		android:layout_height="wrap_content" 
+    		
+    	/>
     </LinearLayout>
 </LinearLayout>
