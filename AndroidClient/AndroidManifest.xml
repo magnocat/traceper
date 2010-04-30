@@ -24,12 +24,21 @@
 			</intent-filter>
 		</activity>	
 		
-	<activity android:name=".android.Register"><intent-filter><action android:name="android.intent.action.MAIN"></action>
-<category android:name="android.intent.category.NORMAL"></category>
-</intent-filter>
-</activity>
+		<activity android:name=".android.Register">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"></action>
+				<category android:name="android.intent.category.NORMAL"></category>
+			</intent-filter>
+		</activity>
+		<activity android:name=".android.CameraController">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"></action>
+				<category android:name="android.intent.category.NORMAL"></category>
+			</intent-filter>
+		</activity>
 </application>
 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>
+<uses-permission android:name="android.permission.CAMERA"></uses-permission>
 </manifest>
