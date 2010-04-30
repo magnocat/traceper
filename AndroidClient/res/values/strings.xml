@@ -48,4 +48,5 @@
 	<string name="lastLocationDataSentAt">Last location data is sent at</string>
 	<string name="realname">Name</string>
 <string name="http_request_failed">Http request failed, please make sure that URL is valid in Settings and you are connected to the Internet...</string>
+<string name="take_photo">Take photo</string>
 </resources>
