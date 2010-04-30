@@ -37,4 +37,6 @@ public interface IAppService {
 	
 	public void setAuthenticationServerAddress(String address);
 	
+	public int sendImage(byte[] image);
+	
 }
