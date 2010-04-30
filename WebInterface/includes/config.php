@@ -33,7 +33,9 @@ define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y
 define("LANGUAGE", "en");
 
 /* This is the number of elements in user and search list page  */
-define ("ELEMENT_COUNT_IN_LIST_PAGE", 15); 
+define ("ELEMENT_COUNT_IN_LIST_PAGE", 18); 
+
+define ('ELEMENT_COUNT_IN_PHOTO_PAGE',10);
 /**
  * This is the number of elements when updating user data in background
  */
@@ -59,7 +61,26 @@ define("GPS_MIN_DATA_SENT_INTERVAL", 60000);
  * Device minimum data sent distance interval in meters 
  */
 define("GPS_MIN_DISTANCE_INTERVAL", 100);
+/**
+ * Flag to determine fetching photos in initialization
+ * its value may be 1 or 0, it is used if cookie is not defined to fetch images
+ */
+define("FETCH_PHOTOS_IN_INITIALIZATION", 1);
+/**
+ * UPLOAD_DIRECTORY is the directory that traceper clients
+ * upload images maybe some other things in future.
+ * 
+ *  Keep in mind that these upload directory doesn't have to under web server document root
+ *  and web server user has to have right to write to this directory
+ */
+define("UPLOAD_DIRECTORY", dirname(dirname(__FILE__)).'/upload');
+/**
+ * WEB_ADDRESS is defined in index.php to get the web site full adress.
+ * MISSING_IMAGE is the image when the correct image is not found.
+ */
+define("MISSING_IMAGE", WEB_ADDRESS . '/images/image_missing.png');
 
+define("IMAGE_HANDLER", WEB_ADDRESS);
 
 define ("WEB_CLIENT_ACTION_PREFIX", "WebClient"); //editing is not recommended 
 define ("DEVICE_ACTION_PREFIX", "Device"); //editing is not recommended
