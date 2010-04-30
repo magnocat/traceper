@@ -1,17 +1,20 @@
 
-function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
+function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval, langOp){
 	
 	TRACKER = this;	
 	MAP = map;
 	this.langOperator = langOp;
 	this.language = "en";
 	this.ajaxUrl = url;
+	this.fetchPhotosInInitialization = Number(fetchPhotosInInitial);
 	this.actionAuthenticateUser = "WebClientAuthenticateUser";
 	this.actionGetUserList = "WebClientGetUserList";	
 	this.actionSearchUser = "WebClientSearchUser";
 	this.actionUpdateUserList = "WebClientUpdateUserList";
 	this.actionGetUpdatedUserList = "WebClientGetUpdatedUserList";
 	this.actionGetUserPastPoints = "WebClientGetUserPastPoints";
+	this.actionGetImageList = "WebClientGetImageList";
+	this.actionSearchImage = "WebClientSearchImage";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -19,6 +22,13 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	this.searchPageNo = 1;
 	this.searchPageCount = 0;
 	this.pastPointsPageNo = 0;
+	this.imageListPageNo = 1;
+	this.imageListPageCount = 0;
+	this.imageListSearchPageNo = 1;
+	this.imageListSearchPageCount = 0;
+	//page no initial value is important
+	this.bgImageListPageNo = 1;
+	this.bgImageListPageCount = 0;
 	this.pastPointsPageCount = 0;
 	this.updateInterval = interval;
 	this.timer;
@@ -38,8 +48,17 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	/**
 	 * if all users are getted from the server, then this variable is set to true
 	 */
-    this.initializationCompleted = false;	
+    this.userPageResetCount = Number(0);	
 	this.users = [];
+	/**
+	 * this is just a flag to know whether images are fetched
+	 * it is used when photos tab is clicked...
+	 */
+	this.allImagesFetched = false;
+	this.images = [];
+	this.imageIds = [];
+	this.imageThumbSuffix;
+	this.imageOrigSuffix;
 	
 	this.User = function(){
 		var username;
@@ -58,6 +77,20 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
 		}		
+	}
+	this.Img = function(){
+		var imageId;
+		var imageURL;
+		var userId;
+		var username;
+		var latitude;
+		var longitude;
+		var time;
+		var gmarker;
+		
+		for (var n in arguments[0]) { 
+			this[n] = arguments[0][n]; 
+		}
 	}
 	
 	this.authenticateUser = function(username, password)
@@ -96,8 +129,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			if (TRACKER.started == false) {
 				TRACKER.started = true;
 				setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
-			}
-			
+			}			
 			
 		});	
 	};
@@ -107,18 +139,19 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 	this.updateUserList = function(){
 		
 		var params;
-		if (TRACKER.initializationCompleted == true) {
-			params = "action=" + TRACKER.actionGetUpdatedUserList + "&pageNo=" + TRACKER.updateUserListPageNo;
+		if (TRACKER.userPageResetCount > 0) 
+		{
+			var getImages = "&";
+			if ($('#showPhotosOnMap').attr('checked') == true)
+			{ 	getImages = "&include=image"; }
+			
+			params = "action=" + TRACKER.actionGetUpdatedUserList + "&pageNo=" + TRACKER.updateUserListPageNo
+					+ getImages;
 		}
 		else {
 			params = "action=" + TRACKER.actionUpdateUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
 			
 		}
-		
-//		if (TRACKER.trackedUserId != 0)
-//		{
-//			params+= "&trackedUser=" + TRACKER.trackedUserId;
-//		}
 
 		// set time out again
 		TRACKER.timer = setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
@@ -133,7 +166,21 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			if (TRACKER.updateUserListPageNo >= TRACKER.updateUserListPageCount){
 				TRACKER.updateUserListPageNo = 1;
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-				TRACKER.initializationCompleted = true;
+				TRACKER.userPageResetCount = Number(TRACKER.userPageResetCount) + 1;
+				
+				var showPhotosOnMap = $('#showPhotosOnMap').attr('checked');
+				if (TRACKER.userPageResetCount >= 1 &&
+					showPhotosOnMap == true)
+				{
+					TRACKER.processImageXML(result);
+				}
+				// this is about initialization, it fetches photos data from server
+				// after fetching users data
+				if (TRACKER.userPageResetCount == 1 &&
+					showPhotosOnMap == true) 
+				{
+					TRACKER.getImageListInBg();
+				}
 			}
 			else{
 				TRACKER.updateUserListPageNo++;
@@ -165,12 +212,11 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 					str = TRACKER.langOperator.noMatchFound;
 				}
 				
-				$('#lists .title').html(TRACKER.langOperator.searchResultsTitle);
-				$('#users').slideUp();
+				$('#usersList #users').slideUp();
 
-				$('#search').slideUp('fast',function(){
-						$('#search #results').html(str);
-						$('#search').slideDown();
+				$('#usersList .searchResults').slideUp('fast',function(){
+						$('#usersList .searchResults #results').html(str);
+						$('#usersList .searchResults').slideDown();
 				});
 			});
 		}
@@ -179,20 +225,104 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		}	
 	};	
 	
+	this.getImageList = function(pageNo, callback){
+		var params = "action=" + TRACKER.actionGetImageList + "&pageNo=" + pageNo;
+				
+		TRACKER.ajaxReq(params, function(result){			
+			TRACKER.imageListPageNo = TRACKER.getPageNo(result);
+			TRACKER.imageListPageCount = TRACKER.getPageCount(result);
+			
+			var str = TRACKER.processImageXML(result);
+			
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getImageList(%d)', TRACKER.imageListPageCount, TRACKER.imageListPageNo, 3);
+			}
+			else {
+				str = TRACKER.langOperator.noMatchFound;				
+			}
+			$('#photos').slideUp('fast',function(){
+									$('#photos').html(str);
+									$('#photos').slideDown();
+								});
+			
+			if (typeof callback == 'function'){
+				callback();
+			}
+			
+		});	
+	};
+	
+	var fetchingImagesInBgStart = false;
+	
+	this.getImageListInBg = function(){
+		if (fetchingImagesInBgStart == true){
+			return;
+		}
+		
+		fetchingImagesInBgStart = true;
+		var params = "action=" + TRACKER.actionGetImageList + "&pageNo=" + TRACKER.bgImageListPageNo
+					+ "&list=long";
+		
+		TRACKER.ajaxReq(params, function(result){			
+			TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
+			TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
+			
+			TRACKER.processImageXML(result);
+			
+			if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+				TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+				setTimeout(TRACKER.getImageListInBg, TRACKER.getUserListInterval);
+			}	
+			else if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount){
+				TRACKER.allImagesFetched = true;
+			}
+		}, true);	
+	}
+	
+	this.searchImage = function(username,userId, pageNo){
+		var params = "";
+		if (userId != false){
+			params = "userId=" + userId;
+		}
+		else if (username != false){
+			params = "username=" + username;
+		}
+		
+		if (params == ""){
+			
+		}
+		else {
+			params += "&action="+ TRACKER.actionSearchImage +"&pageNo=" + pageNo;
+		
+			TRACKER.ajaxReq(params, function(result){			
+				TRACKER.imageListSearchPageNo = TRACKER.getPageNo(result);
+				TRACKER.imageListSearchPageCount = TRACKER.getPageCount(result);
+
+				var str = TRACKER.processImageXML(result);
+
+				if (str != null) {
+					str += TRACKER.writePageNumbers('javascript:TRACKER.searchImage("'+ username +'","'+ userId +'" %d)', TRACKER.imageListSearchPageCount, TRACKER.imageListSearchPageNo, 3);
+				}
+				else {
+					str = "<div class='generalStyle'>" + TRACKER.langOperator.noMatchFound + "</div>";				
+				}
+				$('#usersList').slideUp('fast',function(){
+					$('#photosList').slideDown('fast', function(){
+						$('#photosList #photos').slideUp();
+						$('#photosList .searchResults').slideUp('fast',function(){
+							$('#photosList .searchResults #results').html(str);
+							$('#photosList .searchResults').slideDown();
+						});
+					});					
+				});					
+			});	
+		}
+		
+	}
+	
 	this.trackUser = function(userId){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
-		TRACKER.openMarkerInfoWindow(userId);
-		
-//		$('#user' + TRACKER.trackedUserId).removeClass('trackedUser');
-//		if (TRACKER.trackedUserId == userId) {
-//			TRACKER.trackedUserId = 0;			
-//		}
-//		else {
-//			TRACKER.trackedUserId = userId;
-//		
-//		}
-//		$('#user'+ TRACKER.trackedUserId ).addClass('trackedUser');
-		
+		TRACKER.openMarkerInfoWindow(userId);		
 	};
 	
 	this.drawTraceLine = function(userId, pageNo, callback) 
@@ -260,23 +390,57 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 														   + '<br/>' + TRACKER.langOperator.latitude + ": " + TRACKER.users[userId].latitude  
 														   + '<br/>' + TRACKER.langOperator.longitude + ": " + TRACKER.users[userId].longitude
 														   +'</div>'
-														   + '<div style="float:right">'
-																+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
-										   							+ TRACKER.langOperator.previousPoint 
-										   						+'</a>'
-										   						+'|'
-														   		+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-														   			+ TRACKER.langOperator.zoom 
-														   		+'</a>'														   		
-														   		+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-														   			+'(' + TRACKER.langOperator.zoomMax
-														   			+')'
-														   		+'</a>'
-													   			
-														   +'</div>'
+														   + '<ul class="sf-menu"> '
+														   		+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
+														   				+ TRACKER.langOperator.previousPoint 
+														   			    +'</a>'+ '</li>'
+														   		+ '<li>'+ '<a class="infoWinOperations" href="#">'
+														   				+ TRACKER.langOperator.operations
+														   			    +'</a>'
+														   			+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
+															   					    + TRACKER.langOperator.zoom
+															   					    +'</a>'+ '</li>'
+															   			    + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
+												   							   	    + TRACKER.langOperator.zoomMax
+												   							        +'</a>'+'</li>'
+												   					+'</ul>'
+											   					+'</li>'
+														   + '</ul>'
 														   );
-	}
+	};
 	
+	this.showImageWindow = function(imageId){
+		var image = new Image();
+		
+		image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
+		$("#loading").show();
+		$(image).load(function(){
+			$("#loading").hide();
+			
+			TRACKER.images[imageId].gmarker.openInfoWindowHtml("<div class='origImageContainer'>"
+					+ "<div>"
+						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+					+ "</div>"
+					+ "<div>"
+						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].username + "</a>"
+						+ "<br/>"
+						+ TRACKER.langOperator.time + ": " + TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.langOperator.latitude + ": " + TRACKER.images[imageId].latitude + "<br/>"
+						+ TRACKER.langOperator.longitude + ": " + TRACKER.images[imageId].longitude
+					+ "</div>"
+					+ '<ul class="sf-menu"> '
+						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+				   					    + TRACKER.langOperator.zoom
+				   					    +'</a>'+ '</li>'
+				   			    + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+	   							   	    + TRACKER.langOperator.zoomMax
+	   							        +'</a>'+'</li>'
+   					+'</li>'
+			   + '</ul>'
+				+ "</div>");
+			
+		});		
+	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
 	};
@@ -326,7 +490,8 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		else {
 			MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
 		}
-	}
+	};
+	
 	
 	/**
 	 * this function process the user past locations xml,
@@ -362,28 +527,40 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 						  						+ '<br/>' + TRACKER.langOperator.time + ": " + time
 						  						+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
 						  					+ "</div>"
-						  					+ "<div style='float:right'>"
-											+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
-							   					+ TRACKER.langOperator.previousPoint 
-							   				+'</a>'
-							   				+'|'
-							   				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
-					   							+ TRACKER.langOperator.clearTraceLines
-					   						+'</a>'
-						   					+'|'
-							   				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
-								   				+ TRACKER.langOperator.zoom 
-								   			+'</a>'														   		
-								   			+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
-								   				+'(' + TRACKER.langOperator.zoomMax
-								   				+')'
-								   			+'</a>'
-								   			+'|'
-							   				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
-						 						+ TRACKER.langOperator.nextPoint 
-						 					+'</a>'
-							   
-										+"</div>");	
+						  					+ '<ul class="sf-menu"> '
+						  					+ "<li>"
+						  						+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+							   						+ TRACKER.langOperator.previousPoint 
+							   					+'</a>'
+							   				+ "</li>"
+							   				+ "<li>"
+							   					+"<a href='#' class='infoWinOperations'>" 
+							   						+ TRACKER.langOperator.operations
+							   					+"</a>"
+							   					+"<ul>"
+									   				+"<li>"
+							   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+							   								+ TRACKER.langOperator.zoom 
+							   							+'</a>' 		
+							   						+"</li>"
+							   						+"<li>"
+							   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+							   								+ TRACKER.langOperator.zoomMax
+							   							+'</a>'
+							   						+"</li>"
+							   						+"<li>"
+							   							+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+							   								+ TRACKER.langOperator.clearTraceLines
+							   							+'</a>'
+							   						+"</li>"
+							   					+"</ul>"
+							   				+ "</li>"
+							   				+ "<li>"
+							   					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+							   						+ TRACKER.langOperator.nextPoint 
+							   					+'</a>'
+							   				+ "</li>"
+										+"</ul>");	
 			});
 			index++;
 			MAP.addOverlay(gmarker);			
@@ -451,6 +628,82 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 		}
 	}
 	/**
+	 * 
+	 */
+	this.processImageXML = function(xml){
+		var list = "";
+		TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
+		TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
+		var hideMarker = !($('#showPhotosOnMap').attr('checked'));
+
+		$(xml).find("page").find("image").each(function(){
+			var image = $(this);
+			var imageId = $(image).attr('id');
+			var imageURL =  decodeURIComponent($(image).attr('url'));
+			var username = $(image).attr("byUserName");
+			var userId = $(image).attr("byUserId");
+			var latitude = $(image).attr('latitude');
+			var longitude = $(image).attr('longitude');
+			var time = $(image).attr('time');
+			var point = new GLatLng(latitude, longitude);
+			
+			list += "<li><a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
+								+ "<div>"
+									+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
+								+ "</div>"
+								+ "<div>"
+									+ TRACKER.langOperator.uploader + ": " + username 
+									+ "<br/>"
+									+ TRACKER.langOperator.time + ": " + time
+								+ "</div>"
+							+ "</a>"
+						+"</li>";
+
+			if ($.inArray(imageId, TRACKER.imageIds) == -1)
+			{
+				TRACKER.imageIds.push(imageId);
+			}
+			
+			if (typeof TRACKER.images[imageId] == "undefined") {
+				
+				var personIcon = new GIcon(G_DEFAULT_ICON);
+				personIcon.image = imageURL + TRACKER.imageThumbSuffix;
+		//		personIcon.iconSize = new GSize(24,24);
+				personIcon.shadow = null;
+				markerOptions = { icon:personIcon, hide:hideMarker };
+				TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
+													imageURL:imageURL,
+													userId:userId,
+													username:username,
+													latitude:latitude,
+													longitude:longitude,
+													time:time,
+													gmarker:new GMarker(point, markerOptions),
+													});
+				GEvent.addListener(TRACKER.images[imageId].gmarker, "click", function() {
+					TRACKER.showImageWindow(imageId);	
+				});
+				GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowopen",function(){
+					TRACKER.images[imageId].gmarker.show();
+  				});
+				GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowclose",function(){
+					if ($('#showPhotosOnMap').attr('checked') == false){
+						TRACKER.images[imageId].gmarker.hide();
+					}
+  				});
+				MAP.addOverlay(TRACKER.images[imageId].gmarker);
+			}
+			
+		});
+		if (list != "") {
+			list = "<ul>" + list + "</ul>"; 
+		}
+		else {
+			list = null;
+		}
+		return list;
+	}
+	/**
 	 * this function process XML returned when actions are search user, get user list, update list,
 	 * updated list...
 	 */	
@@ -472,7 +725,7 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			{		
 				var personIcon = new GIcon(G_DEFAULT_ICON);
 				personIcon.image = "images/person.png";
-				personIcon.iconSize = new GSize(32,32);
+				personIcon.iconSize = new GSize(24,24);
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
 			
@@ -503,8 +756,6 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			}
 			else
 			{
-				var latitude = $(user).find("location").attr('latitude');
-				var longitude = $(user).find("location").attr('longitude');
 				var time = $(user).find("time").text();
 				var deviceId = $(user).find("deviceId").text();
 				var point = new GLatLng(latitude, longitude);				
@@ -534,27 +785,40 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 													  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 													  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
 													+ "</div>"
-													+ "<div style='float:right'>"
-														+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
-										   					+ TRACKER.langOperator.previousPoint 
-										   				+'</a>'
-										   				+'|'
-										   				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
-									   						+ TRACKER.langOperator.clearTraceLines
+													+ '<ul class="sf-menu"> '
+								  					+ "<li>"
+								  						+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+									   						+ TRACKER.langOperator.previousPoint 
 									   					+'</a>'
-										   				+'|'
-										   				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ oldlatitude +','+ oldlongitude +')">'
-											   				+ TRACKER.langOperator.zoom 
-											   			+'</a>'														   		
-											   			+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ oldlatitude +','+ oldlongitude +')">'
-											   				+'(' + TRACKER.langOperator.zoomMax
-											   				+')'
-											   			+'</a>'
-											   			+'|'
-										   				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
-									 						+ TRACKER.langOperator.nextPoint 
-									 					+'</a>'					   
-													+"</div>");	
+									   				+ "</li>"
+									   				+ "<li>"
+									   					+"<a href='#' class='infoWinOperations'>"
+									   						+ TRACKER.langOperator.operations
+									   					+"</a>"
+									   					+"<ul>"
+											   				+"<li>"
+									   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ oldlatitude +','+ oldlongitude +')">'
+									   								+ TRACKER.langOperator.zoom 
+									   							+'</a>' 		
+									   						+"</li>"
+									   						+"<li>"
+									   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ oldlatitude +','+ oldlongitude +')">'
+									   								+ TRACKER.langOperator.zoomMax
+									   							+'</a>'
+									   						+"</li>"
+									   						+"<li>"
+									   							+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+									   								+ TRACKER.langOperator.clearTraceLines
+									   							+'</a>'
+									   						+"</li>"
+									   					+"</ul>"
+									   				+ "</li>"
+									   				+ "<li>"
+									   					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+									   						+ TRACKER.langOperator.nextPoint 
+									   					+'</a>'
+									   				+ "</li>"
+												+"</ul>");	
 					});
 					
 					TRACKER.users[userId].pastPointsGMarker.splice(1,0, gmarker);					
@@ -704,17 +968,19 @@ function TrackerOperator(url, map, interval, qUpdatedUserInterval, langOp){
 			}
 		}
 		var result = numsStr + nums + numsEnd;
+		var preNext="";
 		if (currentPage > 1)
 		{
-			var pre = currentPage - 1; 
-			result = "<a href='" + pageName.replace("%d", pre) + "' id='previousPage'></a>" + result;
+			var pre = Number(currentPage) - 1; 
+			preNext = "<a href='" + pageName.replace("%d", pre) + "' id='previousPage'>"+ TRACKER.langOperator.previous +"</a>";
 		}
 		
 		if (currentPage < pageCount)
 		{			
-			next = currentPage + 1; 
-			result +=  " <a href='" + pageName.replace("%d", next) + "' id='nextPage'></a>";
+			next = Number(currentPage) + 1; 
+			preNext +=  " <a href='" + pageName.replace("%d", next) + "' id='nextPage'>" + TRACKER.langOperator.next +"</a>";
 		}
+		result = preNext + "<br/>" + result;
 		
 		return "<div class='pageNumbers'>" +  result + "</div>";
 	};
