@@ -17,6 +17,7 @@ class DeviceManager extends Manager
 	private $locationResolution = 6;
 	private $gpsMinDataSentInterval = 60000;
 	private $gpsMinDistanceInterval = 100;
+	private $uploadPath;
 	
 	public function __construct($dbc, $actionPrefix, $tablePrefix, $gpsMinDataSentInterval,
 	 							$gpsMinDistanceInterval) 
@@ -27,6 +28,10 @@ class DeviceManager extends Manager
 		$this->gpsMinDataSentInterval = $gpsMinDataSentInterval;
 		$this->gpsMinDistanceInterval = $gpsMinDistanceInterval;
 		
+	}
+	
+	public function setUploadPath($uploadPath){
+		$this->uploadPath = $uploadPath;
 	}
 	/**
 	 * 
@@ -41,20 +46,21 @@ class DeviceManager extends Manager
 			switch($reqArray['action']) 
 			{
 				case $this->actionPrefix . "TakeMyLocation":
-					
-					$result = $this->updateUserLocation($reqArray);	
-					$out = $this->prepareXML($result);									
-				
+					$out = $this->updateUserLocation($reqArray);	
 					break;
 				case $this->actionPrefix . "RegisterMe":
-				
-					$result = $this->registerUser($reqArray);
-					$out = $this->prepareXML($result);
+					$out = $this->registerUser($reqArray);
+					break;
+				case $this->actionPrefix . "GetImage":
+					
+					$out = $this->getImage($reqArray, $_FILES);	
+//					move_uploaded_file($_FILES["image"]["tmp_name"], 'image.jpg');
+					
 					break;
 				case $this->actionPrefix . "UnregisterMe":
 				    //this action is not supported, may
 				    //$out = $this->unregisterUser($reqArray);
-					break;
+			//		break;
 				default:
 					$out = UNSUPPORTED_ACTION;
 					break;
@@ -65,7 +71,47 @@ class DeviceManager extends Manager
 			$out = MISSING_PARAMETER;
 		}
 		
-		return $out;		
+		return $this->prepareXML($out);		
+	}
+	
+	private function getImage($reqArray, $uploadedFile){
+		$out = MISSING_PARAMETER;
+		if (isset($uploadedFile["image"])
+			&& isset($reqArray['latitude']) && $reqArray['latitude'] != NULL
+			&& isset($reqArray['longitude']) && $reqArray['longitude'] != NULL
+			&& isset($reqArray['altitude']) && $reqArray['altitude'] != NULL
+			&& isset($reqArray['username']) && $reqArray['username'] != NULL
+			&& isset($reqArray['password']) && $reqArray['password'] != NULL)
+		{
+			$out = FAILED;
+			if ($uploadedFile["image"]["error"] == UPLOAD_ERR_OK )
+			{
+				$latitude = (float) $reqArray['latitude'];
+				$longitude = (float) $reqArray['longitude'];
+				$altitude = (float) $reqArray['altitude'];
+				$username = $this->checkVariable($reqArray['username']);
+				$password = $this->checkVariable($reqArray['password']);
+
+				$sql = sprintf('INSERT INTO '
+									. $this->tablePrefix .'_upload
+									(userId, latitude, longitude, altitude, uploadtime)
+								SELECT Id, %s, %s, %s, NOW()
+									FROM '. $this->tablePrefix .'_users
+								WHERE username = "%s" AND
+									  password = "%s"
+								LIMIT 1', $latitude, $longitude, $altitude,
+									$username, $password);
+				if ($this->dbc->query($sql)){
+					if (move_uploaded_file($uploadedFile["image"]["tmp_name"], $this->uploadPath .'/'.$this->dbc->lastInsertId() . '.jpg'))
+					{
+						$out = SUCCESS; 						
+					}
+				}
+			}
+			
+		}		
+		
+		return $out;
 	}
 	/**
 	 * 
@@ -119,12 +165,14 @@ class DeviceManager extends Manager
 
 			$out = FAILED;
 			if ($this->dbc->query($sql)) {	
-				$this->dbc->query($sqlWasHere);			
-				$out = SUCCESS;
-				
-				if ($this->dbc->getAffectedRows() !== 1) {
+				$out = SUCCESS;				
+				if ($this->dbc->getAffectedRows() === 1) {
+					$this->dbc->query($sqlWasHere);					
+				}
+				else {
 					$out = UNAUTHORIZED_ACCESS;
 				}
+					
 			}
 		}
 		else {
