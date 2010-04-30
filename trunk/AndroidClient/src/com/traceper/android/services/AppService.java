@@ -2,14 +2,25 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.security.spec.EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +58,7 @@ public class AppService extends Service implements IAppService{
 	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
 	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
 	private static final String LOCATION_CHANGED = "location changed";
+	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
 
 
 	private final IBinder mBinder = new IMBinder();
@@ -140,16 +152,37 @@ public class AppService extends Service implements IAppService{
 			longitude = loc.getLongitude();
 			altitude = loc.getLongitude();
 		}
-		String params = "action="+ HTTP_ACTION_TAKE_MY_LOCATION + 
-						"&username=" + usernameText + 
-						"&password=" + passwordText + 
-						"&latitude="+ latitude + 
+		String[] name = new String[7];
+		String[] value = new String[7];
+		name[0] = "action";
+		name[1] = "username";
+		name[2] = "password";
+		name[3] = "latitude";
+		name[4] = "longitude";
+		name[5] = "altitude";
+		name[6] = "deviceId";
+		
+		value[0] = HTTP_ACTION_TAKE_MY_LOCATION;
+		value[1] = usernameText;
+		value[2] = passwordText;
+		value[3] = String.valueOf(latitude);
+		value[4] = String.valueOf(longitude);
+		value[5] = String.valueOf(altitude);
+		value[6] = this.deviceId;
+		
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		String params = "action="+ URLEncoder.encode(HTTP_ACTION_TAKE_MY_LOCATION) + 
+						"&username=" + URLEncoder.encode(usernameText) + 
+						"&password=" + URLEncoder.encode(passwordText) + 
+						"&latitude=" + latitude + 
 						"&longitude=" + longitude + 
 						"&altitude=" + altitude +
-						"&deviceId=" + this.deviceId + 
+						"&deviceId=" + URLEncoder.encode(this.deviceId) + 
 						"&";
 		
-		String httpRes = this.sendHttpRequest(params);	
+	//	String httpRes = this.sendHttpRequest(params);
+		
 		int result = this.evaluateResult(httpRes);
 		if (result == HTTP_RESPONSE_SUCCESS)
 		{			
@@ -161,6 +194,42 @@ public class AppService extends Service implements IAppService{
 			Log.i("broadcast sent", "sendLocationData broadcast sent");			
 		}
 		return result;	
+	}
+	
+	public int sendImage(byte[] image){
+		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		double latitude = 0;
+		double longitude = 0;
+		double altitude = 0;
+		if (loc != null) {
+			latitude = loc.getLatitude();
+			longitude = loc.getLongitude();
+			altitude = loc.getLongitude();
+		}
+		String params;
+//		try {
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "action";
+		name[1] = "username";
+		name[2] = "password";
+		name[3] = "latitude";
+		name[4] = "longitude";
+		name[5] = "altitude";
+		
+		value[0] = HTTP_ACTION_GET_IMAGE;
+		value[1] = this.username;
+		value[2] = this.password;
+		value[3] = String.valueOf(latitude);
+		value[4] = String.valueOf(longitude);
+		value[5] = String.valueOf(altitude);
+		
+		String img = new String(image);
+		String httpRes = this.sendHttpRequest(name, value, "image", image);
+		Log.i("img length: ", String.valueOf(img.length()) );
+		int result = this.evaluateResult(httpRes);
+		
+		return result;		
 	}
 
 	public boolean isNetworkConnected() {
@@ -177,6 +246,72 @@ public class AppService extends Service implements IAppService{
 		super.onDestroy();
 	}
 	
+	private String sendHttpRequest(String[] name, String[] value, String filename, byte[] file){
+		final String end = "\r\n";
+		final String twoHyphens = "--";
+		final String boundary = "*****++++++************++++++++++++";
+		URL url;
+		String result = new String();
+		try {
+			url = new URL(this.authenticationServerAddress);
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			conn.setUseCaches(false);
+			conn.setRequestMethod("POST");
+			
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Charset", "UTF-8");
+			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
+		
+			DataOutputStream ds = new DataOutputStream(conn.getOutputStream());
+			
+			for (int i = 0; i < value.length; i++) {
+				ds.writeBytes(twoHyphens + boundary + end);
+				ds.writeBytes("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+			}
+			if (filename != null && file != null){
+				ds.writeBytes(twoHyphens + boundary + end);
+				ds.writeBytes("Content-Disposition: form-data; name=\"image\";filename=\"" + filename +"\"" + end + end);
+				ds.write(file);
+				ds.writeBytes(end);
+			
+			}			
+			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
+			ds.flush();
+			ds.close();
+			
+			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
+					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
+			{
+				conn.disconnect();
+				this.authenticationServerAddress += "/";
+				return sendHttpRequest(name, value, null, null);				
+			}
+			else
+			{
+				BufferedReader in = new BufferedReader(
+						new InputStreamReader(conn.getInputStream()));
+				String inputLine;
+
+				while ((inputLine = in.readLine()) != null) {
+					result = result.concat(inputLine);				
+				}
+				in.close();	
+			}
+			
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (result.length() >= 0){
+			return result;
+		}
+		return null;		
+	}
+	
 	private String sendHttpRequest(String params)
 	{		
 		URL url;
@@ -185,12 +320,18 @@ public class AppService extends Service implements IAppService{
 		{
 			url = new URL(this.authenticationServerAddress);
 			HttpURLConnection connection;
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setDoOutput(true);			
 			
-			PrintWriter out = new PrintWriter(connection.getOutputStream());			
-			out.println(params);
-			out.close();
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);	
+			connection.setDoInput(true);
+//			PrintWriter out = new PrintWriter(connection.getOutputStream());	
+			
+//			connection.setRequestProperty("Connection", "Keep-Alive");
+			DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+			
+			outputStream.writeBytes(params);
+			outputStream.close();
+			//out.close();
 			
 			// if the / character is not written to end of the address, 
 			// it arises temp or permanent moved error, adding / character may solve this problem
