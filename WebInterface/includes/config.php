@@ -52,7 +52,7 @@ define("QUERYING_UPDATED_USER_LIST_INTERVAL", 30000);
 /**
  * This is the prefix of table in mysql database, edit it according to your needs.
  */
-define ("STAFF_TRACKER_TABLE_PREFIX", "tracker"); 
+define ("STAFF_TRACKER_TABLE_PREFIX", "traceper"); 
 /**
  * Device minimum data sent time interval in ms 
  */
