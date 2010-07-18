@@ -7,14 +7,15 @@
 *	Begin:		Tuesday, April 21, 2009  12:32
 *
 *********************************************/
-require_once('Manager.php');
+require_once('Base.php');
 
 
-class WebClientManager extends Manager
+class WebClientManager extends Base
 {
-	private $dbc = NULL;
+	
+	private $authenticator = NULL; // authenticator object
 	private $actionPrefix = NULL;
-	private $tablePrefix = NULL;	
+	private $tablePrefix = NULL;  // prefix of tables' names in database 	
 	private $elementCountInAPage = 10;
 	private $elementCountInPhotoPage = 6;
 	private $elementCountInLocationsPage = 50;
@@ -26,6 +27,9 @@ class WebClientManager extends Manager
 	private $imageHandlerURL;
 	private $includeImageInUpdatedUserListReq = false;
 	
+	const  dataFetchedTimeStoreKey = "wcm_dataFetchedTime";
+	const  imageFetchedTimeStoreKey = "wcm_imageFetchedTime";
+	
 	public function __construct($dbc, $actionPrefix, $tablePrefix, $elementCountInAPage, 
 								$elementCountInLocationsPage, $elementCountInPhotoPage) 
 	{
@@ -35,6 +39,9 @@ class WebClientManager extends Manager
 		$this->elementCountInAPage = $elementCountInAPage;
 		$this->elementCountInLocationsPage = $elementCountInLocationsPage;	
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
+	}
+	public function setAuthenticator($authenticator){
+		$this->authenticator = $authenticator;
 	}
 	public function setImageRelatedVars($imageDirectory, $missingImage, $imageHandlerURL){
 		$this->imageDirectory = $imageDirectory;
@@ -49,6 +56,12 @@ class WebClientManager extends Manager
 			case $this->actionPrefix . "AuthenticateUser":
 				$out = $this->authenticateUser($reqArray);
 				break;
+			case $this->actionPrefix . "Signout":
+				$out = FAILED;
+				if ($this->tdo->clearAll() == true){
+					$out = SUCCESS;	
+				}				
+				break;
 			case $this->actionPrefix . "GetUserList":
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;
@@ -58,9 +71,19 @@ class WebClientManager extends Manager
 			case $this->actionPrefix . "UpdateUserList":
 				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage,"userListReq");
 				break;		
-			case $this->actionPrefix . "GetUpdatedUserList":	
-				$this->dataFetchedTime = &$dataFetchedTime;	
-				$this->imageFetchedTime = &$imageFetchedTime;			
+			case $this->actionPrefix . "GetUpdatedUserList":
+				if ($this->tdo == NULL || 
+					($this->dataFetchedTime = $this->tdo->getValue(self::dataFetchedTimeStoreKey)) == NULL)
+				{
+						$this->dataFetchedTime = time();
+						$this->tdo->save(self::dataFetchedTimeStoreKey, $this->dataFetchedTime);
+				}
+				if ($this->tdo == NULL || 
+					($this->imageFetchedTime = $this->tdo->getValue(self::imageFetchedTimeStoreKey)) == NULL)
+				{
+						$this->imageFetchedTime = time();
+						$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
+				}	
 				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage, "updatedUserListReq");
 				break;
 			case $this->actionPrefix . "GetUserPastPoints":
@@ -90,24 +113,38 @@ class WebClientManager extends Manager
 	
 	private function authenticateUser($reqArray)
 	{
-		//TODO: add related code when authenticate user is activated
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['username']) && $reqArray['username'] != null &&
 			isset($reqArray['password']) && $reqArray['password'] != null
 		    )
 		{
-			$out = SUCCESS;
-		}
-		
+			$out = UNAUTHORIZED_ACCESS;
+			$keepUserLoggedIn = false;
+			if (isset($reqArray['keepUserLoggedIn']) && $reqArray['keepUserLoggedIn'] == 'true'){
+				$keepUserLoggedIn = true;				
+			}
+			
+			if ($this->authenticator !== null && 
+			    $this->authenticator->authenticateUser($reqArray['username'], md5($reqArray['password']), $keepUserLoggedIn) !== null) {
+				$out = SUCCESS;						
+			}	
+			
+		}		
 		return $out;
 	}
 	
-	private function isUserAuthenticated() {
-		//TODO: add related code when authenticate user is activated
-		return true;
-	}
-		
 	
+	
+	private function isUserAuthenticated() {
+		$authenticated = false;
+		if ($this->authenticator !== null &&
+			$this->authenticator->isUserAuthenticated() == true) 
+		{
+			$authenticated = true;
+		}
+		$authenticated = true;
+		return $authenticated;
+	}
 	
 	private function getUserList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
 	{
@@ -204,8 +241,10 @@ class WebClientManager extends Manager
 				&& $pageCount != 0) 
 			{
 				$this->dataFetchedTime = time();
+				$this->tdo->save(self::dataFetchedTimeStoreKey, $this->dataFetchedTime);
 				if (isset($reqArray["include"]) && $reqArray["include"] == "image"){
 					$this->imageFetchedTime = $this->dataFetchedTime; 
+					$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
 				}
 			}
 			
@@ -336,6 +375,7 @@ class WebClientManager extends Manager
 				&& $pageCount != 0) 
 			{
 				$this->imageFetchedTime = time();
+				$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
 			}
 			
 			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
