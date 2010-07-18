@@ -31,5 +31,13 @@ LAN_OPERATOR.addIndexes({
 			next:'Next >',
 			previous:'< Previous',
 			uploader:'Uploader',
-			
+			usernameLabel:'Username',
+			passwordLabel:'Password',
+			submitLoginFormButtonLabel:'Submit',	
+			incorrectPassOrUsername:'Incorrect username or password!',
+			hi:'Hi',
+			signout:'Sign out',
+			rememberMeLabel:'Keep me logged in',
+			forgotPassword:'Forgot your password?',
+			warningMissingParameter:'Missing parameter, if you fill a form please don\'t leave any required field blank'
 		});
