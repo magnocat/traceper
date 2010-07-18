@@ -152,10 +152,11 @@ class MySQLOperator
 	
 	function getUniqueField($sql)
 	{
-		$out = 0;
+		$out = null;
 		if ($sql != null) {
-			$row = mysql_fetch_row($this->query($sql));
-			$out = $row[0];
+			if (($row = mysql_fetch_row($this->query($sql))) !== false){
+				$out = $row[0];
+			}
 		}
 		return $out;
 	}
