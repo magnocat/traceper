@@ -17,6 +17,9 @@ function bindElements(langOperator, trackerOp)
 			$(this).attr("value", "");
 		}
 	});
+	$("#signout").click(function(){
+		trackerOp.signout();
+	});
 	
 	/**
 	 * binding operations to search image
@@ -133,6 +136,8 @@ function setLanguage(langOperator){
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
 	$("#usersList .search #searchBox").attr('value', langOperator.usersSearchBox);
 	$("#aboutus").html(langOperator.aboutus);
+	$("#userarea").prepend(langOperator.hi);
+	$("#signout").append(langOperator.signout);
 //	$("#loading p").html(langOperator.loading);
 	
 }

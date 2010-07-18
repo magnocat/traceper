@@ -15,6 +15,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionGetUserPastPoints = "WebClientGetUserPastPoints";
 	this.actionGetImageList = "WebClientGetImageList";
 	this.actionSearchImage = "WebClientSearchImage";
+	this.actionSignout = "WebClientSignout";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -93,17 +94,37 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 	
-	this.authenticateUser = function(username, password)
+	this.authenticateUser = function(username, password, rememberMe)
 	{
-		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password;
+		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
+		if (username != "" && password != "" ) 
+		{
+			TRACKER.ajaxReq(params, function (result){
+				if (result == "1") {					
+					location.href = 'index.php';
+				}
+				else if (result == "-4"){
+					alert(TRACKER.langOperator.checkPassOrUsername);
+				}
+			});
+		}
+		else {
+			alert(TRACKER.langOperator.warningMissingParameter);
+		}
+	};
+	
+	this.signout = function(){
+		var params = "action=" + TRACKER.actionSignout;
 		TRACKER.ajaxReq(params, function (result){
+			
 			if (result == "1") {
-				//TODO: doing simultaneous ajax requests 
-				//TRACKER.getLocations();
-				//TRACKER.getUserList(1);
+				location.href = 'index.php';				
+			}
+			else if (result == "-4"){
+				alert(TRACKER.langOperator.checkPassOrUsername);
 			}
 		});
-	};
+	}
 	
 	// getting user list with latitude longittude info
 	this.getUserList = function(pageNo)
@@ -864,7 +885,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			type: 'POST',
 			url: TRACKER.ajaxUrl,
 			data: params,
-			dataType: 'xml',
+		//	dataType: 'xml',
 			timeout:100000,
 			beforeSend: function()
 						{ 	if (!notShowLoadingInfo) {
@@ -872,8 +893,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 							} 
 						},
 			success: function(result){ 
-							$("#loading").hide(); 							
-							callback(result); 
+							$("#loading").hide(); 						
+							if (result == "-4"){
+								alert(TRACKER.langOperator.incorrectPassOrUsername);
+							}
+							else if(result == "-2") {
+								alert(TRACKER.langOperator.warningMissingParameter);
+							}
+							else {
+								callback(result);
+							}
+
 					}, 
 			failure: function(result) {								
 					$("#loading").hide();

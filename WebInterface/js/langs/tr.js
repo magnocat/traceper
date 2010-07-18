@@ -29,5 +29,14 @@ LAN_OPERATOR.addIndexes({
 			usersSearchBox:'Kullanıcı ara',
 			next:'Sonraki >',
 			previous:'< Önceki',
-			uploader:'Yükleyen'
+			uploader:'Yükleyen',
+			usernameLabel:'Kullan\u0131c\u0131 Ad\u0131',
+			passwordLabel:'Şifre',
+			submitLoginFormButtonLabel:'G\u00F6nder',
+			incorrectPassOrUsername:'Kullan\u0131c\u0131 Ad\u0131 veya şifre hatalı!',
+			hi:'Selam',
+			signout:'Çıkış',
+			rememberMeLabel:'Beni hatırla',
+			forgotPassword:'Şifremi unuttum',
+			warningMissingParameter:'Eksik parametre, form dolduruyorsanız lütfen tüm gerekli alanları boş bırakmayınız'
 		});
