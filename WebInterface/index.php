@@ -27,15 +27,18 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
 									ELEMENT_COUNT_IN_LIST_PAGE, ELEMENT_COUNT_IN_LOCATIONS_PAGE,
 									ELEMENT_COUNT_IN_PHOTO_PAGE);
-		session_start();
-		if (!isset($_SESSION["dataFetchedTime"])){
-			$_SESSION["dataFetchedTime"] = time();
-		}
-		if (!isset($_SESSION["imageFetchedTime"])){
-			$_SESSION["imageFetchedTime"] = time();
-		}
+		$tdo = new TempDataStoreOperator();
+		$wcm->setTempDataStoreOperator($tdo);
+		$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+		
+		$wcm->setAuthenticator($auth);
 		$wcm->setImageRelatedVars(UPLOAD_DIRECTORY, MISSING_IMAGE, IMAGE_HANDLER);
+		
 		$out = $wcm->process($_REQUEST, &$_SESSION["dataFetchedTime"], &$_SESSION["imageFetchedTime"]);
+		
+		if ($auth !== NULL && ($userId = $auth->getUserId()) !== null){
+			 $_SESSION["userId"] = $userId;
+		}		
 	}
 	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
 	{
@@ -48,7 +51,16 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 	}
 }
 else {	
-	$out = getContent($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
+	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
+	$tdo = new TempDataStoreOperator();
+	$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+	if ($auth->isUserAuthenticated() === true ) {
+		DisplayOperator::setUsernameAndId($auth->getUsername(), $auth->getUserId());
+		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
+	}
+	else {		
+		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE);
+	}
 }
 
 
