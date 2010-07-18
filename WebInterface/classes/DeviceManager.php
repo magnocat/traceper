@@ -7,9 +7,9 @@
 *	Begin:		Tuesday, April 21, 2009  12:31
 *
 *********************************************/
-require_once('Manager.php');
+require_once('Base.php');
 
-class DeviceManager extends Manager
+class DeviceManager extends Base
 {
 	private $dbc = NULL;
 	private $actionPrefix;
