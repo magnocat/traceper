@@ -91,4 +91,5 @@ define ("MISSING_PARAMETER", "-2"); //Don't edit
 define ("UNSUPPORTED_ACTION", "-3"); //Don't edit
 define ("UNAUTHORIZED_ACCESS", "-4");
 define ("USER_NAME_ALREADY_EXIST", "-5"); //Don't edit
+define ("EMAIL_NOT_FOUND", "-6");
 ?>

@@ -37,6 +37,11 @@ LAN_OPERATOR.addIndexes({
 			hi:'Selam',
 			signout:'Çıkış',
 			rememberMeLabel:'Beni hatırla',
+			emailLabel:'E-posta',
+			emailNotFound:'E-posta adresi bulunamadı.',
+			sendNewPassword:'Yeni şifre gönder',
+			showLoginForm:'Giriş formunu göster',
 			forgotPassword:'Şifremi unuttum',
+			newPasswordSent:'Yeni şifre e-posta adresinize gönderilmiştir.',
 			warningMissingParameter:'Eksik parametre, form dolduruyorsanız lütfen tüm gerekli alanları boş bırakmayınız'
 		});

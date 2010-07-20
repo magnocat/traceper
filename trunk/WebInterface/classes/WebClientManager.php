@@ -62,6 +62,12 @@ class WebClientManager extends Base
 					$out = SUCCESS;	
 				}				
 				break;
+			case $this->actionPrefix . "SendNewPassword":
+				$out = MISSING_PARAMETER;
+				if (isset($reqArray['email']) && $reqArray['email'] != "") {
+					$out = $this->authenticator->sendNewPassword($reqArray['email']);		
+				}		
+				break;
 			case $this->actionPrefix . "GetUserList":
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;

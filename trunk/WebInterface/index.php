@@ -12,7 +12,7 @@ define("IN_PHP", true);
 define("WEB_ADDRESS", 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']));
 
 require_once("includes/config.php");
-require_once("includes/content.php");
+//require_once("includes/content.php");
 
 $dbc = NULL;  // database connectivity;
 $out = NULL;

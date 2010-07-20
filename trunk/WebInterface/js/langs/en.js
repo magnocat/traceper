@@ -36,8 +36,13 @@ LAN_OPERATOR.addIndexes({
 			submitLoginFormButtonLabel:'Submit',	
 			incorrectPassOrUsername:'Incorrect username or password!',
 			hi:'Hi',
-			signout:'Sign out',
+			signout:'Sign out',			
 			rememberMeLabel:'Keep me logged in',
+			emailLabel:'E-mail',
+			emailNotFound:'E-mail address has not been found.',
+			sendNewPassword:'Send new password',
+			showLoginForm:'Show login form',
 			forgotPassword:'Forgot your password?',
+			newPasswordSent:'Your new password has been sent to your email',
 			warningMissingParameter:'Missing parameter, if you fill a form please don\'t leave any required field blank'
 		});
