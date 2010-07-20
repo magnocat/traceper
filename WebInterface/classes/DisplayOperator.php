@@ -49,6 +49,16 @@ EOT;
 					});
 					$('#forgotPassword').text(langOp.forgotPassword);
 					$('#submitLoginFormButton').attr('value', langOp.submitLoginFormButtonLabel);	
+					$('#emailLabel').text(langOp.emailLabel + ":");					
+					$('#showLoginFormButton').attr('value', langOp.showLoginForm);
+					$('#sendNewPassword').attr('value', langOp.sendNewPassword).click(function(){
+						sendNewPassword();
+					});
+					$('#email').keypress(function(event){
+						if (event.keyCode == '13'){
+							sendNewPassword();	
+						}
+					});
 					$('#username , #password').keypress(function(event){
 						if (event.keyCode == '13'){
 							authenticateUser();
@@ -57,9 +67,16 @@ EOT;
 					$('#submitLoginFormButton').click(function(){
 						authenticateUser();
 					});
+					$('#forgotPassword, #showLoginFormButton').click(function(){
+						$('#userLoginForm').toggle();
+						$('#forgotPasswordForm').toggle();
+					});
 					
 				
 				});	
+				function sendNewPassword(){
+					TRACKER.sendNewPassword($('#email').val());
+				}
 				function authenticateUser(){
 					TRACKER.authenticateUser($('#username').val(), $('#password').val(), $('#rememberMe').attr('checked'));
 				}
@@ -68,8 +85,7 @@ EOT;
 				</script>
 			</head>
 			<body>
-				<div id="userLoginForm">
-				
+				<div id="userLoginForm">				
 					<div id="usernameLabel"></div>
 					<div><input type="text" name="username" id="username" /></div>
 					<div id="passwordLabel"></div>
@@ -78,9 +94,15 @@ EOT;
 						 <div style="display:inline" id="rememberMeLabel"></div>
 					</div>
 					<div id="forgotPassword"></div>					
-					<div><input type="button" id="submitLoginFormButton" value="" /></div>
-				
+					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
+				<div id="forgotPasswordForm" style="display:none">
+					<div id="emailLabel"></div>
+					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
+					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
+				</div>
+				
+				
 			</body>
 			</html>				
 EOT;

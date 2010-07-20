@@ -94,6 +94,68 @@ class AuthenticateManager extends Base{
 		return $this->userId;
 	}
 	
+	public function sendNewPassword($email){
+		
+		$email = $this->checkVariable($email);
+		
+		$sql = sprintf('SELECT Id 
+						FROM ' . $this->tablePrefix .'_web_users
+						WHERE email="%s"
+						LIMIT 1', $email);
+		
+		$Id = $this->dbc->getUniqueField($sql);
+		$out = EMAIL_NOT_FOUND;
+		if ($Id != NULL)
+		{
+			$password = $this->generatePassword(8, 8);
+			$sql = sprintf('UPDATE ' . $this->tablePrefix .'_web_users
+							SET password=MD5("%s") 
+							WHERE Id = %d
+							LIMIT 1', $password, $Id);
+			if ($this->dbc->query($sql) !== false){
+				$message = 'Hi,<br/> Your new traceper password is ' . $password
+							.'<br/><br/> traceper team';
+				$headers  = 'MIME-Version: 1.0' . "\r\n";
+				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+				$headers  .= 'From: contact@traceper.com' . "\r\n";
+				mail($email, "new password", $message, $headers);
+				$out = SUCCESS;
+			}
+			
+		}
+		return $out;
+	}
+	
+	private function generatePassword($length=9, $strength=0) {
+		$vowels = 'aeuy';
+		$consonants = 'bdghjmnpqrstvz';
+		if ($strength & 1) {
+			$consonants .= 'BDGHJLMNPQRSTVWXZ';
+		}
+		if ($strength & 2) {
+			$vowels .= "AEUY";
+		}
+		if ($strength & 4) {
+			$consonants .= '23456789';
+		}
+		if ($strength & 8) {
+			$consonants .= '@#$%';
+		}
+	 
+		$password = '';
+		$alt = time() % 2;
+		for ($i = 0; $i < $length; $i++) {
+			if ($alt == 1) {
+				$password .= $consonants[(rand() % strlen($consonants))];
+				$alt = 0;
+			} else {
+				$password .= $vowels[(rand() % strlen($vowels))];
+				$alt = 1;
+			}
+		}
+		return $password;
+}
+	
 	
 	
 }

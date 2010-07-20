@@ -16,6 +16,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionGetImageList = "WebClientGetImageList";
 	this.actionSearchImage = "WebClientSearchImage";
 	this.actionSignout = "WebClientSignout";
+	this.actionSendNewPassword = "WebClientSendNewPassword";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -104,7 +105,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					location.href = 'index.php';
 				}
 				else if (result == "-4"){
-					alert(TRACKER.langOperator.checkPassOrUsername);
+					alert(TRACKER.langOperator.incorrectPassOrUsername);
 				}
 			});
 		}
@@ -112,6 +113,25 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			alert(TRACKER.langOperator.warningMissingParameter);
 		}
 	};
+	
+	this.sendNewPassword = function(email){
+		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;
+		if (email != "" ) 
+		{
+			TRACKER.ajaxReq(params, function (result){
+				alert(result);
+				if (result == "1") {					
+					alert(TRACKER.langOperator.newPasswordSent);
+				}
+				else if (result == "-6"){
+					alert(TRACKER.langOperator.emailNotFound);
+				}
+			});
+		}
+		else {
+			alert(TRACKER.langOperator.warningMissingParameter);
+		}
+	}
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
