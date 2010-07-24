@@ -89,6 +89,18 @@ function bindElements(langOperator, trackerOp)
 				
 	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
+	$("#inviteUserDiv").colorbox({width:"60%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
+
+	$('#inviteUserButton').click(function(){
+		var useremail = $('#useremail').val();
+		if (useremail != ""){
+			TRACKER.inviteUser(useremail);
+		}
+		else {
+			alert(langOperator.warningMissingParameter);
+		}
+	});
+	
 	$("a[href=#returnToUserList]").click(function(){
 		$('#usersList .searchResults').slideUp(function(){ $('#usersList #users').slideDown(); });
 	});

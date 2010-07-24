@@ -193,7 +193,8 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<div id='userarea'><div id="username">$username</div><div id="signout"></div></div>
+	 						<div id='userarea'><div id="username">$username</div><div id="signout"></div>
+	 						<div id="inviteUserDiv">Invite User</div></div>
 							<div id='lists'>	
 								<div class='titles'>						
 									<div class='title active_title' id='user_title'></div>	
@@ -235,7 +236,11 @@ EOT;
 				<div id='loading'></div>											
 	</div>
 	<div style="display:none;">	
-	<div id='aboutus'></div>	
+	<div id='aboutus'></div>
+	<div id='InviteUserForm'>
+		Email: <input type='text' name='useremail' id='useremail' /><br/>		
+		<input type='button' value='invite user' name='inviteUserButton' id='inviteUserButton'/>
+	</div>	
 	</div>
 	</body>
 </html>

@@ -17,6 +17,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionSearchImage = "WebClientSearchImage";
 	this.actionSignout = "WebClientSignout";
 	this.actionSendNewPassword = "WebClientSendNewPassword";
+	this.actionInviteUser = "WebClientInviteUser";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -63,7 +64,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.imageOrigSuffix;
 	
 	this.User = function(){
-		var username;
+//		var username;
 		var realname;
 		var latitude;
 		var longitude;
@@ -112,6 +113,22 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		else {
 			alert(TRACKER.langOperator.warningMissingParameter);
 		}
+	};
+	
+	this.inviteUser = function(email) {
+		var params = "action=" + TRACKER.actionInviteUser + "&email=" + email;
+		
+		TRACKER.ajaxReq(params, function (result){
+			if (result == "1") {					
+				alert("operation is succesfull");
+			}
+			else{
+				alert("Error in operation");
+			}
+		});
+		
+		
+		
 	};
 	
 	this.sendNewPassword = function(email){
@@ -424,7 +441,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.openMarkerInfoWindow = function(userId){
 		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'
-														   + '<b>' + TRACKER.users[userId].username + '</b>'
+														//   + '<b>' + TRACKER.users[userId].username + '</b>'
 														   + '<br/>' + TRACKER.langOperator.realname + ": "+TRACKER.users[userId].realname  
 														   + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 														   + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
@@ -463,7 +480,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
 					+ "</div>"
 					+ "<div>"
-						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].username + "</a>"
+						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
 						+ "<br/>"
 						+ TRACKER.langOperator.time + ": " + TRACKER.images[imageId].time + "<br/>"
 						+ TRACKER.langOperator.latitude + ": " + TRACKER.images[imageId].latitude + "<br/>"
@@ -563,7 +580,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				// attention similar function is used in 
 				// processXML function				
 				gmarker.openInfoWindowHtml("<div>" 
-						  					+ "<b>" + TRACKER.users[userId].username + "</b> " 
+						  					+ "<b>" + TRACKER.users[userId].realname + "</b> " 
 						  						+ TRACKER.langOperator.wasHere 
 						  						+ '<br/>' + TRACKER.langOperator.time + ": " + time
 						  						+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
@@ -755,12 +772,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var user = $(this);			
 			var userId = $(user).find("Id").text();
-			var username = $(user).find("username").text();
+//			var username = $(user).find("username").text();
+			var realname = $(user).find("realname").text();
 			var latitude = $(user).find("location").attr('latitude');
 			var longitude = $(user).find("location").attr('longitude');
 			var point = new GLatLng(latitude, longitude);
 			
-			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ username +"</a></li>";
+			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
@@ -770,8 +788,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
 			
-				TRACKER.users[userId] = new TRACKER.User( {username:username,
-														   realname:$(user).find("realname").text(),
+				TRACKER.users[userId] = new TRACKER.User( {//username:username,
+														   realname:realname,
 														   latitude:latitude,
 														   longitude:longitude,
 														   time:$(user).find("time").text(),
@@ -821,7 +839,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 						
 						gmarker.openInfoWindowHtml("<div>" 
-													  + "<b>" + TRACKER.users[userId].username + "</b> " 
+													  + "<b>" + TRACKER.users[userId].realname + "</b> " 
 													  + TRACKER.langOperator.wasHere 
 													  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 													  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
