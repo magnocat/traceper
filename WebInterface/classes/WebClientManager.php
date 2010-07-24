@@ -26,6 +26,7 @@ class WebClientManager extends Base
 	private $imageDirectory;
 	private $imageHandlerURL;
 	private $includeImageInUpdatedUserListReq = false;
+	private $usermanager = NULL;
 	
 	const  dataFetchedTimeStoreKey = "wcm_dataFetchedTime";
 	const  imageFetchedTimeStoreKey = "wcm_imageFetchedTime";
@@ -40,6 +41,11 @@ class WebClientManager extends Base
 		$this->elementCountInLocationsPage = $elementCountInLocationsPage;	
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
 	}
+	
+	public function setUserManager($usermanager){
+		$this->usermanager = $usermanager;
+	}
+	
 	public function setAuthenticator($authenticator){
 		$this->authenticator = $authenticator;
 	}
@@ -68,7 +74,7 @@ class WebClientManager extends Base
 					$out = $this->authenticator->sendNewPassword($reqArray['email']);		
 				}		
 				break;
-			case $this->actionPrefix . "GetUserList":
+			case $this->actionPrefix . "GetUserList":							
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;
 			case $this->actionPrefix . "SearchUser":
@@ -108,6 +114,9 @@ class WebClientManager extends Base
 			case $this->actionPrefix ."SearchImage":
 				$out = $this->searchImage($reqArray, $this->elementCountInPhotoPage);
 				break;	
+			case $this->actionPrefix ."InviteUser":
+				$out = $this->inviteUser($reqArray);
+				break;
 			default:
 				
 				$out = UNSUPPORTED_ACTION;
@@ -139,6 +148,20 @@ class WebClientManager extends Base
 		return $out;
 	}
 	
+	//
+	private function inviteUser($reqArray){
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['email']) && $reqArray['email'] != null )
+		 {
+		 	$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true)
+			{
+		 		$email = $this->checkVariable($reqArray['email']);		 	
+		 		$out = $this->usermanager->inviteUser($email);		 	
+			}
+		 }
+		 return $out;
+	}
 	
 	
 	private function isUserAuthenticated() {
@@ -174,7 +197,7 @@ class WebClientManager extends Base
 					$this->includeImageInUpdatedUserListReq = true;
 					$sqlImageUnion = 'UNION
 									  SELECT 
-										u.Id, usr.username, u.userId, u.latitude, u.longitude, u.altitude, 
+										u.Id, u.userId, u.latitude, u.longitude, u.altitude, 
 										null, null,  date_format(u.uploadTime,"%d %b %Y %T") as dataArrivedTime,
 										(unix_timestamp(u.uploadTime) - '. $this->imageFetchedTime .')  as timeDif, "image" as type
 									  FROM '. $this->tablePrefix .'_upload u
@@ -192,7 +215,7 @@ class WebClientManager extends Base
 				}
 				
 				$sql = 'SELECT
-							Id, username, null as userId, latitude, longitude, altitude, 
+							Id, null as userId, latitude, longitude, altitude, 
 							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
 							(unix_timestamp(dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
 							"user" as type
@@ -224,12 +247,12 @@ class WebClientManager extends Base
 				// this is the user list showing in left pane
 				
 				$sql = 'SELECT
-							Id, username, latitude, longitude, altitude, 
+							Id, latitude, longitude, altitude, 
 							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 						FROM '
 							. $this->tablePrefix .'_users
 						ORDER BY
-							username 							
+							realname 							
 						LIMIT ' . $offset . ',' 
 								. $elementCountInAPage;
 							
@@ -278,16 +301,14 @@ class WebClientManager extends Base
 			
 				$sql = //sprintf(
 							'SELECT 
-									Id, username, latitude, longitude, altitude, 
+									Id, latitude, longitude, altitude, 
 									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 								FROM '
 									. $this->tablePrefix .'_users								
 								WHERE
-									username like "%'. $search .'%"
-									OR
 									realname like "%'. $search .'%"
 								ORDER BY
-									username
+									realname
 								LIMIT '. $offset .' , '. $this->elementCountInAPage ;
 							
 						//);
@@ -297,8 +318,6 @@ class WebClientManager extends Base
 			 					 FROM '
 			 					 	. $this->tablePrefix .'_users
 								WHERE
-									username like "%'. $search .'%"
-									OR
 									realname like "%'. $search .'%"';
 				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount));
 			}
@@ -570,7 +589,7 @@ class WebClientManager extends Base
 	private function getUserXMLItem($row)
 	{
 		$row->Id = isset($row->Id) ? $row->Id : null;
-		$row->username = isset($row->username) ? $row->username : null;
+	//	$row->username = isset($row->username) ? $row->username : null;
 		$row->realname = isset($row->realname) ? $row->realname : null;
 		$row->latitude = isset($row->latitude) ? $row->latitude : null;
 		$row->longitude = isset($row->longitude) ? $row->longitude : null;
@@ -581,7 +600,7 @@ class WebClientManager extends Base
 			
 		$str = '<user>'
 		. '<Id>'. $row->Id .'</Id>'
-		. '<username>' . $row->username . '</username>'
+//		. '<username>' . $row->username . '</username>'
 		. '<realname>' . $row->realname . '</realname>'
 		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
 		. '<time>' . $row->dataArrivedTime . '</time>'

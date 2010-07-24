@@ -18,7 +18,7 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "21236161";
+$dbPassword = "12345";
 // database name
 $dbName = "php";
 
@@ -33,9 +33,9 @@ define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y
 define("LANGUAGE", "en");
 
 /* This is the number of elements in user and search list page  */
-define ("ELEMENT_COUNT_IN_LIST_PAGE", 18); 
+define ("ELEMENT_COUNT_IN_LIST_PAGE", 8); 
 
-define ('ELEMENT_COUNT_IN_PHOTO_PAGE',10);
+define ('ELEMENT_COUNT_IN_PHOTO_PAGE',5);
 /**
  * This is the number of elements when updating user data in background
  */

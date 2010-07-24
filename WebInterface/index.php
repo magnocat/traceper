@@ -17,6 +17,9 @@ require_once("includes/config.php");
 $dbc = NULL;  // database connectivity;
 $out = NULL;
 
+
+
+
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) 
 {
 	$action = $_REQUEST['action'];	
@@ -30,11 +33,15 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$tdo = new TempDataStoreOperator();
 		$wcm->setTempDataStoreOperator($tdo);
 		$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+
+		$usermanager = new UserManager($dbc);			
+		$wcm->setUserManager($usermanager);
 		
+				
 		$wcm->setAuthenticator($auth);
 		$wcm->setImageRelatedVars(UPLOAD_DIRECTORY, MISSING_IMAGE, IMAGE_HANDLER);
 		
-		$out = $wcm->process($_REQUEST, &$_SESSION["dataFetchedTime"], &$_SESSION["imageFetchedTime"]);
+		$out = $wcm->process($_REQUEST, $_SESSION["dataFetchedTime"], $_SESSION["imageFetchedTime"]);
 		
 		if ($auth !== NULL && ($userId = $auth->getUserId()) !== null){
 			 $_SESSION["userId"] = $userId;
