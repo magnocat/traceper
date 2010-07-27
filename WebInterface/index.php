@@ -39,7 +39,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$wcm->setAuthenticator($auth);
 		$wcm->setImageRelatedVars(UPLOAD_DIRECTORY, MISSING_IMAGE, IMAGE_HANDLER);
 		
-		$out = $wcm->process($_REQUEST, $_SESSION["dataFetchedTime"], $_SESSION["imageFetchedTime"]);
+		$out = $wcm->process($_REQUEST);
 		
 		if ($auth !== NULL && ($userId = $auth->getUserId()) !== null){
 			 $_SESSION["userId"] = $userId;
