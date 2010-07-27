@@ -21,6 +21,23 @@ function bindElements(langOperator, trackerOp)
 		trackerOp.signout();
 	});
 	
+	$("#changePasswordButton").click(function(){		
+		if ($('#newPassword').val() ==  $('#newPasswordAgain').val()){
+			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
+		}
+		else {
+			alert(langOperator.enterSamePassword);
+		}
+	});
+	$("#changePasswordCancel").click(function(){		
+		$.colorbox.close();
+	});
+	
+	
+	
+	
+	
+	
 	/**
 	 * binding operations to search image
 	 */
@@ -89,6 +106,8 @@ function bindElements(langOperator, trackerOp)
 				
 	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
+	$("#changePassword").colorbox({width:"60%", inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
+	
 	$("#inviteUserDiv").colorbox({width:"60%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
 
 	$('#inviteUserButton').click(function(){
@@ -100,6 +119,7 @@ function bindElements(langOperator, trackerOp)
 			alert(langOperator.warningMissingParameter);
 		}
 	});
+	
 	
 	$("a[href=#returnToUserList]").click(function(){
 		$('#usersList .searchResults').slideUp(function(){ $('#usersList #users').slideDown(); });
@@ -150,6 +170,13 @@ function setLanguage(langOperator){
 	$("#aboutus").html(langOperator.aboutus);
 	$("#userarea").prepend(langOperator.hi);
 	$("#signout").append(langOperator.signout);
+	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel);
+	$("#newPasswordLabel").text(langOperator.newPasswordLabel);
+	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel);
+	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
+	$("#changePasswordCancel").val(langOperator.cancelFormButtonLabel);
+	
+	
 //	$("#loading p").html(langOperator.loading);
 	
 }
