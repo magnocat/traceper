@@ -18,6 +18,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionSignout = "WebClientSignout";
 	this.actionSendNewPassword = "WebClientSendNewPassword";
 	this.actionInviteUser = "WebClientInviteUser";
+	this.actionChangePassword = "WebClientChangePassword";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -99,6 +100,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.authenticateUser = function(username, password, rememberMe)
 	{
 		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
+
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
@@ -132,16 +134,35 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	
 	this.sendNewPassword = function(email){
-		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;
+		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;		
 		if (email != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
-				alert(result);
 				if (result == "1") {					
 					alert(TRACKER.langOperator.newPasswordSent);
 				}
-				else if (result == "-6"){
-					alert(TRACKER.langOperator.emailNotFound);
+				else if (result == "-7"){
+					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
+				}
+			});
+		}
+		else {
+			alert(TRACKER.langOperator.warningMissingParameter);
+		}
+	}
+	
+	this.changePassword = function(newPassword, currentPassword){
+		var params = "action=" + TRACKER.actionChangePassword + "&newPassword=" + newPassword + "&currentPassword=" + currentPassword;
+	
+		if (newPassword != "" && currentPassword != "")
+		{
+			TRACKER.ajaxReq(params, function (result){
+				if (result == "1") {					
+					alert(TRACKER.langOperator.passwordChanged);
+					$.colorbox.close();
+				}
+				else if (result == "-7"){
+					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
 				}
 			});
 		}
@@ -441,7 +462,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.openMarkerInfoWindow = function(userId){
 		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'
-														//   + '<b>' + TRACKER.users[userId].username + '</b>'
+												//		   + '<b>' + TRACKER.users[userId].username + '</b>'
 														   + '<br/>' + TRACKER.langOperator.realname + ": "+TRACKER.users[userId].realname  
 														   + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 														   + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
@@ -788,7 +809,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
 			
-				TRACKER.users[userId] = new TRACKER.User( {//username:username,
+				TRACKER.users[userId] = new TRACKER.User( {username:username,
 														   realname:realname,
 														   latitude:latitude,
 														   longitude:longitude,
@@ -932,12 +953,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						},
 			success: function(result){ 
 							$("#loading").hide(); 						
-							if (result == "-4"){
+							if (result == "-4"){			
+								location.href = "index.php";
 								alert(TRACKER.langOperator.incorrectPassOrUsername);
 							}
 							else if(result == "-2") {
 								alert(TRACKER.langOperator.warningMissingParameter);
-							}
+							}							
 							else {
 								callback(result);
 							}
