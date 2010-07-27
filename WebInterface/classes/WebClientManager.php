@@ -41,7 +41,6 @@ class WebClientManager extends Base
 		$this->elementCountInLocationsPage = $elementCountInLocationsPage;	
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
 	}
-	
 	public function setUserManager($usermanager){
 		$this->usermanager = $usermanager;
 	}
@@ -77,7 +76,7 @@ class WebClientManager extends Base
 			case $this->actionPrefix . "ChangePassword":
 				$out = $this->changePassword($reqArray);
 				break;	
-			case $this->actionPrefix . "GetUserList":							
+			case $this->actionPrefix . "GetUserList":
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;
 			case $this->actionPrefix . "SearchUser":
@@ -117,6 +116,9 @@ class WebClientManager extends Base
 			case $this->actionPrefix ."SearchImage":
 				$out = $this->searchImage($reqArray, $this->elementCountInPhotoPage);
 				break;	
+			case $this->actionPrefix ."DeleteImage":
+				$out = $this->deleteImage($reqArray, UPLOAD_DIRECTORY);
+				break;	
 			case $this->actionPrefix ."InviteUser":
 				$out = $this->inviteUser($reqArray);
 				break;
@@ -151,7 +153,6 @@ class WebClientManager extends Base
 		return $out;
 	}
 	
-	//
 	private function inviteUser($reqArray){
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['email']) && $reqArray['email'] != null )
@@ -165,7 +166,6 @@ class WebClientManager extends Base
 		 }
 		 return $out;
 	}
-	
 	private function changePassword($reqArray){
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['newPassword']) && $reqArray['newPassword'] != "" &&
@@ -186,7 +186,7 @@ class WebClientManager extends Base
 		$authenticated = false;
 		if ($this->authenticator !== null &&
 			$this->authenticator->isUserAuthenticated() == true) 
-		{			
+		{
 			$authenticated = true;
 		}
 		return $authenticated;
@@ -194,7 +194,7 @@ class WebClientManager extends Base
 	
 	private function getUserList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
 	{
-		$out = UNAUTHORIZED_ACCESS;		
+		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
 		{
 			$out = FAILED;
@@ -507,6 +507,51 @@ class WebClientManager extends Base
 		}
 		return $out;	
 	}
+	
+	//TODO: thumbnail lerde silinecek 
+	private function deleteImage($reqArray, $path)
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['imageId']) && !empty($reqArray['imageId'])) 
+		{
+			
+			$out = UNAUTHORIZED_ACCESS;			
+			if ($this->isUserAuthenticated() == true)
+			{
+				$imageId = (int) $reqArray['imageId'];
+				$orimg_path = $path."/".$imageId.".jpg";
+				$thumbimg_path = $path."/".$imageId."_thumb.jpg";
+				
+				$sql = sprintf ('DELETE FROM traceper_upload
+				                 WHERE id = %d 
+				                 LIMIT 1', $imageId );
+				
+			 	$out = FAILED;
+			    if	($this->dbc->query($sql) != false ) 
+			    {
+			    	$out = SUCCESS;    	
+			    	if(file_exists($orimg_path) == true)
+			    	{
+			    		if (unlink($orimg_path) != true){
+			    			$out = FAILED;			    			
+			    		}
+			    	}
+			    	if (file_exists($thumbimg_path) == true)
+			    	{
+			    		if (unlink($thumbimg_path) != true){
+			    			$out = FAILED;
+			    		}
+			    	}   	
+			    }
+			  }
+		}
+		return $out;       
+}
+	    
+	
+	
+	
+	
 	/**
 	 * this function generates xml that is used when getting user list or user past locations
 	 * params: $type may be "userList" or "userPastLocations" or "imageList"
@@ -606,7 +651,7 @@ class WebClientManager extends Base
 	private function getUserXMLItem($row)
 	{
 		$row->Id = isset($row->Id) ? $row->Id : null;
-	//	$row->username = isset($row->username) ? $row->username : null;
+//		$row->username = isset($row->username) ? $row->username : null;
 		$row->realname = isset($row->realname) ? $row->realname : null;
 		$row->latitude = isset($row->latitude) ? $row->latitude : null;
 		$row->longitude = isset($row->longitude) ? $row->longitude : null;

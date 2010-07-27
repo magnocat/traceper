@@ -13,11 +13,9 @@ define("WEB_ADDRESS", 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRI
 
 require_once("includes/config.php");
 
+
 $dbc = NULL;  // database connectivity;
 $out = NULL;
-
-
-
 
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) 
 {
