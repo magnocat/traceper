@@ -809,7 +809,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
 			
-				TRACKER.users[userId] = new TRACKER.User( {username:username,
+				TRACKER.users[userId] = new TRACKER.User( {//username:username,
 														   realname:realname,
 														   latitude:latitude,
 														   longitude:longitude,
