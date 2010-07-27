@@ -16,9 +16,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionGetImageList = "WebClientGetImageList";
 	this.actionSearchImage = "WebClientSearchImage";
 	this.actionSignout = "WebClientSignout";
-	this.actionSendNewPassword = "WebClientSendNewPassword";
-	this.actionInviteUser = "WebClientInviteUser";
-	this.actionChangePassword = "WebClientChangePassword";
+	this.actionDeleteImage = "WebClientDeleteImage";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -38,6 +36,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.timer;
 	this.maxZoomlevel = [[]];
 	this.traceLineDrawedUserId = null;
+	this.deletedImageId = 0;
 	/*
 	 * After all users info is got, only users whose location changed is queried every
 	 * queryUpdatedUserInterval seconds
@@ -65,7 +64,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.imageOrigSuffix;
 	
 	this.User = function(){
-//		var username;
+		var username;
 		var realname;
 		var latitude;
 		var longitude;
@@ -100,7 +99,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.authenticateUser = function(username, password, rememberMe)
 	{
 		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
-
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
@@ -108,7 +106,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					location.href = 'index.php';
 				}
 				else if (result == "-4"){
-					alert(TRACKER.langOperator.incorrectPassOrUsername);
+					alert(TRACKER.langOperator.checkPassOrUsername);
 				}
 			});
 		}
@@ -116,60 +114,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			alert(TRACKER.langOperator.warningMissingParameter);
 		}
 	};
-	
-	this.inviteUser = function(email) {
-		var params = "action=" + TRACKER.actionInviteUser + "&email=" + email;
-		
-		TRACKER.ajaxReq(params, function (result){
-			if (result == "1") {					
-				alert("operation is succesfull");
-			}
-			else{
-				alert("Error in operation");
-			}
-		});
-		
-		
-		
-	};
-	
-	this.sendNewPassword = function(email){
-		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;		
-		if (email != "" ) 
-		{
-			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
-					alert(TRACKER.langOperator.newPasswordSent);
-				}
-				else if (result == "-7"){
-					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
-				}
-			});
-		}
-		else {
-			alert(TRACKER.langOperator.warningMissingParameter);
-		}
-	}
-	
-	this.changePassword = function(newPassword, currentPassword){
-		var params = "action=" + TRACKER.actionChangePassword + "&newPassword=" + newPassword + "&currentPassword=" + currentPassword;
-	
-		if (newPassword != "" && currentPassword != "")
-		{
-			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
-					alert(TRACKER.langOperator.passwordChanged);
-					$.colorbox.close();
-				}
-				else if (result == "-7"){
-					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
-				}
-			});
-		}
-		else {
-			alert(TRACKER.langOperator.warningMissingParameter);
-		}
-	}
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
@@ -327,6 +271,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			if (typeof callback == 'function'){
 				callback();
 			}
+			//$(".deleteImageButton").click(function(){
+			//	TRACKER.deleteImage();
+			//})
 			
 		});	
 	};
@@ -378,7 +325,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.imageListSearchPageCount = TRACKER.getPageCount(result);
 
 				var str = TRACKER.processImageXML(result);
-
+				
 				if (str != null) {
 					str += TRACKER.writePageNumbers('javascript:TRACKER.searchImage("'+ username +'","'+ userId +'" %d)', TRACKER.imageListSearchPageCount, TRACKER.imageListSearchPageNo, 3);
 				}
@@ -393,11 +340,35 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 							$('#photosList .searchResults').slideDown();
 						});
 					});					
-				});					
+				});
+				
+				//$(".deleteImageButton").click(function(){
+				//	TRACKER.deleteImage();
+				//})
+				
 			});	
+		}	
+	}
+	
+	this.deleteImage = function(imageId){
+		if (confirm(TRACKER.langOperator.confirmationMessage)) 
+		{
+			TRACKER.deletedImageId = imageId;
+			var params = "action=" + TRACKER.actionDeleteImage + "&imageId=" + imageId
+			TRACKER.ajaxReq(params, function(result){
+				
+				if (result == "1") {
+					TRACKER.getImageList(TRACKER.imageListPageNo);
+					MAP.removeOverlay(TRACKER.images[TRACKER.deletedImageId].gmarker);
+					TRACKER.images.splice(TRACKER.deletedImageId, 1);
+				}
+				else {
+					alert(TRACKER.langOperator.errorInOperation);
+				}
+			});
 		}
 		
-	}
+	};
 	
 	this.trackUser = function(userId){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
@@ -462,7 +433,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.openMarkerInfoWindow = function(userId){
 		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'
-												//		   + '<b>' + TRACKER.users[userId].username + '</b>'
+														   + '<b>' + TRACKER.users[userId].username + '</b>'
 														   + '<br/>' + TRACKER.langOperator.realname + ": "+TRACKER.users[userId].realname  
 														   + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 														   + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
@@ -501,7 +472,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
 					+ "</div>"
 					+ "<div>"
-						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].username + "</a>"
 						+ "<br/>"
 						+ TRACKER.langOperator.time + ": " + TRACKER.images[imageId].time + "<br/>"
 						+ TRACKER.langOperator.latitude + ": " + TRACKER.images[imageId].latitude + "<br/>"
@@ -601,7 +572,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				// attention similar function is used in 
 				// processXML function				
 				gmarker.openInfoWindowHtml("<div>" 
-						  					+ "<b>" + TRACKER.users[userId].realname + "</b> " 
+						  					+ "<b>" + TRACKER.users[userId].username + "</b> " 
 						  						+ TRACKER.langOperator.wasHere 
 						  						+ '<br/>' + TRACKER.langOperator.time + ": " + time
 						  						+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
@@ -733,9 +704,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 								+ "<div>"
 									+ TRACKER.langOperator.uploader + ": " + username 
 									+ "<br/>"
-									+ TRACKER.langOperator.time + ": " + time
+									+ TRACKER.langOperator.time + ": " + time									
 								+ "</div>"
 							+ "</a>"
+							+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/close.jpg' />"
 						+"</li>";
 
 			if ($.inArray(imageId, TRACKER.imageIds) == -1)
@@ -793,13 +765,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var user = $(this);			
 			var userId = $(user).find("Id").text();
-//			var username = $(user).find("username").text();
-			var realname = $(user).find("realname").text();
+			var username = $(user).find("username").text();
 			var latitude = $(user).find("location").attr('latitude');
 			var longitude = $(user).find("location").attr('longitude');
 			var point = new GLatLng(latitude, longitude);
 			
-			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname +"</a></li>";
+			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ username +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
@@ -809,8 +780,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				personIcon.shadow = null;
 				markerOptions = { icon:personIcon };
 			
-				TRACKER.users[userId] = new TRACKER.User( {//username:username,
-														   realname:realname,
+				TRACKER.users[userId] = new TRACKER.User( {username:username,
+														   realname:$(user).find("realname").text(),
 														   latitude:latitude,
 														   longitude:longitude,
 														   time:$(user).find("time").text(),
@@ -860,7 +831,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 						
 						gmarker.openInfoWindowHtml("<div>" 
-													  + "<b>" + TRACKER.users[userId].realname + "</b> " 
+													  + "<b>" + TRACKER.users[userId].username + "</b> " 
 													  + TRACKER.langOperator.wasHere 
 													  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
 													  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
@@ -953,13 +924,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						},
 			success: function(result){ 
 							$("#loading").hide(); 						
-							if (result == "-4"){			
-								location.href = "index.php";
+							if (result == "-4"){
 								alert(TRACKER.langOperator.incorrectPassOrUsername);
 							}
 							else if(result == "-2") {
 								alert(TRACKER.langOperator.warningMissingParameter);
-							}							
+							}
 							else {
 								callback(result);
 							}
