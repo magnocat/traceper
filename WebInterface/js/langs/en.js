@@ -33,7 +33,8 @@ LAN_OPERATOR.addIndexes({
 			uploader:'Uploader',
 			usernameLabel:'Username',
 			passwordLabel:'Password',
-			submitLoginFormButtonLabel:'Submit',	
+			submitFormButtonLabel:'Submit',	
+			cancelFormButtonLabel:'Cancel',
 			incorrectPassOrUsername:'Incorrect username or password!',
 			hi:'Hi',
 			signout:'Sign out',			
@@ -43,6 +44,12 @@ LAN_OPERATOR.addIndexes({
 			sendNewPassword:'Send new password',
 			showLoginForm:'Show login form',
 			forgotPassword:'Forgot your password?',
+			currentPasswordLabel:'Current password',
+			newPasswordLabel:'New password',
+			newPasswordAgainLabel:'New password(again)',
+			enterSamePassword:'Please enter same password to password textboxes',
 			newPasswordSent:'Your new password has been sent to your email',
+			passwordChanged:'Password has been changed successfully',
+			currentPasswordDoesntMatch:'Current password doesn\'t match',
 			warningMissingParameter:'Missing parameter, if you fill a form please don\'t leave any required field blank'
 		});
