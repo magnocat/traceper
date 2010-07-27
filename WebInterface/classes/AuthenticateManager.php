@@ -20,7 +20,8 @@ class AuthenticateManager extends Base{
 	const userId = 'authmanager_userId';
 	const password = 'authmanager_password';
 	const authTime = 'authmanager_authTime';
-	
+	const daysDataStored = 'authmanager_daysDataStored';
+		
 	public function __construct($dbc, $tdo, $tablePrefix){
 		$this->dbc = $dbc;
 		$this->tablePrefix = $tablePrefix;
@@ -51,6 +52,7 @@ class AuthenticateManager extends Base{
 			$this->tdo->save(self::userId,   $this->userId, $daysDataStored);
 			$this->tdo->save(self::username, $username,     $daysDataStored);
 			$this->tdo->save(self::password, $password,     $daysDataStored);						
+			$this->tdo->save(self::daysDataStored, $daysDataStored,     $daysDataStored);									
 			$this->tdo->save(self::authTime, time());
 		}
 		return $this->userId;		
@@ -92,6 +94,29 @@ class AuthenticateManager extends Base{
 	
 	public function getUserId(){
 		return $this->userId;
+	}
+	
+	public function changePassword($newPassword, $currentPassword)
+	{
+		$newPassword = md5($newPassword);
+		$sql = sprintf('UPDATE ' . $this->tablePrefix .'_web_users
+						SET password = "%s"
+						WHERE Id = %d AND password = "%s" 
+						LIMIT 1', $newPassword, $this->getUserId(), md5($currentPassword));
+		$out = FAILED;
+		if ($this->dbc->query($sql) !== false){
+			$out = CURRENT_PASSWORD_DOESNT_MATCH;
+			if ($this->dbc->getAffectedRows() == 1) {
+				$out = SUCCESS;
+				$daysDataStored = $this->tdo->getValue(self::daysDataStored);
+				if ($daysDataStored == NULL){
+					$daysDataStored = 0;
+				}
+				$this->tdo->save(self::password, $newPassword, $daysDataStored);
+			}
+		}
+		
+		return $out;	
 	}
 	
 	public function sendNewPassword($email){
