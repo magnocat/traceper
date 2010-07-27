@@ -48,7 +48,7 @@ EOT;
 							
 					});
 					$('#forgotPassword').text(langOp.forgotPassword);
-					$('#submitLoginFormButton').attr('value', langOp.submitLoginFormButtonLabel);	
+					$('#submitLoginFormButton').attr('value', langOp.submitFormButtonLabel);	
 					$('#emailLabel').text(langOp.emailLabel + ":");					
 					$('#showLoginFormButton').attr('value', langOp.showLoginForm);
 					$('#sendNewPassword').attr('value', langOp.sendNewPassword).click(function(){
@@ -193,7 +193,7 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<div id='userarea'><div id="username">$username</div><div id="signout"></div>
+	 						<div id='userarea'><div id="username">$username</div><div id="signout"></div><div id="changePassword">change pass</div>
 	 						<div id="inviteUserDiv">Invite User</div></div>
 							<div id='lists'>	
 								<div class='titles'>						
@@ -241,6 +241,18 @@ EOT;
 		Email: <input type='text' name='useremail' id='useremail' /><br/>		
 		<input type='button' value='invite user' name='inviteUserButton' id='inviteUserButton'/>
 	</div>	
+	<div id='changePasswordForm'>
+		<div id="currentPasswordLabel"></div>
+		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
+		<div id="newPasswordLabel"></div>
+		<div><input type='password' name='newPassword' id='newPassword' /></div>
+		<div id="newPasswordAgainLabel"></div>
+		<div><input type='password' name='newPasswordAgain' id='newPasswordAgain' /></div>
+		<div></div>
+		<div><input type='button' name='changePassword' id='changePasswordButton' /></div>
+		<div></div>
+		<div><input type='button' name='cancel' id='changePasswordCancel' /></div>
+	</div>
 	</div>
 	</body>
 </html>
