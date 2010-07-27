@@ -74,6 +74,9 @@ class WebClientManager extends Base
 					$out = $this->authenticator->sendNewPassword($reqArray['email']);		
 				}		
 				break;
+			case $this->actionPrefix . "ChangePassword":
+				$out = $this->changePassword($reqArray);
+				break;	
 			case $this->actionPrefix . "GetUserList":							
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;
@@ -163,21 +166,35 @@ class WebClientManager extends Base
 		 return $out;
 	}
 	
+	private function changePassword($reqArray){
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['newPassword']) && $reqArray['newPassword'] != "" &&
+			isset($reqArray['currentPassword']) && $reqArray['currentPassword'] != "") 
+		{	
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true)
+			{	
+				$newPassword = $reqArray['newPassword'];
+				$currentPassword = $reqArray['currentPassword'];					
+				$out = $this->authenticator->changePassword($newPassword, $currentPassword);		
+			}
+		}
+		return $out;
+	}
 	
 	private function isUserAuthenticated() {
 		$authenticated = false;
 		if ($this->authenticator !== null &&
 			$this->authenticator->isUserAuthenticated() == true) 
-		{
+		{			
 			$authenticated = true;
 		}
-		$authenticated = true;
 		return $authenticated;
 	}
 	
 	private function getUserList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
 	{
-		$out = UNAUTHORIZED_ACCESS;
+		$out = UNAUTHORIZED_ACCESS;		
 		if ($this->isUserAuthenticated() == true)
 		{
 			$out = FAILED;
