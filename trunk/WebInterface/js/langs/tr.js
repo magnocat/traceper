@@ -32,7 +32,8 @@ LAN_OPERATOR.addIndexes({
 			uploader:'Yükleyen',
 			usernameLabel:'Kullan\u0131c\u0131 Ad\u0131',
 			passwordLabel:'Şifre',
-			submitLoginFormButtonLabel:'G\u00F6nder',
+			submitFormButtonLabel:'G\u00F6nder',
+			cancelFormButtonLabel:'Vazge\u00E7',
 			incorrectPassOrUsername:'Kullan\u0131c\u0131 Ad\u0131 veya şifre hatalı!',
 			hi:'Selam',
 			signout:'Çıkış',
@@ -42,6 +43,12 @@ LAN_OPERATOR.addIndexes({
 			sendNewPassword:'Yeni şifre gönder',
 			showLoginForm:'Giriş formunu göster',
 			forgotPassword:'Şifremi unuttum',
+			currentPasswordLabel:'Şimdiki şifre',
+			newPasswordLabel:'Yeni şifre',
+			newPasswordAgainLabel:'Yeni şifre(tekrar)',
+			enterSamePassword:'Lütfen yeni şifre kutucuklarına aynı şifreyi giriniz',
 			newPasswordSent:'Yeni şifre e-posta adresinize gönderilmiştir.',
+			passwordChanged:'Şifre başarıyla değiştirildi',
+			currentPasswordDoesntMatch:'Girilen şifre şimdiki şifre ile aynı değil',
 			warningMissingParameter:'Eksik parametre, form dolduruyorsanız lütfen tüm gerekli alanları boş bırakmayınız'
 		});
