@@ -12,7 +12,6 @@ define("IN_PHP", true);
 define("WEB_ADDRESS", 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']));
 
 require_once("includes/config.php");
-//require_once("includes/content.php");
 
 $dbc = NULL;  // database connectivity;
 $out = NULL;
@@ -25,7 +24,6 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 	$action = $_REQUEST['action'];	
 	if (strpos($action, WEB_CLIENT_ACTION_PREFIX) === 0)
 	{
-//		require_once('classes/WebClientManager.php');
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
 									ELEMENT_COUNT_IN_LIST_PAGE, ELEMENT_COUNT_IN_LOCATIONS_PAGE,
@@ -49,7 +47,6 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 	}
 	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
 	{
-//		require_once ('classes/DeviceManager.php');
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
 								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
