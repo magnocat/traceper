@@ -21,6 +21,7 @@ class AuthenticateManager extends Base{
 	const password = 'authmanager_password';
 	const authTime = 'authmanager_authTime';
 	const daysDataStored = 'authmanager_daysDataStored';
+	const realname = 'authmanager_realname';
 		
 	public function __construct($dbc, $tdo, $tablePrefix){
 		$this->dbc = $dbc;
@@ -36,24 +37,34 @@ class AuthenticateManager extends Base{
 		$username = $this->checkVariable($username);
 		$password = $this->checkVariable($password);
 		
-		$sql = sprintf('SELECT Id 
-						FROM ' . $this->tablePrefix .'_web_users
-						WHERE username="%s" AND password="%s"
+		$sql = sprintf('SELECT Id, realname 
+						FROM ' . $this->tablePrefix .'_users
+						WHERE email="%s" AND password="%s"
 						LIMIT 1', $username, $password);
 		
-		$this->userId = $this->dbc->getUniqueField($sql);
-		if ($this->userId != NULL &&
-			$this->tdo != NULL)
+		$result = $this->dbc->query($sql);
+		if ($result != false) 
 		{
-			$daysDataStored = 0;
-			if ($keepUserLoggedIn == true) {
-				$daysDataStored = 7;
+			if (($row = $this->dbc->fetchObject($result)) != false) 
+			{
+				$this->userId = $row->Id;			
+				$realname = $row->realname;
+			
+				if ($this->userId != NULL &&
+					$this->tdo != NULL)
+				{
+					$daysDataStored = 0;
+					if ($keepUserLoggedIn == true) {
+						$daysDataStored = 7;
+					}
+					$this->tdo->save(self::userId,   $this->userId, $daysDataStored);
+					$this->tdo->save(self::realname, $realname, $daysDataStored);			
+					$this->tdo->save(self::username, $username, $daysDataStored);
+					$this->tdo->save(self::password, $password, $daysDataStored);						
+					$this->tdo->save(self::daysDataStored, $daysDataStored, $daysDataStored);									
+					$this->tdo->save(self::authTime, time());
+				}
 			}
-			$this->tdo->save(self::userId,   $this->userId, $daysDataStored);
-			$this->tdo->save(self::username, $username,     $daysDataStored);
-			$this->tdo->save(self::password, $password,     $daysDataStored);						
-			$this->tdo->save(self::daysDataStored, $daysDataStored,     $daysDataStored);									
-			$this->tdo->save(self::authTime, time());
 		}
 		return $this->userId;		
 	}	
@@ -62,13 +73,13 @@ class AuthenticateManager extends Base{
 		
 	}
 	
-	public function getUserName()
+	public function getRealName()
 	{
 		$value = NULL;
 		if ($this->userId != NULL &&
 			$this->tdo != NULL)
 		{
-			$value = $this->tdo->getValue(self::username);
+			$value = $this->tdo->getValue(self::realname);
 		}
 		return $value;
 	}
@@ -99,7 +110,7 @@ class AuthenticateManager extends Base{
 	public function changePassword($newPassword, $currentPassword)
 	{
 		$newPassword = md5($newPassword);
-		$sql = sprintf('UPDATE ' . $this->tablePrefix .'_web_users
+		$sql = sprintf('UPDATE ' . $this->tablePrefix .'_users
 						SET password = "%s"
 						WHERE Id = %d AND password = "%s" 
 						LIMIT 1', $newPassword, $this->getUserId(), md5($currentPassword));
@@ -124,7 +135,7 @@ class AuthenticateManager extends Base{
 		$email = $this->checkVariable($email);
 		
 		$sql = sprintf('SELECT Id 
-						FROM ' . $this->tablePrefix .'_web_users
+						FROM ' . $this->tablePrefix .'_users
 						WHERE email="%s"
 						LIMIT 1', $email);
 		
@@ -133,7 +144,7 @@ class AuthenticateManager extends Base{
 		if ($Id != NULL)
 		{
 			$password = $this->generatePassword(8, 8);
-			$sql = sprintf('UPDATE ' . $this->tablePrefix .'_web_users
+			$sql = sprintf('UPDATE ' . $this->tablePrefix .'_users
 							SET password=MD5("%s") 
 							WHERE Id = %d
 							LIMIT 1', $password, $Id);
