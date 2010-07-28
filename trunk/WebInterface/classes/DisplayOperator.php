@@ -41,7 +41,7 @@ EOT;
 				$(document).ready( function(){
 					var trackerOp = new TrackerOperator("$callbackURL");	
 					trackerOp.langOperator = langOp;
-					$('#usernameLabel').text(langOp.usernameLabel+":");	
+					$('#usernameLabel').text(langOp.emailLabel+":");	
 					$('#passwordLabel').text(langOp.passwordLabel+":");
 					$('#rememberMeLabel').text(langOp.rememberMeLabel).click(function(){
 						$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
