@@ -175,7 +175,8 @@ function setLanguage(langOperator){
 	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel);
 	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
 	$("#changePasswordCancel").val(langOperator.cancelFormButtonLabel);
-	
+	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
+	$("#inviteUserButton").val(langOperator.inviteUserLabel);
 	
 //	$("#loading p").html(langOperator.loading);
 	

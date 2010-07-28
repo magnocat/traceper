@@ -2,11 +2,11 @@
 
 class DisplayOperator
 {
-	private static $username;
+	private static $realname;
 	private static $userId;
 	
 	public static function setUsernameAndId($name, $Id){
-		self::$username = $name;
+		self::$realname = $name;
 		self::$userId = $Id;
 	}
 	
@@ -115,7 +115,7 @@ EOT;
 	public static function getMainPage($callbackURL, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language) {
 
 		$head = self::getMetaNLinkSection();
-		$username = self::$username;
+		$realname = self::$realname;
 		
 		$str = <<<MAIN_PAGE
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -193,7 +193,7 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<div id='userarea'><div id="username">$username</div><div id="signout"></div><div id="changePassword">change pass</div>
+	 						<div id='userarea'><div id="username">$realname</div><div id="signout"></div><div id="changePassword">change pass</div>
 	 						<div id="inviteUserDiv">Invite User</div></div>
 							<div id='lists'>	
 								<div class='titles'>						
@@ -238,8 +238,8 @@ EOT;
 	<div style="display:none;">	
 	<div id='aboutus'></div>
 	<div id='InviteUserForm'>
-		Email: <input type='text' name='useremail' id='useremail' /><br/>		
-		<input type='button' value='invite user' name='inviteUserButton' id='inviteUserButton'/>
+		<div id="inviteUserEmailLabel"></div> <input type='text' name='useremail' id='useremail' /><br/>		
+		<input type='button' name='inviteUserButton' id='inviteUserButton'/>
 	</div>	
 	<div id='changePasswordForm'>
 		<div id="currentPasswordLabel"></div>
