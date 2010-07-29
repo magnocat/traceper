@@ -85,7 +85,8 @@ EOT;
 				</script>
 			</head>
 			<body>
-				<div id="userLoginForm">				
+				<div id='loginLogo' ></div>
+				<div id="userLoginForm">									
 					<div id="usernameLabel"></div>
 					<div><input type="text" name="username" id="username" /></div>
 					<div id="passwordLabel"></div>

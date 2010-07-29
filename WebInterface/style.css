@@ -72,11 +72,24 @@ a {
 	float:right;
 }
 
-#logo, .logo, .logo_inFullMap{
+#logo, .logo, .logo_inFullMap, #loginLogo {
 	height:70px;
 	background: url("images/logo.png") no-repeat center;
 	cursor:pointer;		
 }
+#loginLogo {
+	height:160px;
+}
+#userLoginForm, #forgotPasswordForm {
+	position:absolute;
+	top:125px;
+	width:100%;
+	text-align:center;	
+	line-height: 25px;
+}
+#userLoginForm #username, #userLoginForm #password {
+	width:200px;
+} 
 .logo_inFullMap{
 	display:none;
 	z-index:200;
