@@ -140,7 +140,8 @@ EOT;
 	<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
-	
+	<script type="text/javascript" src="js/DataOperations.js"></script>
+			
 	<script type="text/javascript" src="js/TrackerOperator.js"></script>
 	<script type="text/javascript" src="js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="js/bindings.js"></script>	
