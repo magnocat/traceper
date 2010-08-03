@@ -258,7 +258,7 @@ function processImageXML(MAP, xml){
 		var image = $(this);
 		var imageId = $(image).attr('id');
 		var imageURL =  decodeURIComponent($(image).attr('url'));
-		var username = $(image).attr("byUserName");
+		var realname = $(image).attr("byRealName");
 		var userId = $(image).attr("byUserId");
 		var latitude = $(image).attr('latitude');
 		var longitude = $(image).attr('longitude');
@@ -270,7 +270,7 @@ function processImageXML(MAP, xml){
 								+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
 							+ "</div>"
 							+ "<div>"
-								+ TRACKER.langOperator.uploader + ": " + username 
+								+ TRACKER.langOperator.uploader + ": " + realname 
 								+ "<br/>"
 								+ TRACKER.langOperator.time + ": " + time									
 							+ "</div>"
@@ -293,7 +293,7 @@ function processImageXML(MAP, xml){
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 												imageURL:imageURL,
 												userId:userId,
-												username:username,
+												realname:realname,
 												latitude:latitude,
 												longitude:longitude,
 												time:time,

@@ -10,6 +10,7 @@ LAN_OPERATOR.addIndexes({
 			noMatchFound:'no match found',
 			realname:'Name',
 			time:'Date',
+			upLoadtime:'Upload time',
 			deviceId:'Device id',
 			latitude:'Latitude',
 			longitude:'Longitude',

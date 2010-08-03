@@ -88,7 +88,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var imageId;
 		var imageURL;
 		var userId;
-		var username;
+		var realname; // realname of the user
 		var latitude;
 		var longitude;
 		var time;
@@ -482,13 +482,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	
 	this.openMarkerInfoWindow = function(userId){
-		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'
-											//			   + '<b>' + TRACKER.users[userId].username + '</b>'
-														   + '<br/>' + TRACKER.langOperator.realname + ": "+TRACKER.users[userId].realname  
-														   + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
-														   + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
-														   + '<br/>' + TRACKER.langOperator.latitude + ": " + TRACKER.users[userId].latitude  
-														   + '<br/>' + TRACKER.langOperator.longitude + ": " + TRACKER.users[userId].longitude
+		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'														   
+														   + '<br/>' + TRACKER.users[userId].realname  
+														   + '<br/>' + TRACKER.users[userId].time
+														   + '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
+														   //+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
+															  
 														   +'</div>'
 														   + '<ul class="sf-menu"> '
 														   		+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
@@ -524,9 +523,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					+ "<div>"
 						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
 						+ "<br/>"
-						+ TRACKER.langOperator.time + ": " + TRACKER.images[imageId].time + "<br/>"
-						+ TRACKER.langOperator.latitude + ": " + TRACKER.images[imageId].latitude + "<br/>"
-						+ TRACKER.langOperator.longitude + ": " + TRACKER.images[imageId].longitude
+						+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
 					+ "</div>"
 					+ '<ul class="sf-menu"> '
 						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
