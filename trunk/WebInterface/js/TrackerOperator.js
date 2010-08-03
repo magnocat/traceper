@@ -360,13 +360,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}, true);	
 	}
 	
-	this.searchImage = function(username,userId, pageNo){
+	this.searchImage = function(realname,userId, pageNo){
 		var params = "";
 		if (userId != false){
 			params = "userId=" + userId;
 		}
 		else if (username != false){
-			params = "username=" + username;
+			params = "realname=" + realname;
 		}
 		
 		if (params == ""){
@@ -382,7 +382,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				var str = processImageXML(MAP, result);
 				
 				if (str != null) {
-					str += TRACKER.writePageNumbers('javascript:TRACKER.searchImage("'+ username +'","'+ userId +'" %d)', TRACKER.imageListSearchPageCount, TRACKER.imageListSearchPageNo, 3);
+					str += TRACKER.writePageNumbers('javascript:TRACKER.searchImage("'+ realname +'","'+ userId +'" %d)', TRACKER.imageListSearchPageCount, TRACKER.imageListSearchPageNo, 3);
 				}
 				else {
 					str = "<div class='generalStyle'>" + TRACKER.langOperator.noMatchFound + "</div>";				

@@ -429,7 +429,7 @@ class WebClientManager extends Base
 	private function searchImage($reqArray, $elementCountInAPage)
 	{
 		$userId = null;
-		$username = null;
+		$realname = null;
 		$pageNo = 1;
 		if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
 					$pageNo = (int) $reqArray['pageNo'];
@@ -439,7 +439,7 @@ class WebClientManager extends Base
 		if (isset($reqArray['userId']) && !empty($reqArray['userId'])){
 			$userId = (int) $reqArray['userId'];
 			$sql = 'SELECT 
-						u.Id, u.userId, usr.username, u.latitude, 
+						u.Id, u.userId, usr.realname, u.latitude, 
 						u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
@@ -452,16 +452,16 @@ class WebClientManager extends Base
 			 				  FROM '. $this->tablePrefix .'_upload
 			 				  WHERE userId = '. $userId .'';
 		}
-		else if (isset($reqArray['username']) && !empty($reqArray['username'])){
-			$username = $this->checkVariable($reqArray['username']);
+		else if (isset($reqArray['realname']) && !empty($reqArray['realname'])){
+			$realname = $this->checkVariable($reqArray['realname']);
 			
 			$sql = 'SELECT 
-						u.Id, u.userId, usr.username, u.latitude, 
+						u.Id, u.userId, usr.realname, u.latitude, 
 						u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
 					ON  usr.Id = u.userId
-					WHERE usr.username like "%'. $username .'%"
+					WHERE usr.realname like "%'. $realname .'%"
 					ORDER BY u.Id
 					DESC
 					LIMIT ' . $offset . ',' . $elementCountInAPage;
@@ -471,10 +471,10 @@ class WebClientManager extends Base
 			 				  FROM '. $this->tablePrefix .'_upload u
 			 				  LEFT JOIN '. $this->tablePrefix .'_users usr
 							  ON  usr.Id = u.userId
-							  WHERE usr.username like "%'. $username .'%"';
+							  WHERE usr.realname like "%'. $realname .'%"';
 			
 		}
-		if ($username != null || $userId != null){
+		if ($realname != null || $userId != null){
 			$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true){
 //				$out = FAILED;
