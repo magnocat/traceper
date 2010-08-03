@@ -10,6 +10,7 @@ LAN_OPERATOR.addIndexes({
 			noMatchFound:'Uygun sonu\u00E7 bulunamad\u0131',
 			realname:'Ad',
 			time:'Zaman',
+			upLoadtime:'Yükleme zamanı',
 			deviceId:'Cihaz no',
 			latitude:'Enlem',
 			longitude:'Boylam',

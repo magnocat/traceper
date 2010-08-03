@@ -395,7 +395,7 @@ class WebClientManager extends Base
 			$offset = ($pageNo - 1) * $elementCountInAPage;
 			
 			$sql = 'SELECT 
-								u.Id, u.userId, usr.username, u.latitude, 
+								u.Id, u.userId, usr.realname, u.latitude, 
 								u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
 							FROM '. $this->tablePrefix . '_upload u
 							LEFT JOIN '. $this->tablePrefix .'_users usr
@@ -504,7 +504,7 @@ class WebClientManager extends Base
 				$thumbCreator = new ThumbCreator($this->imageDirectory, $this->missingImage);
 				$out = $thumbCreator->getImage($imageId, $thumb);					
 			}
-		}
+		}		
 		return $out;	
 	}
 	
@@ -640,10 +640,10 @@ class WebClientManager extends Base
 		$row->uploadTime = isset($row->uploadTime) ? $row->uploadTime : null;
 		$row->Id = isset($row->Id) ? $row->Id : null;
 		$row->userId = isset($row->userId) ? $row->userId : null;
-		$row->username = isset($row->username) ? $row->username : null;
+		$row->realname = isset($row->realname) ? $row->realname : null;
 
 
-		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byUserName="'. $row->username .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'"  time="'.$row->uploadTime.'"/>';
+		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'"  time="'.$row->uploadTime.'"/>';
 
 		return $str;
 	}
