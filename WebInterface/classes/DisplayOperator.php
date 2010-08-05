@@ -23,7 +23,7 @@ EOT;
 		return $str;
 		
 	}
-	public function getLoginPage($page, $callbackURL, $language){
+	public static function getLoginPage($page, $callbackURL, $language){
 		$head = self::getMetaNLinkSection();
 		$str = <<<EOT
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -71,7 +71,13 @@ EOT;
 						$('#userLoginForm').toggle();
 						$('#forgotPasswordForm').toggle();
 					});
-					
+					$('#register, #cancelRegistration').click(function(){
+						$('#userLoginForm').toggle();
+						$('#registerForm').toggle();
+					});		
+					$('#registerButton').click(function(){
+						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val());
+					});			
 				
 				});	
 				function sendNewPassword(){
@@ -94,7 +100,8 @@ EOT;
 					<div><input type="checkbox" name="rememberMe" id="rememberMe"/>
 						 <div style="display:inline" id="rememberMeLabel"></div>
 					</div>
-					<div id="forgotPassword"></div>					
+					<div id="forgotPassword"></div>	
+					<div id="register">Register</div>				
 					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
 				<div id="forgotPasswordForm" style="display:none">
@@ -102,7 +109,13 @@ EOT;
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
 				</div>
-				
+				<div id="registerForm" style="display:none">		
+					<div id="registerEmailLabel"></div><input type="text" id="registerEmail" /><br />
+					name     :<input type="text" id="registerName" /><br />
+					password :<input type="password" id="registerPassword" /><br />
+					<input type="button" id="registerButton" value="Register" />
+					<input type="button" id="cancelRegistration" value="Cancel" />
+				</div>
 				
 			</body>
 			</html>				
@@ -262,9 +275,5 @@ MAIN_PAGE;
 
 		  return $str;
 }
-
-		
-	
-
 
 }

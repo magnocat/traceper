@@ -20,6 +20,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionInviteUser = "WebClientInviteUser";
 	this.actionChangePassword = "WebClientChangePassword";
 	this.actionDeleteImage = "WebClientDeleteImage";
+	this.actionRegisterUser = "WebClientRegisterUser";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -129,11 +130,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			else{
 				alert("Error in operation");
 			}
-		});
-		
-		
-		
+		});		
 	};
+	
+	this.registerUser = function(email, name, password) {
+		var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password;
+		
+		TRACKER.ajaxReq(params, function (result){
+			if (result == "1") {					
+				alert("operation is succesfull");
+			}
+			else{
+				alert("Error in operation");
+			}
+		});		
+	}
 	
 	this.sendNewPassword = function(email){
 		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;		

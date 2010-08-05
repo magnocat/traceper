@@ -122,6 +122,9 @@ class WebClientManager extends Base
 			case $this->actionPrefix ."InviteUser":
 				$out = $this->inviteUser($reqArray);
 				break;
+			case $this->actionPrefix ."RegisterUser":
+				$out = $this->registerUser($reqArray);
+				break;
 			default:
 				
 				$out = UNSUPPORTED_ACTION;
@@ -165,6 +168,27 @@ class WebClientManager extends Base
 			}
 		 }
 		 return $out;
+	}
+	private function registerUser($reqArray)
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['email']) && $reqArray['email'] != null &&
+			isset($reqArray['name']) && $reqArray['name'] != null &&
+			isset($reqArray['password']) && $reqArray['password'] != null)
+		 {
+		 			
+		 	$email = $this->checkVariable($reqArray['email']);
+		 	$name = $this->checkVariable($reqArray['name']);
+		 	$password = $this->checkVariable($reqArray['password']);		 	
+		 	$result = $this->usermanager->registerUser($email, $name, $password);
+		 	$out = FAILED;
+		 	if ($result == true) {
+		 		$out = SUCCESS;
+		 	}		 	
+			
+		 }
+		 return $out;
+		
 	}
 	private function changePassword($reqArray){
 		$out = MISSING_PARAMETER;
