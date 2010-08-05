@@ -23,6 +23,20 @@ class UserManager extends Base implements IUserManagement
 		return $out;
 	}
 	
+	public function registerUser($email, $name, $password){
+		
+		$password = md5($password);
+		$sql = sprintf("INSERT INTO traceper_users (email, realname, password ) 
+					    VALUE('%s','%s','%s')", $email, $name, $password);
+	
+		$result = false;
+		if ($this->dbc->query($sql) != false){
+			$result = true;
+		}
+		
+		return $result;		
+	}
+	
 	
 	//TODO: group tablosunda kullanıcının kaydı olan grup varsa onlarda silinmeli
 	public function deleteUser($userId)
