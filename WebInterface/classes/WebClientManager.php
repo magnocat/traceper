@@ -125,6 +125,9 @@ class WebClientManager extends Base
 			case $this->actionPrefix ."RegisterUser":
 				$out = $this->registerUser($reqArray);
 				break;
+			case $this->actionPrefix . "ActivateAccount":
+				$out = $this->usermanager->activateAccount($reqArray);
+				break;
 			default:
 				
 				$out = UNSUPPORTED_ACTION;

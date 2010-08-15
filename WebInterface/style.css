@@ -80,7 +80,7 @@ a {
 #loginLogo {
 	height:160px;
 }
-#userLoginForm, #forgotPasswordForm {
+#userLoginForm, #forgotPasswordForm, #registerForm {
 	position:absolute;
 	top:125px;
 	width:100%;
