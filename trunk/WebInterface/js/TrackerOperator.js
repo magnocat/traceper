@@ -133,17 +133,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});		
 	};
 	
-	this.registerUser = function(email, name, password) {
-		var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password;
+	this.registerUser = function(email, name, password, confirmPassword) {
+		if (password == confirmPassword) {		
 		
-		TRACKER.ajaxReq(params, function (result){
-			if (result == "1") {					
-				alert("operation is succesfull");
-			}
-			else{
-				alert("Error in operation");
-			}
-		});		
+			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password;
+			
+			TRACKER.ajaxReq(params, function (result){
+				if (result == "1") {					
+					alert("operation is succesfull");
+				}
+				else{
+					alert("Error in operation");
+				}
+			});
+			
+		}
+		else{
+			//TODO: uyari dil dosyasindan alinsin
+			//TODO: password alanlarindaki degerler silinsin
+			alert("passwords doesn't match");
+		}
 	}
 	
 	this.sendNewPassword = function(email){

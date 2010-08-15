@@ -76,7 +76,7 @@ EOT;
 						$('#registerForm').toggle();
 					});		
 					$('#registerButton').click(function(){
-						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val());
+						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val());
 					});			
 				
 				});	
@@ -110,9 +110,10 @@ EOT;
 					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
 				</div>
 				<div id="registerForm" style="display:none">		
-					<div id="registerEmailLabel"></div><input type="text" id="registerEmail" /><br />
-					name     :<input type="text" id="registerName" /><br />
-					password :<input type="password" id="registerPassword" /><br />
+					<div id="registerEmailLabel">e-mail</div><input type="text" id="registerEmail" /><br />
+					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
+					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
+					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
 					<input type="button" id="cancelRegistration" value="Cancel" />
 				</div>
