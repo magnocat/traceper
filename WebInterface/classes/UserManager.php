@@ -5,15 +5,18 @@ require_once("Base.php");
 
 class UserManager extends Base implements IUserManagement
 {
-
-	function __construct($dbc){
+	private $tablePrefix;
+	
+	function __construct($dbc, $tablePrefix ){
 		$this->dbc = $dbc;
+		$this->tablePrefix = $tablePrefix;
+	
 	}
 
 
 	public function inviteUser($email)
 	{
-		$sql = sprintf('INSERT INTO traceper_invitedusers(email)
+		$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_invitedusers(email)
 				VALUES("%s")', $email); 							  
 		$out = FAILED;
 		if ($this->dbc->query($sql) != false)
@@ -29,7 +32,8 @@ class UserManager extends Base implements IUserManagement
 		//TODO: email adresinin formatina bakacaz
 		$md5Password = md5($password);
 		$time = date('Y-m-d h:i:s'); 
-		$sql = sprintf("INSERT INTO traceper_user_candidates (email, realname, password, time )
+		// Burada bir hata var this bordo olmad� 
+		$sql = sprintf("INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
 					    VALUE('%s','%s','%s','%s')", $email, $name, $md5Password, $time);
 		$key = md5($email.$time);
 
@@ -48,7 +52,7 @@ class UserManager extends Base implements IUserManagement
 		else {
 			if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE)
 			{
-				$sql = sprintf('UPDATE traceper_user_candidates 
+				$sql = sprintf('UPDATE '.$this->tablePrefix.'_user_candidates 
 								SET time="%s", realname="%s", password="%s" 
 								WHERE email="%s"
 								LIMIT 1', $time, $name, $md5Password, $email);
@@ -74,7 +78,7 @@ class UserManager extends Base implements IUserManagement
 			$key = $reqArray['key'];	
 			
 			$sql = sprintf('SELECT realname, time, password 
-							FROM traceper_user_candidates
+							FROM '.$this->tablePrefix.'_user_candidates
 							WHERE email="%s" 
 							LIMIT 1',$email);
 			if (($result = $this->dbc->query($sql)) != false)
@@ -83,12 +87,12 @@ class UserManager extends Base implements IUserManagement
 					$generatedKey =  md5($email.$row->time);					
 					$out = KEYS_DONT_MATCH;
 					if ($generatedKey == $key){
-						$sql = sprintf('INSERT INTO traceper_users(email, realname, password)
+						$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_users(email, realname, password)
 										VALUES("%s","%s","%s")', $email, $row->realname, $row->password);
 						
 						if ($this->dbc->query($sql) != false){
 							$out = SUCCESS;
-							$sql = sprintf('DELETE FROM traceper_user_candidates 
+							$sql = sprintf('DELETE FROM '.$this->tablePrefix.'_user_candidates 
 											WHERE email="%s"', $email);
 							//TODO: silinmezse bir sekilde anlamamiz gerekiyor
 							$this->dbc->query($sql);							
@@ -109,7 +113,7 @@ class UserManager extends Base implements IUserManagement
 	//TODO: group tablosunda kullanıcının kaydı olan grup varsa onlarda silinmeli
 	public function deleteUser($userId)
 	{
-		$sql = sprintf('DELETE FROM traceper_users WHERE Id=%d',$userId);
+		$sql = sprintf('DELETE FROM '.$this->tablePrefix.'_users WHERE Id=%d',$userId);
 		$result=false;
 		if ($this->dbc->query($sql) != false){
 			$result = true;
@@ -118,7 +122,7 @@ class UserManager extends Base implements IUserManagement
 	}
 
 	public function addUserToGroup($userId, $groupId){
-		$sql = sprintf('INSERT INTO traceper_user_group_relation(userId, groupId)
+		$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_group_relation(userId, groupId)
 						VALUES (%d, %d)', $userId, $groupId);
 
 		$result = false;
@@ -130,7 +134,7 @@ class UserManager extends Base implements IUserManagement
 	}
 
 	public function deleteUserFromGroup($userId, $groupId){
-		$sql = sprintf('DELETE FROM traceper_user_group_relation
+		$sql = sprintf('DELETE FROM '.$this->tablePrefix.'_user_group_relation
 						WHERE userId = %d AND 
 							  groupId = %d
 						LIMIT 1', $userId, $groupId);
@@ -146,7 +150,7 @@ class UserManager extends Base implements IUserManagement
 	public function addGroup($groupName, $description){
 		$groupname = self::checkVariable($groupName);
 
-		$sql = sprintf('INSERT INTO traceper_groups(name, description)
+		$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_groups(name, description)
 						VALUES ("%s", "%s")', $groupName, $description);
 
 		$result = false;
@@ -158,7 +162,7 @@ class UserManager extends Base implements IUserManagement
 	}
 
 	public function deleteGroup($groupId){
-		$sql = sprintf('DELETE FROM traceper_groups
+		$sql = sprintf('DELETE FROM '.$this->tablePrefix.'_groups
 						WHERE id = %d 
 						LIMIT 1', $groupId);
 
@@ -174,7 +178,7 @@ class UserManager extends Base implements IUserManagement
 	public function changeGroupName($groupId, $groupName){
 		$groupname = self::checkVariable($groupName);
 
-		$sql = sprintf('UPDATE traceper_groups
+		$sql = sprintf('UPDATE '.$this->tablePrefix.'_groups
 						SET name = "%s"
 						WHERE Id = %d
 						LIMIT 1', $groupName, $groupId);
