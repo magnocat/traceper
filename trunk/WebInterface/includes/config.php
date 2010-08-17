@@ -18,7 +18,7 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "12345";
+$dbPassword = "2110026";
 // database name
 $dbName = "php";
 
@@ -35,7 +35,7 @@ define("LANGUAGE", "en");
 /* This is the number of elements in user and search list page  */
 define ("ELEMENT_COUNT_IN_LIST_PAGE", 8); 
 
-define ('ELEMENT_COUNT_IN_PHOTO_PAGE',5);
+define ('ELEMENT_COUNT_IN_PHOTO_PAGE',4);
 /**
  * This is the number of elements when updating user data in background
  */
