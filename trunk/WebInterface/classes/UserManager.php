@@ -32,7 +32,7 @@ class UserManager extends Base implements IUserManagement
 		//TODO: email adresinin formatina bakacaz
 		$md5Password = md5($password);
 		$time = date('Y-m-d h:i:s'); 
-		// Burada bir hata var this bordo olmadý 
+		//TODO: Burada bir hata var this bordo olmadý 
 		$sql = sprintf("INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
 					    VALUE('%s','%s','%s','%s')", $email, $name, $md5Password, $time);
 		$key = md5($email.$time);
