@@ -55,5 +55,7 @@ LAN_OPERATOR.addIndexes({
 			warningMissingParameter:'Missing parameter, if you fill a form please don\'t leave any required field blank',
 			confirmationMessage:'Are you sure that you want to do that?',
 			errorInOperation:'Error in operation',
-			inviteUserLabel:'Invite'
+			inviteUserLabel:'Invite',
+			dataRecordedCheckYourEmail:'Your data is recorded successfully, check your email to activate your account',
+			emailAlreadyExist:'This email is already registered.If you want, you can use \'Forgot your password\'',
 		});

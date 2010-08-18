@@ -183,12 +183,7 @@ class WebClientManager extends Base
 		 	$email = $this->checkVariable($reqArray['email']);
 		 	$name = $this->checkVariable($reqArray['name']);
 		 	$password = $this->checkVariable($reqArray['password']);		 	
-		 	$result = $this->usermanager->registerUser($email, $name, $password);
-		 	$out = FAILED;
-		 	if ($result == true) {
-		 		$out = SUCCESS;
-		 	}		 	
-			
+		 	$out = $this->usermanager->registerUser($email, $name, $password);			
 		 }
 		 return $out;
 		

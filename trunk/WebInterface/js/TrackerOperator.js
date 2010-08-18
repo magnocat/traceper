@@ -140,10 +140,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
-					alert("operation is succesfull");
+					alert(TRACKER.langOperator.dataRecordedCheckYourEmail);
 				}
-				else{
-					alert("Error in operation");
+				else if (result == "-5"){
+					alert(TRACKER.langOperator.emailAlreadyExist);
 				}
 			});
 			
@@ -677,6 +677,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 							}
 							else if(result == "-2") {
 								alert(TRACKER.langOperator.warningMissingParameter);
+							}
+							else if (result == "-1"){
+								alert(TRACKER.langOperator.errorInOperation);
 							}
 							else {
 								callback(result);

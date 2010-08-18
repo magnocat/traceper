@@ -11,13 +11,13 @@ require_once('Base.php');
 
 class DeviceManager extends Base
 {
-	private $dbc = NULL;
 	private $actionPrefix;
 	private $tablePrefix = NULL;	
 	private $locationResolution = 6;
 	private $gpsMinDataSentInterval = 60000;
 	private $gpsMinDistanceInterval = 100;
 	private $uploadPath;
+	private $usermanager = NULL;
 	
 	public function __construct($dbc, $actionPrefix, $tablePrefix, $gpsMinDataSentInterval,
 	 							$gpsMinDistanceInterval) 
@@ -28,6 +28,10 @@ class DeviceManager extends Base
 		$this->gpsMinDataSentInterval = $gpsMinDataSentInterval;
 		$this->gpsMinDistanceInterval = $gpsMinDistanceInterval;
 		
+	}
+	
+	public function setUserManager($usermanager){
+		$this->usermanager = $usermanager;		
 	}
 	
 	public function setUploadPath($uploadPath){
@@ -80,7 +84,7 @@ class DeviceManager extends Base
 			&& isset($reqArray['latitude']) && $reqArray['latitude'] != NULL
 			&& isset($reqArray['longitude']) && $reqArray['longitude'] != NULL
 			&& isset($reqArray['altitude']) && $reqArray['altitude'] != NULL
-			&& isset($reqArray['username']) && $reqArray['username'] != NULL
+			&& isset($reqArray['email']) && $reqArray['email'] != NULL
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL)
 		{
 			$out = FAILED;
@@ -89,7 +93,7 @@ class DeviceManager extends Base
 				$latitude = (float) $reqArray['latitude'];
 				$longitude = (float) $reqArray['longitude'];
 				$altitude = (float) $reqArray['altitude'];
-				$username = $this->checkVariable($reqArray['username']);
+				$email = $this->checkVariable($reqArray['email']);
 				$password = $this->checkVariable($reqArray['password']);
 
 				$sql = sprintf('INSERT INTO '
@@ -97,10 +101,10 @@ class DeviceManager extends Base
 									(userId, latitude, longitude, altitude, uploadtime)
 								SELECT Id, %s, %s, %s, NOW()
 									FROM '. $this->tablePrefix .'_users
-								WHERE username = "%s" AND
+								WHERE email = "%s" AND
 									  password = "%s"
 								LIMIT 1', $latitude, $longitude, $altitude,
-									$username, $password);
+									$email, $password);
 				if ($this->dbc->query($sql)){
 					if (move_uploaded_file($uploadedFile["image"]["tmp_name"], $this->uploadPath .'/'.$this->dbc->lastInsertId() . '.jpg'))
 					{
@@ -123,7 +127,7 @@ class DeviceManager extends Base
 		if (isset($reqArray['latitude']) && $reqArray['latitude'] != NULL
 			&& isset($reqArray['longitude']) && $reqArray['longitude'] != NULL
 			&& isset($reqArray['altitude']) && $reqArray['altitude'] != NULL
-			&& isset($reqArray['username']) && $reqArray['username'] != NULL
+			&& isset($reqArray['email']) && $reqArray['email'] != NULL
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL
 			&& isset($reqArray['deviceId']) && $reqArray['deviceId'] != NULL
 		)
@@ -132,7 +136,7 @@ class DeviceManager extends Base
 			$latitude = (float) $reqArray['latitude'];
 			$longitude = (float) $reqArray['longitude'];
 			$altitude = (float) $reqArray['altitude'];
-			$username = $this->checkVariable($reqArray['username']);
+			$email = $this->checkVariable($reqArray['email']);
 			$password = $this->checkVariable($reqArray['password']);
 			$deviceId = $this->checkVariable($reqArray['deviceId']);
 
@@ -146,23 +150,23 @@ class DeviceManager extends Base
 							 	dataArrivedTime = NOW(),
 							 	deviceId = '%s'							 	
 							WHERE 
-								username = '%s' 
+								email = '%s' 
 								AND 
 								password = '%s'
 							LIMIT 1;", 
-						   $latitude, $longitude, $altitude, $deviceId, $username, $password);
-
+						   $latitude, $longitude, $altitude, $deviceId, $email, $password);
+			
 			$sqlWasHere = sprintf('INSERT INTO '
 									. $this->tablePrefix . '_user_was_here
 										(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
 	    							SELECT Id, %f, %f, %f, NOW(), "%s" 
 									FROM '. $this->tablePrefix.'_users 
-									WHERE username = "%s" 
+									WHERE email = "%s" 
 										  AND 
 										  password = "%s"
 									LIMIT 1',
-									$latitude, $longitude, $altitude, $deviceId, $username, $password);			   
-
+									$latitude, $longitude, $altitude, $deviceId, $email, $password);			   
+			
 			$out = FAILED;
 			if ($this->dbc->query($sql)) {	
 				$out = SUCCESS;				
@@ -186,39 +190,23 @@ class DeviceManager extends Base
 	 * @return unknown_type
 	 */
 	private function registerUser($reqArray)
-	{		
+	{	
+		$out = MISSING_PARAMETER;	
 		if (isset($reqArray['realname']) && $reqArray['realname'] != NULL 
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL     
-			&& isset($reqArray['username']) && $reqArray['username'] != NULL 
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL 
-	//		&& isset($reqArray['im']) && $reqArray['im'] != NULL 				
 			)
 		{
 			
 			$realname = $this->checkVariable($reqArray['realname']);
 			$email = $this->checkVariable($reqArray['email']);					
-			$username = $this->checkVariable($reqArray['username']);
 			$password = $this->checkVariable($reqArray['password']);
-	//		$im = $this->checkVariable($reqArray['im']);	
-			
-			$sql = sprintf("INSERT INTO "
-								. $this->tablePrefix ."_users
-								  (username, password, realname, email ) 
-							VALUES
-							('%s',      '%s',      '%s',      '%s');",
-							 $username,	$password, $realname, $email);
 			$out = FAILED;
-			
-			if ($this->dbc->query($sql)) {
-				$out = SUCCESS;
-			}	
-			else if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE) {				
-				$out = USER_NAME_ALREADY_EXIST;
-			}			 							 
+			if ($this->usermanager != NULL) {
+				$out = $this->usermanager->registerUser($email, $name, $password);
+			}							 							 
 		}
-		else {
-			$out = MISSING_PARAMETER;
-		}
+		
 		return $out;		
 	}
 	
@@ -227,6 +215,7 @@ class DeviceManager extends Base
 	 * @param $reqArray
 	 * @return unknown_type
 	 */
+/*	
 	private function unregisterUser($reqArray){
 		
 		if (isset($reqArray['username']) && $reqArray['username'] != NULL 
@@ -256,7 +245,7 @@ class DeviceManager extends Base
 		return $out;				
 		
 	}
-	
+*/	
 	private function prepareXML($result)
 	{
 		$out = '<?xml version="1.0" encoding="UTF-8"?>'

@@ -18,7 +18,7 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "2110026";
+$dbPassword = "21236161";
 // database name
 $dbName = "php";
 
@@ -41,7 +41,7 @@ define ('ELEMENT_COUNT_IN_PHOTO_PAGE',4);
  */
 define ("ELEMENT_COUNT_IN_LOCATIONS_PAGE", 50); 
 /**
- * This is the time(milliseconds) interval that an ajax request is made to get the users data in every times of interval 
+ * This is the time(milliseconds) interredundant val that an ajax request is made to get the users data in every times of interval 
  */
 define ("UPDATE_USER_LIST_INTERVAL", 5000); 
 /**
@@ -90,7 +90,7 @@ define ("FAILED", "-1");  // Don't edit
 define ("MISSING_PARAMETER", "-2"); //Don't edit
 define ("UNSUPPORTED_ACTION", "-3"); //Don't edit
 define ("UNAUTHORIZED_ACCESS", "-4");
-define ("USER_NAME_ALREADY_EXIST", "-5"); //Don't edit
+define ("EMAIL_ALREADY_EXIST", "-5"); //Don't edit
 define ("EMAIL_NOT_FOUND", "-6");
 define ("CURRENT_PASSWORD_DOESNT_MATCH", "-7");
 define ("KEYS_DONT_MATCH", "-8");

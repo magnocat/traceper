@@ -54,5 +54,7 @@ LAN_OPERATOR.addIndexes({
 			warningMissingParameter:'Eksik parametre, form dolduruyorsanız lütfen tüm gerekli alanları boş bırakmayınız',
 			confirmationMessage:'Bu işlemi yapmak istediğinize emin misiniz?',
 			errorInOperation:'İşlem yapılamadı!',
-			inviteUserLabel:'Davetiye gönder'
+			inviteUserLabel:'Davetiye gönder',
+			dataRecordedCheckYourEmail:'Bilgileriniz başarıyla kaydedilmiştir, hesabınızı aktif hale getirmek için e-mailinizi kontrol ediniz.',
+			emailAlreadyExist:'Bu e-posta adresi kayıtlarda zaten bulunmaktadır. İsterseniz, \'Şifremi unuttum\'u kullanabilirsiniz. ',
 		});
