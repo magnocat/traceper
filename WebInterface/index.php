@@ -30,7 +30,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$wcm->setTempDataStoreOperator($tdo);
 		$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
 
-		$usermanager = new UserManager($dbc);			
+		$usermanager = new UserManager($dbc, STAFF_TRACKER_TABLE_PREFIX);			
 		$wcm->setUserManager($usermanager);
 		
 				
@@ -49,6 +49,11 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
 								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
 		$dm->setUploadPath(UPLOAD_DIRECTORY);
+		
+		$usermanager = new UserManager($dbc, STAFF_TRACKER_TABLE_PREFIX);			
+		$dm->setUserManager($usermanager);
+		
+		
 		$out = $dm->process($_REQUEST);
 	}
 }

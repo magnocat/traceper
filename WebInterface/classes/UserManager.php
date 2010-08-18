@@ -28,43 +28,53 @@ class UserManager extends Base implements IUserManagement
 
 	public function registerUser($email, $name, $password)
 	{
-		//TODO: email adresi var olan traceper_users da kayyitli olup olmadigina bakilacak
 		//TODO: email adresinin formatina bakacaz
-		$md5Password = md5($password);
-		$time = date('Y-m-d h:i:s'); 
-		//TODO: Burada bir hata var this bordo olmadý 
-		$sql = sprintf("INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
-					    VALUE('%s','%s','%s','%s')", $email, $name, $md5Password, $time);
-		$key = md5($email.$time);
-
-		$message = 'Hi,<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccount&email='.$email.'&key='.$key.'">'.
+		$sql = sprintf('SELECT Id 
+						FROM '.$this->tablePrefix.'_users
+						WHERE email="%s"
+						LIMIT 1', $email);
+		$out = FAILED;
+		
+		if (($res = $this->dbc->query($sql)) != false)
+		{
+			$out = EMAIL_ALREADY_EXIST;
+			if ($this->dbc->numRows($res) == 0)
+			{ 		
+				$md5Password = md5($password);
+				$time = date('Y-m-d h:i:s');
+				$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
+					    VALUE("%s","%s","%s","%s")', $email, $name, $md5Password, $time);
+				$key = md5($email.$time);
+				$message = 'Hi,<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccount&email='.$email.'&key='.$key.'">'.
 					'Click here to activate your account</a> <br/>';
-		$message .= '<br/> Your Password is :'.$password;
-		$message .= '<br/> The Traceper Team';
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers  .= 'From: contact@traceper.com' . "\r\n";
-		$result = false;
-		if ($this->dbc->query($sql) != false){
-			$result = true;
-			mail($email, "traceper activation", $message, $headers);
-		}
-		else {
-			if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE)
-			{
-				$sql = sprintf('UPDATE '.$this->tablePrefix.'_user_candidates 
+				$message .= '<br/> Your Password is :'.$password;
+				$message .= '<br/> The Traceper Team';
+				$headers  = 'MIME-Version: 1.0' . "\r\n";
+				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+				$headers  .= 'From: contact@traceper.com' . "\r\n";
+				$out = FAILED;
+				if ($this->dbc->query($sql) != false){
+					$out = SUCCESS;
+					mail($email, "traceper activation", $message, $headers);
+				}
+				else {
+					if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE)
+					{
+						$sql = sprintf('UPDATE '.$this->tablePrefix.'_user_candidates
 								SET time="%s", realname="%s", password="%s" 
 								WHERE email="%s"
 								LIMIT 1', $time, $name, $md5Password, $email);
-				$result = false;
-				if ($this->dbc->query($sql) != false){
-					$result = true;
-					mail($email, "traceper account activation", $message, $headers);
+						$out = FAILED;
+						if ($this->dbc->query($sql) != false){
+							$out = SUCCESS;
+							mail($email, "traceper account activation", $message, $headers);
+						}
+
+					}
 				}
-				
 			}
-		}	
-		return $result;
+		}
+		return $out;
 
 	}
 
@@ -84,7 +94,8 @@ class UserManager extends Base implements IUserManagement
 			if (($result = $this->dbc->query($sql)) != false)
 			{
 				if (($row = $this->dbc->fetchObject($result)) != false){
-					$generatedKey =  md5($email.$row->time);					
+				
+					$generatedKey =  md5($email.$row->time);
 					$out = KEYS_DONT_MATCH;
 					if ($generatedKey == $key){
 						$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_users(email, realname, password)
