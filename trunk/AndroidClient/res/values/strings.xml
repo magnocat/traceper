@@ -4,7 +4,7 @@
     <string name="hello">Hello World, startApp</string>
     <string name="friend_list">Friend List</string>
     
-    <string name="username">Username:</string>
+    <string name="email">E-mail:</string>
     <string name="password">Password:</string>
     <string name="login">Login</string>
     <string name="cancel">Cancel</string>
@@ -23,12 +23,11 @@
 	<string name="register">Register</string>
 	<string name="exit_application">Exit</string>	
 	<string name="password_again">Password(again):</string>
-	<string name="email">E-mail</string>
 	<string name="signup_fill_all_fields">Please fill all fields</string>
 	<string name="signup_type_same_password_in_password_fields">Type same password in password fields</string>
 	<string name="signup_failed">Sign up failed because of unknown reason</string>
-	<string name="signup_username_crashed">Your username have been already taken, please try another username</string>
-	<string name="signup_successfull">Your registration is completed successfully,\n you can login now </string>
+	<string name="signup_email_crashed">Your email have been already used</string>
+	<string name="signup_successfull">Your data is recorded successfully, check your email to activate your account</string>
 	<string name="username_and_password_length_short">Username and password length must be at least 5</string>
 	<string name="add_new_friend">Add new friend</string>
 	<string name="no_friend">You have no friend,\n you can add new friends by menu</string>

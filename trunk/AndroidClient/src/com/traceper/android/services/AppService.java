@@ -64,7 +64,7 @@ public class AppService extends Service implements IAppService{
 	private final IBinder mBinder = new IMBinder();
 	
 //	private NotificationManager mNM;
-	private String username;
+	private String email;
 	private String password;
 	private String authenticationServerAddress;
 	private Long lastLocationSentTime;
@@ -141,8 +141,8 @@ public class AppService extends Service implements IAppService{
         mNM.notify((username+msg).hashCode(), notification);
     }	
 */
-
-	private int sendLocationData(String usernameText, String passwordText, Location loc) 
+	//TODO: edit the traceper protocol file
+	private int sendLocationData(String emailText, String passwordText, Location loc) 
 	{		
 		double latitude = 0;
 		double longitude = 0;
@@ -155,7 +155,7 @@ public class AppService extends Service implements IAppService{
 		String[] name = new String[7];
 		String[] value = new String[7];
 		name[0] = "action";
-		name[1] = "username";
+		name[1] = "email";
 		name[2] = "password";
 		name[3] = "latitude";
 		name[4] = "longitude";
@@ -163,7 +163,7 @@ public class AppService extends Service implements IAppService{
 		name[6] = "deviceId";
 		
 		value[0] = HTTP_ACTION_TAKE_MY_LOCATION;
-		value[1] = usernameText;
+		value[1] = emailText;
 		value[2] = passwordText;
 		value[3] = String.valueOf(latitude);
 		value[4] = String.valueOf(longitude);
@@ -172,15 +172,15 @@ public class AppService extends Service implements IAppService{
 		
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 		
-		String params = "action="+ URLEncoder.encode(HTTP_ACTION_TAKE_MY_LOCATION) + 
-						"&username=" + URLEncoder.encode(usernameText) + 
+/*		String params = "action="+ URLEncoder.encode(HTTP_ACTION_TAKE_MY_LOCATION) + 
+						"&username=" + URLEncoder.encode(emailText) + 
 						"&password=" + URLEncoder.encode(passwordText) + 
 						"&latitude=" + latitude + 
 						"&longitude=" + longitude + 
 						"&altitude=" + altitude +
 						"&deviceId=" + URLEncoder.encode(this.deviceId) + 
 						"&";
-		
+*/		
 	//	String httpRes = this.sendHttpRequest(params);
 		
 		int result = this.evaluateResult(httpRes);
@@ -211,14 +211,14 @@ public class AppService extends Service implements IAppService{
 		String[] name = new String[6];
 		String[] value = new String[6];
 		name[0] = "action";
-		name[1] = "username";
+		name[1] = "email";
 		name[2] = "password";
 		name[3] = "latitude";
 		name[4] = "longitude";
 		name[5] = "altitude";
 		
 		value[0] = HTTP_ACTION_GET_IMAGE;
-		value[1] = this.username;
+		value[1] = this.email;
 		value[2] = this.password;
 		value[3] = String.valueOf(latitude);
 		value[4] = String.valueOf(longitude);
@@ -384,17 +384,16 @@ public class AppService extends Service implements IAppService{
 	}
 
 	public String getUsername() {		
-		return this.username;
+		return this.email;
 	}
 
 	public boolean isUserAuthenticated() {
 		return this.isUserAuthenticated;
 	}
 
-	public int registerUser(String username, String password, String email, String realname) {
+	public int registerUser(String password, String email, String realname) {
 		
 		String params = "action="+ HTTP_ACTION_REGISTER_ME + 
-						"&username=" + username + 
 						"&password=" + password + 
 						"&email="+ email + 
 						"&realname=" + realname + 
@@ -406,11 +405,11 @@ public class AppService extends Service implements IAppService{
 	}
 	
 
-	public int authenticateUser(String username, String password) 
+	public int authenticateUser(String email, String password) 
 	{			
 		this.password = password;
-		this.username = username;
-		int result = this.sendLocationData(this.username, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		this.email = email;
+		int result = this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		
 		if (result == HTTP_RESPONSE_SUCCESS) 
 		{			
@@ -482,8 +481,8 @@ public class AppService extends Service implements IAppService{
 				case HTTP_RESPONSE_ERROR_UNSUPPORTED_ACTION:
 					Log.w("HTTP_RESPONSE", "failed: unsupported action");
 					break;
-				case HTTP_RESPONSE_ERROR_USERNAME_EXISTS:
-					Log.w("HTTP_RESPONSE", "failed registration: username alread exists");
+				case HTTP_RESPONSE_ERROR_EMAIL_EXISTS:
+					Log.w("HTTP_RESPONSE", "failed registration: email already exists");
 					break;
 				default:
 					iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
@@ -507,7 +506,7 @@ public class AppService extends Service implements IAppService{
 		public void onLocationChanged(Location loc){	
 			if (loc != null) {
 				Log.i("location listener", "onLocationChanged");
-				AppService.this.sendLocationData(AppService.this.username, AppService.this.password, loc);	
+				AppService.this.sendLocationData(AppService.this.email, AppService.this.password, loc);	
 				
 				int dataSentInterval = AppService.this.xmlHandler.getGpsMinDataSentInterval();
 				int distanceInterval = AppService.this.xmlHandler.getGpsMinDistanceInterval();
