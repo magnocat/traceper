@@ -16,15 +16,16 @@
     android:padding="10dip"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-			
+ 		
+    
     <TextView 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dip"
-        android:text="@string/username"
+        android:text="@string/realname"
     />
     
-    <EditText android:id="@+id/userName"
+    <EditText android:id="@+id/realname"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -36,10 +37,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dip"
-        android:text="@string/realname"
+        android:text="@string/email"
     />
-    
-    <EditText android:id="@+id/realname"
+   
+    <EditText android:id="@+id/email"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -75,22 +76,7 @@
         android:clickable="true"
         android:singleLine="true"
         android:password="true"
-    /> 
-    
-    <TextView 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:text="@string/email"
-    />
-    
-    <EditText android:id="@+id/email"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:singleLine="true"
-        android:password="false"
-    /> 
+    />  
     </LinearLayout>
     
 </ScrollView>    

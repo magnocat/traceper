@@ -30,11 +30,10 @@ public class Register extends Activity {
 	private static final int FILL_ALL_FIELDS = 0;
 	protected static final int TYPE_SAME_PASSWORD_IN_PASSWORD_FIELDS = 1;
 	private static final int SIGN_UP_FAILED = 2;
-	private static final int SIGN_UP_USERNAME_CRASHED = 3;
+	private static final int SIGN_UP_EMAIL_CRASHED = 3;
 	private static final int SIGN_UP_SUCCESSFULL = 4;
 	protected static final int USERNAME_AND_PASSWORD_LENGTH_SHORT = 5;
 	
-	private EditText usernameText;
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
@@ -71,7 +70,6 @@ public class Register extends Activity {
 	        
 	        Button signUpButton = (Button) findViewById(R.id.register);
 	        Button cancelButton = (Button) findViewById(R.id.cancel_signUp);
-	        usernameText = (EditText) findViewById(R.id.userName);
 	        passwordText = (EditText) findViewById(R.id.password);  
 	        passwordAgainText = (EditText) findViewById(R.id.passwordAgain);  
 	        eMailText = (EditText) findViewById(R.id.email);
@@ -80,8 +78,7 @@ public class Register extends Activity {
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
-					if (usernameText.length() > 0 &&		
-						passwordText.length() > 0 && 
+					if (passwordText.length() > 0 && 
 						passwordAgainText.length() > 0 &&
 						eMailText.length() > 0 &&
 						realnameText.length() > 0
@@ -91,7 +88,7 @@ public class Register extends Activity {
 						
 						if (passwordText.getText().toString().equals(passwordAgainText.getText().toString())){
 						
-							if (usernameText.length() >= 5 && passwordText.length() >= 5) {
+							if (eMailText.length() >= 5 && passwordText.length() >= 5) {
 							
 									Thread thread = new Thread(){
 										int result;
@@ -105,8 +102,7 @@ public class Register extends Activity {
 												e.printStackTrace();
 											}									
 											
-											result = appService.registerUser(usernameText.getText().toString(), 
-																			 password, 
+											result = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
 																			 realnameText.getText().toString());
 		
@@ -116,8 +112,8 @@ public class Register extends Activity {
 													if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
 														showDialog(SIGN_UP_SUCCESSFULL);
 													}
-													else if (result == IAppService.HTTP_RESPONSE_ERROR_USERNAME_EXISTS){
-														showDialog(SIGN_UP_USERNAME_CRASHED);
+													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_EXISTS){
+														showDialog(SIGN_UP_EMAIL_CRASHED);
 													}
 													else  //if (result.equals(SERVER_RES_SIGN_UP_FAILED)) 
 													{
@@ -189,9 +185,9 @@ public class Register extends Activity {
 					}
 				})        
 				.create();
-			case SIGN_UP_USERNAME_CRASHED:
+			case SIGN_UP_EMAIL_CRASHED:
 				return new AlertDialog.Builder(Register.this)       
-				.setMessage(R.string.signup_username_crashed)
+				.setMessage(R.string.signup_email_crashed)
 				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						/* User clicked OK so do some stuff */

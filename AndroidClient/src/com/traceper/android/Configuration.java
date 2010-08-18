@@ -7,7 +7,7 @@ public class Configuration {
 	public static final int MIN_GPS_DISTANCE_INTERVAL = 0; // in meters
 	public static final String PREFERENCES_NAME = "Traceper_Preferences";
 	public static final String PREFERENCES_SERVER_INDEX = "Traceper_Preferences_Server";
-	public static final String PREFERENCES_USERNAME = "PREFERENCES_USERNAME";
+	public static final String PREFERENCES_USEREMAIL = "PREFERENCES_USEREMAIL";
 	public static final String PREFERENCES_PASSWORD = "PREFERENCES_PASSWORD";
 	public static final String PREFRENCES_REMEMBER_ME_CHECKBOX = "PREFRENCES_REMEMBER_ME_CHECKBOX";
 	public static final String DEFAULT_SERVER_ADRESS = "http://localhost/traceper";

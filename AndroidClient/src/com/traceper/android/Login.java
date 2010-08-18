@@ -39,7 +39,7 @@ public class Login extends Activity {
 	private static final int UNKNOWN_ERROR_OCCURED = 4;
 	private static final int SETTINGS_DIALOG = 5;
 	private static final int HTTP_REQUEST_FAILED = 6;
-	private EditText usernameText;
+	private EditText emailText;
     private EditText passwordText;
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
@@ -95,12 +95,12 @@ public class Login extends Activity {
         
         Button loginButton = (Button) findViewById(R.id.login);
         cancelButton = (Button) findViewById(R.id.cancel_login);
-        usernameText = (EditText) findViewById(R.id.userName);
+        emailText = (EditText) findViewById(R.id.email);
         passwordText = (EditText) findViewById(R.id.password);   
         rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
         
         SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-        usernameText.setText(preferences.getString(Configuration.PREFERENCES_USERNAME, ""));
+        emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
         passwordText.setText(preferences.getString(Configuration.PREFERENCES_PASSWORD, ""));
         rememberMeCheckBox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, false));
         
@@ -119,7 +119,8 @@ public class Login extends Activity {
 				{
 					showDialog(NOT_CONNECTED_TO_NETWORK);					
 				}
-				else if (usernameText.length() > 0 && passwordText.length() > 0)
+				//TODO: check whether email format is valid.
+				else if (emailText.length() > 0 && passwordText.length() > 0)
 				{					
 					Thread loginThread = new Thread(){
 						private Handler handler = new Handler();
@@ -133,17 +134,17 @@ public class Login extends Activity {
 							} catch (UnsupportedEncodingException e) {
 								e.printStackTrace();
 							}
-							int result = appManager.authenticateUser(usernameText.getText().toString(), password);
+							int result = appManager.authenticateUser(emailText.getText().toString(), password);
 							
 							if (result == IAppService.HTTP_RESPONSE_SUCCESS){
 								SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 								
 								if (rememberMeCheckBox.isChecked() == true) {									
-		                        	editor.putString(Configuration.PREFERENCES_USERNAME, usernameText.getText().toString());
+		                        	editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
 		                        	editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
 								}
 								else {
-									editor.remove(Configuration.PREFERENCES_USERNAME);
+									editor.remove(Configuration.PREFERENCES_USEREMAIL);
 									editor.remove(Configuration.PREFERENCES_PASSWORD);
 								}
 								editor.commit();	
