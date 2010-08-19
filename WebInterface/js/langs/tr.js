@@ -57,4 +57,5 @@ LAN_OPERATOR.addIndexes({
 			inviteUserLabel:'Davetiye gönder',
 			dataRecordedCheckYourEmail:'Bilgileriniz başarıyla kaydedilmiştir, hesabınızı aktif hale getirmek için e-mailinizi kontrol ediniz.',
 			emailAlreadyExist:'Bu e-posta adresi kayıtlarda zaten bulunmaktadır. İsterseniz, \'Şifremi unuttum\'u kullanabilirsiniz. ',
+			emailNotValid:'Girdiğiniz e-posta adresi e-posta yapısında değildir!!',
 		});

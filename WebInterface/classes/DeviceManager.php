@@ -203,7 +203,7 @@ class DeviceManager extends Base
 			$password = $this->checkVariable($reqArray['password']);
 			$out = FAILED;
 			if ($this->usermanager != NULL) {
-				$out = $this->usermanager->registerUser($email, $name, $password);
+				$out = $this->usermanager->registerUser($email, $realname, $password);
 			}							 							 
 		}
 		
