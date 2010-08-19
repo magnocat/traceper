@@ -32,7 +32,8 @@ public class Register extends Activity {
 	private static final int SIGN_UP_FAILED = 2;
 	private static final int SIGN_UP_EMAIL_CRASHED = 3;
 	private static final int SIGN_UP_SUCCESSFULL = 4;
-	protected static final int USERNAME_AND_PASSWORD_LENGTH_SHORT = 5;
+	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
+	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
 	
 	private EditText passwordText;
 	private EditText eMailText;
@@ -115,6 +116,9 @@ public class Register extends Activity {
 													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_EXISTS){
 														showDialog(SIGN_UP_EMAIL_CRASHED);
 													}
+													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID){
+														showDialog(SIGN_UP_EMAIL_NOT_VALID);
+													}
 													else  //if (result.equals(SERVER_RES_SIGN_UP_FAILED)) 
 													{
 														showDialog(SIGN_UP_FAILED);
@@ -128,7 +132,7 @@ public class Register extends Activity {
 									thread.start();
 							}
 							else{
-								showDialog(USERNAME_AND_PASSWORD_LENGTH_SHORT);
+								showDialog(EMAIL_AND_PASSWORD_LENGTH_SHORT);
 							}							
 						}
 						else {
@@ -203,9 +207,18 @@ public class Register extends Activity {
 					}
 				})        
 				.create();	
-			case USERNAME_AND_PASSWORD_LENGTH_SHORT:
+			case EMAIL_AND_PASSWORD_LENGTH_SHORT:
 				return new AlertDialog.Builder(Register.this)       
-				.setMessage(R.string.username_and_password_length_short)
+				.setMessage(R.string.email_and_password_length_short)
+				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						/* User clicked OK so do some stuff */
+					}
+				})        
+				.create();
+			case SIGN_UP_EMAIL_NOT_VALID:
+				return new AlertDialog.Builder(Register.this)       
+				.setMessage(R.string.email_not_valid)
 				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						/* User clicked OK so do some stuff */

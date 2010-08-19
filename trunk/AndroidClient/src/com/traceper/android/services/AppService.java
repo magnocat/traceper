@@ -484,6 +484,9 @@ public class AppService extends Service implements IAppService{
 				case HTTP_RESPONSE_ERROR_EMAIL_EXISTS:
 					Log.w("HTTP_RESPONSE", "failed registration: email already exists");
 					break;
+				case HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID:
+					Log.w("HTTP_RESPONSE", "failed registration: email is not valid");
+					break;
 				default:
 					iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
 					Log.w("HTTP_RESPONSE", "failed: unknown response returned from server");
