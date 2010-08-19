@@ -58,4 +58,5 @@ LAN_OPERATOR.addIndexes({
 			inviteUserLabel:'Invite',
 			dataRecordedCheckYourEmail:'Your data is recorded successfully, check your email to activate your account',
 			emailAlreadyExist:'This email is already registered.If you want, you can use \'Forgot your password\'',
+			emailNotValid:'Email you entered is not valid!',
 		});

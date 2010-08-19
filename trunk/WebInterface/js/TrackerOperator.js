@@ -145,11 +145,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				else if (result == "-5"){
 					alert(TRACKER.langOperator.emailAlreadyExist);
 				}
+				else if (result == "-9"){
+					alert(TRACKER.langOperator.emailNotValid);
+				}
 			});
 			
 		}
 		else{
-			//TODO: uyari dil dosyasindan alinsin
 			//TODO: password alanlarindaki degerler silinsin
 			alert("passwords doesn't match");
 		}

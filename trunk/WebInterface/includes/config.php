@@ -94,4 +94,5 @@ define ("EMAIL_ALREADY_EXIST", "-5"); //Don't edit
 define ("EMAIL_NOT_FOUND", "-6");
 define ("CURRENT_PASSWORD_DOESNT_MATCH", "-7");
 define ("KEYS_DONT_MATCH", "-8");
+define ("EMAIL_NOT_VALID", "-9");
 ?>
