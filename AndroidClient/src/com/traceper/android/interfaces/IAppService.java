@@ -12,6 +12,7 @@ public interface IAppService {
 	public static final int HTTP_RESPONSE_ERROR_UNSUPPORTED_ACTION = -3;
 	public static final int HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS = -4;
 	public static final int HTTP_RESPONSE_ERROR_EMAIL_EXISTS = -5;
+	public static final int HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID = -9;
 	//self-defined error	
 	public static final int HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE = -100;
 

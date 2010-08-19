@@ -28,7 +28,8 @@
 	<string name="signup_failed">Sign up failed because of unknown reason</string>
 	<string name="signup_email_crashed">Your email have been already used</string>
 	<string name="signup_successfull">Your data is recorded successfully, check your email to activate your account</string>
-	<string name="username_and_password_length_short">Username and password length must be at least 5</string>
+	<string name="email_not_valid">Email is not valid!</string>
+	<string name="email_and_password_length_short">Email and password length must be at least 5</string>
 	<string name="add_new_friend">Add new friend</string>
 	<string name="no_friend">You have no friend,\n you can add new friends by menu</string>
 	<string name="add">Add</string>
