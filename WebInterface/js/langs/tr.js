@@ -58,4 +58,8 @@ LAN_OPERATOR.addIndexes({
 			dataRecordedCheckYourEmail:'Bilgileriniz başarıyla kaydedilmiştir, hesabınızı aktif hale getirmek için e-mailinizi kontrol ediniz.',
 			emailAlreadyExist:'Bu e-posta adresi kayıtlarda zaten bulunmaktadır. İsterseniz, \'Şifremi unuttum\'u kullanabilirsiniz. ',
 			emailNotValid:'Girdiğiniz e-posta adresi e-posta yapısında değildir!!',
+			activateAccountSuccesful:'Hesabınız onaylanmıştır. Giriş yapabilirsiniz.',
+			activatedAccountMailNotFound:'E-posta adresiniz aktivasyon listemizde bulunamadı.',
+			activatedAccountKeysDontMatch:'Bir seyler hatalı olmalı, Baglantınızın dogru oldugundan emin olun.',
+			HomePage:'Anasayfa',
 		});

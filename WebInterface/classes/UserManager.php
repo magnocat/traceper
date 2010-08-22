@@ -36,9 +36,9 @@ class UserManager extends Base implements IUserManagement
 						WHERE email="%s"
 						LIMIT 1', $email);
 			$out = FAILED;
-
 			if (($res = $this->dbc->query($sql)) != false)
 			{
+				
 				$out = EMAIL_ALREADY_EXIST;
 				if ($this->dbc->numRows($res) == 0)
 				{
@@ -47,7 +47,7 @@ class UserManager extends Base implements IUserManagement
 					$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
 					    VALUE("%s","%s","%s","%s")', $email, $name, $md5Password, $time);
 					$key = md5($email.$time);
-					$message = 'Hi,<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccount&email='.$email.'&key='.$key.'">'.
+					$message = 'Hi,<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccountRequest&email='.$email.'&key='.$key.'">'.
 					'Click here to activate your account</a> <br/>';
 					$message .= '<br/> Your Password is :'.$password;
 					$message .= '<br/> The Traceper Team';
@@ -115,12 +115,20 @@ class UserManager extends Base implements IUserManagement
 										
 				}
 				else {
-					// email is not found in candidate table
+					$sql = sprintf('SELECT Id 
+							FROM '.$this->tablePrefix.'_users
+							WHERE email="%s" 
+							LIMIT 1',$email);
 					$out = EMAIL_NOT_FOUND;
-				}	
+					if (($result = $this->dbc->query($sql)) != false) {
+						if ($this->dbc->numRows($result) == 1){
+							$out = EMAIL_ALREADY_EXIST;
+						}
+					}	
 			}
 		}
 		return $out;
+	}
 	}
 		
 

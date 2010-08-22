@@ -128,6 +128,18 @@ class WebClientManager extends Base
 			case $this->actionPrefix . "ActivateAccount":
 				$out = $this->usermanager->activateAccount($reqArray);
 				break;
+			case $this->actionPrefix . "ActivateAccountRequest":
+				//TODO: burada tekrar bir duzenleme yapilsin
+				$email = "";
+				$key = "";
+				if (isset($reqArray["key"]) == true){
+					$key = $reqArray["key"];
+				}
+				if (isset($reqArray["email"]) == true){
+					$email = $reqArray["email"];
+				}
+				$out = DisplayOperator::getActivateAccountPage($_SERVER['PHP_SELF'], LANGUAGE, $key, $email);
+				break;
 			default:
 				
 				$out = UNSUPPORTED_ACTION;
