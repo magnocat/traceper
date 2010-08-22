@@ -59,4 +59,9 @@ LAN_OPERATOR.addIndexes({
 			dataRecordedCheckYourEmail:'Your data is recorded successfully, check your email to activate your account',
 			emailAlreadyExist:'This email is already registered.If you want, you can use \'Forgot your password\'',
 			emailNotValid:'Email you entered is not valid!',
-		});
+			activateAccountSuccesful:'Your account activated successfully. You can Log In now.',
+			activatedAccountMailNotFound:'Your email address has not been found in activation list.',
+			activatedAccountKeysDontMatch:'Something wrong, make sure your link is correct.',
+			HomePage:'Home',
+
+	});

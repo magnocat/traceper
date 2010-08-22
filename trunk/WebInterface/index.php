@@ -70,12 +70,6 @@ else {
 	}
 }
 
-
-
-//FIXME: Bu yaz�l�m� kullananlar ile takip edilen kullan�c�lar�n verilerin
-// aynı tablo da m� farkl� tablo da m� tutulmal� ?
-// e�er ayn� tablo kullan�lacaksa WebClientManager daki sorgulamalar kontrol edilmeli
-
 echo $out;
 //error_log($out, 3, "log.txt");
 ///////////////////////////////////////////////////

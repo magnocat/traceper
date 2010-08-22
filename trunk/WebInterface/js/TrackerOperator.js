@@ -21,6 +21,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionChangePassword = "WebClientChangePassword";
 	this.actionDeleteImage = "WebClientDeleteImage";
 	this.actionRegisterUser = "WebClientRegisterUser";
+	this.actionActivateAccount= "WebClientActivateAccount";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.updateUserListPageNo = 1;
@@ -157,6 +158,29 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 	
+	this.activateAccount = function(key, email){
+		var params = "action=" + TRACKER.actionActivateAccount + "&email=" + email + "&key=" + key;
+		TRACKER.ajaxReq(params, function (result){
+			
+			if (result == "1") {					
+				$("#activateAccountInfo").html(TRACKER.langOperator.activateAccountSuccesful);
+			}
+			else if (result == "-6"){
+				$("#activateAccountInfo").html(TRACKER.langOperator.activatedAccountMailNotFound);
+			}
+			else if (result == "-8"){
+				$("#activateAccountInfo").html(TRACKER.langOperator.activatedAccountKeysDontMatch);
+			}
+			else if (result == "-5") {
+				$("#activateAccountInfo").html(TRACKER.langOperator.emailAlreadyExist);
+			}
+			
+			$("#activateAccountInfo").append("<br/><br/> <a href='index.php'>"+TRACKER.langOperator.HomePage+"</a>");
+			
+		});
+		
+	}
+	
 	this.sendNewPassword = function(email){
 		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;		
 		if (email != "" ) 
@@ -165,6 +189,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (result == "1") {					
 					alert(TRACKER.langOperator.newPasswordSent);
 				}
+				
 				else if (result == "-7"){
 					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
 				}

@@ -80,7 +80,7 @@ a {
 #loginLogo {
 	height:160px;
 }
-#userLoginForm, #forgotPasswordForm, #registerForm {
+#userLoginForm, #forgotPasswordForm, #registerForm, #activateAccountInfo {
 	position:absolute;
 	top:125px;
 	width:100%;
@@ -89,7 +89,8 @@ a {
 }
 #userLoginForm #username, #userLoginForm #password {
 	width:200px;
-} 
+}
+
 .logo_inFullMap{
 	display:none;
 	z-index:200;

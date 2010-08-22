@@ -20,9 +20,45 @@ class DisplayOperator
 		<link rel="shortcut icon" href="images/icon.png" type="image/x-icon"/>
 EOT;
 		
-		return $str;
-		
+		return $str;		
 	}
+	
+	public static function getActivateAccountPage($callbackURL, $language, $key, $email){
+	    $head = self::getMetaNLinkSection();
+		$str = <<<EOT
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+			<html>
+			<head>
+				<title></title>
+				$head	
+				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="js/TrackerOperator.js"></script>
+				
+				<script type="text/javascript" src="js/LanguageOperator.js"></script>
+				<script>	
+				var langOp = new LanguageOperator();
+				langOp.load("$language"); 	
+				$(document).ready( function(){
+					var trackerOp = new TrackerOperator("$callbackURL");	
+					trackerOp.langOperator = langOp;
+					trackerOp.activateAccount("$key", "$email");			
+				});						
+				</script>
+			</head>
+			<body>
+				<div id='loginLogo' ></div>
+				<div id="activateAccountInfo">									
+				</div>
+				
+			</body>
+			</html>				
+EOT;
+		
+		return $str;		
+		
+	
+	}
+	
 	public static function getLoginPage($page, $callbackURL, $language){
 		$head = self::getMetaNLinkSection();
 		$str = <<<EOT
