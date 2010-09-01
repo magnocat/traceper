@@ -535,15 +535,15 @@ class WebClientManager extends Base
 				if (isset($reqArray['thumb']) && $reqArray['thumb']=='ok')
 				{ $thumb = true;
 				}					
-				$thumbCreator = new ThumbCreator($this->imageDirectory, $this->missingImage);
+				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
 				$out = $thumbCreator->getImage($imageId, $thumb);					
 			}
 		}		
 		return $out;	
 	}
 	
-	//TODO: thumbnail lerde silinecek 
-	private function deleteImage($reqArray, $path)
+	
+	private function deleteImage( $reqArray )
 	{
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['imageId']) && !empty($reqArray['imageId'])) 
@@ -552,9 +552,8 @@ class WebClientManager extends Base
 			$out = UNAUTHORIZED_ACCESS;			
 			if ($this->isUserAuthenticated() == true)
 			{
-				$imageId = (int) $reqArray['imageId'];
-				$orimg_path = $path."/".$imageId.".jpg";
-				$thumbimg_path = $path."/".$imageId."_thumb.jpg";
+				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
+				$out = $thumbCreator->deleteImage($imageId);
 				
 				$sql = sprintf ('DELETE FROM traceper_upload
 				                 WHERE id = %d 
