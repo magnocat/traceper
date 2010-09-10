@@ -47,7 +47,7 @@ class UserManager extends Base implements IUserManagement
 					$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
 					    VALUE("%s","%s","%s","%s")', $email, $name, $md5Password, $time);
 					$key = md5($email.$time);
-					$message = 'Hi,<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccountRequest&email='.$email.'&key='.$key.'">'.
+					$message = 'Hi '.$name.',<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccountRequest&email='.$email.'&key='.$key.'">'.
 					'Click here to activate your account</a> <br/>';
 					$message .= '<br/> Your Password is :'.$password;
 					$message .= '<br/> The Traceper Team';

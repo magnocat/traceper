@@ -265,17 +265,17 @@ function processImageXML(MAP, xml){
 		var time = $(image).attr('time');
 		var point = new GLatLng(latitude, longitude);
 		
-		list += "<li><a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
+		list += "<li>" 	+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />"
+						+ "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
 							+ "<div>"
 								+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
 							+ "</div>"
 							+ "<div>"
 								+ TRACKER.langOperator.uploader + ": " + realname 
 								+ "<br/>"
-								+ TRACKER.langOperator.time + ": " + time									
+								/* + TRACKER.langOperator.time + ": " */ +  time									
 							+ "</div>"
 						+ "</a>"
-						+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/close.jpg' />"
 					+"</li>";
 
 		if ($.inArray(imageId, TRACKER.imageIds) == -1)

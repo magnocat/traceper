@@ -2,7 +2,7 @@ body, .generalStyle {
 	padding:0px;
 	margin:0px;	
 	overflow-y:hidden;
-	font-size:16px;
+	font-size:14px;
 	font-family:arial;
 	letter-spacing:2px;
 	color:#555;
@@ -52,6 +52,45 @@ a {
 	cursor:pointer;
 		
 }
+#userarea  { 
+	z-index:200; 
+	list-style: none;
+	padding:0 0 10px 0;
+	float:left;
+	margin:0px;
+	position: relative;	
+	cursor: pointer;
+	color:#13a;
+	font-size: 14px;
+}
+#userarea ul {
+	display:none;
+	list-style: none;
+	position: absolute;
+	margin-left:-22px;
+	padding:0px;
+	width:190px;
+	background-color: #FFFFFF;
+	border-bottom: 1px dotted #ddd;
+	
+}
+#userarea ul li {
+	font-size:11px;
+	padding:10px;
+	padding-left:22px;
+	border-top: 1px dotted #ddd;
+}
+#userarea ul li:hover {
+	background-color: #CFDEFF;
+}
+
+#username{
+	padding-left:22px;
+	background: url("images/account.png") no-repeat 3px;
+}
+#signout{background: url("images/signout.ico") no-repeat 3px;}
+#changePassword{ background: url("images/changePassword.ico") no-repeat 3px; }
+
 #bar:hover{ background-color:#6261d8;}
 #infoBottomBar {
 	position:absolute;
@@ -87,10 +126,15 @@ a {
 	text-align:center;	
 	line-height: 25px;
 }
-#userLoginForm #username, #userLoginForm #password {
+#userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input {
 	width:200px;
 }
-
+#changePasswordForm #changePasswordButton, #changePasswordForm #changePasswordCancel{
+	width:80px;
+}
+#projectteam{
+	line-height: 20px;
+}
 .logo_inFullMap{
 	display:none;
 	z-index:200;
@@ -101,7 +145,12 @@ a {
 }
 #lists{
 	overflow: auto;	
-	height:70%;
+	clear:both;
+	vertical-align:bottom;
+	height:100%;
+}
+#content{
+	height: 100%;
 }
 #usersList, #photosList{
 	clear: both;
@@ -124,42 +173,43 @@ a {
 #photosList .searchResults #returnToPhotoList{
 	font-size:16px;
 }
-.titles{
-	border-bottom:2px solid #6261d8;
+.title{ 
+
 }
 #lists .title {
-	display: table-cell;
+	display: block;
 	cursor: pointer;
-	padding:5px 5px 5px 22px;
-	-webkit-border-top-left-radius: 5px; 
-	-webkit-border-top-right-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-moz-border-radius-topright: 5px;
-	border: 1px solid #6261d8;
-	border-bottom:0px;
-	font-size:11px;
+	padding:5px 5px 5px 3px;
 	background-color: #EEE;
 	color:#6261d8;	
 }
 #aboutus .title{
 	color:#555;
-	font-weight: bold;
-	
+	font-weight: bold;	
 }
 #lists .active_title{
-	background-color:#6261d8;
-	font-size:19px;
-	color:#EEE;	
+	z-index: 100;
+	color:#EEE;
+	background-color: #6261d8;
+	font-weight: bold;
+}
+.arrowImage{
+	background: url("images/down.png") no-repeat left;
+	padding:8px;
+	float: left;
+	position:relative;
+	margin-right: 24px;
+}
+.arrowImageRight{
+	background: #EEE url("images/right_arrow.png") no-repeat left;
 }
 #user_title{
-	background-image: url("images/person.png");
-	background-repeat: no-repeat;
-	background-position:3px center;
+	background: url("images/person.png") no-repeat 22px center;
+	position: relative;
 }
 #photo_title{
-	background-image: url("images/image.png") ;
-	background-repeat: no-repeat;
-	background-position:3px center;
+	background: url("images/image.png") no-repeat 22px center;
+	position: relative;
 }
 #lists ul {
 	list-style:none;
@@ -169,6 +219,7 @@ a {
 }
 #lists li a{
 	display:block;
+	clear: both;
 }
 #lists #photosList li a{
 	padding:2px;
@@ -203,6 +254,7 @@ a {
 	text-align:center;
 	font-size:14px;	
 	line-height: 25px;
+	clear:both;
 }
 .pageNumbers a{
 	padding-right:5px;
@@ -230,4 +282,11 @@ a {
 }
 .origImageContainer{
 	font-size:11px;
+}
+.deleteImageButton{
+	display: block;
+	float: right;
+	position:relative;
+	right: 20px;
+	top: 20px;
 }

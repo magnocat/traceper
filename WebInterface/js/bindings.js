@@ -33,11 +33,6 @@ function bindElements(langOperator, trackerOp)
 		$.colorbox.close();
 	});
 	
-	
-	
-	
-	
-	
 	/**
 	 * binding operations to search image
 	 */
@@ -85,28 +80,50 @@ function bindElements(langOperator, trackerOp)
 		if (TRACKER.allImagesFetched == false){
 			TRACKER.getImageListInBg();
 		}
-		$('#usersList').slideUp('fast',function(){
-			$('#photosList').slideDown();
-		});
 		
+		$('#usersList').slideUp('fast',function(){
+			$('#photosList').slideDown('fast');
+		});
 		$(this).addClass('active_title');
+		
+		$('#user_title').animate({top:'0px'}, 500, function(){});
+		$('#photo_title').animate({top:'0px'}, 500, function(){});
+				
+		$('#user_title div').addClass('arrowImageRight');
+		$('#photo_title div').removeClass('arrowImageRight');		
 		$('#user_title').removeClass('active_title');
 		
 	});
 	
 	$('#user_title').click(function(){
 		$('#photosList').slideUp('fast',function(){
-			$('#usersList').slideDown();
+			$('#usersList').slideDown('fast');
+			
 		});
 		$(this).addClass('active_title');
+		
+		$('#user_title').animate({top:'26px'}, 500, function(){});
+		$('#photo_title').animate({top:'-26px'}, 500, function(){});
+				
+		$('#photo_title div').addClass('arrowImageRight');
+		$('#user_title div').removeClass('arrowImageRight');
 		$('#photo_title').removeClass('active_title');
 	});
 	
 	$('ul.sf-menu').superfish();  
+	$('li#username').click(function(){
+		$(this).find('ul').slideToggle('fast');
+		
+		$(this).hover(function(){}, function(){
+			$(this).find('ul').slideUp('fast').hide();
+		});
+		
+		
+	});
 				
 	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
-	$("#changePassword").colorbox({width:"60%", inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
+	$("#changePassword").colorbox({width:"360px", title:langOperator.changePassword , inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
 	
 	$("#inviteUserDiv").colorbox({width:"60%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
 
@@ -161,22 +178,23 @@ function setLanguage(langOperator){
 	
 	$('title').text(langOperator.mark);	
 	$('a[href=#auLink]').html(langOperator.aboutTitle);
-	$("#lists #user_title").html(langOperator.usersTitle);
-	$("#lists #photo_title").html(langOperator.photosTitle);
+	$("#lists #user_title").append(langOperator.usersTitle);
+	$("#lists #photo_title").append(langOperator.photosTitle);
 	$("#usersList .searchResults a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
 	$("#photosList .searchResults a[href=#returnToPhotoList]").html(langOperator.returnToPhotoListLink)
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
 	$("#usersList .search #searchBox").attr('value', langOperator.usersSearchBox);
 	$("#aboutus").html(langOperator.aboutus);
-	$("#userarea").prepend(langOperator.hi);
+//	$("#userarea").prepend(langOperator.hi);
 	$("#signout").append(langOperator.signout);
-	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel);
-	$("#newPasswordLabel").text(langOperator.newPasswordLabel);
-	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel);
+	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
+	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
+	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel + " :");
 	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
 	$("#changePasswordCancel").val(langOperator.cancelFormButtonLabel);
 	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
+	$("#changePassword").text(langOperator.changePassword);
 	
 //	$("#loading p").html(langOperator.loading);
 	

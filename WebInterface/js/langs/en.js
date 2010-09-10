@@ -15,7 +15,7 @@ LAN_OPERATOR.addIndexes({
 			latitude:'Latitude',
 			longitude:'Longitude',
 			searchStringIsTooShort:'Please write a longer word to search',			
-			aboutus:'<div class=\"logo\"></div>traceper is a GPS tracking system via mobile phones, it is free, it is open source, it is simple and it does not require any GPS tracking device, it only uses mobile phones and we think that all mobile phones will support GPS in the near future.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Project Team</div>Ozan Koroglu - koroglu.ozan@gmail.com <br/>Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com',
+			aboutus:'<div class=\"logo\"></div>traceper is a GPS tracking system via mobile phones, it is free, it is open source, it is simple and it does not require any GPS tracking device, it only uses mobile phones and we think that all mobile phones will support GPS in the near future.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Ahmet Ersoy - ahmetersoy7@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Hanseref Yasin - hanseref@gmail.com <br/> Ozan Koroglu - koroglu.ozan@gmail.com </div>',
 			termsofuse:'termsofuse',
 			zoom:'Zoom in',
 			zoomMax:'Zoom max',
@@ -63,5 +63,6 @@ LAN_OPERATOR.addIndexes({
 			activatedAccountMailNotFound:'Your email address has not been found in activation list.',
 			activatedAccountKeysDontMatch:'Something wrong, make sure your link is correct.',
 			HomePage:'Home',
+			changePassword:'Change password',
 
 	});

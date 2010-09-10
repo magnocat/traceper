@@ -33,9 +33,9 @@ define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y
 define("LANGUAGE", "en");
 
 /* This is the number of elements in user and search list page  */
-define ("ELEMENT_COUNT_IN_LIST_PAGE", 8); 
+define ("ELEMENT_COUNT_IN_LIST_PAGE", 15); 
 
-define ('ELEMENT_COUNT_IN_PHOTO_PAGE',4);
+define ('ELEMENT_COUNT_IN_PHOTO_PAGE',6);
 /**
  * This is the number of elements when updating user data in background
  */
