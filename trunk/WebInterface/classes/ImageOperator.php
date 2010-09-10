@@ -58,9 +58,26 @@ class ImageOperator {
 	}
 	
 	public function deleteImage($imageId){
-		$imageId = (int) $reqArray['imageId'];
+		$imageId = (int) $imageId;
 		$orimg_path = $this->imageDirectory . '/' . $imageId . '.jpg';
 		$thumbimg_path = $this->imageDirectory . '/' . $imageId . self::thumbSuffix . '.jpg';
+		
+		$out = SUCCESS;
+		if(file_exists($orimg_path) == true)
+		{
+			if (unlink($orimg_path) != true){
+				$out = FAILED;
+			}
+		}
+		
+		if(file_exists($thumbimg_path) == true)
+		{
+			if (unlink($thumbimg_path) != true){
+				$out = FAILED;
+			}
+		}
+		
+		return $out;		
 	}
 
 }

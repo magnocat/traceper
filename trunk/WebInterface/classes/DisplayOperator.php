@@ -120,7 +120,7 @@ EOT;
 					TRACKER.sendNewPassword($('#email').val());
 				}
 				function authenticateUser(){
-					TRACKER.authenticateUser($('#username').val(), $('#password').val(), $('#rememberMe').attr('checked'));
+					TRACKER.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'));
 				}
 				
 				
@@ -130,7 +130,7 @@ EOT;
 				<div id='loginLogo' ></div>
 				<div id="userLoginForm">									
 					<div id="usernameLabel"></div>
-					<div><input type="text" name="username" id="username" /></div>
+					<div><input type="text" name="email" id="emailLogin" /></div>
 					<div id="passwordLabel"></div>
 					<div><input type="password" name="password" id="password" /></div>
 					<div><input type="checkbox" name="rememberMe" id="rememberMe"/>
@@ -146,7 +146,7 @@ EOT;
 					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
 				</div>
 				<div id="registerForm" style="display:none">		
-					<div id="registerEmailLabel">e-mail</div><input type="text" id="registerEmail" /><br />
+					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
 					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
@@ -175,7 +175,7 @@ EOT;
 		<title></title>
 		  $head		
      <script type="text/javascript" src="http://www.google.com/jsapi?key=$apiKey">
-   </script>
+ 	 </script>
     
       <script type="text/javascript" charset="utf-8">
    
@@ -226,14 +226,14 @@ EOT;
 					map.enableRotation();
 	   	
    					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp);			
-					trackerOp.getUserList(1); 	
-
+   					trackerOp.getUserList(1); 	
    				}
 			}
    			catch (e) {
 				
 			}    			
 			bindElements(langOp, trackerOp);
+			$('#user_title').click();
 		});	
 	</script>
 	
@@ -245,14 +245,23 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<div id='userarea'><div id="username">$realname</div><div id="signout"></div><div id="changePassword">change pass</div>
-	 						<div id="inviteUserDiv">Invite User</div></div>
+	 						<ul id='userarea'><li id="username">$realname
+	 										   <ul>
+	 										   <li id="changePassword"></li>
+	 										   <li id="signout"></li>
+	 										
+	 										<!--
+	 										   <div id="inviteUserDiv">Invite User</div>
+	 										-->
+	 											</ul>
+	 										</li>
+	 						</ul>
 							<div id='lists'>	
-								<div class='titles'>						
-									<div class='title active_title' id='user_title'></div>	
-									<div class='title' id='photo_title'></div>
+								<div class='titles'>									
+									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
+									<div class='title' id='photo_title'><div class='arrowImage'></div></div>								
 								</div>
-								<div id='usersList'>	
+								<div id='usersList'>											
 									<div class='search'>						
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
@@ -262,7 +271,7 @@ EOT;
 										<div id='results'></div>								
 									</div>		
 								</div>
-								<div id="photosList">
+								<div id="photosList">									
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
@@ -301,9 +310,7 @@ EOT;
 		<div id="newPasswordAgainLabel"></div>
 		<div><input type='password' name='newPasswordAgain' id='newPasswordAgain' /></div>
 		<div></div>
-		<div><input type='button' name='changePassword' id='changePasswordButton' /></div>
-		<div></div>
-		<div><input type='button' name='cancel' id='changePasswordCancel' /></div>
+		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel' /></div>
 	</div>
 	</div>
 	</body>

@@ -41,6 +41,7 @@ class WebClientManager extends Base
 		$this->elementCountInLocationsPage = $elementCountInLocationsPage;	
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
 	}
+	
 	public function setUserManager($usermanager){
 		$this->usermanager = $usermanager;
 	}
@@ -52,7 +53,9 @@ class WebClientManager extends Base
 		$this->imageDirectory = $imageDirectory;
 		$this->missingImage = $missingImage;
 		$this->imageHandlerURL = $imageHandlerURL; 
-	}
+	}	
+
+	
 	public function process($reqArray, $dataFetchedTime="", $imageFetchedTime="") 
 	{
 		$out = NULL;
@@ -549,32 +552,21 @@ class WebClientManager extends Base
 		if (isset($reqArray['imageId']) && !empty($reqArray['imageId'])) 
 		{
 			
-			$out = UNAUTHORIZED_ACCESS;			
+			$out = UNAUTHORIZED_ACCESS;		
+			$imageId = $reqArray['imageId']; 	
 			if ($this->isUserAuthenticated() == true)
 			{
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
 				$out = $thumbCreator->deleteImage($imageId);
 				
-				$sql = sprintf ('DELETE FROM traceper_upload
+				$sql = sprintf ('DELETE FROM '.$this->tablePrefix.'_upload
 				                 WHERE id = %d 
 				                 LIMIT 1', $imageId );
 				
 			 	$out = FAILED;
 			    if	($this->dbc->query($sql) != false ) 
 			    {
-			    	$out = SUCCESS;    	
-			    	if(file_exists($orimg_path) == true)
-			    	{
-			    		if (unlink($orimg_path) != true){
-			    			$out = FAILED;			    			
-			    		}
-			    	}
-			    	if (file_exists($thumbimg_path) == true)
-			    	{
-			    		if (unlink($thumbimg_path) != true){
-			    			$out = FAILED;
-			    		}
-			    	}   	
+			    	$out = $thumbCreator->deleteImage($imageId);    				    	   	
 			    }
 			  }
 		}
