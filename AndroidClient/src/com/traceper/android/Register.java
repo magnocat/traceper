@@ -95,13 +95,9 @@ public class Register extends Activity {
 										int result;
 										public void run() {
 											String password = null;
-											try {
-												password = AeSimpleMD5.MD5(passwordText.getText().toString());
-											} catch (NoSuchAlgorithmException e) {
-												e.printStackTrace();
-											} catch (UnsupportedEncodingException e) {
-												e.printStackTrace();
-											}									
+										
+//											password = AeSimpleMD5.MD5(passwordText.getText().toString());
+											password = passwordText.getText().toString();
 											
 											result = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
