@@ -26,7 +26,7 @@ function bindElements(langOperator, trackerOp)
 			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
 		}
 		else {
-			alert(langOperator.enterSamePassword);
+			TRACKER.showMessage(langOperator.enterSamePassword, "warning");
 		}
 	});
 	$("#changePasswordCancel").click(function(){		
@@ -133,7 +133,7 @@ function bindElements(langOperator, trackerOp)
 			TRACKER.inviteUser(useremail);
 		}
 		else {
-			alert(langOperator.warningMissingParameter);
+			TRACKER.showMessage(langOperator.warningMissingParameter, "warning");
 		}
 	});
 	
