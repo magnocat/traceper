@@ -744,6 +744,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 		});
 	 }
+	
+	this.showMessage = function(message, type) {
+		alert(message);
+	}
+	
 	this.writePageNumbers = function(pageName, pageCount, currentPage, len)
 	{
 		var length = 3;
