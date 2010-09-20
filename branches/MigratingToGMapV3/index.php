@@ -63,7 +63,7 @@ else {
 	$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
 	if ($auth->isUserAuthenticated() === true ) {
 		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
-		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
+		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, LANGUAGE);	
 	}
 	else {		
 		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE);
