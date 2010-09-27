@@ -67,7 +67,9 @@ EOT;
 			<head>
 				<title></title>
 				$head	
+				<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
 				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
 				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
 				<script type="text/javascript" src="js/LanguageOperator.js"></script>
