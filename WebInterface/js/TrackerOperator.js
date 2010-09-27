@@ -112,12 +112,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					location.href = 'index.php';
 				}
 				else if (result == "-4"){
-					alert(TRACKER.langOperator.incorrectPassOrUsername);
+					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning");
 				}
 			});
 		}
 		else {
-			alert(TRACKER.langOperator.warningMissingParameter);
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	};
 	
@@ -141,20 +141,20 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
-					alert(TRACKER.langOperator.dataRecordedCheckYourEmail);
+					TRACKER.showMessage(TRACKER.langOperator.dataRecordedCheckYourEmail, "warning");
 				}
 				else if (result == "-5"){
-					alert(TRACKER.langOperator.emailAlreadyExist);
+					TRACKER.showMessage(TRACKER.langOperator.emailAlreadyExist, "warning");
 				}
 				else if (result == "-9"){
-					alert(TRACKER.langOperator.emailNotValid);
+					TRACKER.showMessage(TRACKER.langOperator.emailNotValid, "warning");
 				}
 			});
 			
 		}
 		else{
 			//TODO: password alanlarindaki degerler silinsin
-			alert("passwords doesn't match");
+			TRACKER.showMessage("Passwords don't match", "warning");
 		}
 	}
 	
@@ -187,16 +187,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
-					alert(TRACKER.langOperator.newPasswordSent);
+					TRACKER.showMessage(TRACKER.langOperator.newPasswordSent, "info");
 				}
 				
 				else if (result == "-7"){
-					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
+					TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
 				}
 			});
 		}
 		else {
-			alert(TRACKER.langOperator.warningMissingParameter);
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
 	
@@ -207,29 +207,23 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
-					alert(TRACKER.langOperator.passwordChanged);
 					$.colorbox.close();
+					TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
 				}
 				else if (result == "-7"){
-					alert(TRACKER.langOperator.currentPasswordDoesntMatch);
+					TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
 				}
 			});
 		}
 		else {
-			alert(TRACKER.langOperator.warningMissingParameter);
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
-		TRACKER.ajaxReq(params, function (result){
-			
-			if (result == "1") {
-				location.href = 'index.php';				
-			}
-			else if (result == "-4"){
-				alert(TRACKER.langOperator.checkPassOrUsername);
-			}
+		TRACKER.ajaxReq(params, function (result){				
+				location.href = 'index.php';						
 		});
 	}
 	
@@ -349,7 +343,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			});
 		}
 		else {
-			alert(TRACKER.langOperator.searchStringIsTooShort);
+			TRACKER.showMessage(TRACKER.langOperator.searchStringIsTooShort, "warning");
 		}	
 	};	
 	
@@ -460,7 +454,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					TRACKER.images.splice(TRACKER.deletedImageId, 1);
 				}
 				else {
-					alert(TRACKER.langOperator.errorInOperation);
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation,"warning");
 				}
 			});
 		}
@@ -679,6 +673,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
 		}
 	}
+	this.showMessage = function(message, type, callback){
+		message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
+		if (typeof(callback) == "function") {
+			$.colorbox({width:"500px", opacity:0.5, html:message, onClosed:callback});
+		}
+		else {
+			$.colorbox({width:"500px", opacity:0.5, html:message});
+		}
+	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
 	 */
@@ -698,15 +701,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						},
 			success: function(result){ 
 							$("#loading").hide(); 						
-							if (result == "-4"){			
-								location.href = "index.php";
-								alert(TRACKER.langOperator.incorrectPassOrUsername);
+							if (result == "-4"){								
+								TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });
+								
 							}
 							else if(result == "-2") {
-								alert(TRACKER.langOperator.warningMissingParameter);
+								TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 							}
 							else if (result == "-1"){
-								alert(TRACKER.langOperator.errorInOperation);
+								TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 							}
 							else {
 								callback(result);
@@ -744,11 +747,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 		});
 	 }
-	
-	this.showMessage = function(message, type) {
-		alert(message);
-	}
-	
 	this.writePageNumbers = function(pageName, pageCount, currentPage, len)
 	{
 		var length = 3;
