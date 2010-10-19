@@ -9,19 +9,20 @@
 *********************************************/
 require_once('Base.php');
 
-class AuthenticateManager extends Base{
+abstract class AuthenticateManager extends Base{
 	
-	private $tablePrefix;
+	protected $tablePrefix;
 	private $userId = NULL;
 	//it checks the last user authentication time, if more than
 	// $userCheckInterval passes, it authenticates that user again
-	private $userCheckInterval = "600"; // seconds
+	private $userCheckInterval = "10"; // seconds
 	const username = 'authmanager_username';
 	const userId = 'authmanager_userId';
 	const password = 'authmanager_password';
 	const authTime = 'authmanager_authTime';
 	const daysDataStored = 'authmanager_daysDataStored';
 	const realname = 'authmanager_realname';
+	private $fbc = NULL;
 		
 	public function __construct($dbc, $tdo, $tablePrefix){
 		$this->dbc = $dbc;
@@ -32,8 +33,14 @@ class AuthenticateManager extends Base{
 		}
 	}
 	
-	public function authenticateUser($username, $password, $keepUserLoggedIn = false){
+	public function setFacebookConnectOperator($fbc){
+		$this->fbc = $fbc;
 		
+	}
+	
+	public function authenticateUser($username, $password, $keepUserLoggedIn = false)
+	{
+		$this->userId = NULL;
 		$username = $this->checkVariable($username);
 		$password = $this->checkVariable($password);
 		
@@ -49,7 +56,7 @@ class AuthenticateManager extends Base{
 			{
 				$this->userId = $row->Id;			
 				$realname = $row->realname;
-			
+			    
 				if ($this->userId != NULL &&
 					$this->tdo != NULL)
 				{
@@ -64,6 +71,11 @@ class AuthenticateManager extends Base{
 					$this->tdo->save(self::daysDataStored, $daysDataStored, $daysDataStored);									
 					$this->tdo->save(self::authTime, time());
 				}
+			}
+			else if ($this->fbc != NULL){
+				$this->userId = $this->fbc->getUserId();
+				$this->tdo->save(self::userId, $this->userId);
+				
 			}
 		}
 		return $this->userId;		

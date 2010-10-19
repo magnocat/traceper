@@ -115,6 +115,7 @@ a {
 	height:70px;
 	background: url("images/logo.png") no-repeat center;
 	cursor:pointer;		
+	position: relative;
 }
 #loginLogo {
 	height:160px;
@@ -147,12 +148,13 @@ a {
 	overflow: auto;	
 	clear:both;
 	vertical-align:bottom;
-	height:100%;
+/*	height:100%;
+*/
 }
 #content{
 	height: 100%;
 }
-#usersList, #photosList{
+#friendsList, #photosList{
 	clear: both;
 }
 #loading {	

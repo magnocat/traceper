@@ -1,16 +1,14 @@
 <?php
 
 require_once("IUserManagement.php");
-require_once("Base.php");
+require_once("AuthenticateManager.php");
 
-class UserManager extends Base implements IUserManagement
+class UserManager extends AuthenticateManager implements IUserManagement
 {
-	private $tablePrefix;
+//	private $tablePrefix;
 	
-	function __construct($dbc, $tablePrefix ){
-		$this->dbc = $dbc;
-		$this->tablePrefix = $tablePrefix;
-	
+	function __construct($dbc, $tdo, $tablePrefix ){
+		parent::__construct($dbc, $tdo, $tablePrefix);	
 	}
 
 
@@ -69,7 +67,7 @@ class UserManager extends Base implements IUserManagement
 							$out = FAILED;
 							if ($this->dbc->query($sql) != false){
 								$out = SUCCESS;
-								mail($email, "traceper account activation", $message, $headers);
+								mail($email, "traceper activation", $message, $headers);
 							}
 
 						}

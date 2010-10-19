@@ -28,20 +28,19 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 									ELEMENT_COUNT_IN_PHOTO_PAGE);
 		$tdo = new TempDataStoreOperator();
 		$wcm->setTempDataStoreOperator($tdo);
-		$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
 
-		$usermanager = new UserManager($dbc, STAFF_TRACKER_TABLE_PREFIX);			
-		$wcm->setUserManager($usermanager);
+		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
 		
-				
-		$wcm->setAuthenticator($auth);
+		if (class_exists("FacebookConnect")) {
+			$className = "FacebookConnect";
+			$fbc = new $className($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+			$usermanager->setFacebookConnectOperator($fbc);
+		}
+		
+		$wcm->setUserManager($usermanager);
 		$wcm->setImageRelatedVars(UPLOAD_DIRECTORY, MISSING_IMAGE, IMAGE_HANDLER);
 		
-		$out = $wcm->process($_REQUEST);
-		
-		if ($auth !== NULL && ($userId = $auth->getUserId()) !== null){
-			 $_SESSION["userId"] = $userId;
-		}		
+		$out = $wcm->process($_REQUEST);	
 	}
 	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
 	{
@@ -60,16 +59,31 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 else {	
 	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 	$tdo = new TempDataStoreOperator();
-	$auth = new AuthenticateManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
-	if ($auth->isUserAuthenticated() === true ) {
-		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
-		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE);	
+	$auth = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+	$fbc = NULL;
+	if (class_exists("FacebookConnect")) {
+		$className = "FacebookConnect";
+		$fbc = new $className($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);
+		$auth->setFacebookConnectOperator($fbc);
 	}
-	else {		
-		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE);
+	
+	if ($auth->isUserAuthenticated() === true) 
+	{  
+		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
+		$pluginScript = "";
+		if ($fbc != NULL){
+			$pluginScript = $fbc->getMainScript();	
+		}
+		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
+	}
+	else {	
+		$pluginScript = "";
+		if ($fbc != NULL){
+			$pluginScript = $fbc->getLoginScript();	
+		}	
+		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE, $pluginScript);
 	}
 }
-
 echo $out;
 //error_log($out, 3, "log.txt");
 ///////////////////////////////////////////////////
@@ -81,6 +95,11 @@ function getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName ){
 	return $dbc;
 }
 function __autoload($class_name) {
-    require_once dirname(__FILE__) .'/classes/' . $class_name . '.php';
+	if (file_exists(dirname(__FILE__) .'/classes/' . $class_name . '.php')) {
+    	require_once dirname(__FILE__) .'/classes/' . $class_name . '.php';
+	}
+	else if (file_exists(dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php')){
+		require_once dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php';
+	}
 }
 ?>
