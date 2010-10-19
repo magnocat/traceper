@@ -67,13 +67,17 @@ define("GPS_MIN_DISTANCE_INTERVAL", 100);
  */
 define("FETCH_PHOTOS_IN_INITIALIZATION", 1);
 /**
+ * Root directory of the web application 
+ */
+define("ROOT_DIRECTORY", dirname(dirname(__FILE__)));
+/**
  * UPLOAD_DIRECTORY is the directory that traceper clients
  * upload images maybe some other things in future.
  * 
  *  Keep in mind that these upload directory doesn't have to under web server document root
  *  and web server user has to have right to write to this directory
  */
-define("UPLOAD_DIRECTORY", dirname(dirname(__FILE__)).'/upload');
+define("UPLOAD_DIRECTORY", ROOT_DIRECTORY.'/upload');
 /**
  * WEB_ADDRESS is defined in index.php to get the web site full adress.
  * MISSING_IMAGE is the image when the correct image is not found.

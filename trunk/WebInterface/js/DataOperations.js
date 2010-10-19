@@ -265,8 +265,13 @@ function processImageXML(MAP, xml){
 		var time = $(image).attr('time');
 		var point = new GLatLng(latitude, longitude);
 		
-		list += "<li>" 	+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />"
-						+ "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
+		list += "<li>";
+				
+		if (TRACKER.userId == userId) {
+			// add delete image button if logged in user and image uploader are same
+			list += "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
+		}				
+		list += "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
 							+ "<div>"
 								+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
 							+ "</div>"

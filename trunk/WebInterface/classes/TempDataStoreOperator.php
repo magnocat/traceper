@@ -15,10 +15,8 @@ class TempDataStoreOperator {
 	 * $days is the number of how many days data is stored
 	 */
 	public function save($key, $value, $days=0){
-		if ($days == 0) {
-			$_SESSION[$key] = $value;
-		}
-		else {
+		$_SESSION[$key] = $value;
+		if ($days > 0) {
 			setCookie($key, $value, time()+ 60 * 60 * 24 * $days);
 		}
 	}	

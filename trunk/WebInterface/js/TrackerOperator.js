@@ -1,17 +1,20 @@
 
-function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval, langOp){
+function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval, langOp, userId){
 	
 	TRACKER = this;	
 	MAP = map;
 	this.langOperator = langOp;
+	this.userId = userId;
 	this.language = "en";
 	this.ajaxUrl = url;
+	this.facebookId = null;
 	this.fetchPhotosInInitialization = Number(fetchPhotosInInitial);
 	this.actionAuthenticateUser = "WebClientAuthenticateUser";
-	this.actionGetUserList = "WebClientGetUserList";	
+	this.actionGetUserList = "WebClientGetUserList";
+	this.actionGetFriendList = "WebClientGetFriendList";
 	this.actionSearchUser = "WebClientSearchUser";
-	this.actionUpdateUserList = "WebClientUpdateUserList";
-	this.actionGetUpdatedUserList = "WebClientGetUpdatedUserList";
+	this.actionUpdateFriendList = "WebClientUpdateFriendList";
+	this.actionGetUpdatedFriendList = "WebClientGetUpdatedFriendList";
 	this.actionGetUserPastPoints = "WebClientGetUserPastPoints";
 	this.actionGetImageList = "WebClientGetImageList";
 	this.actionSearchImage = "WebClientSearchImage";
@@ -24,8 +27,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionActivateAccount= "WebClientActivateAccount";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
-	this.updateUserListPageNo = 1;
-	this.updateUserListPageCount = 0;
+	this.friendListPageNo = 1;
+	this.friendListPageCount = 0;
+	this.updateFriendListPageNo = 1;
+	this.updateFriendListPageCount = 0;
 	this.searchPageNo = 1;
 	this.searchPageCount = 0;
 	this.pastPointsPageNo = 0;
@@ -56,7 +61,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	/**
 	 * if all users are getted from the server, then this variable is set to true
 	 */
-    this.userPageResetCount = Number(0);	
+    this.friendPageResetCount = Number(0);	
 	this.users = [];
 	/**
 	 * this is just a flag to know whether images are fetched
@@ -98,6 +103,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
+		}
+	}
+	
+	this.setFacebookId = function(facebookId){
+		if (facebookId) {
+			TRACKER.facebookId = facebookId;
+			$("#changePassword").hide();
 		}
 	}
 	
@@ -222,8 +234,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
-		TRACKER.ajaxReq(params, function (result){				
-				location.href = 'index.php';						
+		TRACKER.ajaxReq(params, function (result){	
+				if (TRACKER.facebookId != null) {
+					FB.logout(function(response){
+						location.href = 'index.php';
+					});
+				}
+				else {
+					location.href = 'index.php';
+				}
 		});
 	}
 	
@@ -232,86 +251,113 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	{		
 		var params = "action=" + TRACKER.actionGetUserList + "&pageNo=" + pageNo;
 		TRACKER.ajaxReq(params, function(result){			
-			TRACKER.userListPageNo = TRACKER.getPageNo(result);
-			TRACKER.userListPageCount = TRACKER.getPageCount(result);
+			TRACKER.friendListPageNo = TRACKER.getPageNo(result);
+			TRACKER.friendListPageCount = TRACKER.getPageCount(result);
 			
 			var str = processXML(MAP, result);
 			
 			if (str != null) {
-				str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.userListPageCount, TRACKER.userListPageNo, 3);
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getUserList(%d)', TRACKER.friendListPageCount, TRACKER.friendListPageNo, 3);
 			}
 			else {
 				str = TRACKER.langOperator.noMatchFound;				
 			}
-			$('#users').slideUp('fast',function(){
-									$('#users').html(str);
-									$('#users').slideDown();
+			$('#friends').slideUp('fast',function(){
+									$('#friends').html(str);
+									$('#friends').slideDown();
 								});
 			
 			if (TRACKER.started == false) {
 				TRACKER.started = true;
-				setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
+				setTimeout(TRACKER.updateFriendList, TRACKER.updateInterval);
 			}			
-			
 		});	
 	};
+	
+	this.getFriendList = function(pageNo)
+	{		
+		var params = "action=" + TRACKER.actionGetFriendList + "&pageNo=" + pageNo;
+		TRACKER.ajaxReq(params, function(result){			
+			TRACKER.friendListPageNo = TRACKER.getPageNo(result);
+			TRACKER.friendListPageCount = TRACKER.getPageCount(result);
+			
+			var str = processXML(MAP, result);
+			
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getFriendList(%d)', TRACKER.friendListPageCount, TRACKER.friendListPageNo, 3);
+			}
+			else {
+				str = TRACKER.langOperator.noMatchFound;				
+			}
+			$('#friends').slideUp('fast',function(){
+									$('#friends').html(str);
+									$('#friends').slideDown();
+								});
+			
+			if (TRACKER.started == false) {
+				TRACKER.started = true;
+				setTimeout(TRACKER.updateFriendList, TRACKER.updateInterval);
+			}			
+		});	
+	};
+	
 	/**
 	 * 
 	 */
-	this.updateUserList = function(){
+	this.updateFriendList = function(){
 		
 		var params;
-		if (TRACKER.userPageResetCount > 0) 
+		if (TRACKER.friendPageResetCount > 0) 
 		{
 			var getImages = "&";
 			if ($('#showPhotosOnMap').attr('checked') == true)
 			{ 	getImages = "&include=image"; }
 			
-			params = "action=" + TRACKER.actionGetUpdatedUserList + "&pageNo=" + TRACKER.updateUserListPageNo
+			params = "action=" + TRACKER.actionGetUpdatedFriendList + "&pageNo=" + TRACKER.updateFriendListPageNo
 					+ getImages;
 		}
 		else {
-			params = "action=" + TRACKER.actionUpdateUserList + "&pageNo=" + TRACKER.updateUserListPageNo; 
+			params = "action=" + TRACKER.actionUpdateFriendList + "&pageNo=" + TRACKER.updateFriendListPageNo; 
 			
 		}
 
 		// set time out again
-		TRACKER.timer = setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
+		TRACKER.timer = setTimeout(TRACKER.updateFriendList, TRACKER.updateInterval);
 				
 		TRACKER.ajaxReq(params, function(result){
 			
-			TRACKER.updateUserListPageNo = TRACKER.getPageNo(result);
-			TRACKER.updateUserListPageCount = TRACKER.getPageCount(result);
+			TRACKER.updateFriendListPageNo = TRACKER.getPageNo(result);
+			TRACKER.updateFriendListPageCount = TRACKER.getPageCount(result);
 			processXML(MAP, result);
-			// to fetched all data reguarly updateUserListPageNo must be resetted.
+			// to fetched all data reguarly updateFriendListPageNo must be resetted.
 			var updateInt = TRACKER.updateInterval;
-			if (TRACKER.updateUserListPageNo >= TRACKER.updateUserListPageCount){
-				TRACKER.updateUserListPageNo = 1;
+			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
+				TRACKER.updateFriendListPageNo = 1;
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-				TRACKER.userPageResetCount = Number(TRACKER.userPageResetCount) + 1;
+				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
 				
 				var showPhotosOnMap = $('#showPhotosOnMap').attr('checked');
-				if (TRACKER.userPageResetCount >= 1 &&
+				if (TRACKER.friendPageResetCount >= 1 &&
 					showPhotosOnMap == true)
 				{
 					processImageXML(MAP, result);
 				}
 				// this is about initialization, it fetches photos data from server
 				// after fetching users data
-				if (TRACKER.userPageResetCount == 1 &&
+				if (TRACKER.friendPageResetCount == 1 &&
 					showPhotosOnMap == true) 
 				{
 					TRACKER.getImageListInBg();
 				}
 			}
 			else{
-				TRACKER.updateUserListPageNo++;
+				TRACKER.updateFriendListPageNo++;
 				TRACKER.updateInterval = TRACKER.getUserListInterval;
 			}
 			
 			if (updateInt != TRACKER.updateInterval) {
 				clearTimeout(TRACKER.timer);
-				TRACKER.timer = setTimeout(TRACKER.updateUserList, TRACKER.updateInterval);
+				TRACKER.timer = setTimeout(TRACKER.updateFriendList, TRACKER.updateInterval);
 			}
 			
 		}, true);
@@ -334,11 +380,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					str = TRACKER.langOperator.noMatchFound;
 				}
 				
-				$('#usersList #users').slideUp();
+				$('#friendsList #friends').slideUp();
 
-				$('#usersList .searchResults').slideUp('fast',function(){
-						$('#usersList .searchResults #results').html(str);
-						$('#usersList .searchResults').slideDown();
+				$('#friendsList .searchResults').slideUp('fast',function(){
+						$('#friendsList .searchResults #results').html(str);
+						$('#friendsList .searchResults').slideDown();
 				});
 			});
 		}
@@ -428,7 +474,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				else {
 					str = "<div class='generalStyle'>" + TRACKER.langOperator.noMatchFound + "</div>";				
 				}
-				$('#usersList').slideUp('fast',function(){
+				$('#friendsList').slideUp('fast',function(){
 					$('#photosList').slideDown('fast', function(){
 						$('#photosList #photos').slideUp();
 						$('#photosList .searchResults').slideUp('fast',function(){

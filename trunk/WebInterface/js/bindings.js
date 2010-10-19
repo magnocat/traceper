@@ -5,12 +5,12 @@ function bindElements(langOperator, trackerOp)
 	/**
 	 * binding operation to search user
 	 */
-	$('#usersList .search #searchButton').click(function(){
-		trackerOp.searchUser($('#usersList .search #searchBox').attr('value'), 1);					
+	$('#friendsList .search #searchButton').click(function(){
+		trackerOp.searchUser($('#friendsList .search #searchBox').attr('value'), 1);					
 	});
-	$('#usersList .search #searchBox').keydown(function(ev){
+	$('#friendsList .search #searchBox').keydown(function(ev){
 		if (ev.keyCode == 13) {
-			trackerOp.searchUser($('#usersList .search #searchBox').attr('value'), 1);
+			trackerOp.searchUser($('#friendsList .search #searchBox').attr('value'), 1);
 		}
 	}).focus(function(){
 		if ($(this).attr("value") == langOperator.usersSearchBox){
@@ -72,7 +72,7 @@ function bindElements(langOperator, trackerOp)
 
 		if ($('#photos').children().size() == 0){
 			trackerOp.getImageList(1, function(){
-				$('#usersList').slideUp('fast',function(){
+				$('#friendsList').slideUp('fast',function(){
 					$('#photosList').slideDown();
 				});				
 			});
@@ -81,7 +81,7 @@ function bindElements(langOperator, trackerOp)
 			TRACKER.getImageListInBg();
 		}
 		
-		$('#usersList').slideUp('fast',function(){
+		$('#friendsList').slideUp('fast',function(){
 			$('#photosList').slideDown('fast');
 		});
 		$(this).addClass('active_title');
@@ -97,7 +97,7 @@ function bindElements(langOperator, trackerOp)
 	
 	$('#user_title').click(function(){
 		$('#photosList').slideUp('fast',function(){
-			$('#usersList').slideDown('fast');
+			$('#friendsList').slideDown('fast');
 			
 		});
 		$(this).addClass('active_title');
@@ -139,11 +139,11 @@ function bindElements(langOperator, trackerOp)
 	
 	
 	$("a[href=#returnToUserList]").click(function(){
-		$('#usersList .searchResults').slideUp(function(){ $('#usersList #users').slideDown(); });
+		$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });
 	});
 	
 	$("a[href=#returnToPhotoList]").click(function(){
-		$('#photosList .searchResults').slideUp(function(){ $('#photosList #photos').slideDown(); });
+		$('#photosList > .searchResults').slideUp(function(){ $('#photosList > #photos').slideDown(); });
 	});
 	
 	
@@ -180,10 +180,10 @@ function setLanguage(langOperator){
 	$('a[href=#auLink]').html(langOperator.aboutTitle);
 	$("#lists #user_title").append(langOperator.usersTitle);
 	$("#lists #photo_title").append(langOperator.photosTitle);
-	$("#usersList .searchResults a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
+	$("#friendsList .searchResults a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
 	$("#photosList .searchResults a[href=#returnToPhotoList]").html(langOperator.returnToPhotoListLink)
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
-	$("#usersList .search #searchBox").attr('value', langOperator.usersSearchBox);
+	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
 	$("#aboutus").html(langOperator.aboutus);
 //	$("#userarea").prepend(langOperator.hi);
 	$("#signout").append(langOperator.signout);

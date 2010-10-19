@@ -13,7 +13,6 @@ require_once('Base.php');
 class WebClientManager extends Base
 {
 	
-	private $authenticator = NULL; // authenticator object
 	private $actionPrefix = NULL;
 	private $tablePrefix = NULL;  // prefix of tables' names in database 	
 	private $elementCountInAPage = 10;
@@ -27,6 +26,7 @@ class WebClientManager extends Base
 	private $imageHandlerURL;
 	private $includeImageInUpdatedUserListReq = false;
 	private $usermanager = NULL;
+	private $fbc = NULL;
 	
 	const  dataFetchedTimeStoreKey = "wcm_dataFetchedTime";
 	const  imageFetchedTimeStoreKey = "wcm_imageFetchedTime";
@@ -46,9 +46,6 @@ class WebClientManager extends Base
 		$this->usermanager = $usermanager;
 	}
 	
-	public function setAuthenticator($authenticator){
-		$this->authenticator = $authenticator;
-	}
 	public function setImageRelatedVars($imageDirectory, $missingImage, $imageHandlerURL){
 		$this->imageDirectory = $imageDirectory;
 		$this->missingImage = $missingImage;
@@ -56,7 +53,7 @@ class WebClientManager extends Base
 	}	
 
 	
-	public function process($reqArray, $dataFetchedTime="", $imageFetchedTime="") 
+	public function process($reqArray) 
 	{
 		$out = NULL;
 		switch($reqArray['action']) 
@@ -73,7 +70,7 @@ class WebClientManager extends Base
 			case $this->actionPrefix . "SendNewPassword":
 				$out = MISSING_PARAMETER;
 				if (isset($reqArray['email']) && $reqArray['email'] != "") {
-					$out = $this->authenticator->sendNewPassword($reqArray['email']);		
+					$out = $this->usermanager->sendNewPassword($reqArray['email']);		
 				}		
 				break;
 			case $this->actionPrefix . "ChangePassword":
@@ -82,13 +79,16 @@ class WebClientManager extends Base
 			case $this->actionPrefix . "GetUserList":
 				$out = $this->getUserList($reqArray, $this->elementCountInAPage, "userListReq");
 				break;
+			case $this->actionPrefix . "GetFriendList":
+				$out = $this->getFriendList($reqArray, $this->elementCountInAPage, "userListReq");
+				break;	
 			case $this->actionPrefix . "SearchUser":
 				$out = $this->searchUser($reqArray);
 				break;		
-			case $this->actionPrefix . "UpdateUserList":
-				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage,"userListReq");
+			case $this->actionPrefix . "UpdateFriendList":
+				$out = $this->getFriendList($reqArray, $this->elementCountInLocationsPage,"userListReq");
 				break;		
-			case $this->actionPrefix . "GetUpdatedUserList":
+			case $this->actionPrefix . "GetUpdatedFriendList":
 				if ($this->tdo == NULL || 
 					($this->dataFetchedTime = $this->tdo->getValue(self::dataFetchedTimeStoreKey)) == NULL)
 				{
@@ -101,7 +101,7 @@ class WebClientManager extends Base
 						$this->imageFetchedTime = time();
 						$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
 				}	
-				$out = $this->getUserList($reqArray, $this->elementCountInLocationsPage, "updatedUserListReq");
+				$out = $this->getFriendList($reqArray, $this->elementCountInLocationsPage, "updatedUserListReq");
 				break;
 			case $this->actionPrefix . "GetUserPastPoints":
 				$out = $this->getUserPastPoints($reqArray,  $this->elementCountInLocationsPage);
@@ -142,10 +142,23 @@ class WebClientManager extends Base
 					$email = $reqArray["email"];
 				}
 				$out = DisplayOperator::getActivateAccountPage($_SERVER['PHP_SELF'], LANGUAGE, $key, $email);
-				break;
-			default:
-				
+				break;				
+			default:				
 				$out = UNSUPPORTED_ACTION;
+				if (class_exists("FacebookConnect")) 
+				{
+					$classname = "FacebookConnect";
+					$this->fbc = new $classname($this->dbc, $this->tdo, $this->tablePrefix);
+					$providedActions = $this->fbc->getProvidedActions();
+					$count = count($providedActions);
+					for($i = 0; $i < $count; $i++){
+						if ($reqArray['action'] == $this->actionPrefix . $providedActions[$i]){
+							$out = $this->fbc->process($reqArray, $providedActions[$i]);
+							break;		
+						} 
+					} 			
+					
+				}
 				
 				break;
 		}
@@ -165,8 +178,12 @@ class WebClientManager extends Base
 				$keepUserLoggedIn = true;				
 			}
 			
-			if ($this->authenticator !== null && 
-			    $this->authenticator->authenticateUser($reqArray['username'], md5($reqArray['password']), $keepUserLoggedIn) !== null) {
+			if (($this->fbc !== NULL && 
+				 $this->fbc->isFacebookUser() === true) 
+				 || 
+			    ($this->usermanager !== null && 
+			    $this->usermanager->authenticateUser($reqArray['username'], md5($reqArray['password']), $keepUserLoggedIn) !== null)) 
+			{
 				$out = SUCCESS;						
 			}	
 			
@@ -213,7 +230,7 @@ class WebClientManager extends Base
 			{	
 				$newPassword = $reqArray['newPassword'];
 				$currentPassword = $reqArray['currentPassword'];					
-				$out = $this->authenticator->changePassword($newPassword, $currentPassword);		
+				$out = $this->usermanager->changePassword($newPassword, $currentPassword);		
 			}
 		}
 		return $out;
@@ -221,19 +238,23 @@ class WebClientManager extends Base
 	
 	private function isUserAuthenticated() {
 		$authenticated = false;
-		if ($this->authenticator !== null &&
-			$this->authenticator->isUserAuthenticated() == true) 
+		if (($this->fbc !== NULL && 
+			 $this->fbc->isFacebookUser() === true) 
+			 || 
+			($this->usermanager !== null &&
+			 $this->usermanager->isUserAuthenticated() == true)) 
 		{
 			$authenticated = true;
 		}
 		return $authenticated;
 	}
 	
-	private function getUserList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
+	private function getFriendList($reqArray, $elementCountInAPage, $req='updatedUserListReq') 
 	{
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
 		{
+			$userId = $this->usermanager->getUserId();
 			$out = FAILED;
 			$pageNo = 1;
 			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
@@ -258,65 +279,84 @@ class WebClientManager extends Base
 									  LEFT JOIN '. $this->tablePrefix .'_users usr
 									  ON  
  										 usr.Id = u.userId
-									  WHERE unix_timestamp(u.uploadTime) >= ' .$this->imageFetchedTime;
+									  WHERE unix_timestamp(u.uploadTime) >= ' .$this->imageFetchedTime . '
+									  		AND ( u.userId IN 
+									  			     (SELECT friend1 FROM '. $this->tablePrefix.'_friends 
+									  			       WHERE friend2 = '. $userId .' and status = 1
+									  			      UNION
+									  			      SELECT friend2 FROM '.$this->tablePrefix.'_friends
+									  			       WHERE friend1 = '. $userId .' and status = 1)
+									  	          OR u.userId = '.$userId .')';
 					
 					$sqlImagePageCountUnion = 'UNION
 											   SELECT
 													count(Id)
 											   FROM '. $this->tablePrefix .'_upload u
 											   WHERE 
-											   		unix_timestamp(uploadTime) >= ' .$this->imageFetchedTime;
+											   		unix_timestamp(u.uploadTime) >= ' .$this->imageFetchedTime. '
+											  		AND ( u.userId IN 
+											  			     (SELECT friend1 FROM '. $this->tablePrefix.'_friends 
+											  			       WHERE friend2 = '. $userId .' and status = 1
+											  			      UNION
+											  			      SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											  			       WHERE friend1 = '. $userId .' and status = 1 )
+											  	          OR u.userId = '.$userId .')';
 				}
 				
 				$sql = 'SELECT
-							Id, null as userId, latitude, longitude, altitude, 
-							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
-							(unix_timestamp(dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
+							u.Id, null as userId, u.latitude, u.longitude, u.altitude, 
+							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
+							(unix_timestamp(u.dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
 							"user" as type
 						FROM '
-							. $this->tablePrefix .'_users
+							. $this->tablePrefix .'_friends f
+						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
 						WHERE
-							unix_timestamp(dataArrivedTime) >= '. $this->dataFetchedTime .'		
+							( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 AND
+							unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
 						'. $sqlImageUnion .'						
 						ORDER BY
 							timeDif 
-							DESC	
+						DESC	
 						LIMIT '. $offset .',' 
 							   .$elementCountInAPage;
 				
 				$sqlPageCount = 'SELECT ceil(sum(itemCount)/'.$elementCountInAPage.')
 								 FROM
 									(SELECT
-										count(Id) as itemCount
-								 	 FROM '
-							 			. $this->tablePrefix .'_users
-							 	 	 WHERE 
-							 			unix_timestamp(dataArrivedTime) >= ' . $this->dataFetchedTime .'
-							 		  '. $sqlImagePageCountUnion .'
+										count(u.Id) as itemCount
+								 	 FROM ' . $this->tablePrefix .'_friends f
+									 LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
+									 WHERE
+										( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 AND
+										unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
+						  			'. $sqlImagePageCountUnion .'
 							 		  ) t';
 							
 			}
 			else //if ($req == 'userListReq') 
 			{
 				// this is the user list showing in left pane
-				
-				$sql = 'SELECT
-							Id, latitude, longitude, altitude, 
-							realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
-						FROM '
-							. $this->tablePrefix .'_users
-						ORDER BY
-							realname 							
+
+				$sql = 'SELECT u.Id, u.latitude, u.longitude, u.altitude, "user" as type,
+							   u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+						FROM '. $this->tablePrefix .'_friends f 
+						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
+						WHERE ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 
+						ORDER BY		
+							u.realname 							
 						LIMIT ' . $offset . ',' 
-								. $elementCountInAPage;
-							
-				$sqlPageCount = 'SELECT
-									ceil(count(Id)/'.$elementCountInAPage.')
-								 FROM '
-							 		. $this->tablePrefix .'_users';
+								. $elementCountInAPage;				
+		
+					 		
+				$sqlPageCount = 'SELECT  ceil(count(u.Id)/'.$elementCountInAPage.') 
+								FROM '. $this->tablePrefix .'_friends f 
+								LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
+								WHERE ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1; ';
 			}	
-			
+		
 			$pageCount = $this->dbc->getUniqueField($sqlPageCount);
+		
 			// data fetched time is used only in updated User list req so it is 
 			// updated only when $req == 'updatedUserListReq'		 							 								
 			if ($req == 'updatedUserListReq' 
@@ -352,7 +392,7 @@ class WebClientManager extends Base
 					$pageNo = (int) $reqArray['pageNo'];
 				}
 				$offset = ($pageNo - 1) * $this->elementCountInAPage;
-			
+				$userId = $this->usermanager->getUserId();
 				$sql = //sprintf(
 							'SELECT 
 									Id, latitude, longitude, altitude, 
@@ -360,7 +400,13 @@ class WebClientManager extends Base
 								FROM '
 									. $this->tablePrefix .'_users								
 								WHERE
-									realname like "%'. $search .'%"
+									realname like "%'. $search .'%" AND 
+									( Id in (SELECT friend1 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend2 = '. $userId .' and status = 1
+											 UNION 
+											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend1 = '. $userId .' and status = 1) 
+									 OR Id = '. $userId .' )
 								ORDER BY
 									realname
 								LIMIT '. $offset .' , '. $this->elementCountInAPage ;
@@ -372,7 +418,14 @@ class WebClientManager extends Base
 			 					 FROM '
 			 					 	. $this->tablePrefix .'_users
 								WHERE
-									realname like "%'. $search .'%"';
+									realname like "%'. $search .'%" AND 
+									( Id in (SELECT friend1 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend2 = '. $userId .' and status = 1
+											 UNION 
+											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend1 = '. $userId .' and status = 1) 
+									 OR Id = '. $userId .' )';
+			 					 	
 				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount));
 			}
 		}
@@ -388,8 +441,9 @@ class WebClientManager extends Base
 			
 			$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true){
-				$userId = (int) $reqArray['userId'];
-				$this->pastPointsFetchedUserId = $userId;
+				$userIdOnMap = (int) $reqArray['userId'];
+				$userId = $this->usermanager->getUserId();
+				$this->pastPointsFetchedUserId = $userIdOnMap;
 				$pageNo = 1;
 				if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
 					$pageNo = (int) $reqArray['pageNo'];
@@ -401,18 +455,32 @@ class WebClientManager extends Base
 							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 						 FROM ' . $this->tablePrefix .'_user_was_here
 						 WHERE 
-						 	userId = '. $userId . '
+						 	userId = '. $userIdOnMap . ' 
+						 	AND userId in (SELECT '. $userId .' 
+										   UNION	
+						 					SELECT friend1 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend2 = '. $userId .' and status = 1
+											 UNION 
+											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend1 = '. $userId .' and status = 1)
 						 ORDER BY 
 						 	Id DESC
 						 LIMIT '. $offset . ','
 								. $elementCountInAPage;
-								
+				//echo $sql;				
 				// subtract 1 to not get the last location into consideration								
 				$sqlItemCount = 'SELECT 
 									ceil((count(Id)-1)/ '.$elementCountInAPage .')
 								 FROM '. $this->tablePrefix .'_user_was_here
 								 wHERE 
-								 	userId = '. $userId . '' ;				
+								 	userId = '. $userIdOnMap . '
+								 	AND userId in (SELECT '. $userId .' 
+										   		  UNION 
+										   		   SELECT friend1 FROM '.$this->tablePrefix.'_friends
+													 WHERE friend2 = '. $userId .' and status = 1
+												  UNION 
+											 	   SELECT friend2 FROM '.$this->tablePrefix.'_friends
+													 WHERE friend1 = '. $userId .' and status = 1)' ;				
 				
 				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount), "userPastLocations");
 			}
@@ -430,24 +498,37 @@ class WebClientManager extends Base
 					$pageNo = (int) $reqArray['pageNo'];
 			}
 			$offset = ($pageNo - 1) * $elementCountInAPage;
-			
+			$userId = $this->usermanager->getUserId();
 			$sql = 'SELECT 
-								u.Id, u.userId, usr.realname, u.latitude, 
-								u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
-							FROM '. $this->tablePrefix . '_upload u
-							LEFT JOIN '. $this->tablePrefix .'_users usr
-							ON  
-								usr.Id = u.userId
-							ORDER BY 
-								u.Id 
-							DESC
-							LIMIT 
+							u.Id, u.userId, usr.realname, u.latitude, 
+							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+					FROM '. $this->tablePrefix . '_upload u
+					LEFT JOIN '. $this->tablePrefix .'_users usr
+						ON  usr.Id = u.userId
+					WHERE u.userId in 
+							(SELECT friend1 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend2 = '. $userId .' and status = 1
+							 UNION 
+							 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend1 = '. $userId .' and status = 1)
+						  OR u.userId = '. $userId .'
+					ORDER BY 
+						u.Id 
+					DESC
+					LIMIT 
 							' . $offset . ',' . $elementCountInAPage;
-			
+		
 			$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$elementCountInAPage.')
-			 					 FROM '
-			 					 	. $this->tablePrefix .'_upload';
+			 				 FROM '
+			 					 	. $this->tablePrefix .'_upload u
+			 				WHERE u.userId in 
+									 	(SELECT friend1 FROM '.$this->tablePrefix.'_friends
+									 		WHERE friend2 = '. $userId .' and status = 1
+									 	UNION 
+									 	SELECT friend2 FROM '.$this->tablePrefix.'_friends
+									 		WHERE friend1 = '. $userId .' and status = 1)
+						  		  OR u.userId = '. $userId;
 			 					 	
 			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
 			if ($pageNo == $pageCount
@@ -465,29 +546,43 @@ class WebClientManager extends Base
 	
 	private function searchImage($reqArray, $elementCountInAPage)
 	{
-		$userId = null;
+		$searchedUserId = null;
 		$realname = null;
+		$userId = $this->usermanager->getUserId();
 		$pageNo = 1;
 		if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
 					$pageNo = (int) $reqArray['pageNo'];
 		}
 		$offset = ($pageNo - 1) * $elementCountInAPage;
 		$out = MISSING_PARAMETER;	
-		if (isset($reqArray['userId']) && !empty($reqArray['userId'])){
-			$userId = (int) $reqArray['userId'];
+		if (isset($reqArray['userId']) && !empty($reqArray['userId']))
+		{
+			$searchedUserId = (int) $reqArray['userId'];
 			$sql = 'SELECT 
 						u.Id, u.userId, usr.realname, u.latitude, 
 						u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
 					ON  usr.Id = u.userId
-					WHERE u.userId = '. $userId .' 
+					WHERE u.userId = '. $searchedUserId .' AND 
+						  u.userId in 
+							(SELECT friend1 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend2 = '. $userId .' and status = 1
+							 UNION 
+							 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend1 = '. $userId .' and status = 1) 
 					LIMIT ' . $offset . ',' . $elementCountInAPage;
 			
 			$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$elementCountInAPage.')
 			 				  FROM '. $this->tablePrefix .'_upload
-			 				  WHERE userId = '. $userId .'';
+			 				  WHERE userId = '. $searchedUserId .' AND 
+			 				  		 u.userId in 
+									(SELECT friend1 FROM '.$this->tablePrefix.'_friends
+									 WHERE friend2 = '. $userId .' and status = 1
+									 UNION 
+									 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+									 WHERE friend1 = '. $userId .' and status = 1) ';
 		}
 		else if (isset($reqArray['realname']) && !empty($reqArray['realname'])){
 			$realname = $this->checkVariable($reqArray['realname']);
@@ -498,7 +593,15 @@ class WebClientManager extends Base
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
 					ON  usr.Id = u.userId
-					WHERE usr.realname like "%'. $realname .'%"
+					WHERE usr.realname like "%'. $realname .'%" AND
+						  usr.Id in 
+							(SELECT '. $userId .' 
+							 UNION
+							 SELECT friend1 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend2 = '. $userId .' and status = 1
+							 UNION 
+							 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+							 WHERE friend1 = '. $userId .' and status = 1)
 					ORDER BY u.Id
 					DESC
 					LIMIT ' . $offset . ',' . $elementCountInAPage;
@@ -508,7 +611,15 @@ class WebClientManager extends Base
 			 				  FROM '. $this->tablePrefix .'_upload u
 			 				  LEFT JOIN '. $this->tablePrefix .'_users usr
 							  ON  usr.Id = u.userId
-							  WHERE usr.realname like "%'. $realname .'%"';
+							  WHERE usr.realname like "%'. $realname .'%" AND
+							  		 usr.Id in 
+									(SELECT '. $userId .' 
+							 		 UNION
+							 		 SELECT friend1 FROM '.$this->tablePrefix.'_friends
+									 WHERE friend2 = '. $userId .' and status = 1
+									 UNION 
+									 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+									 WHERE friend1 = '. $userId .' and status = 1)';
 			
 		}
 		if ($realname != null || $userId != null){
@@ -559,12 +670,15 @@ class WebClientManager extends Base
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
 				$out = $thumbCreator->deleteImage($imageId);
 				
+				$userId = $this->usermanager->getUserId();
+				
 				$sql = sprintf ('DELETE FROM '.$this->tablePrefix.'_upload
-				                 WHERE id = %d 
-				                 LIMIT 1', $imageId );
+				                 WHERE id = %d and userId = %d
+				                 LIMIT 1', $imageId, $userId );
 				
 			 	$out = FAILED;
-			    if	($this->dbc->query($sql) != false ) 
+			    if	($this->dbc->query($sql) != false && 
+			    	 $this->dbc->getAffectedRows() == 1) 
 			    {
 			    	$out = $thumbCreator->deleteImage($imageId);    				    	   	
 			    }
@@ -587,13 +701,13 @@ class WebClientManager extends Base
 		// if page count equal to 0 then there is no need to run query
 //		echo $sql;
 		if ($pageCount >= $pageNo && $pageCount != 0) {
-			$result = $this->dbc->query($sql);			
+			$result = $this->dbc->query($sql);		
 		}
 				
 		$str = NULL;
 		$userId = NULL;
 		if ($result != NULL )
-		{			
+		{		
 			if ($type == "userList") 
 			{
 				while ( $row = $this->dbc->fetchObject($result) )
