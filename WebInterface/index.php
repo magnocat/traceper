@@ -48,8 +48,9 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
 								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
 		$dm->setUploadPath(UPLOAD_DIRECTORY);
+		$tdo = new TempDataStoreOperator();
 		
-		$usermanager = new UserManager($dbc, STAFF_TRACKER_TABLE_PREFIX);			
+		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
 		$dm->setUserManager($usermanager);
 		
 		

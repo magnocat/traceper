@@ -21,6 +21,8 @@ function bindElements(langOperator, trackerOp)
 		trackerOp.signout();
 	});
 	
+	
+	
 	$("#changePasswordButton").click(function(){		
 		if ($('#newPassword').val() ==  $('#newPasswordAgain').val()){
 			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
@@ -170,6 +172,17 @@ function bindElements(langOperator, trackerOp)
 					
 				}
 	});	
+	
+	$('#sendStatusMessageButton').click(function(){
+		var statusMessage = $('#statusMessage').val();
+		if (statusMessage != "") {
+			var params = "action=WebClientSaveStatusMessage&statusMessage=" + statusMessage;
+			TRACKER.ajaxReq(params, function(result){
+				alert(result + "mesaj kaydedildi.");
+			});
+		}
+	});
+	
 	
 
 };	

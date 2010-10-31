@@ -80,7 +80,8 @@ class UserManager extends AuthenticateManager implements IUserManagement
 	}
 
 
-	public function activateAccount($reqArray){
+	public function activateAccount($reqArray)
+	{
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['email']) && $reqArray['email']!=null &&
 			isset($reqArray['key'])&& $reqArray['key']!=null )
@@ -210,6 +211,25 @@ class UserManager extends AuthenticateManager implements IUserManagement
 
 		return $result;
 	}
+	
+	public function isFriend($user1, $user2)
+	{
+						   	
+ 		$sql = 'SELECT status FROM '.$this->tablePrefix.'_friends
+		 			WHERE ((friend1 = '. $user1 .' AND friend2 = '. $user2 .') OR
+		 				   (friend1 = '. $user2 .' AND friend2 = '. $user1 .')) AND 
+		 				  status = 1
+		 		LIMIT 1';
+ 		$result = $this->dbc->query($sql);
+ 		$numRows = $this->dbc->numRows($result);
+ 		$isFriend = false;
+ 		if ($numRows == 1) {
+ 			$isFriend = true;
+ 		}
+ 		
+ 		return $isFriend;	
+	}
+	
 
 
 }
