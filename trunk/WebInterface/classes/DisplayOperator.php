@@ -255,6 +255,9 @@ EOT;
 					<div id='content'>						
 	 						<div id='logo'></div>
 	 						<ul id='userarea'><li id="username">$realname
+	 											<!-- asagidaki iki satir dil dosyasından alınmalı -->
+	 											<input type="text" style='width:230px;height:25px' id="statusMessage" value="Status message"/>
+	 											<input type="button" value="Send" id="sendStatusMessageButton"/>
 	 										   <ul>
 	 										   <li id="changePassword"></li>
 	 										   <li id="signout"></li>

@@ -142,7 +142,10 @@ class WebClientManager extends Base
 					$email = $reqArray["email"];
 				}
 				$out = DisplayOperator::getActivateAccountPage($_SERVER['PHP_SELF'], LANGUAGE, $key, $email);
-				break;				
+				break;	
+			case $this->actionPrefix . "SaveStatusMessage":
+				$out = $this->saveStatusMessage($reqArray);
+				break;			
 			default:				
 				$out = UNSUPPORTED_ACTION;
 				if (class_exists("FacebookConnect")) 
@@ -156,8 +159,7 @@ class WebClientManager extends Base
 							$out = $this->fbc->process($reqArray, $providedActions[$i]);
 							break;		
 						} 
-					} 			
-					
+					} 				
 				}
 				
 				break;
@@ -189,6 +191,45 @@ class WebClientManager extends Base
 			
 		}		
 		return $out;
+	}
+	
+	private function saveStatusMessage($reqArray) {
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['statusMessage']) && $reqArray['statusMessage'] != null )
+		{
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true)
+			{
+				$statusMessage = $this->checkVariable($reqArray['statusMessage']);
+				$userId = $this->usermanager->getUserId();
+				$sql = 	sprintf('UPDATE ' . $this->tablePrefix .'_users
+						 		 SET status_message = "%s",
+						 		 	 status_source = %d,
+						 		 	 status_message_time = NOW()
+						 		 WHERE  
+						 		 	id = %d
+						 		 LIMIT 1', $statusMessage, STATUS_MESSAGE_SOURCE_WEB, $userId);
+				
+				if ($this->dbc->query($sql)) {
+					
+					$sql = 	sprintf('INSERT INTO ' . $this->tablePrefix .'_status_messages
+					             (status_message, status_source, date_time,userId)
+					             VALUES ("%s", %d, NOW(),%d)',
+					          $statusMessage, STATUS_MESSAGE_SOURCE_WEB, $userId);
+					          
+					if ($this->dbc->query($sql))
+					{	
+						$out = SUCCESS;	
+					}
+				}
+				
+				
+			}
+		
+			
+		}		
+		return $out;
+		
 	}
 	
 	private function inviteUser($reqArray){
@@ -440,9 +481,13 @@ class WebClientManager extends Base
 			
 			
 			$out = UNAUTHORIZED_ACCESS;
-			if ($this->isUserAuthenticated() == true){
-				$userIdOnMap = (int) $reqArray['userId'];
-				$userId = $this->usermanager->getUserId();
+			$userIdOnMap = (int) $reqArray['userId'];
+			$userId = $this->usermanager->getUserId();
+			if ($this->isUserAuthenticated() == true && 
+				($this->usermanager->isFriend($userId, $userIdOnMap) == true ||
+				 $userId == $userIdOnMap))
+			{
+				
 				$this->pastPointsFetchedUserId = $userIdOnMap;
 				$pageNo = 1;
 				if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
@@ -455,14 +500,7 @@ class WebClientManager extends Base
 							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 						 FROM ' . $this->tablePrefix .'_user_was_here
 						 WHERE 
-						 	userId = '. $userIdOnMap . ' 
-						 	AND userId in (SELECT '. $userId .' 
-										   UNION	
-						 					SELECT friend1 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend2 = '. $userId .' and status = 1
-											 UNION 
-											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend1 = '. $userId .' and status = 1)
+						 	userId = '. $userIdOnMap . '
 						 ORDER BY 
 						 	Id DESC
 						 LIMIT '. $offset . ','
@@ -473,14 +511,7 @@ class WebClientManager extends Base
 									ceil((count(Id)-1)/ '.$elementCountInAPage .')
 								 FROM '. $this->tablePrefix .'_user_was_here
 								 wHERE 
-								 	userId = '. $userIdOnMap . '
-								 	AND userId in (SELECT '. $userId .' 
-										   		  UNION 
-										   		   SELECT friend1 FROM '.$this->tablePrefix.'_friends
-													 WHERE friend2 = '. $userId .' and status = 1
-												  UNION 
-											 	   SELECT friend2 FROM '.$this->tablePrefix.'_friends
-													 WHERE friend1 = '. $userId .' and status = 1)' ;				
+								 	userId = '. $userIdOnMap ;				
 				
 				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount), "userPastLocations");
 			}
@@ -488,7 +519,8 @@ class WebClientManager extends Base
 		return $out;
 	}
 	
-	private function getImageList($reqArray, $elementCountInAPage){
+	private function getImageList($reqArray, $elementCountInAPage)
+	{
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
 		{

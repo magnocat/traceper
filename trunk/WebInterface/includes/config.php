@@ -23,8 +23,9 @@ $dbPassword = "21236161";
 $dbName = "php";
 
 error_reporting(E_ALL); // edit if you know what you do
+define("GOOGLE_MAP_API_KEY", "ABQIAAAAnfs7bKE82qgb3Zc2YyS-oBT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSySz_REpPq-4WZA27OwgbtyR3VcA");
 
-define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y6UmQXNMhTgFS-OpJG3vTTQzF67ve7Li8eh_g");
+//define("GOOGLE_MAP_API_KEY", "ABQIAAAAEUQFPfeMmwQlu4rVizjq5RTUBQ_8WQnJ0r_AJ0Rg3Y6UmQXNMhTgFS-OpJG3vTTQzF67ve7Li8eh_g");
 /* 
  * language macro
  * en for english -> default language
@@ -88,6 +89,9 @@ define("IMAGE_HANDLER", WEB_ADDRESS);
 
 define ("WEB_CLIENT_ACTION_PREFIX", "WebClient"); //editing is not recommended 
 define ("DEVICE_ACTION_PREFIX", "Device"); //editing is not recommended
+
+define("STATUS_MESSAGE_SOURCE_MOBILE", 0);
+define("STATUS_MESSAGE_SOURCE_WEB", 1);
 
 define ("SUCCESS", "1");  // Don't edit
 define ("FAILED", "-1");  // Don't edit
