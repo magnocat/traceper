@@ -52,6 +52,9 @@ class DeviceManager extends Base
 				case $this->actionPrefix . "TakeMyLocation":
 					$out = $this->updateUserLocation($reqArray);	
 					break;
+				case $this->actionPrefix . "AuthenticateMe":
+					$out = $this->authenticateUser($reqArray);
+					break;
 				case $this->actionPrefix . "RegisterMe":
 					$out = $this->registerUser($reqArray);
 					break;
@@ -76,6 +79,30 @@ class DeviceManager extends Base
 		}
 		
 		return $this->prepareXML($out);		
+	}
+	
+	private function authenticateUser($reqArray){
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['email']) && $reqArray['email'] != NULL
+			&& isset($reqArray['password']) && $reqArray['password'] != NULL)
+		{
+			$email = $this->checkVariable($reqArray['email']);
+			$password = $this->checkVariable($reqArray['password']);
+			
+			$sql = sprintf('SELECT Id
+							FROM '. $this->tablePrefix .'_users
+							WHERE email = "%s" AND
+								  password = "%s"
+							LIMIT 1', $email, $password);
+			
+			$userId = $this->dbc->getUniqueField($sql);
+			$out = UNAUTHORIZED_ACCESS;
+			if ($userId != NULL) {
+				$out = SUCCESS;
+			}			
+				
+		}
+		return $out;
 	}
 	
 	private function getImage($reqArray, $uploadedFile){
@@ -124,6 +151,7 @@ class DeviceManager extends Base
 	 */	
 	private function updateUserLocation($reqArray)
 	{
+		$out = MISSING_PARAMETER;
 		if (isset($reqArray['latitude']) && $reqArray['latitude'] != NULL
 			&& isset($reqArray['longitude']) && $reqArray['longitude'] != NULL
 			&& isset($reqArray['altitude']) && $reqArray['altitude'] != NULL
@@ -132,6 +160,15 @@ class DeviceManager extends Base
 			&& isset($reqArray['deviceId']) && $reqArray['deviceId'] != NULL
 		)
 		{
+			$status_message = NULL;
+			$status_message_query = '';
+			
+			if (isset($reqArray['status_message']) && $reqArray['status_message'] != NULL){
+				$status_message = $this->checkVariable($reqArray['status_message']);
+				$status_message_query = sprintf(', status_message = "%s",
+						 		 	             status_source = %d,
+						 		 	             status_message_time = NOW()',$status_message, STATUS_MESSAGE_SOURCE_MOBILE);
+			}
 			//rounding takes place in database			
 			$latitude = (float) $reqArray['latitude'];
 			$longitude = (float) $reqArray['longitude'];
@@ -140,48 +177,71 @@ class DeviceManager extends Base
 			$password = $this->checkVariable($reqArray['password']);
 			$deviceId = $this->checkVariable($reqArray['deviceId']);
 
-			//only update the location of the users whose location changed
-			$sql = sprintf("UPDATE "
-								. $this->tablePrefix ."_users 
-							SET
-							 	latitude = %f , 
-							 	longitude = %f ,
-							 	altitude = %f ,							 	
-							 	dataArrivedTime = NOW(),
-							 	deviceId = '%s'							 	
-							WHERE 
-								email = '%s' 
-								AND 
-								password = '%s'
-							LIMIT 1;", 
-						   $latitude, $longitude, $altitude, $deviceId, $email, $password);
+			$sql = sprintf('SELECT Id
+								FROM '. $this->tablePrefix.'_users 
+							WHERE email = "%s" 
+						  		  AND 
+						  		  password = "%s"
+							LIMIT 1', $email, $password);
 			
-			$sqlWasHere = sprintf('INSERT INTO '
-									. $this->tablePrefix . '_user_was_here
-										(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
-	    							SELECT Id, %f, %f, %f, NOW(), "%s" 
-									FROM '. $this->tablePrefix.'_users 
-									WHERE email = "%s" 
-										  AND 
-										  password = "%s"
-									LIMIT 1',
-									$latitude, $longitude, $altitude, $deviceId, $email, $password);			   
+			$userId = $this->dbc->getUniqueField($sql);
 			
-			$out = FAILED;
-			if ($this->dbc->query($sql)) {	
-				$out = SUCCESS;				
-				if ($this->dbc->getAffectedRows() === 1) {
-					$this->dbc->query($sqlWasHere);					
+			$out = UNAUTHORIZED_ACCESS;
+			if ($userId != null) 
+			{
+			
+				//only update the location of the users whose location changed
+				$sql = sprintf('UPDATE '
+									. $this->tablePrefix .'_users 
+								SET
+								  	latitude = %f , '
+								  .'	longitude = %f , '
+								  .'	altitude = %f ,	'						 	
+								  .'	dataArrivedTime = NOW(), '
+								  .'	deviceId = "%s"	'
+								  .	$status_message_query 						 	
+							   .' WHERE '
+								  .' Id = %d '
+							   .' LIMIT 1;', 
+							   $latitude, $longitude, $altitude, $deviceId, $userId);
+				
+							   
+				$sqlWasHere = sprintf('INSERT INTO '
+										. $this->tablePrefix . '_user_was_here
+											(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
+		    							 VALUES(%d,	%f, %f, %f, NOW(), "%s") 
+										',
+										$userId, $latitude, $longitude, $altitude, $deviceId, $email, $password);			   
+				
+				$out = FAILED;
+				if ($this->dbc->query($sql)) {						
+						
+					if ($this->dbc->getAffectedRows() === 1) 
+					{
+						if ($this->dbc->query($sqlWasHere)) 
+						{							
+							$out = SUCCESS;					
+							if ($status_message != NULL) {
+								$locationId = $this->dbc->lastInsertId();
+								
+								$sql = 	sprintf('INSERT INTO ' . $this->tablePrefix .'_status_messages
+							    	         (status_message, status_source, date_time, userId, locationId)
+							    	         VALUES ("%s", %d, NOW(),%d)',
+							    		      $status_message, STATUS_MESSAGE_SOURCE_MOBILE, $userId, $locationId);
+							    
+							    $out = FAILED;
+							    echo $sql;
+							    if ($this->dbc->query($sql)){
+							    	$out = SUCCESS;
+							    }								    
+							}
+						}
+					}					
+						
 				}
-				else {
-					$out = UNAUTHORIZED_ACCESS;
-				}
-					
 			}
 		}
-		else {
-			$out = MISSING_PARAMETER;
-		}
+		
 		return $out;		
 	}
 	/**
@@ -209,6 +269,7 @@ class DeviceManager extends Base
 		
 		return $out;		
 	}
+
 	
 	/**
 	 * 

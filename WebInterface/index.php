@@ -13,7 +13,6 @@ define("WEB_ADDRESS", 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRI
 
 require_once("includes/config.php");
 
-
 $dbc = NULL;  // database connectivity;
 $out = NULL;
 
@@ -75,7 +74,8 @@ else {
 		if ($fbc != NULL){
 			$pluginScript = $fbc->getMainScript();	
 		}
-		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
+		$userInfo = $auth->getUserInfo();
+		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
 	}
 	else {	
 		$pluginScript = "";

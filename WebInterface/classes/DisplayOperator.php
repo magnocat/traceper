@@ -170,11 +170,15 @@ EOT;
 	
 	
 	
-	public static function getMainPage($callbackURL, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
+	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
 		$realname = self::$realname;
-		$userId = self::$userId;		
+		$userId = self::$userId;	
+		$latitude = $userInfo->latitude;
+		$longitude = $userInfo->longitude;
+		$time = $userInfo->time;
+		$deviceId = $userInfo->deviceId;	
 		
 		$str = <<<MAIN_PAGE
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -234,6 +238,38 @@ EOT;
 					map.enableRotation();
 	   	
    					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
+   					
+   					var personIcon = new GIcon(G_DEFAULT_ICON);
+					personIcon.image = "images/person.png";
+					personIcon.iconSize = new GSize(24,24);
+					personIcon.shadow = null;
+					markerOptions = { icon:personIcon };
+	   				
+					var point = new GLatLng($latitude, $longitude);
+   					TRACKER.users[$userId] = new TRACKER.User( {//username:username,
+										   realname:'$realname',
+										   latitude:$latitude,
+										   longitude:$longitude,
+										   time:'$time',
+										   message:'',
+										   deviceId:$deviceId,
+										   gmarker:new GMarker(point, markerOptions),														   
+										});
+					GEvent.addListener(TRACKER.users[$userId].gmarker, "click", function() {
+  						TRACKER.openMarkerInfoWindow($userId);	
+  					});
+  				
+					GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowopen",function(){
+						TRACKER.users[$userId].infoWindowIsOpened = true;
+	  				});
+					
+	  				GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowclose",function(){
+	  					TRACKER.users[$userId].infoWindowIsOpened = false;
+	  				});
+	  				if (typeof TRACKER.users[$userId].pastPointsGMarker == "undefined") {
+	  					TRACKER.users[$userId].pastPointsGMarker = new Array(TRACKER.users[$userId].gmarker);
+	  				}
+					map.addOverlay(TRACKER.users[$userId].gmarker);
    					trackerOp.getFriendList(1); 	
    				}
 			}

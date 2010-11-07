@@ -57,11 +57,11 @@ define ("STAFF_TRACKER_TABLE_PREFIX", "traceper");
 /**
  * Device minimum data sent time interval in ms 
  */
-define("GPS_MIN_DATA_SENT_INTERVAL", 60000);
+define("GPS_MIN_DATA_SENT_INTERVAL", 300000);
 /**
  * Device minimum data sent distance interval in meters 
  */
-define("GPS_MIN_DISTANCE_INTERVAL", 100);
+define("GPS_MIN_DISTANCE_INTERVAL", 1000);
 /**
  * Flag to determine fetching photos in initialization
  * its value may be 1 or 0, it is used if cookie is not defined to fetch images
