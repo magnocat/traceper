@@ -6,7 +6,7 @@
 	 <uses-permission android:name="android.permission.INTERNET" />
 	 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	 <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-	<application android:icon="@drawable/icon" android:label="@string/ApplicationName">
+	<application android:icon="@drawable/icon" android:label="@string/ApplicationName" android:debuggable="true">
 		<activity android:name=".android.Main">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
@@ -30,7 +30,7 @@
 				<category android:name="android.intent.category.NORMAL"></category>
 			</intent-filter>
 		</activity>
-		<activity android:name=".android.CameraController">
+		<activity android:name=".android.CameraController" android:screenOrientation="landscape" >
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
 				<category android:name="android.intent.category.NORMAL"></category>
@@ -41,4 +41,6 @@
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.CAMERA"></uses-permission>
+<uses-feature android:name="android.hardware.camera" />
+<uses-feature android:name="android.hardware.camera.autofocus" />
 </manifest>

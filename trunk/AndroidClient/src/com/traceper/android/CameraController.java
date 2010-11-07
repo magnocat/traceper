@@ -22,8 +22,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.traceper.R;
@@ -43,6 +48,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private byte[] picture;
 	private IAppService appService = null;
 	private boolean pictureTaken = false;
+	private Button takePictureButton = null;
 	
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
@@ -77,13 +83,34 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
+		this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
+		
+		
 		setContentView(R.layout.camera_view);
 		
 		getWindow().setFormat(PixelFormat.TRANSLUCENT);
+		
 		surfaceView = (SurfaceView) findViewById(R.id.surface);
 		surfaceHolder = surfaceView.getHolder();
 		surfaceHolder.addCallback(this);
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		
+		takePictureButton = (Button) findViewById(R.id.takePictureButton);
+		takePictureButton.bringToFront();
+		takePictureButton.setOnClickListener(new View.OnClickListener() {			
+			
+			public void onClick(View arg0) {
+				pictureTaken = true;
+				camera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);  
+				openOptionsMenu();
+				
+			}
+		});
+		takePictureButton.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
+		
+		
 	}
 
 	@Override
@@ -91,21 +118,26 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		if (isPreviewRunning) {  
 			camera.stopPreview();  
 		}  
-		Camera.Parameters p = camera.getParameters();  
-		p.setPreviewSize(w, h);  
-		camera.setParameters(p);  
+	//	Camera.Parameters p = camera.getParameters();  
+	//	p.setPreviewSize(w, h);  
+	
+	//	camera.setParameters(p);  
+		
 		try {
 			camera.setPreviewDisplay(holder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
-		camera.startPreview();  
+		
+		camera.startPreview(); 
+				
 		isPreviewRunning = true; 
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder arg0) {
-		camera = Camera.open();
+	public void surfaceCreated(SurfaceHolder holder) {
+		camera = Camera.open();	
+
 	}
 
 	@Override
@@ -126,7 +158,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		return result;		
 	}
 	
-	public boolean onPrepareOptionsMenu (Menu menu){
+	public boolean onPrepareOptionsMenu (Menu menu)
+	{
 		boolean result = super.onPrepareOptionsMenu(menu);
 		MenuItem item = menu.findItem(UPLOAD_PHOTO);
 		if (item == null && pictureTaken == true) {
@@ -145,7 +178,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+		switch (item.getItemId()) 
+		{
 		case UPLOAD_PHOTO:
 			if (pdialog == null) {
 				pdialog = new ProgressDialog(CameraController.this);
