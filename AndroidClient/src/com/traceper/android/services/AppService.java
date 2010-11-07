@@ -56,6 +56,7 @@ public class AppService extends Service implements IAppService{
 	private boolean isUserAuthenticated = false;
 	
 	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
+	private final static String HTTP_ACTION_AUTHENTICATE_ME = "DeviceAuthenticateMe";
 	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
 	private static final String LOCATION_CHANGED = "location changed";
 	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
@@ -243,6 +244,7 @@ public class AppService extends Service implements IAppService{
 	
 	public void onDestroy() {
 		Log.i("Traceper-AppService is being destroyed", "...");
+		locationManager.removeUpdates(locationHandler);
 		super.onDestroy();
 	}
 	
@@ -409,7 +411,22 @@ public class AppService extends Service implements IAppService{
 	{			
 		this.password = password;
 		this.email = email;
-		int result = this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "deviceId";
+		
+		value[0] = HTTP_ACTION_AUTHENTICATE_ME;
+		value[1] = this.email;
+		value[2] = this.password;
+		value[3] = this.deviceId;
+		
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		int result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		
 		if (result == HTTP_RESPONSE_SUCCESS) 
 		{			

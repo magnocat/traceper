@@ -59,7 +59,10 @@ public class Main extends Activity
 			
 			if (appService.isUserAuthenticated()) {				
 				setTitle(appService.getUsername() + " - " + Configuration.APPLICATION_NAME);	
-				lastDataSentTimeText.setText(getFormattedDate(appService.getLastLocationSentTime()));
+				Long dt = appService.getLastLocationSentTime();
+				if (dt != null) {
+					lastDataSentTimeText.setText(getFormattedDate(dt));
+				}
 			}
 			else {
 				Intent i = new Intent(Main.this, Login.class);																

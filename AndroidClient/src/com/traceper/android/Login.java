@@ -39,6 +39,7 @@ public class Login extends Activity {
 	private static final int UNKNOWN_ERROR_OCCURED = 4;
 	private static final int SETTINGS_DIALOG = 5;
 	private static final int HTTP_REQUEST_FAILED = 6;
+	private static final int HTTP_MISSING_PARAMETER = 7;
 	private EditText emailText;
     private EditText passwordText;
     private Button cancelButton;
@@ -87,9 +88,7 @@ public class Login extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
 
-        // Start and bind the  imService 
-    	startService(new Intent(Login.this,  AppService.class));	               
-    	
+        
         setContentView(R.layout.login_screen);
         setTitle("Login - " + Configuration.APPLICATION_NAME);
         
@@ -110,7 +109,9 @@ public class Login extends Activity {
 				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
 				editor.commit();
-				
+				// Start and bind the  imService 
+		    	startService(new Intent(Login.this,  AppService.class));
+		    	
 				if (appManager == null) {
 					showDialog(NOT_CONNECTED_TO_SERVICE);
 					return;
@@ -170,6 +171,12 @@ public class Login extends Activity {
 								handler.post(new Runnable(){
 									public void run() {										
 										showDialog(HTTP_REQUEST_FAILED);
+									}});
+							}
+							else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
+								handler.post(new Runnable(){
+									public void run() {										
+										showDialog(HTTP_MISSING_PARAMETER);
 									}});
 							}
 							else {							
@@ -298,7 +305,15 @@ public class Login extends Activity {
         			}
         		})        
         		.create(); 
-    		
+    		case HTTP_MISSING_PARAMETER:
+    			return new AlertDialog.Builder(Login.this)       
+        		.setMessage(R.string.http_missing_parameter)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 
     		
     		default:
     			return null;
