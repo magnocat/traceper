@@ -230,6 +230,21 @@ class UserManager extends AuthenticateManager implements IUserManagement
  		return $isFriend;	
 	}
 	
+	public function getUserInfo()
+	{
+		$userId = $this->getUserId();
+		$sql = 'SELECT realname, latitude, longitude, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as time
+				FROM '.$this->tablePrefix . '_users 
+				WHERE Id = ' . $userId .'
+				LIMIT 1';
+		$result = $this->dbc->query($sql);
+		$user = null;
+		if ($row = $this->dbc->fetchObject($result)) {
+			$user = $row;
+		}
+		return $user;
+	}
+	
 
 
 }

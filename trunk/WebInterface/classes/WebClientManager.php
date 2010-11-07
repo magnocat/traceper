@@ -221,15 +221,10 @@ class WebClientManager extends Base
 					{	
 						$out = SUCCESS;	
 					}
-				}
-				
-				
-			}
-		
-			
+				}				
+			}			
 		}		
-		return $out;
-		
+		return $out;		
 	}
 	
 	private function inviteUser($reqArray){
@@ -345,7 +340,7 @@ class WebClientManager extends Base
 				}
 				
 				$sql = 'SELECT
-							u.Id, null as userId, u.latitude, u.longitude, u.altitude, 
+							u.Id, null as userId, u.status_message, u.latitude, u.longitude, u.altitude, 
 							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
 							(unix_timestamp(u.dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
 							"user" as type
@@ -353,7 +348,11 @@ class WebClientManager extends Base
 							. $this->tablePrefix .'_friends f
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
 						WHERE
-							( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 AND
+							( ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
+							     ) 
+							     AND f.status = 1
+							    ) 
+								OR u.Id= '.$userId .') AND
 							unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
 						'. $sqlImageUnion .'						
 						ORDER BY
@@ -368,8 +367,12 @@ class WebClientManager extends Base
 										count(u.Id) as itemCount
 								 	 FROM ' . $this->tablePrefix .'_friends f
 									 LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
-									 WHERE
-										( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 AND
+									 WHERE ( ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
+							     				) 
+							     				AND f.status = 1
+							    		     ) 
+											OR u.Id= '.$userId .'
+										   ) AND
 										unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
 						  			'. $sqlImagePageCountUnion .'
 							 		  ) t';
@@ -379,21 +382,28 @@ class WebClientManager extends Base
 			{
 				// this is the user list showing in left pane
 
-				$sql = 'SELECT u.Id, u.latitude, u.longitude, u.altitude, "user" as type,
+				$sql = 'SELECT u.Id, u.latitude, u.status_message, u.longitude, u.altitude, "user" as type,
 							   u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 						FROM '. $this->tablePrefix .'_friends f 
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
-						WHERE ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1 
+						WHERE   ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
+							      ) 
+							      AND f.status = 1
+							     )							 
 						ORDER BY		
 							u.realname 							
 						LIMIT ' . $offset . ',' 
 								. $elementCountInAPage;				
 		
-					 		
+			//	echo $sql;	 		
 				$sqlPageCount = 'SELECT  ceil(count(u.Id)/'.$elementCountInAPage.') 
 								FROM '. $this->tablePrefix .'_friends f 
 								LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
-								WHERE ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') ) AND f.status = 1; ';
+								WHERE  ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
+									      ) 
+									      AND f.status = 1
+									     )					
+										 ';
 			}	
 		
 			$pageCount = $this->dbc->getUniqueField($sqlPageCount);
@@ -436,7 +446,7 @@ class WebClientManager extends Base
 				$userId = $this->usermanager->getUserId();
 				$sql = //sprintf(
 							'SELECT 
-									Id, latitude, longitude, altitude, 
+									Id, status_message, latitude, longitude, altitude, 
 									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 								FROM '
 									. $this->tablePrefix .'_users								
@@ -830,6 +840,7 @@ class WebClientManager extends Base
 		$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
 		$row->message = isset($row->message) ? $row->message : null;
 		$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+		$row->status_message = isset($row->status_message) ? $row->status_message : null;
 			
 		$str = '<user>'
 		. '<Id>'. $row->Id .'</Id>'
@@ -838,6 +849,7 @@ class WebClientManager extends Base
 		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
 		. '<time>' . $row->dataArrivedTime . '</time>'
 		. '<message>' . $row->message . '</message>'
+		. '<status_message>' . $row->status_message . '</status_message>'
 		. '<deviceId>' . $row->deviceId . '</deviceId>'
 		.'</user>';
 		

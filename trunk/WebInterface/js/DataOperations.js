@@ -107,9 +107,10 @@ function processUserPastLocationsXML (MAP, xml) {
 			var realname = $(user).find("realname").text();
 			var latitude = $(user).find("location").attr('latitude');
 			var longitude = $(user).find("location").attr('longitude');
+			var status_message = $(user).find("status_message").text();
 			var point = new GLatLng(latitude, longitude);
 			
-			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname +"</a></li>";
+			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
@@ -125,6 +126,7 @@ function processUserPastLocationsXML (MAP, xml) {
 														   longitude:longitude,
 														   time:$(user).find("time").text(),
 														   message:$(user).find("message").text(),
+														   status_message:status_message,
 														   deviceId:$(user).find("deviceId").text(),
 														   gmarker:new GMarker(point, markerOptions),														   
 														});
