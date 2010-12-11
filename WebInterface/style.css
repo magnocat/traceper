@@ -88,8 +88,8 @@ a {
 	padding-left:22px;
 	background: url("images/account.png") no-repeat 3px;
 }
-#signout{background: url("images/signout.ico") no-repeat 3px;}
-#changePassword{ background: url("images/changePassword.ico") no-repeat 3px; }
+#signout{background: url("images/signout.png") no-repeat 3px;}
+#changePassword{ background: url("images/changePassword.png") no-repeat 3px; }
 
 #bar:hover{ background-color:#6261d8;}
 #infoBottomBar {
