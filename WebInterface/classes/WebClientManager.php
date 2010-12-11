@@ -145,7 +145,10 @@ class WebClientManager extends Base
 				break;	
 			case $this->actionPrefix . "SaveStatusMessage":
 				$out = $this->saveStatusMessage($reqArray);
-				break;			
+				break;	
+			case $this->actionPrefix . "DeleteFriendship":
+				$out = $this->deleteFriendShip($reqArray);
+				break;		
 			default:				
 				$out = UNSUPPORTED_ACTION;
 				if (class_exists("FacebookConnect")) 
@@ -190,6 +193,25 @@ class WebClientManager extends Base
 			}	
 			
 		}		
+		return $out;
+	}
+	
+	private function deleteFriendship($reqArray) 
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['friendId']) && $reqArray['friendId'] != null ){
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true){
+				$userId = $this->usermanager->getUserId();
+				$friendId = $this->checkVariable($reqArray['friendId']);
+				
+				$result = $this->usermanager->deleteFriendship($userId, $friendId);
+				$out = FAILED;
+				if ($result === true) {
+					$out = SUCCESS;
+				}
+			}
+		}
 		return $out;
 	}
 	

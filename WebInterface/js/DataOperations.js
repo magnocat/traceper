@@ -110,6 +110,8 @@ function processUserPastLocationsXML (MAP, xml) {
 			var status_message = $(user).find("status_message").text();
 			var point = new GLatLng(latitude, longitude);
 			
+			list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+")' src='images/delete.png' />";
+			
 			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 		
 			if (typeof TRACKER.users[userId] == "undefined") 

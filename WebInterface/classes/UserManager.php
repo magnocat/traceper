@@ -230,6 +230,23 @@ class UserManager extends AuthenticateManager implements IUserManagement
  		return $isFriend;	
 	}
 	
+	public function deleteFriendship($user1, $user2) {
+		
+		$user1 = (int) $user1;
+		$user2 = (int) $user2;
+		
+		$sql = sprintf('DELETE FROM ' . $this->tablePrefix .'_friends 
+						WHERE ((friend1 = %d  AND friend2 = %d ) OR
+	 				   		   (friend1 = %d  AND friend2 = %d ))
+	 				   	LIMIT 1', $user1, $user2, $user2, $user1);
+		$result = false;
+		if ($this->dbc->query($sql) != false) {
+			$result = true;
+		}
+			
+		return $result;	
+	}
+	
 	public function getUserInfo()
 	{
 		$userId = $this->getUserId();
