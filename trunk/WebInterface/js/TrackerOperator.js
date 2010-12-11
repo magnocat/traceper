@@ -25,6 +25,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionDeleteImage = "WebClientDeleteImage";
 	this.actionRegisterUser = "WebClientRegisterUser";
 	this.actionActivateAccount= "WebClientActivateAccount";
+	this.actionDeleteFriendship= "WebClientDeleteFriendship";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -247,6 +248,23 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});
 	}
 	
+	this.deleteFriendship = function (friendId) {
+		if (confirm(TRACKER.langOperator.confirmationMessage)) {
+			var params = "action=" + TRACKER.actionDeleteFriendship + "&friendId="+friendId;
+			TRACKER.ajaxReq(params, function (result){	
+					if (result == "1") {
+						TRACKER.getFriendList(TRACKER.friendListPageNo);
+					}
+					else {
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+					}
+			});
+			
+		}
+		
+	}
+/*	we will use it to get whole user list page by page
+ 
 	// getting user list with latitude longittude info
 	this.getUserList = function(pageNo)
 	{		
@@ -274,7 +292,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}			
 		});	
 	};
-	
+*/	
 	this.getFriendList = function(pageNo)
 	{		
 		var params = "action=" + TRACKER.actionGetFriendList + "&pageNo=" + pageNo;
