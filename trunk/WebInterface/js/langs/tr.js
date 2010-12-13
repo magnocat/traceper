@@ -65,5 +65,7 @@ LAN_OPERATOR.addIndexes({
 			activatedAccountKeysDontMatch:'Bir seyler hatalı olmalı, Baglantınızın dogru oldugundan emin olun.',
 			HomePage:'Anasayfa',
 			changePassword:'Şifremi değiştir',
+			addFriendRequestConfirmation:'Bu kullan\u0131c\u0131ya arkadaşl\u0131k teklifi gönderimini onayl\u0131yor musunuz?',
+			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.'
 			
 		});

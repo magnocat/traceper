@@ -66,5 +66,7 @@ LAN_OPERATOR.addIndexes({
 			activatedAccountKeysDontMatch:'Something wrong, make sure your link is correct.',
 			HomePage:'Home',
 			changePassword:'Change password',
+			addFriendRequestConfirmation:'Do you confirm that you are sending friend request to this user?',
+			friendRequestRecorded:'Your friend request is recorded successfully'
 
 	});
