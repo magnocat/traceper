@@ -26,6 +26,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionRegisterUser = "WebClientRegisterUser";
 	this.actionActivateAccount= "WebClientActivateAccount";
 	this.actionDeleteFriendship= "WebClientDeleteFriendship";
+	this.actionAddFriendRequest = "WebClientAddFriendRequest";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -300,7 +301,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.friendListPageNo = TRACKER.getPageNo(result);
 			TRACKER.friendListPageCount = TRACKER.getPageCount(result);
 			
-			var str = processXML(MAP, result);
+			var str = processXML(MAP, result, true);
 			
 			if (str != null) {
 				str += TRACKER.writePageNumbers('javascript:TRACKER.getFriendList(%d)', TRACKER.friendListPageCount, TRACKER.friendListPageNo, 3);
@@ -438,6 +439,24 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 		});	
 	};
+	
+	this.addAsFriend = function(userId) {
+		if (confirm(TRACKER.langOperator.addFriendRequestConfirmation)) 
+		{
+			var params = "action=" + TRACKER.actionAddFriendRequest + "&friendId=" + userId;
+			
+			TRACKER.ajaxReq(params, function(result){
+				if (result == "1") {
+					TRACKER.showMessage(TRACKER.langOperator.friendRequestRecorded, "info");
+				}
+				else {
+					
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "info");
+				}
+			});
+		}
+		
+	}
 	
 	var fetchingImagesInBgStart = false;
 	

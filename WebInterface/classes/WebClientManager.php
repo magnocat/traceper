@@ -148,6 +148,9 @@ class WebClientManager extends Base
 				break;	
 			case $this->actionPrefix . "DeleteFriendship":
 				$out = $this->deleteFriendShip($reqArray);
+				break;
+			case $this->actionPrefix . "AddFriendRequest":
+				$out = $this->addFriendRequest($reqArray);
 				break;		
 			default:				
 				$out = UNSUPPORTED_ACTION;
@@ -213,6 +216,24 @@ class WebClientManager extends Base
 			}
 		}
 		return $out;
+	}
+	
+	private function addFriendRequest($reqArray){
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['friendId']) && $reqArray['friendId'] != null )
+		{
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true)
+			{				
+				$friendId = $this->checkVariable($reqArray['friendId']);				
+				$result = $this->usermanager->addFriendRequest($friendId);
+				$out = FAILED;
+				if ($result === true) {
+					$out = SUCCESS;
+				}
+			}
+		}
+		return $out;		
 	}
 	
 	private function saveStatusMessage($reqArray) {
@@ -467,37 +488,64 @@ class WebClientManager extends Base
 				$offset = ($pageNo - 1) * $this->elementCountInAPage;
 				$userId = $this->usermanager->getUserId();
 				$sql = //sprintf(
-							'SELECT 
-									Id, status_message, latitude, longitude, altitude, 
+							'(SELECT 
+									Id, 1 as isFriend, status_message, latitude, longitude, altitude, 
 									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 								FROM '
 									. $this->tablePrefix .'_users								
 								WHERE
 									realname like "%'. $search .'%" AND 
-									( Id in (SELECT friend1 FROM '.$this->tablePrefix.'_friends
+									( Id IN (SELECT friend1 FROM '.$this->tablePrefix.'_friends
 											 WHERE friend2 = '. $userId .' and status = 1
 											 UNION 
 											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
 											 WHERE friend1 = '. $userId .' and status = 1) 
+										 
 									 OR Id = '. $userId .' )
+							)
+							UNION
+								(SELECT 
+									Id, 0 as isFriend, null, null, null, null, 
+									realname, null, null 
+								FROM '
+									. $this->tablePrefix .'_users								
+								WHERE
+									realname like "%'. $search .'%" AND 
+									( Id NOT IN (SELECT friend1 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend2 = '. $userId .' and status = 1
+											 UNION 
+											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend1 = '. $userId .' and status = 1) 
+									 AND Id != '. $userId .'
+									)
+								)	
+							UNION  
+								(SELECT 
+									Id, 2 as isFriend, null, null, null, null, 
+									realname, null, null 
+								FROM '
+									. $this->tablePrefix .'_users								
+								WHERE
+									realname like "%'. $search .'%" AND 
+									( Id IN (SELECT friend1 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend2 = '. $userId .' and status != 1
+											 UNION 
+											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
+											 WHERE friend1 = '. $userId .'  and status != 1) 
+									 AND Id != '. $userId .'
+									)
+								)							
 								ORDER BY
 									realname
 								LIMIT '. $offset .' , '. $this->elementCountInAPage ;
 							
-						//);
-						
+						//);				
 				$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$this->elementCountInAPage.')
 			 					 FROM '
 			 					 	. $this->tablePrefix .'_users
-								WHERE
-									realname like "%'. $search .'%" AND 
-									( Id in (SELECT friend1 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend2 = '. $userId .' and status = 1
-											 UNION 
-											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend1 = '. $userId .' and status = 1) 
-									 OR Id = '. $userId .' )';
+								 WHERE
+									realname like "%'. $search .'%" ';
 			 					 	
 				$out = $this->prepareXML($sql, $pageNo, $this->dbc->getUniqueField($sqlItemCount));
 			}
@@ -510,8 +558,7 @@ class WebClientManager extends Base
 	{
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['userId']) && !empty($reqArray['userId']))	{
-			
-			
+					
 			$out = UNAUTHORIZED_ACCESS;
 			$userIdOnMap = (int) $reqArray['userId'];
 			$userId = $this->usermanager->getUserId();
@@ -855,6 +902,7 @@ class WebClientManager extends Base
 	{
 		$row->Id = isset($row->Id) ? $row->Id : null;
 //		$row->username = isset($row->username) ? $row->username : null;
+		$row->isFriend = isset($row->isFriend) ? $row->isFriend : 0; 
 		$row->realname = isset($row->realname) ? $row->realname : null;
 		$row->latitude = isset($row->latitude) ? $row->latitude : null;
 		$row->longitude = isset($row->longitude) ? $row->longitude : null;
@@ -865,7 +913,7 @@ class WebClientManager extends Base
 		$row->status_message = isset($row->status_message) ? $row->status_message : null;
 			
 		$str = '<user>'
-		. '<Id>'. $row->Id .'</Id>'
+		. '<Id isFriend="'.$row->isFriend.'">'. $row->Id .'</Id>'
 //		. '<username>' . $row->username . '</username>'
 		. '<realname>' . $row->realname . '</realname>'
 		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'

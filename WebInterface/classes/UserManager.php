@@ -247,6 +247,19 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		return $result;	
 	}
 	
+	public function addFriendRequest($friendId) 
+	{
+		$friendId = (int) $friendId;
+		$sql = sprintf('INSERT INTO ' . $this->tablePrefix .'_friends(friend1, friend2) 
+						VALUES (%d, %d)	', $this->getUserId(), $friendId);
+		$result = false;
+		if ($this->dbc->query($sql) != false) {
+			$result = true;
+		}
+		return $result;
+	}
+	
+	
 	public function getUserInfo()
 	{
 		$userId = $this->getUserId();

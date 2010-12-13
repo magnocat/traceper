@@ -95,7 +95,7 @@ function processUserPastLocationsXML (MAP, xml) {
 	 * this function process XML returned when actions are search user, get user list, update list,
 	 * updated list...
 	 */	
-	function processXML(MAP, xml)
+	function processXML(MAP, xml, isFriendList)
 	{
 		//alert("in processXML");
 		var list = "";
@@ -103,6 +103,7 @@ function processUserPastLocationsXML (MAP, xml) {
 			
 			var user = $(this);			
 			var userId = $(user).find("Id").text();
+			var isFriend =  $(user).find("Id").attr('isFriend');
 //			var username = $(user).find("username").text();
 			var realname = $(user).find("realname").text();
 			var latitude = $(user).find("location").attr('latitude');
@@ -110,133 +111,151 @@ function processUserPastLocationsXML (MAP, xml) {
 			var status_message = $(user).find("status_message").text();
 			var point = new GLatLng(latitude, longitude);
 			
-			list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+")' src='images/delete.png' />";
-			
+			if (userId  != TRACKER.userId ){
+				
+				if (isFriend == "1" || isFriend == "2" || isFriendList == true) {
+					list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+")' src='images/delete.png' />";
+					if (isFriend == "2")
+					{
+						list += "<img class='deleteImageButton' src='images/question_mark.png' />";					
+						
+					}				
+				}
+				else {
+					// add as friend button
+					list += "<img class='deleteImageButton' onclick='TRACKER.addAsFriend("+userId+")' src='images/user_add_friend.png' />";
+				}
+				
+				
+			}
 			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 		
-			if (typeof TRACKER.users[userId] == "undefined") 
-			{		
-				var personIcon = new GIcon(G_DEFAULT_ICON);
-				personIcon.image = "images/person.png";
-				personIcon.iconSize = new GSize(24,24);
-				personIcon.shadow = null;
-				markerOptions = { icon:personIcon };
-			
-				TRACKER.users[userId] = new TRACKER.User( {//username:username,
-														   realname:realname,
-														   latitude:latitude,
-														   longitude:longitude,
-														   time:$(user).find("time").text(),
-														   message:$(user).find("message").text(),
-														   status_message:status_message,
-														   deviceId:$(user).find("deviceId").text(),
-														   gmarker:new GMarker(point, markerOptions),														   
-														});
-				GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
-  						TRACKER.openMarkerInfoWindow(userId);	
-  				});
-  				
-				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
-					TRACKER.users[userId].infoWindowIsOpened = true;
-  				});
-				
-  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
-  					TRACKER.users[userId].infoWindowIsOpened = false;
-  				});
-  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
-  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
-  				}
-				MAP.addOverlay(TRACKER.users[userId].gmarker);
-			}
-			else
+			if (isFriend == 1)
 			{
-				var time = $(user).find("time").text();
-				var deviceId = $(user).find("deviceId").text();
-				var point = new GLatLng(latitude, longitude);				
-				TRACKER.users[userId].gmarker.setLatLng(point);
+				if (typeof TRACKER.users[userId] == "undefined") 
+				{		
+					var personIcon = new GIcon(G_DEFAULT_ICON);
+					personIcon.image = "images/person.png";
+					personIcon.iconSize = new GSize(24,24);
+					personIcon.shadow = null;
+					markerOptions = { icon:personIcon };
 				
-				if ((TRACKER.users[userId].latitude != latitude ||
-					 TRACKER.users[userId].longitude != longitude) &&
-					 typeof TRACKER.users[userId].polyline != "undefined")
+					TRACKER.users[userId] = new TRACKER.User( {//username:username,
+															   realname:realname,
+															   latitude:latitude,
+															   longitude:longitude,
+															   time:$(user).find("time").text(),
+															   message:$(user).find("message").text(),
+															   status_message:status_message,
+															   deviceId:$(user).find("deviceId").text(),
+															   gmarker:new GMarker(point, markerOptions),														   
+															});
+					GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
+	  						TRACKER.openMarkerInfoWindow(userId);	
+	  				});
+	  				
+					GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
+						TRACKER.users[userId].infoWindowIsOpened = true;
+	  				});
+					
+	  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
+	  					TRACKER.users[userId].infoWindowIsOpened = false;
+	  				});
+	  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
+	  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
+	  				}
+					MAP.addOverlay(TRACKER.users[userId].gmarker);
+				}
+				else
 				{
-					//these "if" is for creating new gmarker when user polyline is already drawed  
-					var gmarker = new GMarker(new GLatLng(TRACKER.users[userId].latitude, 
-														  TRACKER.users[userId].longitude));
-					TRACKER.users[userId].polyline.insertVertex(0, point);
-					var oldlatitude = TRACKER.users[userId].latitude;
-					var oldlongitude = TRACKER.users[userId].longitude;
+					var time = $(user).find("time").text();
+					var deviceId = $(user).find("deviceId").text();
+					var point = new GLatLng(latitude, longitude);				
+					TRACKER.users[userId].gmarker.setLatLng(point);
 					
-					GEvent.addListener(gmarker, "click", function(){
-						// attention similar function is used in 
-						// processUserPastLocationsXML function
-						var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
-						var previousGMarkerIndex = tr + 1; // it is reverse because 
-						var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+					if ((TRACKER.users[userId].latitude != latitude ||
+						 TRACKER.users[userId].longitude != longitude) &&
+						 typeof TRACKER.users[userId].polyline != "undefined")
+					{
+						//these "if" is for creating new gmarker when user polyline is already drawed  
+						var gmarker = new GMarker(new GLatLng(TRACKER.users[userId].latitude, 
+															  TRACKER.users[userId].longitude));
+						TRACKER.users[userId].polyline.insertVertex(0, point);
+						var oldlatitude = TRACKER.users[userId].latitude;
+						var oldlongitude = TRACKER.users[userId].longitude;
 						
-						gmarker.openInfoWindowHtml("<div>" 
-													  + "<b>" + TRACKER.users[userId].realname + "</b> " 
-													  + TRACKER.langOperator.wasHere 
-													  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
-													  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
-													+ "</div>"
-													+ '<ul class="sf-menu"> '
-								  					+ "<li>"
-								  						+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
-									   						+ TRACKER.langOperator.previousPoint 
-									   					+'</a>'
-									   				+ "</li>"
-									   				+ "<li>"
-									   					+"<a href='#' class='infoWinOperations'>"
-									   						+ TRACKER.langOperator.operations
-									   					+"</a>"
-									   					+"<ul>"
-											   				+"<li>"
-									   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ oldlatitude +','+ oldlongitude +')">'
-									   								+ TRACKER.langOperator.zoom 
-									   							+'</a>' 		
-									   						+"</li>"
-									   						+"<li>"
-									   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ oldlatitude +','+ oldlongitude +')">'
-									   								+ TRACKER.langOperator.zoomMax
-									   							+'</a>'
-									   						+"</li>"
-									   						+"<li>"
-									   							+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
-									   								+ TRACKER.langOperator.clearTraceLines
-									   							+'</a>'
-									   						+"</li>"
-									   					+"</ul>"
-									   				+ "</li>"
-									   				+ "<li>"
-									   					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
-									   						+ TRACKER.langOperator.nextPoint 
-									   					+'</a>'
-									   				+ "</li>"
-												+"</ul>");	
-					});
+						GEvent.addListener(gmarker, "click", function(){
+							// attention similar function is used in 
+							// processUserPastLocationsXML function
+							var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
+							var previousGMarkerIndex = tr + 1; // it is reverse because 
+							var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+							
+							gmarker.openInfoWindowHtml("<div>" 
+														  + "<b>" + TRACKER.users[userId].realname + "</b> " 
+														  + TRACKER.langOperator.wasHere 
+														  + '<br/>' + TRACKER.langOperator.time + ": " + TRACKER.users[userId].time
+														  + '<br/>' + TRACKER.langOperator.deviceId + ": " + TRACKER.users[userId].deviceId
+														+ "</div>"
+														+ '<ul class="sf-menu"> '
+									  					+ "<li>"
+									  						+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+										   						+ TRACKER.langOperator.previousPoint 
+										   					+'</a>'
+										   				+ "</li>"
+										   				+ "<li>"
+										   					+"<a href='#' class='infoWinOperations'>"
+										   						+ TRACKER.langOperator.operations
+										   					+"</a>"
+										   					+"<ul>"
+												   				+"<li>"
+										   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ oldlatitude +','+ oldlongitude +')">'
+										   								+ TRACKER.langOperator.zoom 
+										   							+'</a>' 		
+										   						+"</li>"
+										   						+"<li>"
+										   							+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ oldlatitude +','+ oldlongitude +')">'
+										   								+ TRACKER.langOperator.zoomMax
+										   							+'</a>'
+										   						+"</li>"
+										   						+"<li>"
+										   							+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+										   								+ TRACKER.langOperator.clearTraceLines
+										   							+'</a>'
+										   						+"</li>"
+										   					+"</ul>"
+										   				+ "</li>"
+										   				+ "<li>"
+										   					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+										   						+ TRACKER.langOperator.nextPoint 
+										   					+'</a>'
+										   				+ "</li>"
+													+"</ul>");	
+						});
+						
+						TRACKER.users[userId].pastPointsGMarker.splice(1,0, gmarker);					
+						MAP.addOverlay(gmarker);
+						
+						if (TRACKER.traceLineDrawedUserId != userId) {
+							// if traceline is not visible, hide the marker
+							gmarker.hide();
+						}
+						
+					}
+					TRACKER.users[userId].latitude = latitude;
+					TRACKER.users[userId].longitude = longitude;
+					TRACKER.users[userId].time = time;
+					TRACKER.users[userId].deviceId = deviceId;
 					
-					TRACKER.users[userId].pastPointsGMarker.splice(1,0, gmarker);					
-					MAP.addOverlay(gmarker);
+					var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
+					TRACKER.closeMarkerInfoWindow(userId);
 					
-					if (TRACKER.traceLineDrawedUserId != userId) {
-						// if traceline is not visible, hide the marker
-						gmarker.hide();
+					if (isWindowOpen == true) {
+						TRACKER.openMarkerInfoWindow(userId);
 					}
 					
-				}
-				TRACKER.users[userId].latitude = latitude;
-				TRACKER.users[userId].longitude = longitude;
-				TRACKER.users[userId].time = time;
-				TRACKER.users[userId].deviceId = deviceId;
-				
-				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
-				TRACKER.closeMarkerInfoWindow(userId);
-				
-				if (isWindowOpen == true) {
-					TRACKER.openMarkerInfoWindow(userId);
-				}
-				
-			}				
+				}			
+			} // end of if (isFriend == 1)
 					
 		});
 		
