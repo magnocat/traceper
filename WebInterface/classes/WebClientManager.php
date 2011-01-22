@@ -386,7 +386,7 @@ class WebClientManager extends Base
 							u.Id, null as userId, u.status_message, u.latitude, u.longitude, u.altitude, 
 							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
 							(unix_timestamp(u.dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
-							"user" as type
+							"user" as type, 1 as isFriend
 						FROM '
 							. $this->tablePrefix .'_friends f
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
@@ -426,7 +426,7 @@ class WebClientManager extends Base
 				// this is the user list showing in left pane
 
 				$sql = 'SELECT u.Id, u.latitude, u.status_message, u.longitude, u.altitude, "user" as type,
-							   u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+							   u.realname, u.deviceId,  "1" as isFriend, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 						FROM '. $this->tablePrefix .'_friends f 
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
 						WHERE   ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
