@@ -42,6 +42,7 @@ LAN_OPERATOR.addIndexes({
 			signout:'Çıkış',
 			rememberMeLabel:'Beni hatırla',
 			emailLabel:'E-posta',
+			invitationMessage:'Mesaj:',
 			emailNotFound:'E-posta adresi bulunamadı.',
 			sendNewPassword:'Yeni şifre gönder',
 			showLoginForm:'Giriş formunu göster',
@@ -66,6 +67,7 @@ LAN_OPERATOR.addIndexes({
 			HomePage:'Anasayfa',
 			changePassword:'Şifremi değiştir',
 			addFriendRequestConfirmation:'Bu kullan\u0131c\u0131ya arkadaşl\u0131k teklifi gönderimini onayl\u0131yor musunuz?',
-			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.'
+			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.',
+			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.'
 			
 		});

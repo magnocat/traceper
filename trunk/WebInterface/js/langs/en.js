@@ -42,7 +42,8 @@ LAN_OPERATOR.addIndexes({
 			hi:'Hi',
 			signout:'Logout',
 			rememberMeLabel:'Keep me logged in',
-			emailLabel:'E-mail',
+			emailLabel:'E-mail:',
+			invitationMessage:'Message:',
 			emailNotFound:'E-mail address has not been found.',			
 			sendNewPassword:'Send new password',
 			showLoginForm:'Show login form',
@@ -67,6 +68,7 @@ LAN_OPERATOR.addIndexes({
 			HomePage:'Home',
 			changePassword:'Change password',
 			addFriendRequestConfirmation:'Do you confirm that you are sending friend request to this user?',
-			friendRequestRecorded:'Your friend request is recorded successfully'
+			friendRequestRecorded:'Your friend request is recorded successfully',
+			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)'
 
 	});
