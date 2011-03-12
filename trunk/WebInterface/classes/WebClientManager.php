@@ -151,6 +151,10 @@ class WebClientManager extends Base
 				break;
 			case $this->actionPrefix . "AddFriendRequest":
 				$out = $this->addFriendRequest($reqArray);
+				break;
+			case $this->actionPrefix . "GetFriendRequests":
+		
+				$out = $this->usermanager->getFriendRequests($reqArray['pageNo'], $this->elementCountInAPage);
 				break;		
 			default:				
 				$out = UNSUPPORTED_ACTION;
@@ -272,13 +276,15 @@ class WebClientManager extends Base
 	
 	private function inviteUser($reqArray){
 		$out = MISSING_PARAMETER;
-		if (isset($reqArray['email']) && $reqArray['email'] != null )
+		if (isset($reqArray['email']) && $reqArray['email'] != null && 
+			isset($reqArray['message']) && $reqArray['message'] != null)
 		 {
 		 	$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true)
 			{
-		 		$email = $this->checkVariable($reqArray['email']);		 	
-		 		$out = $this->usermanager->inviteUser($email);		 	
+		 		$email = $this->checkVariable($reqArray['email']);
+		 		$message = $this->checkVariable($reqArray['message']);		 	
+		 		$out = $this->usermanager->inviteUser($email, $message);		 	
 			}
 		 }
 		 return $out;
