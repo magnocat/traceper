@@ -129,8 +129,8 @@ function processUserPastLocationsXML (MAP, xml) {
 				
 			}
 			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
-		
-			if (isFriend == 1)
+			
+			if (isFriend == "1")
 			{
 				if (typeof TRACKER.users[userId] == "undefined") 
 				{		
