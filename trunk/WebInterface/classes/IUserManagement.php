@@ -2,7 +2,7 @@
 
 interface IUserManagement 
 {
-	public function inviteUser($email);
+	public function inviteUser($email, $message);
 	
 	public function deleteUser($userId);
 	
