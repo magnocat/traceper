@@ -12,18 +12,76 @@ class UserManager extends AuthenticateManager implements IUserManagement
 	}
 
 
-	public function inviteUser($email)
+	public function inviteUser($emails, $message)
 	{
-		$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_invitedusers(email)
-				VALUES("%s")', $email); 							  
-		$out = FAILED;
-		if ($this->dbc->query($sql) != false)
-		{
-			$out = SUCCESS;
+		
+		$emailArray= $this->splitEmails($emails);
+		$arrayLenth = count($emailArray);
+		$invitationSentCount = 0;
+		
+		for ($i = 0; $i < $arrayLenth; $i++)
+		{		
+	//		if ($this->check_email_address($emailArray[$i])) 
+			{
+				echo "<br/>email address:".$emailArray[$i];
+
+/*				$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_invitedusers(email)
+						VALUES("%s")', $emailArray[$i]); 							  
+				$out = FAILED;
+				if ($this->dbc->query($sql) != false)
+				{
+					//send invitation mail 
+					$invitationSentCount++;
+				}
+*/
+			}
 		}
+		$out = $invitationSentCount;
+		if ($arrayLenth == $invitationSentCount) {
+			$out = true;
+		}		
 		return $out;
 	}
+	
+	private function splitEmails($emails)
+	{
+		$emails = str_replace(array(" ",",", chr(13)),array(";",";",";1212"),$emails);
+		$emails = str_replace(array(chr(13)), array(";".chr(13)),$emails);
+		$emails = str_replace(array(";;"), array(";"),$emails);
+		
+		
+		$emails = explode(";", $emails);					
+		return $emails;
+	}
 
+	private function check_email_address($email) 
+	{
+	  // First, we check that there's one @ symbol, and that the lengths are right
+	  if (!preg_match("/^[^@]{1,64}@[^@]{1,255}$/", $email)) {
+	    // Email invalid because wrong number of characters in one section, or wrong number of @ symbols.
+	    return false;
+	  }
+	  // Split it into sections to make life easier
+	  $email_array = explode("@", $email);
+	  $local_array = explode(".", $email_array[0]);
+	  for ($i = 0; $i < sizeof($local_array); $i++) {
+	     if (!preg_match("^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$", $local_array[$i])) {
+	      return false;
+	    }
+	  }  
+	  if (!preg_match("^\[?[0-9\.]+\]?$", $email_array[1])) { // Check if domain is IP. If not, it should be valid domain name
+	    $domain_array = explode(".", $email_array[1]);
+	    if (sizeof($domain_array) < 2) {
+	        return false; // Not enough parts to domain
+	    }
+	    for ($i = 0; $i < sizeof($domain_array); $i++) {
+	      if (!preg_match("^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$", $domain_array[$i])) {
+	        return false;
+	      }
+	    }
+	  }
+	  return true;
+	}
 	public function registerUser($email, $name, $password)
 	{
 		$out = EMAIL_NOT_VALID;
@@ -275,6 +333,102 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		return $user;
 	}
 	
+	public function getFriendRequests($pageNo, $elementCountInAPage)
+	{
+		$out = UNAUTHORIZED_ACCESS;
+		if ($this->isUserAuthenticated() == true)
+		{
+			$userId = $this->getUserId();
+			if (isset($pageNo) && $pageNo > 0) {
+				$pageNo = (int) $pageNo;
+			}
+			else {
+				$pageNo = 1;
+			}
+			$offset = ($pageNo - 1) * $elementCountInAPage;
+			
+			$sql = 'SELECT tu.Id, tu.realname, 0 as isFriend
+					FROM traceper_friends tf 
+						LEFT JOIN traceper_users tu 
+							ON tf.friend1 = tu.Id
+					WHERE tf.status=0 AND 
+							tf.friend2= ' . $userId . '
+					LIMIT '. $offset . ' , '. $elementCountInAPage;
+			
+			$sqlPageCount = 'SELECT 
+								ceil(count(Id)/'.$elementCountInAPage.')
+							 FROM traceper_friends
+							 WHERE status=0 AND 
+						  			friend2= ' . $userId ;
+			
+			$pageCount = $this->dbc->getUniqueField($sqlPageCount);	
+			
+			
+			$out = $this->prepareXML($sql, $pageNo, $pageCount);
+		}
+		return $out;
+	}
+	
+	private function prepareXML($sql, $pageNo, $pageCount)
+	{		
+		$result = NULL;
+		// if page count equal to 0 then there is no need to run query
+//		echo $sql;
+		if ($pageCount >= $pageNo && $pageCount != 0) {
+			$result = $this->dbc->query($sql);		
+		}
+				
+		$str = NULL;
+		$userId = NULL;
+		if ($result != NULL )
+		{				
+				while ( $row = $this->dbc->fetchObject($result) )
+				{
+					
+						$str .= $this->getUserXMLItem($row);	
+
+				}	
+				header("Content-type: application/xml; charset=utf-8");
+		
+				$pageNo = $pageCount == 0 ? 0 : $pageNo;
+		
+				$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
+		
+				$str = '<?xml version="1.0" encoding="UTF-8"?>'
+					.'<page '. $pageStr . ' >'					
+						. $str
+				   .'</page>';
+		}
+		return $str;		
+	}
+	
+	private function getUserXMLItem($row)
+	{
+		$row->Id = isset($row->Id) ? $row->Id : null;
+//		$row->username = isset($row->username) ? $row->username : null;
+		$row->isFriend = isset($row->isFriend) ? $row->isFriend : 0; 
+		$row->realname = isset($row->realname) ? $row->realname : null;
+		$row->latitude = isset($row->latitude) ? $row->latitude : null;
+		$row->longitude = isset($row->longitude) ? $row->longitude : null;
+		$row->altitude = isset($row->altitude) ? $row->altitude : null;
+		$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
+		$row->message = isset($row->message) ? $row->message : null;
+		$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+		$row->status_message = isset($row->status_message) ? $row->status_message : null;
+			
+		$str = '<user>'
+		. '<Id isFriend="'.$row->isFriend.'">'. $row->Id .'</Id>'
+//		. '<username>' . $row->username . '</username>'
+		. '<realname>' . $row->realname . '</realname>'
+		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
+		. '<time>' . $row->dataArrivedTime . '</time>'
+		. '<message>' . $row->message . '</message>'
+		. '<status_message>' . $row->status_message . '</status_message>'
+		. '<deviceId>' . $row->deviceId . '</deviceId>'
+		.'</user>';
+		
+		return $str;
+	}
 
 
 }
