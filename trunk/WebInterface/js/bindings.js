@@ -127,12 +127,13 @@ function bindElements(langOperator, trackerOp)
 
 	$("#changePassword").colorbox({width:"360px", title:langOperator.changePassword , inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
 	
-	$("#inviteUserDiv").colorbox({width:"60%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
+	$("#inviteUserDiv").colorbox({width:"40%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
 
 	$('#inviteUserButton').click(function(){
 		var useremail = $('#useremail').val();
+		var invitationMessage = $('#invitationMessage').val();
 		if (useremail != ""){
-			TRACKER.inviteUser(useremail);
+			TRACKER.inviteUser(useremail, invitationMessage);
 		}
 		else {
 			TRACKER.showMessage(langOperator.warningMissingParameter, "warning");
@@ -208,6 +209,8 @@ function setLanguage(langOperator){
 	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
 	$("#changePassword").text(langOperator.changePassword);
+	$("#inviteUserInvitationMessage").text(langOperator.invitationMessage);
+	$("#mailEntraceAlert").text(langOperator.mailEntranceRule);
 	
 //	$("#loading p").html(langOperator.loading);
 	
