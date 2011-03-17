@@ -168,7 +168,49 @@ EOT;
 		return $str;		
 	}
 	
-	
+	public static function getRegistrationPage($email, $invitedUser, $callbackURL)
+	{
+		$out = <<<EOT
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+			<html xmlns="http://www.w3.org/1999/xhtml"
+      			  xmlns:fb="http://www.facebook.com/2008/fbml">
+			<head>
+				<title></title>
+				
+				<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
+				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
+				<script type="text/javascript" src="js/TrackerOperator.js"></script>
+				
+				<script type="text/javascript" src="js/LanguageOperator.js"></script>
+				<script>	
+				var langOp = new LanguageOperator();
+				langOp.load("en"); 	
+				$(document).ready( function(){				    
+					var trackerOp = new TrackerOperator("$callbackURL");	
+					trackerOp.langOperator = langOp;
+					$('#registerButton').click(function(){
+						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(), $invitedUser);
+					});			
+				
+				});	
+				</script>
+			</head>
+			<body>
+			<div id="registerForm">		
+					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
+					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
+					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
+					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
+					<input type="button" id="registerButton" value="Register" />
+					<input type="button" id="cancelRegistration" value="Cancel" />
+				</div>
+			</body>
+			</html>
+EOT;
+		return $out;
+		
+	}
 	
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
@@ -297,17 +339,16 @@ EOT;
 	 										   <ul>
 	 										   <li id="changePassword"></li>
 	 										   <li id="signout"></li>
+	 										   <li id="inviteUserDiv">Invite User</li>
 	 										
-	 										<!--
-	 										   <div id="inviteUserDiv">Invite User</div>
-	 										-->
 	 											</ul>
 	 										</li>
 	 						</ul>
 							<div id='lists'>	
 								<div class='titles'>									
 									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
-									<div class='title' id='photo_title'><div class='arrowImage'></div></div>								
+									<div class='title' id='photo_title'><div class='arrowImage'></div></div>	
+									<div class='title' id='friendRequest_title'><div class='arrowImage'>Friend Requests</div></div>							
 								</div>
 								<div id='friendsList'>											
 									<div class='search'>						
@@ -347,7 +388,12 @@ EOT;
 	<div style="display:none;">	
 	<div id='aboutus'></div>
 	<div id='InviteUserForm'>
-		<div id="inviteUserEmailLabel"></div> <input type='text' name='useremail' id='useremail' /><br/>		
+		<div id="inviteUserEmailLabel"></div> 
+		<textarea name='useremail' id='useremail' ></textarea><br/>		
+		<div id="inviteUserInvitationMessage"></div>
+		<!--
+		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
+		-->
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>
 	</div>	
 	<div id='changePasswordForm'>
@@ -367,5 +413,8 @@ MAIN_PAGE;
 
 		  return $str;
 }
+	public static function showErrorMessage($message) {
+		return $message;
+	}
 
 }
