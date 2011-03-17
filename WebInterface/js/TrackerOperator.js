@@ -28,6 +28,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionDeleteFriendship= "WebClientDeleteFriendship";
 	this.actionAddFriendRequest = "WebClientAddFriendRequest";
 	this.actionGetFriendRequests = "WebClientGetFriendRequests";	
+	this.actionConfirmFriendship = "WebClientConfirmFriendship";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -41,6 +42,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.imageListPageCount = 0;
 	this.imageListSearchPageNo = 1;
 	this.imageListSearchPageCount = 0;
+	this.friendRequestListPageNo = 1;
+	this.friendRequestListPageCount = 0;
 	//page no initial value is important
 	this.bgImageListPageNo = 1;
 	this.bgImageListPageCount = 0;
@@ -151,10 +154,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});		
 	};
 	
-	this.registerUser = function(email, name, password, confirmPassword) {
+	this.registerUser = function(email, name, password, confirmPassword, invitedUser) {
 		if (password == confirmPassword) {		
 		
-			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password;
+			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password + "&invitedUser="+invitedUser;
 			
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
@@ -261,11 +264,24 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					else {
 						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 					}
-			});
-			
-		}
-		
+			});	
+		}	
 	}
+	
+	this.confirmFriendship = function(friendId){
+		if (confirm(TRACKER.langOperator.confirmationMessage)) {
+			var params = "action=" + TRACKER.actionConfirmFriendship + "&friendId="+friendId;
+			TRACKER.ajaxReq(params, function (result){	
+					if (result == "1") {
+						TRACKER.getFriendRequests(TRACKER.friendRequestListPageNo);
+					}
+					else {
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+					}
+			});	
+		}
+	}
+	
 /*	we will use it to get whole user list page by page
  
 	// getting user list with latitude longittude info
@@ -329,8 +345,22 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var params = "action=" + TRACKER.actionGetFriendRequests + "&pageNo=" + pageNo;
 		
 		TRACKER.ajaxReq(params, function (result){
-								
-				alert(result);
+			TRACKER.friendRequestListPageNo = TRACKER.getPageNo(result);
+			TRACKER.friendRequestListPageCount = TRACKER.getPageCount(result);
+			
+			var str = processXML(MAP, result, true);
+			
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getFriendRequests(%d)', TRACKER.friendRequestListPageNo, TRACKER.friendRequestListPageCount, 3);
+			}
+			else {
+				str = TRACKER.langOperator.noMatchFound;				
+			}
+			$('#friends').slideUp('fast',function(){
+									$('#friends').html(str);
+									$('#friends').slideDown();
+								});			
+				
 		
 		});		
 	};

@@ -112,6 +112,14 @@ function bindElements(langOperator, trackerOp)
 		$('#photo_title').removeClass('active_title');
 	});
 	
+	$('#friendRequest_title').click(function(){
+		TRACKER.getFriendRequests(1);
+		$('#photosList').slideUp('fast',function(){
+			$('#friendsList').slideDown('fast');
+			
+		});
+	});
+	
 	$('ul.sf-menu').superfish();  
 	$('li#username').click(function(){
 		$(this).find('ul').slideToggle('fast');
