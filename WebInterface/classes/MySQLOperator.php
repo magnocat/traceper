@@ -88,7 +88,7 @@ class MySQLOperator
 			$this->connect();
 			
 		if (! $result = mysql_query($sql,$this->dbLink)) {
-			echo $this->ShowError();			
+			//echo $this->ShowError();			
 			return false;
 		}
 		$this->queryCount++;	

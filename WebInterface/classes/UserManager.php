@@ -21,19 +21,31 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		
 		for ($i = 0; $i < $arrayLenth; $i++)
 		{		
-	//		if ($this->check_email_address($emailArray[$i])) 
+			if ($this->checkEmail($emailArray[$i])) 
 			{
-				echo "<br/>email address:".$emailArray[$i];
-
-/*				$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_invitedusers(email)
-						VALUES("%s")', $emailArray[$i]); 							  
+				
+				$dt = date("Y-m-d H:m:s");
+				$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_invitedusers(email, dt)
+						VALUES("%s", "%s")', $emailArray[$i], $dt); 							  
 				$out = FAILED;
 				if ($this->dbc->query($sql) != false)
 				{
+					
+					$key = md5($emailArray[$i].$dt);
 					//send invitation mail 
 					$invitationSentCount++;
+					
+					$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.WEB_ADDRESS.'?action=WebClientRegisterInvitedUser&email='.$emailArray[$i].'&key='.$key.'">'.
+					'Click here to register to traceper</a> <br/>';
+					$message .= '<br/> The Traceper Team';
+					$headers  = 'MIME-Version: 1.0' . "\r\n";
+					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+					$headers  .= 'From: contact@traceper.com' . "\r\n";					
+					echo $message;
+						
+					mail($emailArray[$i], "traceper invitation", $message, $headers);
+					
 				}
-*/
 			}
 		}
 		$out = $invitationSentCount;
@@ -43,46 +55,48 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		return $out;
 	}
 	
+	public function isInvitedUser($reqArray) 
+	{
+		
+		$out = false;
+		if (isset($reqArray["email"]) && $reqArray["email"] != null &&
+		    isset($reqArray["key"]) && $reqArray["key"] != null)
+		{
+			$email = $reqArray["email"];
+			$key = $reqArray["key"];	
+		
+			$sql = sprintf('SELECT dt 
+							FROM '.$this->tablePrefix.'_invitedusers
+							WHERE email="%s"
+							LIMIT 1', $email);
+			
+			$dt = $this->dbc->getUniqueField($sql);
+			if (md5($email.$dt) == $key){
+				$out = true;
+			}			    
+		}
+		return $out;		
+	}
+	
 	private function splitEmails($emails)
 	{
-		$emails = str_replace(array(" ",",", chr(13)),array(";",";",";1212"),$emails);
-		$emails = str_replace(array(chr(13)), array(";".chr(13)),$emails);
-		$emails = str_replace(array(";;"), array(";"),$emails);
-		
-		
+		$emails = str_replace(array(" ",",","\r","\n"),array(";",";",";",";"),$emails);
+		$emails = str_replace(";;", ";",$emails);		
 		$emails = explode(";", $emails);					
 		return $emails;
 	}
 
-	private function check_email_address($email) 
+	private function checkEmail($email)
 	{
-	  // First, we check that there's one @ symbol, and that the lengths are right
-	  if (!preg_match("/^[^@]{1,64}@[^@]{1,255}$/", $email)) {
-	    // Email invalid because wrong number of characters in one section, or wrong number of @ symbols.
-	    return false;
-	  }
-	  // Split it into sections to make life easier
-	  $email_array = explode("@", $email);
-	  $local_array = explode(".", $email_array[0]);
-	  for ($i = 0; $i < sizeof($local_array); $i++) {
-	     if (!preg_match("^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$", $local_array[$i])) {
-	      return false;
-	    }
-	  }  
-	  if (!preg_match("^\[?[0-9\.]+\]?$", $email_array[1])) { // Check if domain is IP. If not, it should be valid domain name
-	    $domain_array = explode(".", $email_array[1]);
-	    if (sizeof($domain_array) < 2) {
-	        return false; // Not enough parts to domain
-	    }
-	    for ($i = 0; $i < sizeof($domain_array); $i++) {
-	      if (!preg_match("^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$", $domain_array[$i])) {
-	        return false;
-	      }
-	    }
-	  }
-	  return true;
+	  	// checks proper syntax
+	  	if( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $email))
+	  	{
+	  	  return false;
+	  	}
+	  	return true;
 	}
-	public function registerUser($email, $name, $password)
+	
+	public function registerUser($email, $name, $password, $invitedUser)
 	{
 		$out = EMAIL_NOT_VALID;
 		if (preg_match("/^([a-zA-Z0-9])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]+)+/", $email))
@@ -100,34 +114,51 @@ class UserManager extends AuthenticateManager implements IUserManagement
 				{
 					$md5Password = md5($password);
 					$time = date('Y-m-d h:i:s');
-					$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
-					    VALUE("%s","%s","%s","%s")', $email, $name, $md5Password, $time);
-					$key = md5($email.$time);
-					$message = 'Hi '.$name.',<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccountRequest&email='.$email.'&key='.$key.'">'.
-					'Click here to activate your account</a> <br/>';
-					$message .= '<br/> Your Password is :'.$password;
-					$message .= '<br/> The Traceper Team';
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers  .= 'From: contact@traceper.com' . "\r\n";
-					$out = FAILED;
-					if ($this->dbc->query($sql) != false){
-						$out = SUCCESS;
-						mail($email, "traceper activation", $message, $headers);
+					if ($invitedUser == true) 
+					{
+						$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_users(email, realname, password)
+										VALUES("%s","%s","%s")', $email, $name, $md5Password);
+						
+						if ($this->dbc->query($sql) != false){
+							$sql = sprintf('DELETE FROM ' .$this->tablePrefix.'_invitedusers 
+											WHERE email="%s"
+											LIMIT 1', $email);	
+							$this->dbc->query($sql);
+							//TODO: kullanıcı giriş yapabilmeli...
+						}
+						
 					}
-					else {
-						if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE)
-						{
-							$sql = sprintf('UPDATE '.$this->tablePrefix.'_user_candidates
-								SET time="%s", realname="%s", password="%s" 
-								WHERE email="%s"
-								LIMIT 1', $time, $name, $md5Password, $email);
-							$out = FAILED;
-							if ($this->dbc->query($sql) != false){
-								$out = SUCCESS;
-								mail($email, "traceper activation", $message, $headers);
+					else 
+					{
+						$sql = sprintf('INSERT INTO '.$this->tablePrefix.'_user_candidates (email, realname, password, time )
+						    VALUE("%s","%s","%s","%s")', $email, $name, $md5Password, $time);
+						$key = md5($email.$time);
+						$message = 'Hi '.$name.',<br/> <a href="'.WEB_ADDRESS.'?action=WebClientActivateAccountRequest&email='.$email.'&key='.$key.'">'.
+						'Click here to activate your account</a> <br/>';
+						$message .= '<br/> Your Password is :'.$password;
+						$message .= '<br/> The Traceper Team';
+						$headers  = 'MIME-Version: 1.0' . "\r\n";
+						$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+						$headers  .= 'From: contact@traceper.com' . "\r\n";
+						$out = FAILED;
+						if ($this->dbc->query($sql) != false){
+							$out = SUCCESS;
+							mail($email, "traceper activation", $message, $headers);
+						}
+						else {
+							if ($this->dbc->getErrorNo() == DB_ERROR_CODES::DB_KEY_DUPLICATE)
+							{
+								$sql = sprintf('UPDATE '.$this->tablePrefix.'_user_candidates
+									SET time="%s", realname="%s", password="%s" 
+									WHERE email="%s"
+									LIMIT 1', $time, $name, $md5Password, $email);
+								$out = FAILED;
+								if ($this->dbc->query($sql) != false){
+									$out = SUCCESS;
+									mail($email, "traceper activation", $message, $headers);
+								}
+	
 							}
-
 						}
 					}
 				}
@@ -305,6 +336,24 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		return $result;	
 	}
 	
+ 	public function confirmFriendship($user1, $user2) 
+    {
+        $user1 = (int) $user1;
+        $user2 = (int) $user2;
+        
+        $sql = sprintf('UPDATE ' . $this->tablePrefix .'_friends
+                        SET status = 1 
+                        WHERE ((friend1 = %d  AND friend2 = %d ) OR
+                                   (friend1 = %d  AND friend2 = %d ))
+                            LIMIT 1', $user1, $user2, $user2, $user1);
+        $result = false;
+        if ($this->dbc->query($sql) != false) {
+            $result = true;
+        }
+            
+        return $result;    
+    }
+	
 	public function addFriendRequest($friendId) 
 	{
 		$friendId = (int) $friendId;
@@ -347,7 +396,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 			}
 			$offset = ($pageNo - 1) * $elementCountInAPage;
 			
-			$sql = 'SELECT tu.Id, tu.realname, 0 as isFriend
+			$sql = 'SELECT tu.Id, tu.realname, 3 as isFriend
 					FROM traceper_friends tf 
 						LEFT JOIN traceper_users tu 
 							ON tf.friend1 = tu.Id

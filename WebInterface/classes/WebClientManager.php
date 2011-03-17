@@ -143,12 +143,25 @@ class WebClientManager extends Base
 				}
 				$out = DisplayOperator::getActivateAccountPage($_SERVER['PHP_SELF'], LANGUAGE, $key, $email);
 				break;	
+			case $this->actionPrefix ."RegisterInvitedUser":
+				
+				if ($this->usermanager->isInvitedUser($reqArray) == true){
+					
+					$out = DisplayOperator::getRegistrationPage($reqArray["email"], 1, $_SERVER['PHP_SELF']);
+				}
+				else {
+					$out = DisplayOperator::showErrorMessage("There is no valid invitation found");
+				}
+				break;
 			case $this->actionPrefix . "SaveStatusMessage":
 				$out = $this->saveStatusMessage($reqArray);
 				break;	
 			case $this->actionPrefix . "DeleteFriendship":
-				$out = $this->deleteFriendShip($reqArray);
+				$out = $this->deleteFriendship($reqArray);
 				break;
+			case $this->actionPrefix . "ConfirmFriendship":
+				$out = $this->confirmFriendship($reqArray);
+				break;	
 			case $this->actionPrefix . "AddFriendRequest":
 				$out = $this->addFriendRequest($reqArray);
 				break;
@@ -222,6 +235,26 @@ class WebClientManager extends Base
 		return $out;
 	}
 	
+	private function confirmFriendship($reqArray) 
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['friendId']) && $reqArray['friendId'] != null ){
+			$out = UNAUTHORIZED_ACCESS;
+			if ($this->isUserAuthenticated() == true){
+				$userId = $this->usermanager->getUserId();
+				$friendId = $this->checkVariable($reqArray['friendId']);
+				
+				$result = $this->usermanager->confirmFriendship($userId, $friendId);
+				$out = FAILED;
+				if ($result === true) {
+					$out = SUCCESS;
+				}
+			}
+		}
+		return $out;
+	}
+	
+	
 	private function addFriendRequest($reqArray){
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['friendId']) && $reqArray['friendId'] != null )
@@ -276,8 +309,8 @@ class WebClientManager extends Base
 	
 	private function inviteUser($reqArray){
 		$out = MISSING_PARAMETER;
-		if (isset($reqArray['email']) && $reqArray['email'] != null && 
-			isset($reqArray['message']) && $reqArray['message'] != null)
+		if (isset($reqArray['email']) && $reqArray['email'] != null ) 
+			//isset($reqArray['message']) && $reqArray['message'] != null)
 		 {
 		 	$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true)
@@ -299,8 +332,12 @@ class WebClientManager extends Base
 		 			
 		 	$email = $this->checkVariable($reqArray['email']);
 		 	$name = $this->checkVariable($reqArray['name']);
-		 	$password = $this->checkVariable($reqArray['password']);		 	
-		 	$out = $this->usermanager->registerUser($email, $name, $password);			
+		 	$password = $this->checkVariable($reqArray['password']);	
+		 	$invitedUser = false;
+		 	if (isset($reqArray["invitedUser"]) && $reqArray["invitedUser"] != null) {
+		 		$invitedUser = true;
+		 	}	 	
+		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);			
 		 }
 		 return $out;
 		
