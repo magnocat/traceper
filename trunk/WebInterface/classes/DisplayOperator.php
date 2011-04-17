@@ -74,7 +74,17 @@ EOT;
 				<title></title>
 				$head	
 				<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
-				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+  			    <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+ 
+<!--				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+-->				
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+				<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    			<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
+  				<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
+	
+				
 				<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
 				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
@@ -121,7 +131,16 @@ EOT;
 					});		
 					$('#registerButton').click(function(){
 						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val());
-					});			
+					});	
+					
+					$(".containerPlus").buildContainers({
+			        	containment:"document",
+			        	elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
+			        	onClose:function(o){},
+			        	onIconize:function(o){},
+			        	effectDuration:10,
+			        	zIndexContext:"auto" 
+      				});		
 				
 				});	
 				function sendNewPassword(){
@@ -147,6 +166,9 @@ EOT;
 					<div id="register">Register</div>				
 					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
+				<div id='message2' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
+				</div>
+	
 				<div id="forgotPasswordForm" style="display:none">
 					<div id="emailLabel"></div>
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
@@ -168,7 +190,7 @@ EOT;
 		return $str;		
 	}
 	
-	public static function getRegistrationPage($email, $invitedUser, $callbackURL)
+	public static function getRegistrationPage($email, $invitationKey, $callbackURL)
 	{
 		$out = <<<EOT
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -190,7 +212,7 @@ EOT;
 					var trackerOp = new TrackerOperator("$callbackURL");	
 					trackerOp.langOperator = langOp;
 					$('#registerButton').click(function(){
-						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(), $invitedUser);
+						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(), "$invitationKey");
 					});			
 				
 				});	
@@ -239,10 +261,19 @@ EOT;
       	  
 	<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
     <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
-	
-	<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+	 <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+  
+<!--	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+-->
+<!--	<script type="text/javascript" src="js/jquery/jquery.min.js"></script> -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
-	<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
+  	<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
+	
+  	<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script> 
 	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="js/DataOperations.js"></script>
 			
@@ -294,7 +325,7 @@ EOT;
 										   longitude:$longitude,
 										   time:'$time',
 										   message:'',
-										   deviceId:$deviceId,
+										   deviceId:'$deviceId',
 										   gmarker:new GMarker(point, markerOptions),														   
 										});
 					GEvent.addListener(TRACKER.users[$userId].gmarker, "click", function() {
@@ -320,13 +351,26 @@ EOT;
 			}    			
 			bindElements(langOp, trackerOp);
 			$('#user_title').click();
+			
+			    $(".containerPlus").buildContainers({
+			        containment:"document",
+			        elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
+			        onClose:function(o){},
+			        onIconize:function(o){},
+			        effectDuration:10,
+			        zIndexContext:"auto" 
+      			});
+      			
+      	
+      		
+			
 		});	
 	</script>
 	
 	</head>
 	<body  onunload="GUnload();" >	
 	$pluginScript
-	<div id='wrap'>	
+	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
 				<div id='bar'></div>
 				<div id='sideBar'>						
@@ -334,21 +378,35 @@ EOT;
 	 						<div id='logo'></div>
 	 						<ul id='userarea'><li id="username">$realname
 	 											<!-- asagidaki iki satir dil dosyasından alınmalı -->
-	 											<input type="text" style='width:230px;height:25px' id="statusMessage" value="Status message"/>
-	 											<input type="button" value="Send" id="sendStatusMessageButton"/>
-	 										   <ul>
+	 											<!--<input type="text" style='width:230px;height:25px' id="statusMessage" value="Status message"/>-->
+	 											<!--<input type="button" value="Send" id="sendStatusMessageButton"/>-->
+	 										   <!--
+	 											<ul>
 	 										   <li id="changePassword"></li>
 	 										   <li id="signout"></li>
 	 										   <li id="inviteUserDiv">Invite User</li>
 	 										
 	 											</ul>
+	 										-->	
 	 										</li>
 	 						</ul>
-							<div id='lists'>	
+	 						<div style="clear:both" id="changePassword" class="userOperations">	
+	 							<img src='images/changePassword.png'  /><div></div>
+	 						</div>
+	 						<div class="userOperations" id="inviteUser">
+	 							<img src='images/invite.png'  /><div></div>
+	 						</div>
+	 						<div class="userOperations" id="friendRequests">	
+	 							<img src='images/friends.png'  /><div></div>
+	 						</div>
+	 						<div  class="userOperations" id="signout">	 			
+	 							<img src='images/signout.png'  /><div></div>		
+	 						</div>
+	 						<div id='lists'>	
 								<div class='titles'>									
 									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
 									<div class='title' id='photo_title'><div class='arrowImage'></div></div>	
-									<div class='title' id='friendRequest_title'><div class='arrowImage'>Friend Requests</div></div>							
+									<!-- <div class='title' id='friendRequest_title'><div class='arrowImage'>Friend Requests</div></div>-->							
 								</div>
 								<div id='friendsList'>											
 									<div class='search'>						
@@ -385,27 +443,33 @@ EOT;
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
 	</div>
-	<div style="display:none;">	
-	<div id='aboutus'></div>
-	<div id='InviteUserForm'>
-		<div id="inviteUserEmailLabel"></div> 
-		<textarea name='useremail' id='useremail' ></textarea><br/>		
-		<div id="inviteUserInvitationMessage"></div>
-		<!--
-		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
-		-->
-		<input type='button' name='inviteUserButton' id='inviteUserButton'/>
-	</div>	
-	<div id='changePasswordForm'>
+  	
+	<div id='aboutus' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
+	</div>
+	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
-		<div><input type='password' name='newPassword' id='newPassword' /></div>
+		<div><input type='password' name='newPassword' id='newPassword' /></div>  
 		<div id="newPasswordAgainLabel"></div>
 		<div><input type='password' name='newPasswordAgain' id='newPasswordAgain' /></div>
 		<div></div>
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel' /></div>
 	</div>
+	<div id='message' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }"></div>
+	<div style="display:none;">	
+>
+
+	<div id='InviteUserForm'>
+		<div id="inviteUserEmailLabel"></div> 
+		<textarea name='useremail' id='useremail' ></textarea><br/>		
+		<div id="inviteUserInvitationMessage"></div>
+		
+		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
+		
+		<input type='button' name='inviteUserButton' id='inviteUserButton'/>
+	</div>	
+	
 	</div>
 	</body>
 </html>
