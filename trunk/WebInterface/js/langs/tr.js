@@ -56,6 +56,9 @@ LAN_OPERATOR.addIndexes({
 			currentPasswordDoesntMatch:'Girilen şifre şimdiki şifre ile aynı değil',
 			warningMissingParameter:'Eksik parametre, form dolduruyorsanız lütfen tüm gerekli alanları boş bırakmayınız',
 			confirmationMessage:'Bu işlemi yapmak istediğinize emin misiniz?',
+			addFriendRequestConfirmation:'%s kullan\u0131c\u0131s\u0131na arkadaşl\u0131ık isteği göndermek isteğinize emin misiniz?',
+			acceptFriendRequestConfirmation:'%s kullan\u0131c\u0131s\u0131n\u0131n arkadaşl\u0131ık isteğini onayl\u0131yor musunuz?',
+			deleteFriendshipConfirmation:'%s kullan\u0131c\u0131s\u0131n\u0131 arkadaş listenizden ç\u0131karmak isteğinize emin misiniz?',
 			errorInOperation:'İşlem yapılamadı!',
 			inviteUserLabel:'Davetiye gönder',
 			dataRecordedCheckYourEmail:'Bilgileriniz başarıyla kaydedilmiştir, hesabınızı aktif hale getirmek için e-mailinizi kontrol ediniz.',
@@ -66,8 +69,8 @@ LAN_OPERATOR.addIndexes({
 			activatedAccountKeysDontMatch:'Bir seyler hatalı olmalı, Baglantınızın dogru oldugundan emin olun.',
 			HomePage:'Anasayfa',
 			changePassword:'Şifremi değiştir',
-			addFriendRequestConfirmation:'Bu kullan\u0131c\u0131ya arkadaşl\u0131k teklifi gönderimini onayl\u0131yor musunuz?',
 			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.',
+			friendRequests:'Arkadaşlık istekleri'
 			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.'
 			
 		});
