@@ -93,6 +93,7 @@ define ("DEVICE_ACTION_PREFIX", "Device"); //editing is not recommended
 define("STATUS_MESSAGE_SOURCE_MOBILE", 0);
 define("STATUS_MESSAGE_SOURCE_WEB", 1);
 
+define ("LOGIN_ENABLED", "2"); //Don't edit
 define ("SUCCESS", "1");  // Don't edit
 define ("FAILED", "-1");  // Don't edit
 define ("MISSING_PARAMETER", "-2"); //Don't edit
