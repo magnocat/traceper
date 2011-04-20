@@ -12,7 +12,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 	}
 
 
-	public function inviteUser($emails, $message)
+	public function inviteUser($emails, $invitationMessage)
 	{
 		
 		$emailArray= $this->splitEmails($emails);
@@ -37,12 +37,12 @@ class UserManager extends AuthenticateManager implements IUserManagement
 					
 					$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.WEB_ADDRESS.'?action=WebClientRegisterInvitedUser&email='.$emailArray[$i].'&key='.$key.'">'.
 					'Click here to register to traceper</a> <br/>';
+					$message .= '<br/> ' .$invitationMessage;	
 					$message .= '<br/> The Traceper Team';
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 					$headers  .= 'From: contact@traceper.com' . "\r\n";					
-					echo $message;
-						
+					//echo $message;	
 					mail($emailArray[$i], "traceper invitation", $message, $headers);
 					
 				}
@@ -124,7 +124,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 											WHERE email="%s"
 											LIMIT 1', $email);	
 							$this->dbc->query($sql);
-							//TODO: kullanıcı giriş yapabilmeli...
+							$out = LOGIN_ENABLED;
 						}
 						
 					}
