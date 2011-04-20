@@ -21,18 +21,13 @@ function bindElements(langOperator, trackerOp)
 		trackerOp.signout();
 	});
 	
-	
-	
-	$("#changePasswordButton").click(function(){		
-		if ($('#newPassword').val() ==  $('#newPasswordAgain').val()){
-			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
-		}
-		else {
-			TRACKER.showMessage(langOperator.enterSamePassword, "warning");
-		}
-	});
-	$("#changePasswordCancel").click(function(){		
-		$.colorbox.close();
+	$(".userOperations").mouseover(function(){
+		
+		$(".userOperations div").hide();
+		
+		$("div", $(this)).css('display','inline');
+		
+
 	});
 	
 	/**
@@ -131,12 +126,40 @@ function bindElements(langOperator, trackerOp)
 		
 	});
 				
-	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
+//	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
-	$("#changePassword").colorbox({width:"360px", title:langOperator.changePassword , inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
+	$("a[href=#auLink], #logo, .logo_inFullMap").click(function(){
+		$('#aboutus').mb_open();
+		$('#aboutus').mb_centerOnWindow(true);
+	});
+
 	
-	$("#inviteUserDiv").colorbox({width:"40%", inline:true, href:"#InviteUserForm", opacity:0.5, scrolling:true});
-
+//	$("#changePassword").colorbox({width:"360px", title:langOperator.changePassword , inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
+	//this callback opens the change password window
+	$('#changePassword').click(function(){
+		$('#changePasswordForm').mb_open();
+		$('#changePasswordForm').mb_centerOnWindow(true);
+	});
+	
+	$("#changePasswordButton").click(function(){		
+		if ($('#newPassword').val() ==  $('#newPasswordAgain').val()){
+			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
+		}
+		else {
+			TRACKER.showMessage(langOperator.enterSamePassword, "warning");
+		}
+	});
+	
+	$("#changePasswordCancel").click(function()
+	{
+		$('#changePasswordForm').mb_close();
+	});
+	
+	$("#inviteUser").click(function(){
+		$('#InviteUserForm').mb_open();
+		$('#InviteUserForm').mb_centerOnWindow(true);
+	});
+	
 	$('#inviteUserButton').click(function(){
 		var useremail = $('#useremail').val();
 		var invitationMessage = $('#invitationMessage').val();
@@ -147,6 +170,13 @@ function bindElements(langOperator, trackerOp)
 			TRACKER.showMessage(langOperator.warningMissingParameter, "warning");
 		}
 	});
+	
+	$("#inviteUserCancel").click(function()
+	{
+		$('#InviteUserForm').mb_close();
+	});
+	
+	
 	
 	
 	$("a[href=#returnToUserList]").click(function(){
@@ -208,15 +238,19 @@ function setLanguage(langOperator){
 	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
 	$("#aboutus").html(langOperator.aboutus);
 //	$("#userarea").prepend(langOperator.hi);
-	$("#signout").append(langOperator.signout);
+	
 	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
 	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
 	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel + " :");
 	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
-	$("#changePasswordCancel").val(langOperator.cancelFormButtonLabel);
+	$("#changePasswordCancel, #inviteUserCancel").val(langOperator.cancelFormButtonLabel);
 	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
-	$("#changePassword").text(langOperator.changePassword);
+	$("#signout div").append(langOperator.signout);
+	$("#changePassword div").text(langOperator.changePassword);
+	$("#inviteUser div").append(langOperator.inviteUserLabel);
+	$("#friendRequests div").append(langOperator.friendRequests);
+	
 	$("#inviteUserInvitationMessage").text(langOperator.invitationMessage);
 	$("#mailEntraceAlert").text(langOperator.mailEntranceRule);
 	

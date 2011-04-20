@@ -132,7 +132,7 @@ function processUserPastLocationsXML (MAP, xml) {
 			}
 			list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 			
-			if (isFriend == "1")
+	//		if (isFriend == "1")
 			{
 				if (typeof TRACKER.users[userId] == "undefined") 
 				{		
@@ -146,6 +146,7 @@ function processUserPastLocationsXML (MAP, xml) {
 															   realname:realname,
 															   latitude:latitude,
 															   longitude:longitude,
+															   friendshipStatus:isFriend,
 															   time:$(user).find("time").text(),
 															   message:$(user).find("message").text(),
 															   status_message:status_message,
@@ -248,7 +249,7 @@ function processUserPastLocationsXML (MAP, xml) {
 					TRACKER.users[userId].longitude = longitude;
 					TRACKER.users[userId].time = time;
 					TRACKER.users[userId].deviceId = deviceId;
-					
+					TRACKER.users[userId].friendshipStatus = isFriend;
 					var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
 					TRACKER.closeMarkerInfoWindow(userId);
 					

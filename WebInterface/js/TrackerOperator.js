@@ -84,6 +84,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var realname;
 		var latitude;
 		var longitude;
+		var friendshipStatus;
 		var time;
 		var deviceId;
 		var message;
@@ -123,14 +124,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.authenticateUser = function(username, password, rememberMe)
 	{
 		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
-
+		
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
 					location.href = 'index.php';
 				}
-				else if (result == "-4"){
+				else if (result == "-4"){				
 					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning");
 				}
 			});
@@ -154,14 +155,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});		
 	};
 	
-	this.registerUser = function(email, name, password, confirmPassword, invitedUser) {
+	this.registerUser = function(email, name, password, confirmPassword, invitationKey) {
 		if (password == confirmPassword) {		
 		
-			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password + "&invitedUser="+invitedUser;
+			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password + "&key="+invitationKey;
 			
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
 					TRACKER.showMessage(TRACKER.langOperator.dataRecordedCheckYourEmail, "warning");
+				}
+				else if (result == "2"){
+					TRACKER.showMessage(TRACKER.langOperator.activateAccountSuccesful, "info");
 				}
 				else if (result == "-5"){
 					TRACKER.showMessage(TRACKER.langOperator.emailAlreadyExist, "warning");
@@ -255,30 +259,66 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 	
 	this.deleteFriendship = function (friendId) {
-		if (confirm(TRACKER.langOperator.confirmationMessage)) {
-			var params = "action=" + TRACKER.actionDeleteFriendship + "&friendId="+friendId;
-			TRACKER.ajaxReq(params, function (result){	
-					if (result == "1") {
-						TRACKER.getFriendList(TRACKER.friendListPageNo);
-					}
-					else {
-						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
-					}
-			});	
+		var deleteFriendMessage = TRACKER.langOperator.deleteFriendshipConfirmation;
+		if (typeof TRACKER.users[friendId] != "undefined") 
+		{
+			deleteFriendMessage = deleteFriendMessage.replace("%s", TRACKER.users[friendId].realname);
+			if (confirm(deleteFriendMessage)) {
+				var params = "action=" + TRACKER.actionDeleteFriendship + "&friendId="+friendId;
+				TRACKER.ajaxReq(params, function (result){	
+						if (result == "1") {
+							TRACKER.getFriendList(TRACKER.friendListPageNo);
+							TRACKER.users[friendId].friendshipStatus = 0;
+						}
+						else {
+							TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+						}
+				});	
+			}
 		}	
 	}
 	
 	this.confirmFriendship = function(friendId){
-		if (confirm(TRACKER.langOperator.confirmationMessage)) {
-			var params = "action=" + TRACKER.actionConfirmFriendship + "&friendId="+friendId;
-			TRACKER.ajaxReq(params, function (result){	
+		var confirmationMessage = TRACKER.langOperator.acceptFriendRequestConfirmation;
+		if (typeof TRACKER.users[friendId] != "undefined") 
+		{
+			confirmationMessage = confirmationMessage.replace("%s", TRACKER.users[friendId].realname);
+			if (confirm(confirmationMessage)) {
+				var params = "action=" + TRACKER.actionConfirmFriendship + "&friendId="+friendId;
+				TRACKER.ajaxReq(params, function (result){	
+						if (result == "1") {
+							TRACKER.getFriendRequests(TRACKER.friendRequestListPageNo);
+							TRACKER.users[friendId].friendshipStatus = 1; 
+						}
+						else {
+							TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+						}
+				});	
+			}
+		}
+	}
+	
+	this.addAsFriend = function(userId) {
+		var friendRequestMessage = TRACKER.langOperator.addFriendRequestConfirmation;
+		if (typeof TRACKER.users[userId] != "undefined") 
+		{
+			friendRequestMessage = friendRequestMessage.replace("%s", TRACKER.users[userId].realname);
+			
+			if (confirm(friendRequestMessage)) 
+			{
+				var params = "action=" + TRACKER.actionAddFriendRequest + "&friendId=" + userId;
+				
+				TRACKER.ajaxReq(params, function(result){
 					if (result == "1") {
-						TRACKER.getFriendRequests(TRACKER.friendRequestListPageNo);
+						TRACKER.showMessage(TRACKER.langOperator.friendRequestRecorded, "info");
+						TRACKER.users[friendId].friendshipStatus = 2;
 					}
 					else {
-						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+						
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "info");
 					}
-			});	
+				});
+			}
 		}
 	}
 	
@@ -484,23 +524,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});	
 	};
 	
-	this.addAsFriend = function(userId) {
-		if (confirm(TRACKER.langOperator.addFriendRequestConfirmation)) 
-		{
-			var params = "action=" + TRACKER.actionAddFriendRequest + "&friendId=" + userId;
-			
-			TRACKER.ajaxReq(params, function(result){
-				if (result == "1") {
-					TRACKER.showMessage(TRACKER.langOperator.friendRequestRecorded, "info");
-				}
-				else {
-					
-					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "info");
-				}
-			});
-		}
-		
-	}
+	
 	
 	var fetchingImagesInBgStart = false;
 	
@@ -590,6 +614,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	
 	this.trackUser = function(userId){
+		
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
 		TRACKER.openMarkerInfoWindow(userId);		
 	};
@@ -801,14 +826,28 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
 		}
 	}
-	this.showMessage = function(message, type, callback){
-		message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
-		if (typeof(callback) == "function") {
-			$.colorbox({width:"500px", opacity:0.5, html:message, onClosed:callback});
+	this.showMessage = function(message, type, callback)
+	{
+		//message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
+
+		//$("#message").html(message);
+
+		$('#message_div').mb_resizeTo(100, 600);
+		$('#message_div .mbcontainercontent:first').html(message);
+		$('#message_div').mb_open();
+		$('#message_div').mb_centerOnWindow(true);
+		
+		
+		
+/*		if (typeof(callback) == "function") {
+			$('#message').mb_open();
+			$('#message').mb_centerOnWindow(true);
+//			$.colorbox({width:"500px", opacity:0.5, html:message, onClosed:callback});
 		}
 		else {
 			$.colorbox({width:"500px", opacity:0.5, html:message});
 		}
+*/		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
