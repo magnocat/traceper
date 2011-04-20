@@ -166,7 +166,12 @@ EOT;
 					<div id="register">Register</div>				
 					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
-				<div id='message2' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
+				
+				<div id='message_div' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
+				
+				<div id='message'>
+				</div>
+				
 				</div>
 	
 				<div id="forgotPasswordForm" style="display:none">
@@ -349,8 +354,7 @@ EOT;
    			catch (e) {
 				
 			}    			
-			bindElements(langOp, trackerOp);
-			$('#user_title').click();
+			
 			
 			    $(".containerPlus").buildContainers({
 			        containment:"document",
@@ -361,9 +365,8 @@ EOT;
 			        zIndexContext:"auto" 
       			});
       			
-      	
-      		
-			
+      			bindElements(langOp, trackerOp);
+			    $('#user_title').click();
 		});	
 	</script>
 	
@@ -454,21 +457,30 @@ EOT;
 		<div id="newPasswordAgainLabel"></div>
 		<div><input type='password' name='newPasswordAgain' id='newPasswordAgain' /></div>
 		<div></div>
-		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel' /></div>
+		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
-	<div id='message' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }"></div>
-	<div style="display:none;">	
->
-
-	<div id='InviteUserForm'>
+	
+		<div id='InviteUserForm'class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' ></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
 		
 		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
 		
-		<input type='button' name='inviteUserButton' id='inviteUserButton'/>
+		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
+	
+	<div id='message_div' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
+				
+	<div id='message'>
+	</div>
+				
+	</div>
+				
+	<div style="display:none;">	
+>
+
+
 	
 	</div>
 	</body>
