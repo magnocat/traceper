@@ -147,7 +147,7 @@ class WebClientManager extends Base
 				
 				if ($this->usermanager->isInvitedUser($reqArray) == true){
 					
-					$out = DisplayOperator::getRegistrationPage($reqArray["email"], 1, $_SERVER['PHP_SELF']);
+					$out = DisplayOperator::getRegistrationPage($reqArray["email"], $reqArray["key"], $_SERVER['PHP_SELF']);
 				}
 				else {
 					$out = DisplayOperator::showErrorMessage("There is no valid invitation found");
@@ -310,18 +310,21 @@ class WebClientManager extends Base
 	private function inviteUser($reqArray){
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['email']) && $reqArray['email'] != null ) 
-			//isset($reqArray['message']) && $reqArray['message'] != null)
 		 {
 		 	$out = UNAUTHORIZED_ACCESS;
 			if ($this->isUserAuthenticated() == true)
 			{
 		 		$email = $this->checkVariable($reqArray['email']);
-		 		$message = $this->checkVariable($reqArray['message']);		 	
+		 		$message = null;
+		 		if (isset($reqArray['message']) && $reqArray['message'] != null ) {
+		 			$message = $this->checkVariable($reqArray['message']);		 	
+		 		}
 		 		$out = $this->usermanager->inviteUser($email, $message);		 	
 			}
 		 }
 		 return $out;
 	}
+	
 	private function registerUser($reqArray)
 	{
 		$out = MISSING_PARAMETER;
@@ -329,14 +332,17 @@ class WebClientManager extends Base
 			isset($reqArray['name']) && $reqArray['name'] != null &&
 			isset($reqArray['password']) && $reqArray['password'] != null)
 		 {
-		 			
+			$invitedUser = false;
+		 	if (isset($reqArray['key']) && $reqArray['key'] != null)
+		 	{
+		 		if ($this->usermanager->isInvitedUser($reqArray) == true){
+		 			$invitedUser = true;
+		 		}
+		 	}
 		 	$email = $this->checkVariable($reqArray['email']);
 		 	$name = $this->checkVariable($reqArray['name']);
 		 	$password = $this->checkVariable($reqArray['password']);	
-		 	$invitedUser = false;
-		 	if (isset($reqArray["invitedUser"]) && $reqArray["invitedUser"] != null) {
-		 		$invitedUser = true;
-		 	}	 	
+		 	 	
 		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);			
 		 }
 		 return $out;
