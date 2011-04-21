@@ -125,28 +125,40 @@ function bindElements(langOperator, trackerOp)
 		
 		
 	});
-				
-//	$("a[href=#auLink], #logo, .logo_inFullMap").colorbox({width:"60%", inline:true, href:"#aboutus", opacity:0.5, scrolling:true});
 
 	$("a[href=#auLink], #logo, .logo_inFullMap").click(function(){
 		$('#aboutus').mb_open();
 		$('#aboutus').mb_centerOnWindow(true);
 	});
-
 	
-//	$("#changePassword").colorbox({width:"360px", title:langOperator.changePassword , inline:true, href:"#changePasswordForm", opacity:0.5, scrolling:true})
 	//this callback opens the change password window
 	$('#changePassword').click(function(){
 		$('#changePasswordForm').mb_open();
 		$('#changePasswordForm').mb_centerOnWindow(true);
 	});
 	
-	$("#changePasswordButton").click(function(){		
-		if ($('#newPassword').val() ==  $('#newPasswordAgain').val()){
-			trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());			
+	$("#changePasswordButton").click(function(){
+		
+		if ($('#currentPassword').val() != '' && 
+			$('#newPassword').val() != '' &&
+			$('#newPasswordAgain').val() != '')
+		{
+			
+			if	($('#newPassword').val() ==  $('#newPasswordAgain').val())
+			{
+				trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());	
+				$('#changePasswordForm').mb_close();
+				
+				$('#currentPassword').val('');
+				$('#newPassword').val('');
+				$('#newPasswordAgain').val('');
+			}
+			else {
+				TRACKER.showMessage(langOperator.enterSamePassword, "warning");
+			}
 		}
 		else {
-			TRACKER.showMessage(langOperator.enterSamePassword, "warning");
+			TRACKER.showMessage(langOperator.warningMissingParameter, "warning");
 		}
 	});
 	
@@ -175,9 +187,6 @@ function bindElements(langOperator, trackerOp)
 	{
 		$('#InviteUserForm').mb_close();
 	});
-	
-	
-	
 	
 	$("a[href=#returnToUserList]").click(function(){
 		$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });

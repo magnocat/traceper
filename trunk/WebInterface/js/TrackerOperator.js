@@ -162,7 +162,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			TRACKER.ajaxReq(params, function (result){
 				if (result == "1") {					
-					TRACKER.showMessage(TRACKER.langOperator.dataRecordedCheckYourEmail, "warning");
+					TRACKER.showMessage(TRACKER.langOperator.dataRecordedCheckYourEmail, "info");
 				}
 				else if (result == "2"){
 					TRACKER.showMessage(TRACKER.langOperator.activateAccountSuccesful, "info");
@@ -230,8 +230,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (newPassword != "" && currentPassword != "")
 		{
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
-					$.colorbox.close();
+				if (result == "1") {	
 					TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
 				}
 				else if (result == "-7"){
@@ -831,23 +830,18 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		//message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
 
 		//$("#message").html(message);
-
-		$('#message_div').mb_resizeTo(100, 600);
-		$('#message_div .mbcontainercontent:first').html(message);
-		$('#message_div').mb_open();
-		$('#message_div').mb_centerOnWindow(true);
 		
-		
-		
-/*		if (typeof(callback) == "function") {
-			$('#message').mb_open();
-			$('#message').mb_centerOnWindow(true);
-//			$.colorbox({width:"500px", opacity:0.5, html:message, onClosed:callback});
+		var object = "#message_info";
+		if (type == "warning") {
+			object = "#message_warning";
 		}
-		else {
-			$.colorbox({width:"500px", opacity:0.5, html:message});
-		}
-*/		
+		
+		$(object).mb_resizeTo(100, 600);
+		$(object + ' .mbcontainercontent:first').html(message);
+		$(object).mb_open();
+		$(object).mb_centerOnWindow(true);
+		$(object).mb_switchAlwaisOnTop(); 
+		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
