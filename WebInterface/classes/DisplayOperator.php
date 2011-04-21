@@ -73,8 +73,7 @@ EOT;
 			<head>
 				<title></title>
 				$head	
-				<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
-  			    <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+ 			    <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
  
 <!--				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 -->				
@@ -85,7 +84,6 @@ EOT;
   				<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
 	
 				
-				<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
 				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
 				<script type="text/javascript" src="js/LanguageOperator.js"></script>
@@ -167,13 +165,11 @@ EOT;
 					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
 				
-				<div id='message_div' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
-				
-				<div id='message'>
+				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
+				</div>
+				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
 				</div>
 				
-				</div>
-	
 				<div id="forgotPasswordForm" style="display:none">
 					<div id="emailLabel"></div>
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
@@ -204,9 +200,7 @@ EOT;
 			<head>
 				<title></title>
 				
-				<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
 				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-				<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script>
 				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
 				<script type="text/javascript" src="js/LanguageOperator.js"></script>
@@ -264,8 +258,7 @@ EOT;
    
       </script>
       	  
-	<link type="text/css" href="js/jquery/plugins/colorbox/colorbox.css" rel="stylesheet" media="screen"/>
-    <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
+   <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
 	 <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
   
 <!--	
@@ -278,8 +271,7 @@ EOT;
     <script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
   	<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
 	
-  	<script type="text/javascript" src="js/jquery/plugins/colorbox/jquery.colorbox-min.js"></script> 
-	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
+  	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="js/DataOperations.js"></script>
 			
 	<script type="text/javascript" src="js/TrackerOperator.js"></script>
@@ -354,8 +346,6 @@ EOT;
    			catch (e) {
 				
 			}    			
-			
-			
 			    $(".containerPlus").buildContainers({
 			        containment:"document",
 			        elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
@@ -447,9 +437,9 @@ EOT;
 				<div id='loading'></div>											
 	</div>
   	
-	<div id='aboutus' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
+	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	</div>
-	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
+	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'300', closed:'true' }">  
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
@@ -460,7 +450,7 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-		<div id='InviteUserForm'class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">  
+		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'300', closed:'true' }">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' ></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
@@ -470,11 +460,9 @@ EOT;
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
 	
-	<div id='message_div' class="containerPlus draggable {buttons:'c', skin:'default', width:'600', closed:'true' }">
-				
-	<div id='message'>
+	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
 	</div>
-				
+	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
 	</div>
 				
 	<div style="display:none;">	
@@ -489,6 +477,7 @@ MAIN_PAGE;
 
 		  return $str;
 }
+	
 	public static function showErrorMessage($message) {
 		return $message;
 	}
