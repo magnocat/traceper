@@ -72,8 +72,8 @@ function bindElements(langOperator, trackerOp)
 
 		if ($('#photos').children().size() == 0){
 			trackerOp.getImageList(1, function(){
-				$('#usersList').slideUp('fast',function(){
-					$('#photosList').slideDown();
+				//$('#usersList').slideUp('fast',function(){
+				//	$('#photosList').slideDown();
 				});				
 			});
 		}
@@ -81,13 +81,13 @@ function bindElements(langOperator, trackerOp)
 			TRACKER.getImageListInBg();
 		}
 		
-		$('#usersList').slideUp('fast',function(){
-			$('#photosList').slideDown('fast');
-		});
+		//$('#usersList').slideUp('fast',function(){
+		//	$('#photosList').slideDown('fast');
+		//});
 		$(this).addClass('active_title');
 		
-		$('#user_title').animate({top:'0px'}, 500, function(){});
-		$('#photo_title').animate({top:'0px'}, 500, function(){});
+		//$('#user_title').animate({top:'0px'}, 500, function(){});
+		//$('#photo_title').animate({top:'0px'}, 500, function(){});
 				
 		$('#user_title div').addClass('arrowImageRight');
 		$('#photo_title div').removeClass('arrowImageRight');		
