@@ -18,9 +18,9 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "21236161";
+$dbPassword = "";
 // database name
-$dbName = "php";
+$dbName = "traceper";
 
 error_reporting(E_ALL); // edit if you know what you do
 
