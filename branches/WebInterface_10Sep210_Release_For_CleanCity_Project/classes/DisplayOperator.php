@@ -222,7 +222,7 @@ EOT;
    					map = new GMap2(document.getElementById("map"));
    					map.setCenter(new GLatLng(39.504041,35.024414), 3);
 					map.setUIToDefault();					
-					map.setMapType(G_HYBRID_MAP);	
+					map.setMapType(G_NORMAL_MAP); //map.setMapType(G_HYBRID_MAP);	
 					map.enableRotation();
 	   	
    					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp);			
@@ -233,7 +233,7 @@ EOT;
 				
 			}    			
 			bindElements(langOp, trackerOp);
-			$('#user_title').click();
+			$('#photo_title').click(); //$('#user_title').click();
 		});	
 	</script>
 	
@@ -245,23 +245,23 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<ul id='userarea'><li id="username">$realname
+	 						<!--
+	 							<ul id='userarea'><li id="username">$realname
 	 										   <ul>
 	 										   <li id="changePassword"></li>
 	 										   <li id="signout"></li>
-	 										
-	 										<!--
-	 										   <div id="inviteUserDiv">Invite User</div>
-	 										-->
+	 											 										
+	 										   <div id="inviteUserDiv">Invite User</div>	 										
 	 											</ul>
 	 										</li>
-	 						</ul>
+	 							</ul>
+	 						-->
 							<div id='lists'>	
 								<div class='titles'>									
-									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
-									<div class='title' id='photo_title'><div class='arrowImage'></div></div>								
+									<!-- <div class='title active_title' id='user_title'><div class='arrowImage'></div></div> -->
+									<div class='title active_title' id='photo_title'><div class='arrowImage'></div></div>								
 								</div>
-								<div id='usersList'>											
+								 <!--<div id='usersList'>											
 									<div class='search'>						
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
@@ -270,7 +270,7 @@ EOT;
 										<a href='#returnToUserList'></a>	
 										<div id='results'></div>								
 									</div>		
-								</div>
+								</div>--> 
 								<div id="photosList">									
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
