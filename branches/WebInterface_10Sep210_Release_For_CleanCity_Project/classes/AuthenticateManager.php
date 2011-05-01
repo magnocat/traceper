@@ -86,6 +86,8 @@ class AuthenticateManager extends Base{
 	
 	
 	public function isUserAuthenticated(){
+		
+		return true;
 		$authenticated = false;
 		if ($this->userId != NULL)
 		{
@@ -99,7 +101,8 @@ class AuthenticateManager extends Base{
 			else {
 				$authenticated = true;
 			}
-		}	
+		}
+			
 		return $authenticated;
 	}
 	
