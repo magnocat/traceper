@@ -75,8 +75,8 @@ function bindElements(langOperator, trackerOp)
 				//$('#usersList').slideUp('fast',function(){
 				//	$('#photosList').slideDown();
 				});				
-			});
 		}
+		
 		if (TRACKER.allImagesFetched == false){
 			TRACKER.getImageListInBg();
 		}
