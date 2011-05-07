@@ -166,7 +166,7 @@ a {
 	background:url(images/ajax-loader.gif) no-repeat center;	
 }
 
-.searchResults, #photosList{ display: none; }
+.searchResults{ display: none; }
 #photosList{
 	font-size:11px;
 }
