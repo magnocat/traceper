@@ -72,9 +72,8 @@ function bindElements(langOperator, trackerOp)
 
 		if ($('#photos').children().size() == 0){
 			trackerOp.getImageList(1, function(){
-				//$('#usersList').slideUp('fast',function(){
-				//	$('#photosList').slideDown();
-				});				
+				
+			});				
 		}
 		
 		if (TRACKER.allImagesFetched == false){
