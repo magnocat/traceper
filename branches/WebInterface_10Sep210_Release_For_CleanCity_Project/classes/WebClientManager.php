@@ -438,6 +438,7 @@ class WebClientManager extends Base
 							LEFT JOIN '. $this->tablePrefix .'_users usr
 							ON  
 								usr.Id = u.userId
+							WHERE u.confirmation = 1 
 							ORDER BY 
 								u.Id 
 							DESC
