@@ -220,13 +220,13 @@ EOT;
 				if (GBrowserIsCompatible()) 
 				{
    					map = new GMap2(document.getElementById("map"));
-   					map.setCenter(new GLatLng(39.504041,35.024414), 3);
+   					map.setCenter(new GLatLng(26.915641,75.807724), 12);
 					map.setUIToDefault();					
 					map.setMapType(G_NORMAL_MAP); //map.setMapType(G_HYBRID_MAP);	
 					map.enableRotation();
 	   	
    					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp);			
-   					trackerOp.getUserList(1); 	
+   			//		trackerOp.getUserList(1); 	
    				}
 			}
    			catch (e) {
