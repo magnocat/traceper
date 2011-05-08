@@ -21,13 +21,29 @@ function bindElements(langOperator, trackerOp)
 		trackerOp.signout();
 	});
 	
-	$(".userOperations").mouseover(function(){
+	$(".userOperations").mouseover(function(event){
 		
-		$(".userOperations div").hide();
+		//$(".userOperations div").hide();
 		
-		$("div", $(this)).css('display','inline');
+		//$("div", $(this)).css('display','inline');
+		//alert($("div", $(this)).html());	
+//		
+//		if ($("#activeUserOperationText").html() == null) {
+//			$("html").append("<div id='activeUserOperationText'></div>");
+//			$("#activeUserOperationText").css("position","absolute").css("z-index","200").
+//			css("color","#13A").css("font-size","13px");
+//		}
+//		$("#activeUserOperationText").html($("div", $(this)).html()).
+//			css("left",event.pageX+15).css("top",event.pageY-10).css("background-color","#FFFFFF").
+//			css("padding","5px 5px 5px 5px").css("border","1px dotted #999999");
+//		
+//		$("#activeUserOperationText").show();
+		
 		
 
+	}).mouseout(function(){
+//		$("#activeUserOperationText").hide();
+		
 	});
 	
 	/**
@@ -188,6 +204,20 @@ function bindElements(langOperator, trackerOp)
 		$('#InviteUserForm').mb_close();
 	});
 	
+	//this callback opens the friend requests window
+	$('#friendRequests').click(function(){
+		TRACKER.getFriendRequests(1,function(str){
+			$('#friendRequestsList').find(".mbcontainercontent:first").html(str);
+			$('#friendRequestsList').mb_open();
+			$('#friendRequestsList').mb_centerOnWindow(true);
+			$('#friendRequestsList').mb_resizeTo(200,300);
+			
+			
+			//$('#friendRequestsListContent').html(str);
+		});		
+	});
+	
+	
 	$("a[href=#returnToUserList]").click(function(){
 		$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });
 	});
@@ -245,7 +275,7 @@ function setLanguage(langOperator){
 	$("#photosList .searchResults a[href=#returnToPhotoList]").html(langOperator.returnToPhotoListLink)
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
 	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
-	$("#aboutus").html(langOperator.aboutus);
+	$("#aboutus").append(langOperator.aboutus);
 //	$("#userarea").prepend(langOperator.hi);
 	
 	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");

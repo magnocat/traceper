@@ -72,7 +72,7 @@ else {
 		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
 		$pluginScript = "";
 		if ($fbc != NULL){
-			$pluginScript = $fbc->getMainScript();	
+			//$pluginScript = $fbc->getMainScript();	
 		}
 		$userInfo = $auth->getUserInfo();
 		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
@@ -80,7 +80,7 @@ else {
 	else {	
 		$pluginScript = "";
 		if ($fbc != NULL){
-			$pluginScript = $fbc->getLoginScript();	
+			//$pluginScript = $fbc->getLoginScript();	
 		}	
 		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE, $pluginScript);
 	}
