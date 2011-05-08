@@ -133,25 +133,42 @@ a {
 	float:right;
 }
 
-#logo, .logo, .logo_inFullMap, #loginLogo {
+#logo, .logo, .logo_inFullMap {
 	height:70px;
 	background: url("images/logo.png") no-repeat center;
 	cursor:pointer;		
 	position: relative;
 }
-#loginLogo {
+/*#loginLogo {
 	height:160px;
 }
+*/
+.loginPageBlock {
+	padding:20px;
+	margin:0px;
+
+}
 #userLoginForm, #forgotPasswordForm, #registerForm, #activateAccountInfo {
-	position:absolute;
-	top:125px;
-	width:100%;
+/*	position:absolute;
 	text-align:center;	
+*/
 	line-height: 25px;
 }
-#userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input {
+
+#userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input, #InviteUserForm textarea{
 	width:200px;
 }
+#userLoginForm div {
+  font-size:12px;
+  display: table-cell;
+  padding:5px;
+}
+
+#submitLoginFormButton
+{
+	width:80px
+}
+
 #changePasswordForm #changePasswordButton, #changePasswordForm #changePasswordCancel{
 	width:80px;
 }
@@ -283,10 +300,11 @@ a {
 .pageNumbers a{
 	padding-right:5px;
 }
-
+/*
 #aboutus, #termsofuse {	
-	margin:15px;
+	margin:0px;
 }
+*/
 .infoWinOperations {
 	padding:3px;
 	font-size: 10px;
@@ -322,9 +340,18 @@ a {
 	float:left;
 	margin: 0px;
 	cursor: pointer;
-	padding:0px 0px 0px 0px;
+	padding:5px 2px 5px 2px;
 }
 .userOperations div{
 	display: none;
-
 }
+.userOperations:hover{
+	background-color: #EEE;
+}
+
+#message_warning .mbcontainercontent, #message_info .mbcontainercontent
+{
+	font-family:arial;
+	text-align:center;
+	font-size:16px;
+	padding:15px;

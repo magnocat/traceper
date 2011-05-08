@@ -75,8 +75,6 @@ EOT;
 				$head	
  			    <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
  
-<!--				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
--->				
 				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 				<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
 				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
@@ -101,7 +99,9 @@ EOT;
 					});
 					$('#forgotPassword').text(langOp.forgotPassword);
 					$('#submitLoginFormButton').attr('value', langOp.login);	
-					$('#emailLabel').text(langOp.emailLabel + ":");					
+					$('#emailLabel').text(langOp.emailLabel + ":");	
+					$("#aboutus").html(langOp.aboutus);
+									
 					$('#showLoginFormButton').attr('value', langOp.showLoginForm);
 					$('#sendNewPassword').attr('value', langOp.sendNewPassword).click(function(){
 						sendNewPassword();
@@ -145,26 +145,34 @@ EOT;
 					TRACKER.sendNewPassword($('#email').val());
 				}
 				function authenticateUser(){
-					TRACKER.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'));
+					TRACKER.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });
 				}
 				</script>
 			</head>
 			<body>
 				$pluginScript
-				<div id='loginLogo' ></div>
-				<div id="userLoginForm">									
-					<div id="usernameLabel"></div>
-					<div><input type="text" name="email" id="emailLogin" /></div>
-					<div id="passwordLabel"></div>
-					<div><input type="password" name="password" id="password" /></div>
-					<div><input type="checkbox" name="rememberMe" id="rememberMe"/>
-						 <div style="display:inline" id="rememberMeLabel"></div>
+				<div style="padding:20px"><img src="images/logo.png" style="display:block; float:left; width:300px; margin-right:200px"/>	
+				<div id="userLoginForm">	
+					<div>								
+						<font id="usernameLabel"></font><br/>
+						<input type="text" name="email" id="emailLogin" /><br/>
+						<input type="checkbox" name="rememberMe" id="rememberMe"/>
+						<div style="display:inline" id="rememberMeLabel"></div>
 					</div>
-					<div id="forgotPassword"></div>	
-					<div id="register">Register</div>				
-					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
+					<div>
+						<font id="passwordLabel"></font><br/>
+						<input type="password" name="password" id="password" /><br/>
+						<font id="forgotPassword"></font>	
+					</div>
+					<div><br/><input type="button" id="submitLoginFormButton" value=""/> 
+					     <br/><font id="register" style="display:block">Register</font>
+					</div>
+				</div>					
 				</div>
 				
+				<div id='aboutus' class="loginPageBlock">  
+				</div>
+							
 				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
 				</div>
 				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
@@ -438,7 +446,7 @@ EOT;
 	</div>
   	
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
-	</div>
+	<div class="logo"></div></div>
 	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'300', closed:'true' }">  
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
@@ -450,7 +458,11 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'300', closed:'true' }">  
+	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'300', closed:'true' }">  
+		
+	</div>
+	
+		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'300',  closed:'true' }">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' ></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>

@@ -121,7 +121,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 	
-	this.authenticateUser = function(username, password, rememberMe)
+	this.authenticateUser = function(username, password, rememberMe, callback)
 	{
 		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
 		
@@ -131,8 +131,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (result == "1") {					
 					location.href = 'index.php';
 				}
-				else if (result == "-4"){				
-					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning");
+				else {
+					if (typeof(callback) == "function") {
+						callback();
+					}
 				}
 			});
 		}
@@ -379,7 +381,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	
 
-	this.getFriendRequests = function(pageNo) {
+	this.getFriendRequests = function(pageNo,callback) {
 	
 		var params = "action=" + TRACKER.actionGetFriendRequests + "&pageNo=" + pageNo;
 		
@@ -395,10 +397,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			else {
 				str = TRACKER.langOperator.noMatchFound;				
 			}
-			$('#friends').slideUp('fast',function(){
-									$('#friends').html(str);
-									$('#friends').slideDown();
-								});			
+			if (typeof(callback)=="function")
+			{
+				callback(str);
+			}
+				
 				
 		
 		});		
@@ -872,9 +875,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 							else if (result == "-1"){
 								TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 							}
-							else {
-								callback(result);
-							}
+							
+							callback(result);
+							
 
 					}, 
 			failure: function(result) {								
