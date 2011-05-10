@@ -448,7 +448,7 @@ class WebClientManager extends Base
 			$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$elementCountInAPage.')
 			 					 FROM '
-			 					 	. $this->tablePrefix .'_upload WHERE u.confirmation = 1';
+			 					 	. $this->tablePrefix .'_upload WHERE confirmation = 1';
 			 					 	
 			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
 			if ($pageNo == $pageCount
@@ -492,7 +492,7 @@ class WebClientManager extends Base
 			$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$elementCountInAPage.')
 			 					 FROM '
-			 					 	. $this->tablePrefix .'_upload WHERE u.confirmation = 0';
+			 					 	. $this->tablePrefix .'_upload WHERE confirmation = 0';
 			 					 	
 			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
 			if ($pageNo == $pageCount
