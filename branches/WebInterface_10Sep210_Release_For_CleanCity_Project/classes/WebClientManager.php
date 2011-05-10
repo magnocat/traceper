@@ -448,7 +448,51 @@ class WebClientManager extends Base
 			$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$elementCountInAPage.')
 			 					 FROM '
-			 					 	. $this->tablePrefix .'_upload';
+			 					 	. $this->tablePrefix .'_upload WHERE u.confirmation = 1';
+			 					 	
+			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
+			if ($pageNo == $pageCount
+				&& $pageCount != 0) 
+			{
+				$this->imageFetchedTime = time();
+				$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
+			}
+			
+			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
+			 					 	
+		}
+		return $out;
+	}
+	
+	private function getUnconfirmedImageList($reqArray, $elementCountInAPage){
+		$out = UNAUTHORIZED_ACCESS;
+		if ($this->isUserAuthenticated() == true)
+		{
+			$out = FAILED;
+			$pageNo = 1;
+			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
+					$pageNo = (int) $reqArray['pageNo'];
+			}
+			$offset = ($pageNo - 1) * $elementCountInAPage;
+			
+			$sql = 'SELECT 
+								u.Id, u.userId, usr.realname, u.latitude, 
+								u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+							FROM '. $this->tablePrefix . '_upload u
+							LEFT JOIN '. $this->tablePrefix .'_users usr
+							ON  
+								usr.Id = u.userId
+							WHERE u.confirmation = 0 
+							ORDER BY 
+								u.Id 
+							DESC
+							LIMIT 
+							' . $offset . ',' . $elementCountInAPage;
+			
+			$sqlItemCount = 'SELECT
+			 						ceil(count(Id)/'.$elementCountInAPage.')
+			 					 FROM '
+			 					 	. $this->tablePrefix .'_upload WHERE u.confirmation = 0';
 			 					 	
 			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
 			if ($pageNo == $pageCount
@@ -551,8 +595,7 @@ class WebClientManager extends Base
 	{
 		$out = MISSING_PARAMETER;
 		if (isset($reqArray['imageId']) && !empty($reqArray['imageId'])) 
-		{
-			
+		{			
 			$out = UNAUTHORIZED_ACCESS;		
 			$imageId = $reqArray['imageId']; 	
 			if ($this->isUserAuthenticated() == true)
@@ -572,7 +615,31 @@ class WebClientManager extends Base
 			  }
 		}
 		return $out;       
-}
+	}
+	
+	private function confirmImage( $reqArray )
+	{
+		$out = MISSING_PARAMETER;
+		if (isset($reqArray['imageId']) && !empty($reqArray['imageId'])) 
+		{			
+			$out = UNAUTHORIZED_ACCESS;		
+			$imageId = $reqArray['imageId']; 	
+			if ($this->isUserAuthenticated() == true)
+			{
+				$sql = sprintf ('UPDATE '.$this->tablePrefix.'_upload
+								 set confirmation = 1
+				                 WHERE id = %d 
+				                 LIMIT 1', $imageId );
+				
+			 	$out = FAILED;
+			    if	($this->dbc->query($sql) == false ) 
+			    {
+			    	//Something wrong!	    				    	   	
+			    }
+			  }
+		}
+		return $out;       
+	}
 	    
 	
 	
