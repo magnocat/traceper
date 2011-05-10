@@ -601,7 +601,7 @@ class WebClientManager extends Base
 			if ($this->isUserAuthenticated() == true)
 			{
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
-				$out = $thumbCreator->deleteImage($imageId);
+				//$out = $thumbCreator->deleteImage($imageId); //This code is unnecessary since same exists below
 				
 				$sql = sprintf ('DELETE FROM '.$this->tablePrefix.'_upload
 				                 WHERE id = %d 
