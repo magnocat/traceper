@@ -14,12 +14,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionGetUpdatedUserList = "WebClientGetUpdatedUserList";
 	this.actionGetUserPastPoints = "WebClientGetUserPastPoints";
 	this.actionGetImageList = "WebClientGetImageList";
+	this.actionGetUnconfirmedImageList = "WebClientGetUnconfirmedImageList";
 	this.actionSearchImage = "WebClientSearchImage";
 	this.actionSignout = "WebClientSignout";
 	this.actionSendNewPassword = "WebClientSendNewPassword";
 	this.actionInviteUser = "WebClientInviteUser";
 	this.actionChangePassword = "WebClientChangePassword";
 	this.actionDeleteImage = "WebClientDeleteImage";
+	this.actionDeleteImage = "WebClientConfirmImage";
 	this.actionRegisterUser = "WebClientRegisterUser";
 	this.actionActivateAccount= "WebClientActivateAccount";
 	this.userListPageNo = 1;	
@@ -380,6 +382,33 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});	
 	};
 	
+	this.getUnconfirmedImageList = function(pageNo, callback){
+		var params = "action=" + TRACKER.actionGetUnconfirmedImageList + "&pageNo=" + pageNo;
+				
+		TRACKER.ajaxReq(params, function(result){			
+			TRACKER.imageListPageNo = TRACKER.getPageNo(result);
+			TRACKER.imageListPageCount = TRACKER.getPageCount(result);
+			
+			var str = processImageXML(MAP, result);
+			
+			if (str != null) {
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getImageList(%d)', TRACKER.imageListPageCount, TRACKER.imageListPageNo, 3);
+			}
+			else {
+				str = TRACKER.langOperator.noMatchFound;				
+			}
+			$('#photos').slideUp('fast',function(){
+									$('#photos').html(str);
+									$('#photos').slideDown();
+								});
+			
+			if (typeof callback == 'function'){
+				callback();
+			}
+			
+		});	
+	};	
+	
 	var fetchingImagesInBgStart = false;
 	
 	this.getImageListInBg = function(){
@@ -466,6 +495,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 		
 	};
+	
+	this.confirmImage = function(imageId){
+		if (confirm(TRACKER.langOperator.confirmationMessage)) 
+		{
+			//TRACKER.deletedImageId = imageId;
+			var params = "action=" + TRACKER.actionConfirmImage + "&imageId=" + imageId
+			TRACKER.ajaxReq(params, function(result){
+				
+				if (result == "1") {
+					//TRACKER.getImageList(TRACKER.imageListPageNo);
+					//MAP.removeOverlay(TRACKER.images[TRACKER.deletedImageId].gmarker);
+					//TRACKER.images.splice(TRACKER.deletedImageId, 1);
+				}
+				else {
+					alert(TRACKER.langOperator.errorInOperation);
+				}
+			});
+		}
+		
+	};	
 	
 	this.trackUser = function(userId){
 		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
