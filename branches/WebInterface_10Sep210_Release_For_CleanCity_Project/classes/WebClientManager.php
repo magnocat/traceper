@@ -112,7 +112,10 @@ class WebClientManager extends Base
 					$elementCount = $this->elementCountInLocationsPage;
 				}
 				$out = $this->getImageList($reqArray, $elementCount);
-				break;	
+				break;
+			case $this->actionPrefix . "GetUnconfirmedImageList":
+				$out = $this->getUnconfirmedImageList($reqArray, $this->elementCountInPhotoPage);
+				break;					
 			case $this->actionPrefix ."GetImage":
 				$out = $this->getImage($reqArray);							
 				break;							
@@ -122,6 +125,9 @@ class WebClientManager extends Base
 			case $this->actionPrefix ."DeleteImage":
 				$out = $this->deleteImage($reqArray, UPLOAD_DIRECTORY);
 				break;	
+			case $this->actionPrefix ."ConfirmImage":
+				$out = $this->confirmImage($reqArray);
+				break;				
 			case $this->actionPrefix ."InviteUser":
 				$out = $this->inviteUser($reqArray);
 				break;
