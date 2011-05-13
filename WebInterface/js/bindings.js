@@ -123,13 +123,13 @@ function bindElements(langOperator, trackerOp)
 		$('#photo_title').removeClass('active_title');
 	});
 	
-	$('#friendRequest_title').click(function(){
+	/*$('#friendRequest_title').click(function(){
 		TRACKER.getFriendRequests(1);
 		$('#photosList').slideUp('fast',function(){
 			$('#friendsList').slideDown('fast');
 			
 		});
-	});
+	});*/
 	
 	$('ul.sf-menu').superfish();  
 	$('li#username').click(function(){
@@ -207,7 +207,9 @@ function bindElements(langOperator, trackerOp)
 	//this callback opens the friend requests window
 	$('#friendRequests').click(function(){
 		TRACKER.getFriendRequests(1,function(str){
-			$('#friendRequestsList').find(".mbcontainercontent:first").html(str);
+			//$('#friendRequestsList').find(".mbcontainercontent:first").html(str);
+			$('#friendRequestsList').find(".mbcontainercontent:first").html("<div id='lists'><div id='friendsList'><div id='friends'></div></div></div>");
+			$('#friendRequestsList').find(".mbcontainercontent:first #friends").html(str);			
 			$('#friendRequestsList').mb_open();
 			$('#friendRequestsList').mb_centerOnWindow(true);
 			$('#friendRequestsList').mb_resizeTo(200,300);
