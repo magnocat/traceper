@@ -828,7 +828,6 @@ class WebClientManager extends Base
 			if ($this->isUserAuthenticated() == true)
 			{
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
-				$out = $thumbCreator->deleteImage($imageId);
 				
 				$userId = $this->usermanager->getUserId();
 				
