@@ -638,9 +638,9 @@ class WebClientManager extends Base
 				                 LIMIT 1', $imageId );
 				
 			 	$out = FAILED;
-			    if	($this->dbc->query($sql) == false ) 
+			    if	($this->dbc->query($sql) == true ) 
 			    {
-			    	//Something wrong!	    				    	   	
+			    	$out = SUCCESS;
 			    }
 			  }
 		}

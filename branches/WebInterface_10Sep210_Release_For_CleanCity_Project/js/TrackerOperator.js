@@ -21,7 +21,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionInviteUser = "WebClientInviteUser";
 	this.actionChangePassword = "WebClientChangePassword";
 	this.actionDeleteImage = "WebClientDeleteImage";
-	this.actionDeleteImage = "WebClientConfirmImage";
+	this.actionConfirmImage = "WebClientConfirmImage";
 	this.actionRegisterUser = "WebClientRegisterUser";
 	this.actionActivateAccount= "WebClientActivateAccount";
 	this.userListPageNo = 1;	
@@ -389,10 +389,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.imageListPageNo = TRACKER.getPageNo(result);
 			TRACKER.imageListPageCount = TRACKER.getPageCount(result);
 			
-			var str = processImageXML(MAP, result);
+			var str = processImageXML(MAP, result, true);
 			
 			if (str != null) {
-				str += TRACKER.writePageNumbers('javascript:TRACKER.getImageList(%d)', TRACKER.imageListPageCount, TRACKER.imageListPageNo, 3);
+				str += TRACKER.writePageNumbers('javascript:TRACKER.getUnconfirmedImageList(%d)', TRACKER.imageListPageCount, TRACKER.imageListPageNo, 3);
 			}
 			else {
 				str = TRACKER.langOperator.noMatchFound;				
@@ -479,6 +479,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.deleteImage = function(imageId){
 		if (confirm(TRACKER.langOperator.confirmationMessage)) 
 		{
+			alert("hellos");
 			TRACKER.deletedImageId = imageId;
 			var params = "action=" + TRACKER.actionDeleteImage + "&imageId=" + imageId
 			TRACKER.ajaxReq(params, function(result){

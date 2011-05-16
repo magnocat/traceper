@@ -248,12 +248,12 @@ function processUserPastLocationsXML (MAP, xml) {
 	/**
 	 * 
 	 */
-function processImageXML(MAP, xml){
+function processImageXML(MAP, xml, unconfirmedImages){
 	var list = "";
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	var hideMarker = !($('#showPhotosOnMap').attr('checked'));
-
+		
 	$(xml).find("page").find("image").each(function(){
 		var image = $(this);
 		var imageId = $(image).attr('id');
@@ -265,7 +265,13 @@ function processImageXML(MAP, xml){
 		var time = $(image).attr('time');
 		var point = new GLatLng(latitude, longitude);
 		
+		var approveImage = "";
+		if (unconfirmedImages == true) {
+			approveImage = "<img class='deleteImageButton' onclick='TRACKER.confirmImage("+imageId+")' src='images/approve.png' />";
+		}
+		
 		list += "<li>" 	+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />"
+						+ approveImage 
 						+ "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
 							+ "<div>"
 								+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 

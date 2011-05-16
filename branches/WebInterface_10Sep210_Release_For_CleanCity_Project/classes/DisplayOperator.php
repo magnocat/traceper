@@ -275,6 +275,7 @@ EOT;
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
+									<div id="showUnconfirmedImages">Show unconfirmed images</div>
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
 									<div id="photos"></div>
 									<div class='searchResults'>

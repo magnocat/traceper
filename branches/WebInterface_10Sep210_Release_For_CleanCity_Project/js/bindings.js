@@ -170,6 +170,10 @@ function bindElements(langOperator, trackerOp)
 				}
 	});	
 	
+	$('#showUnconfirmedImages').click(function(){
+		TRACKER.getUnconfirmedImageList(1);
+	});
+	
 
 };	
 
