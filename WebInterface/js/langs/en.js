@@ -46,7 +46,6 @@ LAN_OPERATOR.addIndexes({
 			invitationMessage:'Message:',
 			emailNotFound:'E-mail address has not been found.',			
 			sendNewPassword:'Send new password',
-			showLoginForm:'Show login form',
 			forgotPassword:'Forgot your password?',
 			currentPasswordLabel:'Current password',
 			newPasswordLabel:'New password',
@@ -72,5 +71,6 @@ LAN_OPERATOR.addIndexes({
 			changePassword:'Change Password',
 			friendRequestRecorded:'Your friend request is recorded successfully',
 			friendRequests:'Friend Requests',
-			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)'
+			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)',
+			registerLabel:'Register'
 	});

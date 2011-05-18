@@ -97,12 +97,12 @@ EOT;
 						$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
 							
 					});
-					$('#forgotPassword').text(langOp.forgotPassword);
-					$('#submitLoginFormButton').attr('value', langOp.login);	
+					$('#forgotPasswordLink').text(langOp.forgotPassword);		
+					$('#registerLink').text(langOp.registerLabel);	
 					$('#emailLabel').text(langOp.emailLabel + ":");	
 					$("#aboutus").html(langOp.aboutus);
-									
-					$('#showLoginFormButton').attr('value', langOp.showLoginForm);
+					$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);			
+				
 					$('#sendNewPassword').attr('value', langOp.sendNewPassword).click(function(){
 						sendNewPassword();
 					});
@@ -119,18 +119,19 @@ EOT;
 					$('#submitLoginFormButton').click(function(){
 						authenticateUser();
 					});
-					$('#forgotPassword, #showLoginFormButton').click(function(){
-						$('#userLoginForm').toggle();
-						$('#forgotPasswordForm').toggle();
+					$('#forgotPasswordLink').click(function(){
+						$('#forgotPasswordForm').mb_open();
+						$('#forgotPasswordForm').mb_centerOnWindow(true);
 					});
-					$('#register, #cancelRegistration').click(function(){
-						$('#userLoginForm').toggle();
-						$('#registerForm').toggle();
+					$('#registerLink').click(function(){
+						$('#registerForm').mb_open();
+						$('#registerForm').mb_centerOnWindow(true);
+						
+						$('#registerButton').click(function(){
+							TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val());
+						});	
 					});		
-					$('#registerButton').click(function(){
-						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val());
-					});	
-					
+
 					$(".containerPlus").buildContainers({
 			        	containment:"document",
 			        	elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
@@ -157,15 +158,15 @@ EOT;
 						<font id="usernameLabel"></font><br/>
 						<input type="text" name="email" id="emailLogin" /><br/>
 						<input type="checkbox" name="rememberMe" id="rememberMe"/>
-						<div style="display:inline" id="rememberMeLabel"></div>
+						<div style="display:inline" class="link" id="rememberMeLabel"></div>
 					</div>
 					<div>
 						<font id="passwordLabel"></font><br/>
 						<input type="password" name="password" id="password" /><br/>
-						<font id="forgotPassword"></font>	
+						<font class="link" id="forgotPasswordLink"></font>	
 					</div>
 					<div><br/><input type="button" id="submitLoginFormButton" value=""/> 
-					     <br/><font id="register" style="display:block">Register</font>
+					     <br/><font class="link" id="registerLink" style="display:block"></font>
 					</div>
 				</div>					
 				</div>
@@ -178,18 +179,17 @@ EOT;
 				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
 				</div>
 				
-				<div id="forgotPasswordForm" style="display:none">
+				<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'500', closed:'true' }">
 					<div id="emailLabel"></div>
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
-					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
 				</div>
-				<div id="registerForm" style="display:none">		
+				
+				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">		
 					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
 					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
-					<input type="button" id="cancelRegistration" value="Cancel" />
 				</div>
 				
 			</body>
@@ -199,6 +199,7 @@ EOT;
 		return $str;		
 	}
 	
+	/*
 	public static function getRegistrationPage($email, $invitationKey, $callbackURL)
 	{
 		$out = <<<EOT
@@ -232,7 +233,6 @@ EOT;
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
-					<input type="button" id="cancelRegistration" value="Cancel" />
 				</div>
 			</body>
 			</html>
@@ -240,7 +240,7 @@ EOT;
 		return $out;
 		
 	}
-	
+	-*/
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
