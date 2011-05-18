@@ -45,7 +45,6 @@ LAN_OPERATOR.addIndexes({
 			invitationMessage:'Mesaj:',
 			emailNotFound:'E-posta adresi bulunamadı.',
 			sendNewPassword:'Yeni şifre gönder',
-			showLoginForm:'Giriş formunu göster',
 			forgotPassword:'Şifremi unuttum',
 			currentPasswordLabel:'Şimdiki şifre',
 			newPasswordLabel:'Yeni şifre',
@@ -71,6 +70,6 @@ LAN_OPERATOR.addIndexes({
 			changePassword:'Şifremi değiştir',
 			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.',
 			friendRequests:'Arkadaşlık istekleri'
-			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.'
-			
+			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.',
+			registerLabel:'Kayıt Ol'
 		});
