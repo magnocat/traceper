@@ -110,11 +110,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
+				if (result == "1") {
 					location.href = 'index.php';
 				}
-				else if (result == "-4"){
+				else if (result == "-4"){ //Buraya callback ile aslýnda hiç gelmiyor
 					alert(TRACKER.langOperator.incorrectPassOrUsername);
+					location.href = 'login.php';
+				}
+				else
+				{
+					alert("authenticateUser else");
 				}
 			});
 		}
@@ -734,7 +739,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
-			
 		$.ajax({
 			type: 'POST',
 			url: TRACKER.ajaxUrl,
@@ -749,7 +753,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			success: function(result){ 
 							$("#loading").hide(); 						
 							if (result == "-4"){			
-								location.href = "index.php";
 								alert(TRACKER.langOperator.incorrectPassOrUsername);
 							}
 							else if(result == "-2") {
