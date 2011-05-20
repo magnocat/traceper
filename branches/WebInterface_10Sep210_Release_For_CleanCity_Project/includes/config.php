@@ -1,7 +1,7 @@
 <?php
 /********************************************
 *
-*	Filename:	index.php
+*	Filename:	config.php
 *	Author:		Ahmet Oguz Mermerkaya
 *	E-mail:		ahmetmermerkaya@hotmail.com
 *	Begin:		Tuesday, April 21, 2009  11:27
@@ -18,7 +18,7 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "21236161";
+$dbPassword = "";
 // database name
 $dbName = "traceper";
 
