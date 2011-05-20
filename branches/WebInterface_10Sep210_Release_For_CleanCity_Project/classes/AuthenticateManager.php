@@ -42,6 +42,16 @@ class AuthenticateManager extends Base{
 						WHERE email="%s" AND password="%s"
 						LIMIT 1', $username, $password);
 		
+		if($this->tdo != NULL)
+		{
+			$this->tdo->save(self::userId,   0, 0);
+			$this->tdo->save(self::realname, '', 0);			
+			$this->tdo->save(self::username, '', 0);
+			$this->tdo->save(self::password, '', 0);						
+			$this->tdo->save(self::daysDataStored, 0, 0);									
+			$this->tdo->save(self::authTime, time());
+		}
+				
 		$result = $this->dbc->query($sql);
 		if ($result != false) 
 		{
@@ -64,7 +74,19 @@ class AuthenticateManager extends Base{
 					$this->tdo->save(self::daysDataStored, $daysDataStored, $daysDataStored);									
 					$this->tdo->save(self::authTime, time());
 				}
+				else
+				{
+					$this->userId = NULL;
+				}
 			}
+			else
+			{
+				$this->userId = NULL;
+			}
+		}
+		else
+		{
+			$this->userId = NULL;	
 		}
 		return $this->userId;		
 	}	
@@ -105,6 +127,26 @@ class AuthenticateManager extends Base{
 			
 		return $authenticated;
 	}
+	
+	public function isAdminAuthenticated(){
+		
+		$authenticated = false;
+		if ($this->userId != NULL)
+		{
+			if (($this->tdo->getValue(self::authTime) + $this->userCheckInterval) < time()) 
+			{
+				if ($this->authenticateUser($this->tdo->getValue(self::username), $this->tdo->getValue(self::password)) != NULL)
+				{
+					$authenticated = true;
+				}	
+			}
+			else {
+				$authenticated = true;
+			}
+		}
+			
+		return $authenticated;
+	}	
 	
 	public function getUserId(){
 		return $this->userId;
