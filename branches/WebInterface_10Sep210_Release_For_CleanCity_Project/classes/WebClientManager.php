@@ -472,7 +472,7 @@ class WebClientManager extends Base
 	
 	private function getUnconfirmedImageList($reqArray, $elementCountInAPage){
 		$out = UNAUTHORIZED_ACCESS;
-		if ($this->isUserAuthenticated() == true)
+		if ($authenticator->isAdminAuthenticated() == true)
 		{
 			$out = FAILED;
 			$pageNo = 1;
@@ -604,7 +604,7 @@ class WebClientManager extends Base
 		{			
 			$out = UNAUTHORIZED_ACCESS;		
 			$imageId = $reqArray['imageId']; 	
-			if ($this->isUserAuthenticated() == true)
+			if ($authenticator->isAdminAuthenticated() == true)
 			{
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
 				//$out = $thumbCreator->deleteImage($imageId); //This code is unnecessary since same exists below
@@ -630,7 +630,7 @@ class WebClientManager extends Base
 		{			
 			$out = UNAUTHORIZED_ACCESS;		
 			$imageId = $reqArray['imageId']; 	
-			if ($this->isUserAuthenticated() == true)
+			if ($authenticator->isAdminAuthenticated() == true)
 			{
 				$sql = sprintf ('UPDATE '.$this->tablePrefix.'_upload
 								 set confirmation = 1
