@@ -163,12 +163,12 @@ EOT;
 	
 	
 	
-	public static function getMainPage($callbackURL, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language) {
+	public static function getMainPage($callbackURL, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $isAdmin) {
 
 		$head = self::getMetaNLinkSection();
 		$realname = self::$realname;
 		
-		$str = <<<MAIN_PAGE
+		$str = <<<MAIN_PAGE_1
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
@@ -261,16 +261,23 @@ EOT;
 									<!-- <div class='title active_title' id='user_title'><div class='arrowImage'></div></div> -->
 									<div class='title active_title' id='photo_title'><div class='arrowImage'></div></div>								
 								</div>
-								 <!--<div id='usersList'>											
-									<div class='search'>						
-										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
-									</div>
-									<div id="users"></div>
-									<div class='searchResults'>
-										<a href='#returnToUserList'></a>	
-										<div id='results'></div>								
-									</div>		
-								</div>--> 
+MAIN_PAGE_1;
+																
+								if ($isAdmin === true)
+								{
+									$str .= "<div id='usersList'>											
+												<div class='search'>						
+													<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
+												</div>
+												<div id=\"users\"></div>
+												<div class='searchResults'>
+													<a href='#returnToUserList'></a>	
+													<div id='results'></div>								
+												</div>		
+											</div>";									
+								}; 
+								
+								$str2 = <<<MAIN_PAGE_2
 								<div id="photosList">									
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
@@ -316,9 +323,9 @@ EOT;
 	</div>
 	</body>
 </html>
-MAIN_PAGE;
+MAIN_PAGE_2;
 
-		  return $str;
+		  return $str.$str2;
 }
 
 }
