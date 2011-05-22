@@ -472,7 +472,7 @@ class WebClientManager extends Base
 	
 	private function getUnconfirmedImageList($reqArray, $elementCountInAPage){
 		$out = UNAUTHORIZED_ACCESS;
-		if ($authenticator->isAdminAuthenticated() == true)
+		if ($this->authenticator->isAdminAuthenticated() == true)
 		{
 			$out = FAILED;
 			$pageNo = 1;
@@ -604,7 +604,7 @@ class WebClientManager extends Base
 		{			
 			$out = UNAUTHORIZED_ACCESS;		
 			$imageId = $reqArray['imageId']; 	
-			if ($authenticator->isAdminAuthenticated() == true)
+			if ($this->authenticator->isAdminAuthenticated() == true)
 			{
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
 				//$out = $thumbCreator->deleteImage($imageId); //This code is unnecessary since same exists below
@@ -618,7 +618,8 @@ class WebClientManager extends Base
 			    {
 			    	$out = $thumbCreator->deleteImage($imageId);    				    	   	
 			    }
-			  }
+			}
+			
 		}
 		return $out;       
 	}
@@ -630,7 +631,7 @@ class WebClientManager extends Base
 		{			
 			$out = UNAUTHORIZED_ACCESS;		
 			$imageId = $reqArray['imageId']; 	
-			if ($authenticator->isAdminAuthenticated() == true)
+			if ($this->authenticator->isAdminAuthenticated() == true)
 			{
 				$sql = sprintf ('UPDATE '.$this->tablePrefix.'_upload
 								 set confirmation = 1
@@ -721,6 +722,10 @@ class WebClientManager extends Base
 		if ( $type == "imageList" || $this->includeImageInUpdatedUserListReq == true)
 		{
 			$pageStr.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
+		}
+	
+		if ($this->authenticator->isAdminAuthenticated() == true) {
+			$pageStr .= ' isAdmin="1" '; 
 		}
 		
 		$out = '<?xml version="1.0" encoding="UTF-8"?>'

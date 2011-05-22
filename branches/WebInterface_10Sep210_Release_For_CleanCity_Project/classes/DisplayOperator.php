@@ -133,19 +133,20 @@ EOT;
 					<div><input type="text" name="email" id="emailLogin" /></div>
 					<div id="passwordLabel"></div>
 					<div><input type="password" name="password" id="password" /></div>
-					<div><input type="checkbox" name="rememberMe" id="rememberMe"/>
+					<div class="link"><input type="checkbox" name="rememberMe" id="rememberMe"/>
 						 <div style="display:inline" id="rememberMeLabel"></div>
 					</div>
-					<div id="forgotPassword"></div>	
+					<div id="forgotPassword" class="link"></div>	
+	<!--				
 					<div id="register">Register</div>				
-					<div><input type="button" id="submitLoginFormButton" value="" /></div>				
+	-->				<div><input type="button" id="submitLoginFormButton" value="" /></div>				
 				</div>
 				<div id="forgotPasswordForm" style="display:none">
 					<div id="emailLabel"></div>
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 					<div><input type="button" name="showLoginFormButton" id="showLoginFormButton" /></div>
 				</div>
-				<div id="registerForm" style="display:none">		
+<!--				<div id="registerForm" style="display:none">		
 					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
 					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
@@ -153,7 +154,7 @@ EOT;
 					<input type="button" id="registerButton" value="Register" />
 					<input type="button" id="cancelRegistration" value="Cancel" />
 				</div>
-				
+-->				
 			</body>
 			</html>				
 EOT;
@@ -261,11 +262,7 @@ EOT;
 									<!-- <div class='title active_title' id='user_title'><div class='arrowImage'></div></div> -->
 									<div class='title active_title' id='photo_title'><div class='arrowImage'></div></div>								
 								</div>
-MAIN_PAGE_1;
-																
-								if ($isAdmin === true)
-								{
-									$str .= "<div id='usersList'>											
+					<!--				<div id='usersList'>											
 												<div class='search'>						
 													<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 												</div>
@@ -274,22 +271,33 @@ MAIN_PAGE_1;
 													<a href='#returnToUserList'></a>	
 													<div id='results'></div>								
 												</div>		
-											</div>";									
-								}; 
-								
-								$str2 = <<<MAIN_PAGE_2
-								<div id="photosList">									
+											</div>
+							-->
+									<div id="photosList">	
+							<!--										
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
-									<div id="showUnconfirmedImages">Show unconfirmed images</div>
+							-->
+MAIN_PAGE_1;
+																
+								if ($isAdmin === true)
+								{
+									$str .= '<div id="showUnconfirmedImages" class="link">Show unconfirmed images</div>';							
+								}; 
+								
+								$str2 = <<<MAIN_PAGE_2
+								
+					<!--				
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
-									<div id="photos"></div>
+					-->				<div id="photos"></div>
+									<div id="unconfirmedPhotos"><font id="showPhotosList" class="link"> &lt;&lt;show photos list</font><div></div></div>
+					<!--
 									<div class='searchResults'>
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
 										<div id='results'></div>								
 									</div>
-								</div>	
+					-->			</div>	
 								
 							<!-- <div id='footer'>							
 									<a href='#auLink'></a>								

@@ -174,6 +174,14 @@ function bindElements(langOperator, trackerOp)
 		TRACKER.getUnconfirmedImageList(1);
 	});
 	
+	$('#showPhotosList').click(function(){
+		
+			TRACKER.getImageList(TRACKER.imageListPageNo, function(){
+				$('#unconfirmedPhotos').slideUp('fast');
+			});
+		
+	});
+	
 
 };	
 

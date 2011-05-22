@@ -32,16 +32,22 @@ class AuthenticateManager extends Base{
 		}
 	}
 	
-	public function authenticateUser($username, $password, $keepUserLoggedIn = false){
+	public function authenticateUser($username, $password, $keepUserLoggedIn = false, $isAdmin = false){
 		
 		$username = $this->checkVariable($username);
 		$password = $this->checkVariable($password);
-		
-		$sql = sprintf('SELECT Id, realname 
+		if ($isAdmin == true) {
+			$sql = sprintf('SELECT Id, realname 
+					FROM ' . $this->tablePrefix .'_users
+					WHERE email="%s" AND password="%s" AND level = -1
+					LIMIT 1', $username, $password);
+		}
+		else {
+			$sql = sprintf('SELECT Id, realname 
 						FROM ' . $this->tablePrefix .'_users
 						WHERE email="%s" AND password="%s"
 						LIMIT 1', $username, $password);
-		
+		}
 		if($this->tdo != NULL)
 		{
 			$this->tdo->save(self::userId,   0, 0);
@@ -107,9 +113,11 @@ class AuthenticateManager extends Base{
 	}
 	
 	
-	public function isUserAuthenticated(){
-		
+	public function isUserAuthenticated()
+	{
 		return true;
+		// make code disable or delete if it is unreachable or it doesnt run...
+/*		
 		$authenticated = false;
 		if ($this->userId != NULL)
 		{
@@ -126,16 +134,16 @@ class AuthenticateManager extends Base{
 		}
 			
 		return $authenticated;
+*/
 	}
 	
 	public function isAdminAuthenticated(){
-		
 		$authenticated = false;
 		if ($this->userId != NULL)
 		{
 			if (($this->tdo->getValue(self::authTime) + $this->userCheckInterval) < time()) 
 			{
-				if ($this->authenticateUser($this->tdo->getValue(self::username), $this->tdo->getValue(self::password)) != NULL)
+				if ($this->authenticateUser($this->tdo->getValue(self::username), $this->tdo->getValue(self::password), false, true) != NULL)
 				{
 					$authenticated = true;
 				}	
@@ -144,7 +152,6 @@ class AuthenticateManager extends Base{
 				$authenticated = true;
 			}
 		}
-			
 		return $authenticated;
 	}	
 	

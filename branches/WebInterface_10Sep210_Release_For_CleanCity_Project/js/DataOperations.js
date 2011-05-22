@@ -253,7 +253,8 @@ function processImageXML(MAP, xml, unconfirmedImages){
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	var hideMarker = !($('#showPhotosOnMap').attr('checked'));
-		
+	var isAdmin = $(xml).find("page").attr("isAdmin");
+	
 	$(xml).find("page").find("image").each(function(){
 		var image = $(this);
 		var imageId = $(image).attr('id');
@@ -266,11 +267,15 @@ function processImageXML(MAP, xml, unconfirmedImages){
 		var point = new GLatLng(latitude, longitude);
 		
 		var approveImage = "";
+		var deleteImage = "";
+		if (isAdmin == "1") {
+			deleteImage = "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
+		}
 		if (unconfirmedImages == true) {
 			approveImage = "<img class='deleteImageButton' onclick='TRACKER.confirmImage("+imageId+")' src='images/approve.png' />";
 		}
 		
-		list += "<li>" 	+ "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />"
+		list += "<li>" 	+ deleteImage
 						+ approveImage 
 						+ "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
 							+ "<div>"

@@ -33,6 +33,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.pastPointsPageNo = 0;
 	this.imageListPageNo = 1;
 	this.imageListPageCount = 0;
+	this.unConfirmedImageListPageNo = 1;
+	this.unConfirmedImageListPageCount = 0;
 	this.imageListSearchPageNo = 1;
 	this.imageListSearchPageCount = 0;
 	//page no initial value is important
@@ -113,7 +115,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (result == "1") {
 					location.href = 'index.php';
 				}
-				else if (result == "-4"){ //Buraya callback ile aslýnda hiç gelmiyor
+				else if (result == "-4"){ //Buraya callback ile aslï¿½nda hiï¿½ gelmiyor
 					alert(TRACKER.langOperator.incorrectPassOrUsername);
 					location.href = 'login.php';
 				}
@@ -391,8 +393,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var params = "action=" + TRACKER.actionGetUnconfirmedImageList + "&pageNo=" + pageNo;
 				
 		TRACKER.ajaxReq(params, function(result){			
-			TRACKER.imageListPageNo = TRACKER.getPageNo(result);
-			TRACKER.imageListPageCount = TRACKER.getPageCount(result);
+			TRACKER.unConfirmedImageListPageNo = TRACKER.getPageNo(result);
+			TRACKER.unConfirmedImageListPageCount = TRACKER.getPageCount(result);
 			
 			var str = processImageXML(MAP, result, true);
 			
@@ -403,8 +405,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				str = TRACKER.langOperator.noMatchFound;				
 			}
 			$('#photos').slideUp('fast',function(){
-									$('#photos').html(str);
-									$('#photos').slideDown();
+									$('#unconfirmedPhotos div').html(str);
+									$('#unconfirmedPhotos').slideDown();
 								});
 			
 			if (typeof callback == 'function'){
@@ -484,7 +486,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.deleteImage = function(imageId){
 		if (confirm(TRACKER.langOperator.confirmationMessage)) 
 		{
-			alert("hellos");
 			TRACKER.deletedImageId = imageId;
 			var params = "action=" + TRACKER.actionDeleteImage + "&imageId=" + imageId
 			TRACKER.ajaxReq(params, function(result){
@@ -497,6 +498,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				else {
 					alert(TRACKER.langOperator.errorInOperation);
 				}
+				
 			});
 		}
 		
@@ -510,7 +512,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.ajaxReq(params, function(result){
 				
 				if (result == "1") {
-					//TRACKER.getImageList(TRACKER.imageListPageNo);
+					
+					TRACKER.getUnconfirmedImageList(TRACKER.unConfirmedImageListPageNo);
 					//MAP.removeOverlay(TRACKER.images[TRACKER.deletedImageId].gmarker);
 					//TRACKER.images.splice(TRACKER.deletedImageId, 1);
 				}

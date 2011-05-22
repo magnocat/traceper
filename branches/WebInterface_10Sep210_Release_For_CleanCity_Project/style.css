@@ -290,3 +290,9 @@ a {
 	right: 20px;
 	top: 20px;
 }
+#unconfirmedPhotos {
+	display: none;
+}
+.link {
+	cursor: pointer;
+}
