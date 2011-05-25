@@ -157,7 +157,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		});		
 	};
 	
-	this.registerUser = function(email, name, password, confirmPassword, invitationKey) {
+	this.registerUser = function(email, name, password, confirmPassword, invitationKey, callback) {
 		if (password == confirmPassword) {		
 		
 			var params = "action=" + TRACKER.actionRegisterUser + "&email=" + email + "&name=" + name + "&password=" + password + "&key="+invitationKey;
@@ -174,6 +174,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				}
 				else if (result == "-9"){
 					TRACKER.showMessage(TRACKER.langOperator.emailNotValid, "warning");
+				}
+				
+				if (typeof callback == 'function'){
+					callback(result);
 				}
 			});
 			
@@ -207,7 +211,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 	}
 	
-	this.sendNewPassword = function(email){
+	this.sendNewPassword = function(email, callback){
 		var params = "action=" + TRACKER.actionSendNewPassword + "&email=" + email;		
 		if (email != "" ) 
 		{
@@ -215,9 +219,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (result == "1") {					
 					TRACKER.showMessage(TRACKER.langOperator.newPasswordSent, "info");
 				}
-				
+				else if (result == "-6"){
+					TRACKER.showMessage(TRACKER.langOperator.emailNotFound, "warning");
+				}
 				else if (result == "-7"){
 					TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+				
+				if (typeof callback == 'function'){
+					callback(result);
 				}
 			});
 		}
@@ -855,7 +865,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		$(object).mb_open();
 		$(object).mb_centerOnWindow(true);
 		$(object).mb_switchAlwaisOnTop(); 
-		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
