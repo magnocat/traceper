@@ -97,15 +97,14 @@ EOT;
 						$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
 							
 					});
-					$('#forgotPasswordLink').text(langOp.forgotPassword);		
+					$('#forgotPasswordLink').text(langOp.forgotPassword);
+					$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
 					$('#registerLink').text(langOp.registerLabel);	
 					$('#emailLabel').text(langOp.emailLabel + ":");	
-					$("#aboutus").html(langOp.aboutus);
-					$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);			
-				
-					$('#sendNewPassword').attr('value', langOp.sendNewPassword).click(function(){
-						sendNewPassword();
-					});
+					$("#aboutus").append(langOp.aboutus);
+					$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
+					$('#aboutusLink').text(langOp.aboutTitle);				
+
 					$('#email').keypress(function(event){
 						if (event.keyCode == '13'){
 							sendNewPassword();	
@@ -122,15 +121,32 @@ EOT;
 					$('#forgotPasswordLink').click(function(){
 						$('#forgotPasswordForm').mb_open();
 						$('#forgotPasswordForm').mb_centerOnWindow(true);
+
+						$('#sendNewPassword').click(function(){
+						    TRACKER.sendNewPassword($('#email').val(),
+						   		function(result){
+	                                $('#forgotPasswordForm input[type!=button]').attr('value', '');
+									$('#forgotPasswordForm').mb_close();
+								});
+						});
 					});
 					$('#registerLink').click(function(){
 						$('#registerForm').mb_open();
 						$('#registerForm').mb_centerOnWindow(true);
 						
 						$('#registerButton').click(function(){
-							TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val());
+							TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(),null, 
+								function(result){
+	                                $('#registerForm input[type!=button]').attr('value', '');
+									$('#registerForm').mb_close();
+								});						
 						});	
-					});		
+					});	
+
+					$('#aboutusLink').click(function(){
+						$('#aboutus').mb_open();
+						$('#aboutus').mb_centerOnWindow(true);
+					});	
 
 					$(".containerPlus").buildContainers({
 			        	containment:"document",
@@ -142,9 +158,6 @@ EOT;
       				});		
 				
 				});	
-				function sendNewPassword(){
-					TRACKER.sendNewPassword($('#email').val());
-				}
 				function authenticateUser(){
 					TRACKER.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });
 				}
@@ -152,27 +165,26 @@ EOT;
 			</head>
 			<body>
 				$pluginScript
-				<div style="padding:20px"><img src="images/logo.png" style="display:block; float:left; width:300px; margin-right:200px"/>	
+				<div align="center" style="margin-top:60px"><img src="images/logo.png" style="display:block"/>	
 				<div id="userLoginForm">	
-					<div>								
+					<div><br/>
 						<font id="usernameLabel"></font><br/>
 						<input type="text" name="email" id="emailLogin" /><br/>
-						<input type="checkbox" name="rememberMe" id="rememberMe"/>
-						<div style="display:inline" class="link" id="rememberMeLabel"></div>
-					</div>
-					<div>
 						<font id="passwordLabel"></font><br/>
-						<input type="password" name="password" id="password" /><br/>
-						<font class="link" id="forgotPasswordLink"></font>	
-					</div>
-					<div><br/><input type="button" id="submitLoginFormButton" value=""/> 
-					     <br/><font class="link" id="registerLink" style="display:block"></font>
+						<input type="password" name="password" id="password"/><br/>
+						<font class="link" id="forgotPasswordLink"></font><br/>
+						<input type="checkbox" name="rememberMe" id="rememberMe"/>
+						<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
+					    <input type="button" id="submitLoginFormButton" value=""/> <br/>
+					    <font class="link" id="registerLink" style="display:block"></font>
 					</div>
 				</div>					
 				</div>
 				
-				<div id='aboutus' class="loginPageBlock">  
-				</div>
+				<div align="center" class="link" id='aboutusLink'></div>					
+					
+				<div id='aboutus' class="containerPlus draggable {buttons:'c', skin:'default', icon:'browser.png', width:'600', closed:'true' }">  
+				<div class="logo"></div></div>
 							
 				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
 				</div>
