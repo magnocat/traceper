@@ -22,25 +22,6 @@ function bindElements(langOperator, trackerOp)
 	});
 	
 	$(".userOperations").mouseover(function(event){
-		
-		//$(".userOperations div").hide();
-		
-		//$("div", $(this)).css('display','inline');
-		//alert($("div", $(this)).html());	
-//		
-//		if ($("#activeUserOperationText").html() == null) {
-//			$("html").append("<div id='activeUserOperationText'></div>");
-//			$("#activeUserOperationText").css("position","absolute").css("z-index","200").
-//			css("color","#13A").css("font-size","13px");
-//		}
-//		$("#activeUserOperationText").html($("div", $(this)).html()).
-//			css("left",event.pageX+15).css("top",event.pageY-10).css("background-color","#FFFFFF").
-//			css("padding","5px 5px 5px 5px").css("border","1px dotted #999999");
-//		
-//		$("#activeUserOperationText").show();
-		
-		
-
 	}).mouseout(function(){
 //		$("#activeUserOperationText").hide();
 		
@@ -207,15 +188,11 @@ function bindElements(langOperator, trackerOp)
 	//this callback opens the friend requests window
 	$('#friendRequests').click(function(){
 		TRACKER.getFriendRequests(1,function(str){
-			//$('#friendRequestsList').find(".mbcontainercontent:first").html(str);
 			$('#friendRequestsList').find(".mbcontainercontent:first").html("<div id='lists'><div id='friendsList'><div id='friends'></div></div></div>");
 			$('#friendRequestsList').find(".mbcontainercontent:first #friends").html(str);			
 			$('#friendRequestsList').mb_open();
 			$('#friendRequestsList').mb_centerOnWindow(true);
 			$('#friendRequestsList').mb_resizeTo(200,300);
-			
-			
-			//$('#friendRequestsListContent').html(str);
 		});		
 	});
 	
