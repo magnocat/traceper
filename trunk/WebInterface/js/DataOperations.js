@@ -114,7 +114,12 @@ function processUserPastLocationsXML (MAP, xml) {
 			if (userId  != TRACKER.userId ){
 				
 				if (isFriend == "1" || isFriend == "2" || isFriend == "3" || isFriendList == true) {
-					list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+")' src='images/delete.png' />";
+					var isFriendRequest=true;
+					if (isFriendList == true){
+						isFriendRequest=false;
+					}
+					
+					list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+","+isFriendRequest+")' src='images/delete.png' />";
 					if (isFriend == "2")
 					{
 						list += "<img class='deleteImageButton' src='images/question_mark.png' />";											
