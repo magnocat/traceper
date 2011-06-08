@@ -470,11 +470,11 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'300', closed:'true' }">  
+	<div id='friendRequestsList' class="containerPlus draggable resizable {buttons:'c', icon:'friends.png' ,skin:'default', width:'300', closed:'true' }">  
 		
 	</div>
 	
-		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'300',  closed:'true' }">  
+		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'400', height:'600',  closed:'true' }">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' ></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
