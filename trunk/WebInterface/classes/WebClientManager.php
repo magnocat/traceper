@@ -537,7 +537,7 @@ class WebClientManager extends Base
 				$offset = ($pageNo - 1) * $this->elementCountInAPage;
 				$userId = $this->usermanager->getUserId();
 				$sql = //sprintf(
-							'(SELECT 
+							'  (SELECT 
 									Id, 1 as isFriend, status_message, latitude, longitude, altitude, 
 									realname, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
 								FROM '
@@ -551,8 +551,8 @@ class WebClientManager extends Base
 											 WHERE friend1 = '. $userId .' and status = 1) 
 										 
 									 OR Id = '. $userId .' )
-							)
-							UNION
+								)
+								UNION
 								(SELECT 
 									Id, 0 as isFriend, null, null, null, null, 
 									realname, null, null 
@@ -561,14 +561,14 @@ class WebClientManager extends Base
 								WHERE
 									realname like "%'. $search .'%" AND 
 									( Id NOT IN (SELECT friend1 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend2 = '. $userId .' and status = 1
+											 WHERE friend2 = '. $userId .'
 											 UNION 
 											 SELECT friend2 FROM '.$this->tablePrefix.'_friends
-											 WHERE friend1 = '. $userId .' and status = 1) 
+											 WHERE friend1 = '. $userId .') 
 									 AND Id != '. $userId .'
 									)
 								)	
-							UNION  
+								UNION  
 								(SELECT 
 									Id, 2 as isFriend, null, null, null, null, 
 									realname, null, null 
@@ -583,11 +583,12 @@ class WebClientManager extends Base
 											 WHERE friend1 = '. $userId .'  and status != 1) 
 									 AND Id != '. $userId .'
 									)
-								)							
-								ORDER BY
-									realname
-								LIMIT '. $offset .' , '. $this->elementCountInAPage ;
-							
+								)	
+												
+							ORDER BY
+								realname
+							LIMIT '. $offset .' , '. $this->elementCountInAPage ;
+						
 						//);				
 				$sqlItemCount = 'SELECT
 			 						ceil(count(Id)/'.$this->elementCountInAPage.')

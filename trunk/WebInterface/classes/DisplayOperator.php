@@ -211,7 +211,7 @@ EOT;
 		return $str;		
 	}
 	
-	/*
+	
 	public static function getRegistrationPage($email, $invitationKey, $callbackURL)
 	{
 		$out = <<<EOT
@@ -240,7 +240,7 @@ EOT;
 			</head>
 			<body>
 			<div id="registerForm">		
-					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
+					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" value="$email" readonly="readonly"/><br />
 					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
@@ -252,7 +252,7 @@ EOT;
 		return $out;
 		
 	}
-	-*/
+	
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
