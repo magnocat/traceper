@@ -158,21 +158,24 @@ function processUserPastLocationsXML (MAP, xml) {
 															   deviceId:$(user).find("deviceId").text(),
 															   gmarker:new GMarker(point, markerOptions),														   
 															});
-					GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
-	  						TRACKER.openMarkerInfoWindow(userId);	
-	  				});
-	  				
-					GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
-						TRACKER.users[userId].infoWindowIsOpened = true;
-	  				});
-					
-	  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
-	  					TRACKER.users[userId].infoWindowIsOpened = false;
-	  				});
-	  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
-	  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
-	  				}
-					MAP.addOverlay(TRACKER.users[userId].gmarker);
+					if (latitude != "" && longitude != "") 
+					{
+						GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
+		  						TRACKER.openMarkerInfoWindow(userId);	
+		  				});
+		  				
+						GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
+							TRACKER.users[userId].infoWindowIsOpened = true;
+		  				});
+						
+		  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
+		  					TRACKER.users[userId].infoWindowIsOpened = false;
+		  				});
+		  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
+		  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
+		  				}
+						MAP.addOverlay(TRACKER.users[userId].gmarker);
+					}
 				}
 				else
 				{
