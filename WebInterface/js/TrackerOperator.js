@@ -642,9 +642,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.trackUser = function(userId){
-
-		MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
-		TRACKER.openMarkerInfoWindow(userId);		
+		if (TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
+		{
+			MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
+			TRACKER.openMarkerInfoWindow(userId);		
+		}
 	};
 
 	this.drawTraceLine = function(userId, pageNo, callback) 
