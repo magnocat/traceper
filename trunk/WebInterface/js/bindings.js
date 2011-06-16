@@ -21,12 +21,6 @@ function bindElements(langOperator, trackerOp)
 		trackerOp.signout();
 	});
 	
-	$(".userOperations").mouseover(function(event){
-	}).mouseout(function(){
-//		$("#activeUserOperationText").hide();
-		
-	});
-	
 	/**
 	 * binding operations to search image
 	 */
@@ -57,9 +51,7 @@ function bindElements(langOperator, trackerOp)
 			$(TRACKER.imageIds).each(function(){
 				TRACKER.images[this].gmarker.hide();
 			});
-		}
-	
-		
+		}		
 	});
 	
 	$('#photo_title').click(function(){
@@ -192,7 +184,6 @@ function bindElements(langOperator, trackerOp)
 			$('#friendRequestsList').find(".mbcontainercontent:first #friends").html(str);			
 			$('#friendRequestsList').mb_open();
 			$('#friendRequestsList').mb_centerOnWindow(true);
-			$('#friendRequestsList').mb_resizeTo(200,300);
 		});		
 	});
 	
