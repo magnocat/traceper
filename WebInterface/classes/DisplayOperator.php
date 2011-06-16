@@ -176,11 +176,13 @@ EOT;
 						<input type="checkbox" name="rememberMe" id="rememberMe"/>
 						<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
 					    <input type="button" id="submitLoginFormButton" value=""/> <br/>
-					    <font class="link" id="registerLink" style="display:block"></font>
+					    
 					</div>
 				</div>					
 				</div>
-				
+				<br/>
+				<div align="center" class="link" id="registerLink"></div> 
+				<br/> 
 				<div align="center" class="link" id='aboutusLink'></div>					
 					
 				<div id='aboutus' class="containerPlus draggable {buttons:'c', skin:'default', icon:'browser.png', width:'600', closed:'true' }">  
@@ -196,11 +198,11 @@ EOT;
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 				</div>
 				
-				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">		
-					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
-					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
-					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
-					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
+				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
+					<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+					<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+					<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+					<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
 				</div>
 				
@@ -459,7 +461,7 @@ EOT;
   	
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
-	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'300', closed:'true' }">  
+	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', closed:'true' }">  
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
@@ -470,16 +472,15 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-	<div id='friendRequestsList' class="containerPlus draggable resizable {buttons:'c', icon:'friends.png' ,skin:'default', width:'300', closed:'true' }">  
-		
+	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', closed:'true' }">  
 	</div>
 	
-		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'400', height:'600',  closed:'true' }">  
+	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350',  closed:'true' }">  
 		<div id="inviteUserEmailLabel"></div> 
-		<textarea name='useremail' id='useremail' ></textarea><br/>		
+		<textarea name='useremail' id='useremail' style="width:300px; height:100px"></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
 		
-		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
+		<textarea name='invitationMessage' id='invitationMessage' style="width:300px; height:100px"></textarea><br/>
 		
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
@@ -487,14 +488,7 @@ EOT;
 	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
 	</div>
 	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
-	</div>
-				
-	<div style="display:none;">	
->
-
-
-	
-	</div>
+	</div>				
 	</body>
 </html>
 MAIN_PAGE;
