@@ -69,7 +69,9 @@ LAN_OPERATOR.addIndexes({
 			HomePage:'Anasayfa',
 			changePassword:'Şifremi değiştir',
 			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.',
-			friendRequests:'Arkadaşlık istekleri'
+			friendRequests:'Arkadaşlık istekleri',
+			invitationSentSuccesfull:'Davetiyeler başarıyla gönderildi.',
+			invitationSentPartial:'Davetiyeler gönderildi yalnız uygun formatta olmayan e-posta adresleri bulundu',
 			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.',
 			registerLabel:'Kayıt Ol'
 		});

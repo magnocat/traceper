@@ -148,12 +148,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var params = "action=" + TRACKER.actionInviteUser + "&email=" + email + "&message=" + message;
 
 		TRACKER.ajaxReq(params, function (result){
-			if (result == "1") {					
-				alert("operation is succesfull");
+			if (result == 1) {					
+				TRACKER.showMessage(TRACKER.langOperator.invitationSentSuccesfull, "info");
 			}
-			else{
-				alert("Error in operation");
+			else if (result > 1) {
+				TRACKER.showMessage(TRACKER.langOperator.invitationSentPartial, "info");
 			}
+			else {
+				TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+			}
+
 		});		
 	};
 
@@ -642,7 +646,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.trackUser = function(userId){
-		if (TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
+		if (TRACKER.users[userId].friendshipStatus == "1" &&  TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
 		{
 			MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
 			TRACKER.openMarkerInfoWindow(userId);		
