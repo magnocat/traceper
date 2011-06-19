@@ -153,6 +153,7 @@ function bindElements(langOperator, trackerOp)
 	
 	$("#changePasswordCancel").click(function()
 	{
+		$('#changePasswordForm input:text').attr('value','');
 		$('#changePasswordForm').mb_close();
 	});
 	
@@ -174,6 +175,7 @@ function bindElements(langOperator, trackerOp)
 	
 	$("#inviteUserCancel").click(function()
 	{
+		$('#InviteUserForm textarea').attr('value','');
 		$('#InviteUserForm').mb_close();
 	});
 	

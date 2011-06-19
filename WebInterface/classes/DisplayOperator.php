@@ -475,7 +475,7 @@ EOT;
 	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', closed:'true' }">  
 	</div>
 	
-	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350',  closed:'true' }">  
+	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' style="width:300px; height:100px"></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
@@ -485,9 +485,9 @@ EOT;
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
 	
-	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
+	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
 	</div>
-	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
+	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
 	</div>				
 	</body>
 </html>

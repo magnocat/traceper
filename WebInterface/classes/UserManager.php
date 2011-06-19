@@ -18,7 +18,6 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		$emailArray= $this->splitEmails($emails);
 		$arrayLenth = count($emailArray);
 		$invitationSentCount = 0;
-		
 		for ($i = 0; $i < $arrayLenth; $i++)
 		{		
 			if ($this->checkEmail($emailArray[$i])) 
@@ -50,7 +49,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 		}
 		$out = $invitationSentCount;
 		if ($arrayLenth == $invitationSentCount) {
-			$out = true;
+			$out = SUCCESS;
 		}		
 		return $out;
 	}
