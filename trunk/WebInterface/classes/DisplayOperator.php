@@ -222,9 +222,17 @@ EOT;
       			  xmlns:fb="http://www.facebook.com/2008/fbml">
 			<head>
 				<title></title>
+				  <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+ 
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+				<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    			<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
+  				<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
+	
 				
-				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-				<script type="text/javascript" src="js/TrackerOperator.js"></script>
+<!--				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+-->				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
 				<script type="text/javascript" src="js/LanguageOperator.js"></script>
 				<script>	
@@ -236,7 +244,15 @@ EOT;
 					$('#registerButton').click(function(){
 						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(), "$invitationKey");
 					});			
-				
+					
+					$(".containerPlus").buildContainers({
+			        	containment:"document",
+			        	elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
+			        	onClose:function(o){},
+			        	onIconize:function(o){},
+			        	effectDuration:10,
+			        	zIndexContext:"auto" 
+      				});					
 				});	
 				</script>
 			</head>
@@ -248,6 +264,11 @@ EOT;
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
 				</div>
+				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
+				</div>
+				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
+				</div>
+				
 			</body>
 			</html>
 EOT;
