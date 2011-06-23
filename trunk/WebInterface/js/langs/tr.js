@@ -70,6 +70,7 @@ LAN_OPERATOR.addIndexes({
 			changePassword:'Şifremi değiştir',
 			friendRequestRecorded:'Arkadaşlık isteği başarıyla kaydedildi.',
 			friendRequests:'Arkadaşlık istekleri',
+			sendInvitations:'Arkadaşlarınıza davetiye gönderin',
 			invitationSentSuccesfull:'Davetiyeler başarıyla gönderildi.',
 			invitationSentPartial:'Davetiyeler gönderildi yalnız uygun formatta olmayan e-posta adresleri bulundu',
 			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.',
