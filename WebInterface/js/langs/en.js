@@ -71,6 +71,7 @@ LAN_OPERATOR.addIndexes({
 			changePassword:'Change Password',
 			friendRequestRecorded:'Your friend request is recorded successfully',
 			friendRequests:'Friend Requests',
+			sendInvitations:'Send invitations to your friends',
 			invitationSentSuccesfull:'All invitation has been sent successfully',
 			invitationSentPartial:'Invitations has been sent, but wrong-formatted e-mail address found',
 			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)',

@@ -248,7 +248,6 @@ function setLanguage(langOperator){
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
 	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
 	$("#aboutus").append(langOperator.aboutus);
-//	$("#userarea").prepend(langOperator.hi);
 	
 	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
 	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
@@ -264,7 +263,7 @@ function setLanguage(langOperator){
 	
 	$("#inviteUserInvitationMessage").text(langOperator.invitationMessage);
 	$("#mailEntraceAlert").text(langOperator.mailEntranceRule);
-	
-//	$("#loading p").html(langOperator.loading);
-	
+	$("#inviteUserFormTitle").text(langOperator.sendInvitations);
+	$("#friendRequestsListTitle").text(langOperator.friendRequests);
+	$("#changePasswordFormTitle").text(langOperator.changePassword);
 }

@@ -326,7 +326,7 @@ EOT;
 		langOp.load("$language"); 	
 				
 		$(document).ready( function(){			
-			setLanguage(langOp);	
+				
 			var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
 			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
@@ -397,9 +397,9 @@ EOT;
 			        effectDuration:10,
 			        zIndexContext:"auto" 
       			});
-      			
-      			bindElements(langOp, trackerOp);
-			    $('#user_title').click();
+      			setLanguage(langOp);
+      			bindElements(langOp, trackerOp);			    
+      			$('#user_title').click();
 		});	
 	</script>
 	
@@ -482,7 +482,8 @@ EOT;
   	
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
-	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', closed:'true' }">  
+	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', height:'225', title:'<div id=\'changePasswordFormTitle\'></div>', closed:'true' }">  
+		<br/>
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
@@ -493,10 +494,10 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', closed:'true' }">  
+	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
 	</div>
 	
-	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350',  closed:'true'}">  
+	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350', title:'<div id=\'inviteUserFormTitle\'></div>',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
 		<textarea name='useremail' id='useremail' style="width:300px; height:100px"></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
