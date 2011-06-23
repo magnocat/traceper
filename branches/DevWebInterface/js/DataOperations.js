@@ -141,45 +141,57 @@ function processUserPastLocationsXML (MAP, xml) {
 			{
 				if (typeof TRACKER.users[userId] == "undefined") 
 				{		
-					var personIcon = new GIcon(G_DEFAULT_ICON);
-					personIcon.image = "images/person.png";
-					personIcon.iconSize = new GSize(24,24);
-					personIcon.shadow = null;
-					markerOptions = { icon:personIcon };
-				
-					TRACKER.users[userId] = new TRACKER.User( {//username:username,
-															   realname:realname,
-															   latitude:latitude,
-															   longitude:longitude,
-															   friendshipStatus:isFriend,
-															   time:$(user).find("time").text(),
-															   message:$(user).find("message").text(),
-															   status_message:status_message,
-															   deviceId:$(user).find("deviceId").text(),
-															   gmarker:new GMarker(point, markerOptions),														   
-															});
-					GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
-	  						TRACKER.openMarkerInfoWindow(userId);	
-	  				});
-	  				
-					GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
-						TRACKER.users[userId].infoWindowIsOpened = true;
-	  				});
 					
-	  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
-	  					TRACKER.users[userId].infoWindowIsOpened = false;
-	  				});
-	  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
-	  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
-	  				}
-					MAP.addOverlay(TRACKER.users[userId].gmarker);
+						var personIcon = new GIcon(G_DEFAULT_ICON);
+						personIcon.image = "images/person.png";
+						personIcon.iconSize = new GSize(24,24);
+						personIcon.shadow = null;
+						markerOptions = { icon:personIcon };
+					
+						TRACKER.users[userId] = new TRACKER.User( {//username:username,
+																   realname:realname,
+																   latitude:latitude,
+																   longitude:longitude,
+																   friendshipStatus:isFriend,
+																   time:$(user).find("time").text(),
+																   message:$(user).find("message").text(),
+																   status_message:status_message,
+																   deviceId:$(user).find("deviceId").text(),
+																   gmarker:new GMarker(point, markerOptions),														   
+																});
+				
+					
+					
+						GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
+		  						TRACKER.openMarkerInfoWindow(userId);	
+		  				});
+		  				
+						GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
+							TRACKER.users[userId].infoWindowIsOpened = true;
+		  				});
+						
+		  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
+		  					TRACKER.users[userId].infoWindowIsOpened = false;
+		  				});
+		  				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
+		  					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
+		  				}
+		  				if (isFriend == "1") {
+		  					MAP.addOverlay(TRACKER.users[userId].gmarker);
+		  				}
 				}
 				else
 				{
 					var time = $(user).find("time").text();
 					var deviceId = $(user).find("deviceId").text();
-					var point = new GLatLng(latitude, longitude);				
+					var point = new GLatLng(latitude, longitude);	
 					TRACKER.users[userId].gmarker.setLatLng(point);
+					if (isFriend == "1" && TRACKER.users[userId].latitude == "" && TRACKER.users[userId].longitude == "")
+					{
+						// if they have just become friend, there are no latitude and longitude data 
+						// so this statement will run and we update latitude and longitude
+						MAP.addOverlay(TRACKER.users[userId].gmarker);
+					}
 					
 					if ((TRACKER.users[userId].latitude != latitude ||
 						 TRACKER.users[userId].longitude != longitude) &&

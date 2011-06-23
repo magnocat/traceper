@@ -155,7 +155,7 @@ a {
 	line-height: 25px;
 }
 
-#userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input, #InviteUserForm textarea{
+#userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input, .registerFormText{
 	width:200px;
 }
 #userLoginForm div {

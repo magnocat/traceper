@@ -176,11 +176,13 @@ EOT;
 						<input type="checkbox" name="rememberMe" id="rememberMe"/>
 						<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
 					    <input type="button" id="submitLoginFormButton" value=""/> <br/>
-					    <font class="link" id="registerLink" style="display:block"></font>
+					    
 					</div>
 				</div>					
 				</div>
-				
+				<br/>
+				<div align="center" class="link" id="registerLink"></div> 
+				<br/> 
 				<div align="center" class="link" id='aboutusLink'></div>					
 					
 				<div id='aboutus' class="containerPlus draggable {buttons:'c', skin:'default', icon:'browser.png', width:'600', closed:'true' }">  
@@ -196,11 +198,11 @@ EOT;
 					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 				</div>
 				
-				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">		
-					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
-					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
-					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
-					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
+				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
+					<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+					<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+					<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+					<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
 				</div>
 				
@@ -211,7 +213,7 @@ EOT;
 		return $str;		
 	}
 	
-	/*
+	
 	public static function getRegistrationPage($email, $invitationKey, $callbackURL)
 	{
 		$out = <<<EOT
@@ -220,9 +222,17 @@ EOT;
       			  xmlns:fb="http://www.facebook.com/2008/fbml">
 			<head>
 				<title></title>
+				  <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+ 
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+				<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    			<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
+  				<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
+	
 				
-				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-				<script type="text/javascript" src="js/TrackerOperator.js"></script>
+<!--				<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+-->				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
 				<script type="text/javascript" src="js/LanguageOperator.js"></script>
 				<script>	
@@ -234,25 +244,38 @@ EOT;
 					$('#registerButton').click(function(){
 						TRACKER.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(), "$invitationKey");
 					});			
-				
+					
+					$(".containerPlus").buildContainers({
+			        	containment:"document",
+			        	elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
+			        	onClose:function(o){},
+			        	onIconize:function(o){},
+			        	effectDuration:10,
+			        	zIndexContext:"auto" 
+      				});					
 				});	
 				</script>
 			</head>
 			<body>
 			<div id="registerForm">		
-					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" /><br />
+					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" value="$email" readonly="readonly"/><br />
 					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
 					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
 					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
 					<input type="button" id="registerButton" value="Register" />
 				</div>
+				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
+				</div>
+				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
+				</div>
+				
 			</body>
 			</html>
 EOT;
 		return $out;
 		
 	}
-	-*/
+	
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
@@ -303,7 +326,7 @@ EOT;
 		langOp.load("$language"); 	
 				
 		$(document).ready( function(){			
-			setLanguage(langOp);	
+				
 			var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
 			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
@@ -374,9 +397,9 @@ EOT;
 			        effectDuration:10,
 			        zIndexContext:"auto" 
       			});
-      			
-      			bindElements(langOp, trackerOp);
-			    $('#user_title').click();
+      			setLanguage(langOp);
+      			bindElements(langOp, trackerOp);			    
+      			$('#user_title').click();
 		});	
 	</script>
 	
@@ -459,7 +482,8 @@ EOT;
   	
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
-	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'300', closed:'true' }">  
+	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', height:'225', title:'<div id=\'changePasswordFormTitle\'></div>', closed:'true' }">  
+		<br/>
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
@@ -470,31 +494,23 @@ EOT;
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-	<div id='friendRequestsList' class="containerPlus draggable resizable {buttons:'c', icon:'friends.png' ,skin:'default', width:'300', closed:'true' }">  
-		
+	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
 	</div>
 	
-		<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'400', height:'600',  closed:'true' }">  
+	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350', title:'<div id=\'inviteUserFormTitle\'></div>',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
-		<textarea name='useremail' id='useremail' ></textarea><br/>		
+		<textarea name='useremail' id='useremail' style="width:300px; height:100px"></textarea><br/>		
 		<div id="inviteUserInvitationMessage"></div>
 		
-		<textarea name='invitationMessage' id='invitationMessage'></textarea><br/>
+		<textarea name='invitationMessage' id='invitationMessage' style="width:300px; height:100px"></textarea><br/>
 		
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
 	
-	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
+	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
 	</div>
-	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
-	</div>
-				
-	<div style="display:none;">	
->
-
-
-	
-	</div>
+	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
+	</div>				
 	</body>
 </html>
 MAIN_PAGE;
