@@ -269,7 +269,12 @@ function processImageXML(MAP, xml, unconfirmedImages){
 		var approveImage = "";
 		var deleteImage = "";
 		if (isAdmin == "1") {
-			deleteImage = "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
+			var confirmedImages = true;
+			if (unconfirmedImages == true) {
+				confirmedImages = false;
+			}
+			
+			deleteImage = "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+", "+ confirmedImages +")' src='images/delete.png' />";
 		}
 		if (unconfirmedImages == true) {
 			approveImage = "<img class='deleteImageButton' onclick='TRACKER.confirmImage("+imageId+")' src='images/approve.png' />";
@@ -297,10 +302,10 @@ function processImageXML(MAP, xml, unconfirmedImages){
 		if (typeof TRACKER.images[imageId] == "undefined") {
 			
 			var personIcon = new GIcon(G_DEFAULT_ICON);
-			personIcon.image = imageURL + TRACKER.imageThumbSuffix;
-	//		personIcon.iconSize = new GSize(24,24);
+//			personIcon.image = imageURL + TRACKER.imageThumbSuffix;
+//			personIcon.iconSize = new GSize(24,24);
 			personIcon.shadow = null;
-			markerOptions = { icon:personIcon, hide:hideMarker };
+			markerOptions = { icon:personIcon}; // , hide:hideMarker 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 												imageURL:imageURL,
 												userId:userId,

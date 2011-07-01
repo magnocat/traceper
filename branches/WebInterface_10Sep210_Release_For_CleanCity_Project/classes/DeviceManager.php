@@ -90,6 +90,7 @@ class DeviceManager extends Base
 			$out = FAILED;
 			if ($uploadedFile["image"]["error"] == UPLOAD_ERR_OK )
 			{
+				
 				$latitude = (float) $reqArray['latitude'];
 				$longitude = (float) $reqArray['longitude'];
 				$altitude = (float) $reqArray['altitude'];

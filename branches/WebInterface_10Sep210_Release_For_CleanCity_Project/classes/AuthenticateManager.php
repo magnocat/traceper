@@ -33,21 +33,16 @@ class AuthenticateManager extends Base{
 	}
 	
 	public function authenticateUser($username, $password, $keepUserLoggedIn = false, $isAdmin = false){
-		
+		$this->userId = null;
 		$username = $this->checkVariable($username);
 		$password = $this->checkVariable($password);
-		if ($isAdmin == true) {
+
 			$sql = sprintf('SELECT Id, realname 
 					FROM ' . $this->tablePrefix .'_users
 					WHERE email="%s" AND password="%s" AND level = -1
 					LIMIT 1', $username, $password);
-		}
-		else {
-			$sql = sprintf('SELECT Id, realname 
-						FROM ' . $this->tablePrefix .'_users
-						WHERE email="%s" AND password="%s"
-						LIMIT 1', $username, $password);
-		}
+		
+	
 		if($this->tdo != NULL)
 		{
 			$this->tdo->save(self::userId,   0, 0);

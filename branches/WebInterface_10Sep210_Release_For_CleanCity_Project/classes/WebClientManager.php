@@ -590,6 +590,7 @@ class WebClientManager extends Base
 				{ $thumb = true;
 				}					
 				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
+				
 				$out = $thumbCreator->getImage($imageId, $thumb);					
 			}
 		}		

@@ -171,13 +171,16 @@ function bindElements(langOperator, trackerOp)
 	});	
 	
 	$('#showUnconfirmedImages').click(function(){
-		TRACKER.getUnconfirmedImageList(1);
+		TRACKER.getUnconfirmedImageList(1, function(){
+			$('#showUnconfirmedImages').hide();
+		});		
 	});
 	
 	$('#showPhotosList').click(function(){
 		
 			TRACKER.getImageList(TRACKER.imageListPageNo, function(){
 				$('#unconfirmedPhotos').slideUp('fast');
+				$('#showUnconfirmedImages').show();
 			});
 		
 	});

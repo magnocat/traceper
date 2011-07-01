@@ -295,4 +295,10 @@ a {
 }
 .link {
 	cursor: pointer;
+	font-size:14px;
+	padding:6px;
+	color:#3333ff;
+}
+.link:hover {
+	text-decoration: underline;
 }

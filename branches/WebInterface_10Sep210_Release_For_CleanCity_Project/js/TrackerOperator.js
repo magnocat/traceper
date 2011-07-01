@@ -405,7 +405,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				str = TRACKER.langOperator.noMatchFound;				
 			}
 			$('#photos').slideUp('fast',function(){
-									$('#unconfirmedPhotos div').html(str);
+									$('#unconfirmedPhotos #photoList').html(str);
 									$('#unconfirmedPhotos').slideDown();
 								});
 			
@@ -483,15 +483,20 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}	
 	}
 	
-	this.deleteImage = function(imageId){
-		if (confirm(TRACKER.langOperator.confirmationMessage)) 
+	this.deleteImage = function(imageId, confirmedImage){
+		if (confirm("Are you sure you want to delete this image?")) 
 		{
 			TRACKER.deletedImageId = imageId;
 			var params = "action=" + TRACKER.actionDeleteImage + "&imageId=" + imageId
 			TRACKER.ajaxReq(params, function(result){
 				
 				if (result == "1") {
-					TRACKER.getImageList(TRACKER.imageListPageNo);
+					if (confirmedImage == true) {
+						TRACKER.getImageList(TRACKER.imageListPageNo);
+					}
+					else if (confirmedImage == false) {
+						TRACKER.getUnconfirmedImageList(TRACKER.unConfirmedImageListPageNo);
+					}
 					MAP.removeOverlay(TRACKER.images[TRACKER.deletedImageId].gmarker);
 					TRACKER.images.splice(TRACKER.deletedImageId, 1);
 				}
@@ -505,7 +510,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	
 	this.confirmImage = function(imageId){
-		if (confirm(TRACKER.langOperator.confirmationMessage)) 
+		if (confirm("Are you sure you want to confirm this image?")) 
 		{
 			//TRACKER.deletedImageId = imageId;
 			var params = "action=" + TRACKER.actionConfirmImage + "&imageId=" + imageId

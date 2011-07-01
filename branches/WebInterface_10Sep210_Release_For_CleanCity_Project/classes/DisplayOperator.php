@@ -291,7 +291,7 @@ MAIN_PAGE_1;
 					<!--				
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
 					-->				<div id="photos"></div>
-									<div id="unconfirmedPhotos"><font id="showPhotosList" class="link"> &lt;&lt;show photos list</font><div></div></div>
+									<div id="unconfirmedPhotos" ><div id="showPhotosList" class="link"> &lt;&lt; Show photos list</div><div id="photoList"></div></div>
 					<!--
 									<div class='searchResults'>
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
