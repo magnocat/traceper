@@ -1,5 +1,7 @@
 package com.traceper.android.interfaces;
 
+import android.location.Location;
+
 
 
 public interface IAppService {
@@ -20,7 +22,9 @@ public interface IAppService {
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
 	
-	
+	public interface ISimpleLocationListener {
+		public void locationReceived(Location loc);
+	}
 	
 	public String getUsername();
 	
@@ -38,6 +42,10 @@ public interface IAppService {
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public int sendImage(byte[] image);
+	public int sendImage(byte[] image, Location loc);
+	
+	public void updateLocationData(ISimpleLocationListener listener);
+	
+	
 	
 }

@@ -2,25 +2,13 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.security.spec.EncodedKeySpec;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -150,7 +138,7 @@ public class AppService extends Service implements IAppService{
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
-			altitude = loc.getLongitude();
+			altitude = loc.getAltitude();
 		}
 		String[] name = new String[7];
 		String[] value = new String[7];
@@ -196,8 +184,7 @@ public class AppService extends Service implements IAppService{
 		return result;	
 	}
 	
-	public int sendImage(byte[] image){
-		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	public int sendImage(final byte[] image, Location loc){
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
@@ -218,18 +205,19 @@ public class AppService extends Service implements IAppService{
 		name[5] = "altitude";
 		
 		value[0] = HTTP_ACTION_GET_IMAGE;
-		value[1] = this.email;
-		value[2] = this.password;
+		value[1] = AppService.this.email;
+		value[2] = AppService.this.password;
 		value[3] = String.valueOf(latitude);
 		value[4] = String.valueOf(longitude);
 		value[5] = String.valueOf(altitude);
 		
 		String img = new String(image);
-		String httpRes = this.sendHttpRequest(name, value, "image", image);
+		String httpRes = AppService.this.sendHttpRequest(name, value, "image", image);
 		Log.i("img length: ", String.valueOf(img.length()) );
-		int result = this.evaluateResult(httpRes);
-		
-		return result;		
+		int result = AppService.this.evaluateResult(httpRes);
+	      
+					  
+		return result;
 	}
 
 	public boolean isNetworkConnected() {
@@ -409,7 +397,7 @@ public class AppService extends Service implements IAppService{
 	{			
 		this.password = password;
 		this.email = email;
-		int result = this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		int result = this.sendLocationData(this.email, this.password, null/*locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)*/);	
 		
 		if (result == HTTP_RESPONSE_SUCCESS) 
 		{			
@@ -417,7 +405,8 @@ public class AppService extends Service implements IAppService{
 			this.minDataSentInterval = xmlHandler.getGpsMinDataSentInterval();
 			this.minDistanceInterval = xmlHandler.getGpsMinDistanceInterval();
 			
-			Thread locationUpdates = new Thread() {
+//Below lines are commented because no need to get regular gps update  					
+/*			Thread locationUpdates = new Thread() {
 			      public void run() {
 			          Looper.prepare();
 			          
@@ -430,7 +419,7 @@ public class AppService extends Service implements IAppService{
 			};		      
 						  
 			locationUpdates.start();
-			
+*/			
 						
 		}
 		else {
@@ -521,7 +510,8 @@ public class AppService extends Service implements IAppService{
 					AppService.this.minDistanceInterval = distanceInterval;
 					
 					locationManager.removeUpdates(locationHandler);
-					Thread locationUpdates = new Thread() {
+	//Below lines are commented because no need to get regular gps update  		
+	/*				Thread locationUpdates = new Thread() {
 					      public void run() {
 					          Looper.prepare();
 					          
@@ -531,12 +521,11 @@ public class AppService extends Service implements IAppService{
 									  								 locationHandler);			       
 					          
 					          Looper.loop();
-					      }
-					
+					      }					
 					};		      
 								  
 					locationUpdates.start();
-					
+	*/				
 				}
 				
 			}
@@ -550,7 +539,43 @@ public class AppService extends Service implements IAppService{
 		public void onStatusChanged(String provider, int status, Bundle extras){															
 			Log.i("location listener", "onProviderEnabled");	
 		}	
-		
 	}
 
+	@Override
+	public void updateLocationData(final ISimpleLocationListener listener) {
+		Thread locationUpdates = new Thread() {
+		      public void run() {
+		          Looper.prepare();
+		          
+		          locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 
+							new LocationListener() {
+								
+								@Override
+								public void onStatusChanged(String provider, int status, Bundle extras) {
+									// TODO Auto-generated method stub
+								}
+								
+								@Override
+								public void onProviderEnabled(String provider) {
+									// TODO Auto-generated method stub
+								}
+								
+								@Override
+								public void onProviderDisabled(String provider) {
+									// TODO Auto-generated method stub
+								}
+								
+								@Override
+								public void onLocationChanged(Location location) {
+									locationManager.removeUpdates(this);
+									listener.locationReceived(location);
+								}
+							});				       
+		          
+		          Looper.loop();
+		      }
+		};		      
+					  
+		locationUpdates.start();
+	}
 }

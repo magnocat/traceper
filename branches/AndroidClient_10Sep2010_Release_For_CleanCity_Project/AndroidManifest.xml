@@ -24,13 +24,8 @@
 			</intent-filter>
 		</activity>	
 		
-		<activity android:name=".android.Register">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.NORMAL"></category>
-			</intent-filter>
-		</activity>
-		<activity android:name=".android.CameraController">
+		<activity android:name=".android.Register"/>		
+		<activity android:name=".android.CameraController" android:screenOrientation="landscape">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
 				<category android:name="android.intent.category.NORMAL"></category>

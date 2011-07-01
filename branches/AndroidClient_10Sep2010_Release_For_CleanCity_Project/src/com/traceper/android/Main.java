@@ -31,7 +31,7 @@ public class Main extends Activity
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
-	private TextView lastDataSentTimeText;
+//	private TextView lastDataSentTimeText;
 	private Button takePhoto;
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
@@ -43,8 +43,8 @@ public class Main extends Activity
 				String action = intent.getAction();
 				if (action.equals(IAppService.LAST_LOCATION_DATA_SENT_TIME))
 				{
-					Long time = (Long) extra.getLong(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-					lastDataSentTimeText.setText(getFormattedDate(time));
+					//Long time = (Long) extra.getLong(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+					//lastDataSentTimeText.setText(getFormattedDate(time));
 				}
 			}
 		}
@@ -59,7 +59,7 @@ public class Main extends Activity
 			
 			if (appService.isUserAuthenticated()) {				
 				setTitle(appService.getUsername() + " - " + Configuration.APPLICATION_NAME);	
-				lastDataSentTimeText.setText(getFormattedDate(appService.getLastLocationSentTime()));
+//				lastDataSentTimeText.setText(getFormattedDate(appService.getLastLocationSentTime()));
 			}
 			else {
 				Intent i = new Intent(Main.this, Login.class);																
@@ -89,7 +89,7 @@ public class Main extends Activity
 				startActivity(i);
 			}
 		});
-		lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
+	//	lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
 
     }
 
