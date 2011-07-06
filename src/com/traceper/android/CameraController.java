@@ -1,11 +1,15 @@
 package com.traceper.android;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +17,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -49,6 +55,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private IAppService appService = null;
 	private boolean pictureTaken = false;
 	private Button takePictureButton = null;
+	private NotificationManager mManager;
+	private static int NOTIFICATION_ID = 0;
 	
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
@@ -78,8 +86,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			appService = null;
 		}
 	};
-	
-	 
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -180,25 +186,51 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) 
 		{
-		case UPLOAD_PHOTO:
-			if (pdialog == null) {
-				pdialog = new ProgressDialog(CameraController.this);
-			}
-			pdialog.setMessage("Uploading. Please wait...");
-			pdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			pdialog.show();
+		case UPLOAD_PHOTO:	
+			CameraController.this.finish();
+			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			
+			final Notification notification = new Notification(R.drawable.icon, "Traceper", System.currentTimeMillis());
+
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+			
+			 notification.setLatestEventInfo(CameraController.this,
+						 "Traceper","Uploading, please wait...", contentIntent);
+
+			 mManager.notify(NOTIFICATION_ID , notification);
+
 			
 			Thread uploadThread = new Thread(){
 				private Handler handler = new Handler();
 				@Override
 				public void run() {
-					final int result = appService.sendImage(picture);
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					int inSampleSize = 2;
+					int quality = 75;
+					if (picture.length > 1000000) {
+						inSampleSize = 6;
+						quality = 50;
+					}					
+					options.inSampleSize = inSampleSize;
+					Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+					int byteCount = bitmap.getRowBytes();
+					ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
+					bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
+					
+					final int result = appService.sendImage(byteArrayOutputStream.toByteArray());
 					{
 						handler.post(new Runnable() {							
 							@Override
 							public void run() {
-								pdialog.cancel();
-								showDialog(result);
+								String str;
+								if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
+									str = "Upload is successfull";
+								}
+								else {
+									str = "Upload is failed. Please try again later...";
+								}
+								notification.setLatestEventInfo(getApplicationContext(), "Traceper", str, contentIntent);
+								mManager.notify(NOTIFICATION_ID, notification);
 							}
 						});
 					}
@@ -218,7 +250,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		return super.onOptionsItemSelected(item);
 	}
 	
-	
+/*	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id){
@@ -243,7 +275,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		
 		return null;
 	}
-
+*/
 	public boolean onKeyDown(int keyCode, KeyEvent event)  
 	{  
 		if (keyCode == KeyEvent.KEYCODE_BACK) {  
