@@ -132,7 +132,8 @@ class DeviceManager extends Base
 									  password = "%s"
 								LIMIT 1', $latitude, $longitude, $altitude,
 									$email, $password);
-				if ($this->dbc->query($sql)){
+				if ($this->dbc->query($sql))
+				{
 					if (move_uploaded_file($uploadedFile["image"]["tmp_name"], $this->uploadPath .'/'.$this->dbc->lastInsertId() . '.jpg'))
 					{
 						$out = SUCCESS; 						

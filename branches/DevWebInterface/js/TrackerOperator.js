@@ -446,8 +446,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (TRACKER.friendPageResetCount > 0) 
 		{
 			var getImages = "&";
-			if ($('#showPhotosOnMap').attr('checked') == true)
-			{ 	getImages = "&include=image"; }
+			if ($('#showPhotosOnMap').prop('checked') == true)
+			{ 	
+				getImages = "&include=image"; 
+			}
 
 			params = "action=" + TRACKER.actionGetUpdatedFriendList + "&pageNo=" + TRACKER.updateFriendListPageNo
 			+ getImages;
@@ -472,9 +474,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
 				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
 
-				var showPhotosOnMap = $('#showPhotosOnMap').attr('checked');
-				if (TRACKER.friendPageResetCount >= 1 &&
-						showPhotosOnMap == true)
+				var showPhotosOnMap = $('#showPhotosOnMap').prop('checked');
+				if (TRACKER.friendPageResetCount >= 1 && showPhotosOnMap == true)
 				{
 					processImageXML(MAP, result);
 				}

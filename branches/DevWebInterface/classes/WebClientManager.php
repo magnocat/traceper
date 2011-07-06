@@ -89,13 +89,13 @@ class WebClientManager extends Base
 				$out = $this->getFriendList($reqArray, $this->elementCountInLocationsPage,"userListReq");
 				break;		
 			case $this->actionPrefix . "GetUpdatedFriendList":
-				if ($this->tdo == NULL || 
+				if ($this->tdo != NULL && 
 					($this->dataFetchedTime = $this->tdo->getValue(self::dataFetchedTimeStoreKey)) == NULL)
 				{
 						$this->dataFetchedTime = time();
 						$this->tdo->save(self::dataFetchedTimeStoreKey, $this->dataFetchedTime);
 				}
-				if ($this->tdo == NULL || 
+				if ($this->tdo != NULL && 
 					($this->imageFetchedTime = $this->tdo->getValue(self::imageFetchedTimeStoreKey)) == NULL)
 				{
 						$this->imageFetchedTime = time();
@@ -400,9 +400,9 @@ class WebClientManager extends Base
 					$this->includeImageInUpdatedUserListReq = true;
 					$sqlImageUnion = 'UNION
 									  SELECT 
-										u.Id, u.userId, u.latitude, u.longitude, u.altitude, 
+										u.Id, u.userId, null, u.latitude, u.longitude, u.altitude, 
 										null, null,  date_format(u.uploadTime,"%d %b %Y %T") as dataArrivedTime,
-										(unix_timestamp(u.uploadTime) - '. $this->imageFetchedTime .')  as timeDif, "image" as type
+										(unix_timestamp(u.uploadTime) - '. $this->imageFetchedTime .')  as timeDif, "image" as type, null
 									  FROM '. $this->tablePrefix .'_upload u
 									  LEFT JOIN '. $this->tablePrefix .'_users usr
 									  ON  
@@ -468,7 +468,6 @@ class WebClientManager extends Base
 										unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
 						  			'. $sqlImagePageCountUnion .'
 							 		  ) t';
-							
 			}
 			else //if ($req == 'userListReq') 
 			{
