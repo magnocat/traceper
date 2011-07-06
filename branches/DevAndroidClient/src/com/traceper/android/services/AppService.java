@@ -84,15 +84,9 @@ public class AppService extends Service implements IAppService{
 	   
     public void onCreate() 
     {   	
- //       mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
         conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     	
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        
-//        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true);
-//		locationManager.setTestProviderStatus(LocationManager.GPS_PROVIDER,
-//		           LocationProvider.AVAILABLE, null, System.currentTimeMillis()); 
         
         deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
         
@@ -172,17 +166,6 @@ public class AppService extends Service implements IAppService{
 		value[6] = this.deviceId;
 		
 		String httpRes = this.sendHttpRequest(name, value, null, null);
-		
-/*		String params = "action="+ URLEncoder.encode(HTTP_ACTION_TAKE_MY_LOCATION) + 
-						"&username=" + URLEncoder.encode(emailText) + 
-						"&password=" + URLEncoder.encode(passwordText) + 
-						"&latitude=" + latitude + 
-						"&longitude=" + longitude + 
-						"&altitude=" + altitude +
-						"&deviceId=" + URLEncoder.encode(this.deviceId) + 
-						"&";
-*/		
-	//	String httpRes = this.sendHttpRequest(params);
 		
 		int result = this.evaluateResult(httpRes);
 		if (result == HTTP_RESPONSE_SUCCESS)
