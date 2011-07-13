@@ -290,24 +290,31 @@ EOT;
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+	
 		<title></title>
 		  $head		
-     <script type="text/javascript" src="http://www.google.com/jsapi?key=$apiKey">
- 	 </script>
-    
-      <script type="text/javascript" charset="utf-8">
+   <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+   <script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js"></script>
    
-        google.load("maps", "2.x",{"other_params":"sensor=true"});
+		   
+	<script type="text/javascript">
+	  function initialize() {
+	    var myLatlng = new google.maps.LatLng(39.504041,35.024414);
+	    var myOptions = {
+	      zoom: 8,
+	      center: myLatlng,
+	      mapTypeId: google.maps.MapTypeId.ROADMAP
+	    }
+	    //var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+	  }
+	</script>
    
-      </script>
-      	  
-   <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
+	<link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
 	 <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
   
-<!--	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
--->
-<!--	<script type="text/javascript" src="js/jquery/jquery.min.js"></script> -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
@@ -323,10 +330,10 @@ EOT;
 	<script type="text/javascript">		
 		var langOp = new LanguageOperator();
 		var fetchPhotosDefaultValue =  $fetchPhotosInInitialization;
-		langOp.load("$language"); 	
-				
-		$(document).ready( function(){			
-				
+		langOp.load("$language");
+
+		$(document).ready( function(){
+							
 			var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
 			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
@@ -339,52 +346,112 @@ EOT;
 			}
 			$('#showPhotosOnMap').attr('checked', checked);
 			
+			var initialLocation;
+			var siberia = new google.maps.LatLng(60, 105);
+			var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
+			var browserSupportFlag =  new Boolean();
 			var map;
+			var infowindow = new google.maps.InfoWindow();
+			
 			try 
 			{
-				if (GBrowserIsCompatible()) 
+				// Try W3C Geolocation method (Preferred)
+  				if(navigator.geolocation) 
+  				{
+  					var myOptions = {
+					   zoom: 6,
+					   mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+					browserSupportFlag = true;
+				    navigator.geolocation.getCurrentPosition(function(position) {
+				      initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				      contentString = "Your location found using W3C standard";
+				      map.setCenter(initialLocation);
+				      infowindow.setContent(contentString);
+				      infowindow.setPosition(initialLocation);
+				      infowindow.open(map);
+				    }, function() {
+				      handleNoGeolocation(browserSupportFlag);
+				    });
+				}
+				else if (google.gears) 
 				{
-   					map = new GMap2(document.getElementById("map"));
-   					map.setCenter(new GLatLng(39.504041,35.024414), 3);
-					map.setUIToDefault();					
-					map.setMapType(G_HYBRID_MAP);	
-					map.enableRotation();
-	   	
-   					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
+				    // Try Google Gears Geolocation
+				    browserSupportFlag = true;
+				    var geo = google.gears.factory.create('beta.geolocation');
+				    geo.getCurrentPosition(function(position) {
+				      initialLocation = new google.maps.LatLng(position.latitude,position.longitude);
+				      contentString = "Location found using Google Gears";
+				      map.setCenter(initialLocation);
+				      infowindow.setContent(contentString);
+				      infowindow.setPosition(initialLocation);
+				      infowindow.open(map);
+				    }, function() {
+				      handleNoGeolocation(browserSupportFlag);
+				    });
+				} 
+				else 
+				{
+				    // Browser doesn't support Geolocation
+				    browserSupportFlag = false;
+				    handleNoGeolocation(browserSupportFlag);
+			  	}
+				
+			  	function handleNoGeolocation(errorFlag) 
+				{
+					if (errorFlag == true) 
+					{
+						initialLocation = newyork;
+			    		contentString = "Error: The Geolocation service failed.";
+			  		} 
+			  		else 
+			  		{
+			  			initialLocation = siberia;
+			    		contentString = "Error: Your browser doesn't support geolocation. Are you in Siberia?";
+			  		}
+			  		map.setCenter(initialLocation);
+			  		infowindow.setContent(contentString);
+			  		infowindow.setPosition(initialLocation);
+			  		infowindow.open(map);
+				}
+
+				    
+   				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
    					
-   					var personIcon = new GIcon(G_DEFAULT_ICON);
-					personIcon.image = "images/person.png";
-					personIcon.iconSize = new GSize(24,24);
-					personIcon.shadow = null;
-					markerOptions = { icon:personIcon };
-	   				
-					var point = new GLatLng($latitude, $longitude);
-   					TRACKER.users[$userId] = new TRACKER.User( {//username:username,
-										   realname:'$realname',
-										   latitude:$latitude,
-										   longitude:$longitude,
-										   time:'$time',
-										   message:'',
-										   deviceId:'$deviceId',
-										   gmarker:new GMarker(point, markerOptions),														   
-										});
-					GEvent.addListener(TRACKER.users[$userId].gmarker, "click", function() {
-  						TRACKER.openMarkerInfoWindow($userId);	
-  					});
-  				
-					GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowopen",function(){
-						TRACKER.users[$userId].infoWindowIsOpened = true;
-	  				});
-					
-	  				GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowclose",function(){
-	  					TRACKER.users[$userId].infoWindowIsOpened = false;
-	  				});
-	  				if (typeof TRACKER.users[$userId].pastPointsGMarker == "undefined") {
-	  					TRACKER.users[$userId].pastPointsGMarker = new Array(TRACKER.users[$userId].gmarker);
-	  				}
-					map.addOverlay(TRACKER.users[$userId].gmarker);
-   					trackerOp.getFriendList(1); 	
-   				}
+   				var personIcon = new GIcon(G_DEFAULT_ICON);
+				personIcon.image = "images/person.png";
+				personIcon.iconSize = new GSize(24,24);
+				personIcon.shadow = null;
+				markerOptions = { icon:personIcon };
+   				
+				var point = new GLatLng($latitude, $longitude);
+   				TRACKER.users[$userId] = new TRACKER.User( {//username:username,
+									   realname:'$realname',
+									   latitude:$latitude,
+									   longitude:$longitude,
+									   time:'$time',
+									   message:'',
+									   deviceId:'$deviceId',
+									   gmarker:new GMarker(point, markerOptions),														   
+									});
+				GEvent.addListener(TRACKER.users[$userId].gmarker, "click", function() {
+  					TRACKER.openMarkerInfoWindow($userId);	
+  				});
+  			
+				GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowopen",function(){
+					TRACKER.users[$userId].infoWindowIsOpened = true;
+  				});
+				
+  				GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowclose",function(){
+  					TRACKER.users[$userId].infoWindowIsOpened = false;
+  				});
+  				if (typeof TRACKER.users[$userId].pastPointsGMarker == "undefined") {
+  					TRACKER.users[$userId].pastPointsGMarker = new Array(TRACKER.users[$userId].gmarker);
+  				}
+				map.addOverlay(TRACKER.users[$userId].gmarker);
+   				trackerOp.getFriendList(1); 	
+   				
 			}
    			catch (e) {
 				
@@ -402,9 +469,9 @@ EOT;
       			$('#user_title').click();
 		});	
 	</script>
-	
+   
 	</head>
-	<body  onunload="GUnload();" >	
+	<body>	
 	$pluginScript
 	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
@@ -475,7 +542,7 @@ EOT;
 																																									
 				</div>
 				
-				<div id='map'>MAP</div>	
+				<div id="map_canvas"></div>					
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
 	</div>
@@ -516,8 +583,7 @@ EOT;
 MAIN_PAGE;
 
 		  return $str;
-}
-	
+}	
 	public static function showErrorMessage($message) {
 		return $message;
 	}
