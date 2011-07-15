@@ -336,8 +336,16 @@ EOT;
 			
 			
 			try 
-			{				
-				//var mapOperator = new MapOperator();    
+			{
+			
+				//alert("1");
+				var mapOperator = new MapOperator();
+				//alert("2");
+				mapOperator.initializeMap();
+				//mapOperator.loadMapScript();
+				//alert("3");
+
+				
    				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
    					
    				var personIcon = new GIcon(G_DEFAULT_ICON);
