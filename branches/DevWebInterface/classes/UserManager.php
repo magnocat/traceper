@@ -369,7 +369,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 	public function getUserInfo()
 	{
 		$userId = $this->getUserId();
-		$sql = 'SELECT realname, latitude, longitude, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as time
+		$sql = 'SELECT Id, realname, latitude, longitude, deviceId, date_format(dataArrivedTime,"%d %b %Y %T") as time
 				FROM '.$this->tablePrefix . '_users 
 				WHERE Id = ' . $userId .'
 				LIMIT 1';

@@ -1,15 +1,7 @@
 <?php
 
 class DisplayOperator
-{
-	private static $realname;
-	private static $userId;
-	
-	public static function setUsernameAndId($name, $Id){
-		self::$realname = $name;
-		self::$userId = $Id;
-	}
-	
+{	
 	private static function getMetaNLinkSection(){
 		
 		$str = <<<EOT
@@ -279,8 +271,8 @@ EOT;
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
-		$realname = self::$realname;
-		$userId = self::$userId;	
+		$realname = $userInfo->realname;
+		$userId = $userInfo->Id;	
 		$latitude = $userInfo->latitude;
 		$longitude = $userInfo->longitude;
 		$time = $userInfo->time;

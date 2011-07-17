@@ -69,8 +69,7 @@ else {
 	
 	if ($auth->isUserAuthenticated() === true) 
 	{  
-		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
-		$pluginScript = "";
+	//	$pluginScript = "";
 		if ($fbc != NULL){
 			//$pluginScript = $fbc->getMainScript();	
 		}
