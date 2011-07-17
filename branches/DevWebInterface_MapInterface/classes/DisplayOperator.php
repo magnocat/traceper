@@ -290,12 +290,6 @@ EOT;
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-	<!--
-	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-	-->
-	<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
-	
 		<title></title>
 		  $head		
       
@@ -311,15 +305,19 @@ EOT;
   	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="js/DataOperations.js"></script>
 
-	<script type="text/javascript" src="js/MapOperator.js"></script>
+	<script type="text/javascript" src="js/maps/MapStructs.js"></script>	
+	<script type="text/javascript" src="js/maps/GMapOperator.js"></script>
 	<script type="text/javascript" src="js/TrackerOperator.js"></script>
 	<script type="text/javascript" src="js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="js/bindings.js"></script>	
+
 	<script type="text/javascript">		
 		var langOp = new LanguageOperator();
 		var fetchPhotosDefaultValue =  $fetchPhotosInInitialization;
 		langOp.load("$language");
-
+		
+		var mapOperator = new MapOperator();
+		
 		$(document).ready( function(){
 							
 			var checked = false;
@@ -337,15 +335,12 @@ EOT;
 			
 			try 
 			{
-			
-				//alert("1");
-				var mapOperator = new MapOperator();
-				//alert("2");
-				mapOperator.initializeMap();
-				//mapOperator.loadMapScript();
-				//alert("3");
-
-				
+				var mapStruct = new MapStruct();
+			    var initialLoc = new mapStruct.Location({latitude:39.504041,
+			    								  longitude:35.024414}); 
+			    
+				mapOperator.initialize(initialLoc);
+				mapOperator.putMarker(initialLoc, "images/person.png", true);				
    				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
    					
    				var personIcon = new GIcon(G_DEFAULT_ICON);
@@ -400,7 +395,7 @@ EOT;
 	</script>
    
 	</head>
-	<body onload="loadMapScript()">	
+	<body>	
 	$pluginScript
 	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
@@ -471,7 +466,7 @@ EOT;
 																																									
 				</div>
 				
-				<div id="map_canvas"></div>					
+				<div id="map"></div>					
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
 	</div>
