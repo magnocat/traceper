@@ -233,6 +233,52 @@ function bindElements(langOperator, trackerOp)
 		}
 	});
 	
+	$('#registerLink').click(function(){
+		$('#registerForm').mb_open();
+		$('#registerForm').mb_centerOnWindow(true);
+		
+		$('#registerButton').click(function(){
+			trackerOp.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(),null, 
+				function(result){
+                    $('#registerForm input[type!=button]').attr('value', '');
+					$('#registerForm').mb_close();
+				});						
+		});	
+	});
+	
+	$('#loginLink').click(function(){
+		$('#userLoginForm').mb_open();
+		$('#userLoginForm').mb_centerOnWindow(true);
+		
+		$('#submitLoginFormButton').click(function(){
+			trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
+		});
+	});
+	
+	$('#forgotPasswordLink').click(function(){
+		$('#forgotPasswordForm').mb_open();
+		$('#forgotPasswordForm').mb_centerOnWindow(true);
+
+		$('#sendNewPassword').click(function(){
+		    TRACKER.sendNewPassword($('#email').val(),
+		   		function(result){
+                    $('#forgotPasswordForm input[type!=button]').attr('value', '');
+					$('#forgotPasswordForm').mb_close();
+				});
+		});
+	});
+	
+	$('#email').keypress(function(event){
+		if (event.keyCode == '13'){
+			sendNewPassword();	
+		}
+	});
+	$('#username , #password').keypress(function(event){
+		if (event.keyCode == '13'){
+			authenticateUser();
+		}						
+	});	
+	
 	
 
 };	
@@ -266,4 +312,20 @@ function setLanguage(langOperator){
 	$("#inviteUserFormTitle").text(langOperator.sendInvitations);
 	$("#friendRequestsListTitle").text(langOperator.friendRequests);
 	$("#changePasswordFormTitle").text(langOperator.changePassword);
+	
+	
+	$('#usernameLabel').text(langOp.emailLabel+":");	
+	$('#passwordLabel').text(langOp.passwordLabel+":");
+	$('#rememberMeLabel').text(langOp.rememberMeLabel).click(function(){
+		$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
+			
+	});
+	$('#forgotPasswordLink').text(langOp.forgotPassword);
+	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
+	$('#registerLink').text(langOp.registerLabel);	
+	$('#loginLink').text(langOp.login);
+	$('#emailLabel').text(langOp.emailLabel + ":");	
+	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
+	$('#aboutusLink').text(langOp.aboutTitle);
+	
 }

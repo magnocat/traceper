@@ -1,10 +1,10 @@
 
-function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval, langOp, userId){
+function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval){
 
 	TRACKER = this;	
 	MAP = map;
-	this.langOperator = langOp;
-	this.userId = userId;
+	this.langOperator;
+	this.userId;
 	this.language = "en";
 	this.ajaxUrl = url;
 	this.facebookId = null;
@@ -112,6 +112,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
 		}
+	}
+	
+	this.setLangOperator = function(langOperator) {
+		TRACKER.langOperator = langOperator;		
+	}
+	
+	this.setUserId = function(userId) {
+		TRACKER.userId = userId;
 	}
 
 	this.setFacebookId = function(facebookId){

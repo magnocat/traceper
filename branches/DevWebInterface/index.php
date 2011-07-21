@@ -51,8 +51,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		
 		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
 		$dm->setUserManager($usermanager);
-		
-		
+	
 		$out = $dm->process($_REQUEST);
 	}
 }
@@ -67,6 +66,7 @@ else {
 		$auth->setFacebookConnectOperator($fbc);
 	}
 	
+	$userInfo = null;
 	if ($auth->isUserAuthenticated() === true) 
 	{  
 	//	$pluginScript = "";
@@ -74,15 +74,9 @@ else {
 			//$pluginScript = $fbc->getMainScript();	
 		}
 		$userInfo = $auth->getUserInfo();
-		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
 	}
-	else {	
-		$pluginScript = "";
-		if ($fbc != NULL){
-			//$pluginScript = $fbc->getLoginScript();	
-		}	
-		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE, $pluginScript);
-	}
+
+	$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
 }
 echo $out;
 //error_log($out, 3, "log.txt");

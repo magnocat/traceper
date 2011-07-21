@@ -158,11 +158,6 @@ a {
 #userLoginForm #emailLogin, #userLoginForm #password, #changePasswordForm input, .registerFormText{
 	width:200px;
 }
-#userLoginForm div {
-  font-size:12px;
-  display: table-cell;
-  padding:5px;
-}
 
 #submitLoginFormButton
 {

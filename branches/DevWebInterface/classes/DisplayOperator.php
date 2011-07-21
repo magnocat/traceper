@@ -72,7 +72,6 @@ EOT;
 				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
     			<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
   				<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
-	
 				
 				<script type="text/javascript" src="js/TrackerOperator.js"></script>
 				
@@ -158,22 +157,10 @@ EOT;
 			<body>
 				$pluginScript
 				<div align="center" style="margin-top:60px"><img src="images/logo.png" style="display:block"/>	
-				<div id="userLoginForm">	
-					<div><br/>
-						<font id="usernameLabel"></font><br/>
-						<input type="text" name="email" id="emailLogin" /><br/>
-						<font id="passwordLabel"></font><br/>
-						<input type="password" name="password" id="password"/><br/>
-						<font class="link" id="forgotPasswordLink"></font><br/>
-						<input type="checkbox" name="rememberMe" id="rememberMe"/>
-						<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
-					    <input type="button" id="submitLoginFormButton" value=""/> <br/>
-					    
-					</div>
-				</div>					
+						
 				</div>
 				<br/>
-				<div align="center" class="link" id="registerLink"></div> 
+				
 				<br/> 
 				<div align="center" class="link" id='aboutusLink'></div>					
 					
@@ -185,18 +172,7 @@ EOT;
 				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
 				</div>
 				
-				<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'500', closed:'true' }">
-					<div id="emailLabel"></div>
-					<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
-				</div>
 				
-				<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
-					<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
-					<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
-					<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
-					<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
-					<input type="button" id="registerButton" value="Register" />
-				</div>
 				
 			</body>
 			</html>				
@@ -249,13 +225,7 @@ EOT;
 				</script>
 			</head>
 			<body>
-			<div id="registerForm">		
-					<div id="registerEmailLabel">E-mail:</div><input type="text" id="registerEmail" value="$email" readonly="readonly"/><br />
-					<div id="registerNameLabel">Name:</div><input type="text" id="registerName" /><br />
-					<div id="registerPasswordLabel">Password:</div><input type="password" id="registerPassword" /><br />
-					<div id="registerConfirmPasswordLabel">Password Again:</div><input type="password" id="registerConfirmPassword" /><br />
-					<input type="button" id="registerButton" value="Register" />
-				</div>
+			
 				<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'600', closed:'true' }">
 				</div>
 				<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'600', closed:'true' }">
@@ -271,12 +241,54 @@ EOT;
 	public static function getMainPage($callbackURL, $userInfo, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, $apiKey, $language, $pluginScript) {
 
 		$head = self::getMetaNLinkSection();
-		$realname = $userInfo->realname;
-		$userId = $userInfo->Id;	
-		$latitude = $userInfo->latitude;
-		$longitude = $userInfo->longitude;
-		$time = $userInfo->time;
-		$deviceId = $userInfo->deviceId;	
+		$realname = "";
+		$userId = "";	
+		$latitude = "";
+		$longitude = "";
+		$time = "";
+		$deviceId = "";	
+		$userArea = "";
+		$forms = "";
+		$startScript = "";
+		if ($userInfo != null) 
+		{
+			$realname = $userInfo->realname;
+			$userId = $userInfo->Id;	
+			$latitude = $userInfo->latitude;
+			$longitude = $userInfo->longitude;
+			$time = $userInfo->time;
+			$deviceId = $userInfo->deviceId;	
+			$startScript = "trackerOp.getFriendList(1);
+   						    "; 	
+			
+			$userArea = <<<USER_AREA
+						<ul id='userarea'><li id="username">$realname</li>
+	 						</ul>
+	 						<div style="clear:both" id="changePassword" class="userOperations">	
+	 							<img src='images/changePassword.png'  /><div></div>
+	 						</div>
+	 						<div class="userOperations" id="inviteUser">
+	 							<img src='images/invite.png'  /><div></div>
+	 						</div>
+	 						<div class="userOperations" id="friendRequests">	
+	 							<img src='images/friends.png'  /><div></div>
+	 						</div>
+	 						<div  class="userOperations" id="signout">	 			
+	 							<img src='images/signout.png'  /><div></div>		
+	 						</div>
+USER_AREA;
+
+		}
+		else {
+			$startScript = "";  // langOp is initialized before document.ready function in str variable 
+			
+			$userArea = <<<USER_AREA
+	 						<div style="clear:both" id="loginLink" class="userOperations">	 							
+	 						</div>
+	 						<div class="userOperations" id="registerLink">	 							
+	 						</div>
+USER_AREA;
+		}
 		
 		$str = <<<MAIN_PAGE
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -288,9 +300,7 @@ EOT;
  	 </script>
     
       <script type="text/javascript" charset="utf-8">
-   
         google.load("maps", "2.x",{"other_params":"sensor=true"});
-   
       </script>
       	  
    <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
@@ -317,7 +327,7 @@ EOT;
 		var fetchPhotosDefaultValue =  $fetchPhotosInInitialization;
 		langOp.load("$language"); 	
 				
-		$(document).ready( function(){			
+		$(document).ready(function(){			
 				
 			var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
@@ -341,41 +351,10 @@ EOT;
 					map.setUIToDefault();					
 					map.setMapType(G_HYBRID_MAP);	
 					map.enableRotation();
-	   	
-   					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
-   					
-   					var personIcon = new GIcon(G_DEFAULT_ICON);
-					personIcon.image = "images/person.png";
-					personIcon.iconSize = new GSize(24,24);
-					personIcon.shadow = null;
-					markerOptions = { icon:personIcon };
-	   				
-					var point = new GLatLng($latitude, $longitude);
-   					TRACKER.users[$userId] = new TRACKER.User( {//username:username,
-										   realname:'$realname',
-										   latitude:$latitude,
-										   longitude:$longitude,
-										   time:'$time',
-										   message:'',
-										   deviceId:'$deviceId',
-										   gmarker:new GMarker(point, markerOptions),														   
-										});
-					GEvent.addListener(TRACKER.users[$userId].gmarker, "click", function() {
-  						TRACKER.openMarkerInfoWindow($userId);	
-  					});
-  				
-					GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowopen",function(){
-						TRACKER.users[$userId].infoWindowIsOpened = true;
-	  				});
-					
-	  				GEvent.addListener(TRACKER.users[$userId].gmarker,"infowindowclose",function(){
-	  					TRACKER.users[$userId].infoWindowIsOpened = false;
-	  				});
-	  				if (typeof TRACKER.users[$userId].pastPointsGMarker == "undefined") {
-	  					TRACKER.users[$userId].pastPointsGMarker = new Array(TRACKER.users[$userId].gmarker);
-	  				}
-					map.addOverlay(TRACKER.users[$userId].gmarker);
-   					trackerOp.getFriendList(1); 	
+					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers)	   	
+					trackerOp.setLangOperator(langOp),
+					trackerOp.setUserId($userId);
+		  			$startScript
    				}
 			}
    			catch (e) {
@@ -392,6 +371,7 @@ EOT;
       			setLanguage(langOp);
       			bindElements(langOp, trackerOp);			    
       			$('#user_title').click();
+      			     		
 		});	
 	</script>
 	
@@ -404,32 +384,7 @@ EOT;
 				<div id='sideBar'>						
 					<div id='content'>						
 	 						<div id='logo'></div>
-	 						<ul id='userarea'><li id="username">$realname
-	 											<!-- asagidaki iki satir dil dosyasından alınmalı -->
-	 											<!--<input type="text" style='width:230px;height:25px' id="statusMessage" value="Status message"/>-->
-	 											<!--<input type="button" value="Send" id="sendStatusMessageButton"/>-->
-	 										   <!--
-	 											<ul>
-	 										   <li id="changePassword"></li>
-	 										   <li id="signout"></li>
-	 										   <li id="inviteUserDiv">Invite User</li>
-	 										
-	 											</ul>
-	 										-->	
-	 										</li>
-	 						</ul>
-	 						<div style="clear:both" id="changePassword" class="userOperations">	
-	 							<img src='images/changePassword.png'  /><div></div>
-	 						</div>
-	 						<div class="userOperations" id="inviteUser">
-	 							<img src='images/invite.png'  /><div></div>
-	 						</div>
-	 						<div class="userOperations" id="friendRequests">	
-	 							<img src='images/friends.png'  /><div></div>
-	 						</div>
-	 						<div  class="userOperations" id="signout">	 			
-	 							<img src='images/signout.png'  /><div></div>		
-	 						</div>
+	 						$userArea
 	 						<div id='lists'>	
 								<div class='titles'>									
 									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
@@ -456,13 +411,8 @@ EOT;
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
 										<div id='results'></div>								
 									</div>
-								</div>	
-								
-							<!-- <div id='footer'>							
-									<a href='#auLink'></a>								
-								</div>
-							-->					
-							</div>							
+								</div>				
+							</div> 													
 					</div>
 																																									
 				</div>
@@ -475,7 +425,7 @@ EOT;
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
 	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', height:'225', title:'<div id=\'changePasswordFormTitle\'></div>', closed:'true' }">  
-		<br/>
+					<br/>
 		<div id="currentPasswordLabel"></div>
 		<div><input type='password' name='currentPassword' id='currentPassword' /></div>
 		<div id="newPasswordLabel"></div>
@@ -498,6 +448,28 @@ EOT;
 		
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
+	<div id="userLoginForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', height:'250', closed:'true' }">	
+			<div id="usernameLabel"></div>
+			<input type="text" name="email" id="emailLogin" />
+			<div id="passwordLabel"></div>
+			<input type="password" name="password" id="password"/>
+			<div class="link" id="forgotPasswordLink"></div>
+			<input type="checkbox" name="rememberMe" id="rememberMe"/>
+			<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
+		    <input type="button" id="submitLoginFormButton" value=""/> <br/>
+	</div>
+	<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
+		<div id="emailLabel"></div>
+		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
+	</div>
+	
+	<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
+		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
+		<input type="button" id="registerButton" value="Register" />
+	</div>
 	
 	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
 	</div>
