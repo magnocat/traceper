@@ -168,6 +168,14 @@ CREATE TABLE  `traceper_users` (
   KEY `facebook_id` (`facebook_id`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users';
 
+DROP TABLE IF EXISTS `traceper_upload_rating`;
+CREATE TABLE  `traceper_upload_rating` (
+  `upload_id` int(11) NOT NULL AUTO_INCREMENT,
+  `voting_count` int(10) unsigned NOT NULL DEFAULT '0',
+  `points` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`upload_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 --
 -- Dumping data for table `php`.`traceper_users`
 --
