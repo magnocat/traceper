@@ -338,11 +338,72 @@ EOT;
 				var mapStruct = new MapStruct();
 			    var initialLoc = new mapStruct.Location({latitude:39.504041,
 			    								  longitude:35.024414}); 
+			    var initialLoc2 = new mapStruct.Location({latitude:40.504041,
+			    								  longitude:36.024414});	
+			    var initialLoc3 = new mapStruct.Location({latitude:40.504041,
+			    								  longitude:37.024414});
+			    var initialLoc4 = new mapStruct.Location({latitude:39.504041,
+			    								  longitude:35.024414}); 
 			    
 				mapOperator.initialize(initialLoc);
-				mapOperator.putMarker(initialLoc, "images/person.png", true);				
-   				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);			
-   					
+				
+				var contentString = '<div id="content">'+
+			        '<div id="siteNotice">'+
+			        '</div>'+
+			        '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+			        '<div id="bodyContent">'+
+			        '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+			        'sandstone rock formation in the southern part of the '+
+			        'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
+			        'south west of the nearest large town, Alice Springs; 450&#160;km '+
+			        '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
+			        'features of the Uluru - Kata Tjuta National Park. Uluru is '+
+			        'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
+			        'Aboriginal people of the area. It has many springs, waterholes, '+
+			        'rock caves and ancient paintings. Uluru is listed as a World '+
+			        'Heritage Site.</p>'+
+			        '<p>Attribution: Uluru, <a href="http://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+			        'http://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+			        '(last visited June 22, 2009).</p>'+
+			        '</div>'+
+			        '</div>';
+			    var contentString2 = '<div id="content">'+
+			        '<div id="siteNotice">'+
+			        '</div>'+
+			        '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+			        '<div id="bodyContent">'+
+			        '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+			        'Heritage Site.</p>'+
+			        '<p>Attribution: Uluru, <a href="http://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+			        'http://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+			        '(last visited June 22, 2009).</p>'+
+			        '</div>'+
+			        '</div>';    
+			        
+				//mapOperator.putMarker(initialLoc, "images/person.png", true);
+				//mapOperator.initializeInfoWindow(contentString);
+				/*
+				alert(1);
+				var ab=mapOperator.initializeInfoWindow(contentString);
+				mapOperator.openInfoWindow(ab,mapOperator.putMarker(initialLoc, "images/person.png", true));
+				alert(2);
+				mapOperator.setContentOfInfoWindow(ab,contentString2);
+				alert(3);
+				*/
+				var poly=mapOperator.initializePolyline();	
+				alert(4);
+				//mapOperator.clickFunction(mapOperator.abc);
+				
+    			mapOperator.updatePolyline(poly,initialLoc);
+				mapOperator.updatePolyline(poly,initialLoc2);
+				mapOperator.updatePolyline(poly,initialLoc3);
+				mapOperator.updatePolyline(poly,initialLoc4);
+				
+   				alert(5);			
+   				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);
+   							
+
+   				
    				var personIcon = new GIcon(G_DEFAULT_ICON);
 				personIcon.image = "images/person.png";
 				personIcon.iconSize = new GSize(24,24);
