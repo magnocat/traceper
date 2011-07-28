@@ -50,4 +50,6 @@
 <string name="http_request_failed">Http request failed, please make sure that URL is valid in Settings and you are connected to the Internet...</string>
 <string name="take_photo">Take photo</string>
 <string name="http_missing_parameter">Missing parameter, please consult the developer</string>
+<string name="upload_succesfull">Upload is successfull</string>
+<string name="upload_failed">Upload is failed. Please try again later...</string>
 </resources>
