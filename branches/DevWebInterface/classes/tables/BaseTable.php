@@ -38,6 +38,54 @@ class BaseTable
 		}
 		
 		$sql .= ' LIMIT '. $limit;
+
+		$result = false;
+		if($this->dbc->query($sql) != false)
+		{
+			$result = true;
+		}
+
+		return $result;
+	}
+	
+public function select($values, $conditions, $limit=1) {
+		
+		$sqlSelectPart = implode(',', $values);
+
+		$sql = 'SELECT ' . $sqlSelectPart . ' FROM ' . $this->tableName;				
+		
+		if(!empty($conditions) && is_array($conditions))
+		{
+			$conditionValuePair = array();
+			foreach ($conditions as $key => $value)
+			{
+				array_push($conditionValuePair, $key .'='. $value);
+			}
+	
+			$sqlConditionPart = implode(',', $conditionValuePair);
+			
+			$sql .= ' WHERE ' . $sqlConditionPart;
+		}
+		
+		$sql .= ' LIMIT '. $limit;
+					
+		$result = false;
+		if(($res = $this->dbc->query($sql)) != false)
+		{
+			$result = true;
+		}
+		
+		echo "Number Of Rows:".$this->dbc->numRows($res);
+		
+		return $result;
+	}	
+	
+	public function insert($elements, $values) {
+		
+		$sqlElementsPart = implode(',', $elements);
+		$sqlValuesPart = implode(',', $values);
+
+		$sql = 'INSERT INTO ' . $this->tableName . '(' . $sqlElementsPart . ')' . 'VALUES(' . $sqlValuesPart .')';
 					
 		$result = false;
 		if($this->dbc->query($sql) != false)
@@ -45,6 +93,10 @@ class BaseTable
 			$result = true;
 		}
 		
+		echo $sql;
+		
 		return $result;
-	}
+	}	
 }
+
+?>
