@@ -67,6 +67,7 @@ else {
 	}
 	
 	$userInfo = null;
+	$pluginScript = "";
 	if ($auth->isUserAuthenticated() === true) 
 	{  
 	//	$pluginScript = "";
@@ -75,8 +76,21 @@ else {
 		}
 		$userInfo = $auth->getUserInfo();
 	}
+	
+//	$arr = array(Rating::field_voting_count => Rating::field_voting_count. "+1", Rating::field_points => Rating::field_points ."+10");
+//	$arr2 = array(Rating::field_points);
+//	
+//	$condArr = array(Rating::field_upload_id => "1");	
+//	$values = array(40);
+//	
+//	$ratingTable = new Rating(TABLE_PREFIX, $dbc);
+	
 
-	$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
+	$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);
+
+	//$ratingTable->update($arr, $condArr);
+	
+	//$ratingTable->insert($arr2, $values);
 }
 echo $out;
 //error_log($out, 3, "log.txt");
@@ -94,6 +108,9 @@ function __autoload($class_name) {
 	}
 	else if (file_exists(dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php')){
 		require_once dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php';
+	}
+	else if (file_exists(dirname(__FILE__) .'/classes/tables/' . $class_name . '.php')) {
+    	require_once dirname(__FILE__) .'/classes/tables/' . $class_name . '.php';
 	}
 }
 ?>
