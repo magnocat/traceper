@@ -46,7 +46,9 @@ public class Register extends Activity {
         
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
-            appService = ((AppService.IMBinder)service).getService();              
+            appService = ((AppService.IMBinder)service).getService(); 
+            appService.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
+            
         }
 
         public void onServiceDisconnected(ComponentName className) {

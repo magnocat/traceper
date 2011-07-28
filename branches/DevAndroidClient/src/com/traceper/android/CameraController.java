@@ -124,10 +124,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		if (isPreviewRunning) {  
 			camera.stopPreview();  
 		}  
-	//	Camera.Parameters p = camera.getParameters();  
-	//	p.setPreviewSize(w, h);  
-	
-	//	camera.setParameters(p);  
 		
 		try {
 			camera.setPreviewDisplay(holder);
@@ -217,17 +213,17 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
 					bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
 					
-					final int result = appService.sendImage(byteArrayOutputStream.toByteArray());
+					final int result = appService.sendImage(byteArrayOutputStream.toByteArray(), false);
 					{
 						handler.post(new Runnable() {							
 							@Override
 							public void run() {
 								String str;
 								if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
-									str = "Upload is successfull";
+									str = getString(R.string.upload_succesfull);
 								}
 								else {
-									str = "Upload is failed. Please try again later...";
+									str = getString(R.string.upload_failed);
 								}
 								notification.setLatestEventInfo(getApplicationContext(), "Traceper", str, contentIntent);
 								mManager.notify(NOTIFICATION_ID, notification);
@@ -294,7 +290,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	protected void onResume(){
 		super.onResume();
 		bindService(new Intent(CameraController.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
-		Toast.makeText(this, "Press dpad center to take photo", Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override

@@ -104,38 +104,7 @@ public class AppService extends Service implements IAppService{
 	 * Show a notification while this service is running.
 	 * @param msg 
 	 **/
-/*
-    private void showNotification(String username, String msg) 
-	{       
-        // Set the icon, scrolling text and timestamp
-    	String title = username + ": " + 
-     				((msg.length() < 5) ? msg : msg.substring(0, 5)+ "...");
-        Notification notification = new Notification(R.drawable.stat_sample, 
-        					title,
-                System.currentTimeMillis());
 
-        Intent i = new Intent(this, Messaging.class);
-        i.putExtra(FriendInfo.USERNAME, username);
-        i.putExtra(FriendInfo.MESSAGE, msg);	
-        
-        // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                i, 0);
-
-        // Set the info for the views that show in the notification panel.
-        // msg.length()>15 ? msg : msg.substring(0, 15);
-        notification.setLatestEventInfo(this, "New message from " + username,
-                       						msg, 
-                       						contentIntent);
-        
-        //TODO: it can be improved, for instance message coming from same user may be concatenated 
-        // next version
-        
-        // Send the notification.
-        // We use a layout id because it is a unique number.  We use it later to cancel.
-        mNM.notify((username+msg).hashCode(), notification);
-    }	
-*/
 	//TODO: edit the traceper protocol file
 	private int sendLocationData(String emailText, String passwordText, Location loc) 
 	{		
@@ -180,7 +149,7 @@ public class AppService extends Service implements IAppService{
 		return result;	
 	}
 	
-	public int sendImage(byte[] image){
+	public int sendImage(byte[] image, boolean publicData){
 		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		double latitude = 0;
 		double longitude = 0;
@@ -192,14 +161,15 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 //		try {
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "action";
 		name[1] = "email";
 		name[2] = "password";
 		name[3] = "latitude";
 		name[4] = "longitude";
 		name[5] = "altitude";
+		name[6] = "publicData";
 		
 		value[0] = HTTP_ACTION_GET_IMAGE;
 		value[1] = this.email;
@@ -207,6 +177,12 @@ public class AppService extends Service implements IAppService{
 		value[3] = String.valueOf(latitude);
 		value[4] = String.valueOf(longitude);
 		value[5] = String.valueOf(altitude);
+		int publicDataInt = 0;
+		if (publicData == true) {
+			publicDataInt = 1; 
+		} 
+		value[6] = String.valueOf(publicDataInt);
+		
 		
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
@@ -296,73 +272,6 @@ public class AppService extends Service implements IAppService{
 		}
 		return null;		
 	}
-	
-	private String sendHttpRequest(String params)
-	{		
-		URL url;
-		String result = new String();
-		try 
-		{
-			url = new URL(this.authenticationServerAddress);
-			HttpURLConnection connection;
-			
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setDoOutput(true);	
-			connection.setDoInput(true);
-//			PrintWriter out = new PrintWriter(connection.getOutputStream());	
-			
-//			connection.setRequestProperty("Connection", "Keep-Alive");
-			DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-			
-			outputStream.writeBytes(params);
-			outputStream.close();
-			//out.close();
-			
-			// if the / character is not written to end of the address, 
-			// it arises temp or permanent moved error, adding / character may solve this problem
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
-				connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
-			{
-				connection.disconnect();
-				this.authenticationServerAddress += "/";
-				return sendHttpRequest(params);				
-			}
-			else
-			{
-				BufferedReader in = new BufferedReader(
-									new InputStreamReader(connection.getInputStream()));
-				String inputLine;
-
-				while ((inputLine = in.readLine()) != null) {
-					result = result.concat(inputLine);				
-				}
-				in.close();	
-			}
-			
-			
-		} 
-		catch (MalformedURLException e) {
-			e.printStackTrace();
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-		}	
-		
-		String response = null;
-		if (result.length() != 0) {
-			response = result;
-//			response = HTTP_REQUEST_FAILED;
-		}
-		else {
-			
-//			try {
-//				response = Integer.parseInt(result);
-//			}catch(NumberFormatException ex) {
-//				response = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
-//			}
-		}		
-		return response;
-	}
 
 	public void exit() {
 		this.stopSelf();	
@@ -376,15 +285,21 @@ public class AppService extends Service implements IAppService{
 		return this.isUserAuthenticated;
 	}
 
-	public int registerUser(String password, String email, String realname) {
+	public int registerUser(String password, String email, String realname) 
+	{
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "realname";
 		
-		String params = "action="+ HTTP_ACTION_REGISTER_ME + 
-						"&password=" + password + 
-						"&email="+ email + 
-						"&realname=" + realname + 
-						"&";
+		value[0] = HTTP_ACTION_REGISTER_ME;
+		value[1] = email;
+		value[2] = password;
+		value[3] = realname;
 		
-		String result = this.sendHttpRequest(params);		
+		String result = this.sendHttpRequest(name, value, null, null);		
 		
 		return this.evaluateResult(result);
 	}
@@ -426,12 +341,8 @@ public class AppService extends Service implements IAppService{
 			          
 			          Looper.loop();
 			      }
-			
 			};		      
-						  
 			locationUpdates.start();
-			
-						
 		}
 		else {
 			this.isUserAuthenticated = false;

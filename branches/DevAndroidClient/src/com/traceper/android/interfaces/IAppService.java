@@ -38,6 +38,6 @@ public interface IAppService {
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public int sendImage(byte[] image);
+	public int sendImage(byte[] image, boolean publicData);
 	
 }
