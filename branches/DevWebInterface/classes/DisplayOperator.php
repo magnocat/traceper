@@ -250,6 +250,7 @@ EOT;
 		$userArea = "";
 		$forms = "";
 		$startScript = "";
+		$hideUserArea = "";
 		if ($userInfo != null) 
 		{
 			$realname = $userInfo->realname;
@@ -260,8 +261,22 @@ EOT;
 			$deviceId = $userInfo->deviceId;	
 			$startScript = "trackerOp.getFriendList(1);
    						    "; 	
+
+		}
+		else {
+			$startScript = "";  // langOp is initialized before document.ready function in str variable 
 			
 			$userArea = <<<USER_AREA
+							<div id="loginBlock">
+	 						<div style="clear:both" id="loginLink" class="userOperations"></div>
+	 						<div class="userOperations" id="registerLink"></div>
+	 						</div>
+USER_AREA;
+			$hideUserArea .= "display:none";
+		}
+		
+		$userArea .= <<<USER_AREA
+						<div id="userBlock" style="$hideUserArea">
 						<ul id='userarea'><li id="username">$realname</li>
 	 						</ul>
 	 						<div style="clear:both" id="changePassword" class="userOperations">	
@@ -276,19 +291,11 @@ EOT;
 	 						<div  class="userOperations" id="signout">	 			
 	 							<img src='images/signout.png'  /><div></div>		
 	 						</div>
+	 					</div>
 USER_AREA;
-
-		}
-		else {
-			$startScript = "";  // langOp is initialized before document.ready function in str variable 
-			
-			$userArea = <<<USER_AREA
-	 						<div style="clear:both" id="loginLink" class="userOperations">	 							
-	 						</div>
-	 						<div class="userOperations" id="registerLink">	 							
-	 						</div>
-USER_AREA;
-		}
+		
+		
+		
 		
 		$str = <<<MAIN_PAGE
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">

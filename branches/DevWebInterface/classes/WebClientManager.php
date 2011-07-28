@@ -193,6 +193,7 @@ class WebClientManager extends Base
 	private function authenticateUser($reqArray)
 	{
 		$out = MISSING_PARAMETER;
+		$realName = "";
 		if (isset($reqArray['username']) && $reqArray['username'] != null &&
 			isset($reqArray['password']) && $reqArray['password'] != null
 		    )
@@ -209,10 +210,19 @@ class WebClientManager extends Base
 			    ($this->usermanager !== null && 
 			    $this->usermanager->authenticateUser($reqArray['username'], md5($reqArray['password']), $keepUserLoggedIn) !== null)) 
 			{
-				$out = SUCCESS;						
+				$userInfo = $this->usermanager->getUserInfo();
+				$out = SUCCESS; 
+				$realName = '<realname>'. $userInfo->realname .'</realname>';	
 			}	
 			
-		}		
+		}	
+		header("Content-type: application/xml; charset=utf-8");
+		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+				.'<result value="'. $out .'">'
+					. $realName
+				.'</result>';
+
+		
 		return $out;
 	}
 	
@@ -343,7 +353,8 @@ class WebClientManager extends Base
 		 	$name = $this->checkVariable($reqArray['name']);
 		 	$password = $this->checkVariable($reqArray['password']);	
 		 	 	
-		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);			
+		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);
+		 				
 		 }
 		 return $out;
 		
@@ -908,7 +919,7 @@ class WebClientManager extends Base
 			}	
 		}
 		
-		header("Content-type: application/xml; charset=utf-8");
+		
 		
 		$pageNo = $pageCount == 0 ? 0 : $pageNo;
 		
@@ -922,6 +933,7 @@ class WebClientManager extends Base
 			$pageStr.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
 		}
 		
+		header("Content-type: application/xml; charset=utf-8");
 		$out = '<?xml version="1.0" encoding="UTF-8"?>'
 				.'<page '. $pageStr . ' >'					
 					. $str

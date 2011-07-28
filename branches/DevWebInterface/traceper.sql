@@ -89,10 +89,12 @@ CREATE TABLE  `traceper_upload` (
   `longitude` decimal(9,6) NOT NULL,
   `altitude` decimal(15,6) NOT NULL,
   `uploadTime` datetime NOT NULL,
+  `publicData` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`) USING BTREE,
   KEY `new_index` (`userId`),
-  KEY `index2` (`uploadTime`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+  KEY `index2` (`uploadTime`),
+  KEY `publicData` (`publicData`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
 
 --
 -- Definition of table `php`.`traceper_user_candidates`

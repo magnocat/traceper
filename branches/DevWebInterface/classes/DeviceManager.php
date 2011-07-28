@@ -43,7 +43,7 @@ class DeviceManager extends Base
 	 * @return unknown_type
 	 */
 	public function process($reqArray) {
-		
+
 		$out = NULL;
 		if (isset($reqArray['action']))
 		{			
@@ -122,15 +122,23 @@ class DeviceManager extends Base
 				$altitude = (float) $reqArray['altitude'];
 				$email = $this->checkVariable($reqArray['email']);
 				$password = $this->checkVariable($reqArray['password']);
-
+				
+				$publicData = 0;
+				if (isset($reqArray['publicData']) && $reqArray['publicData'] != NULL) {
+					$tmp = (int) $this->checkVariable($reqArray['publicData']);
+					if ($tmp == 1) {
+						$publicData = 1;
+					}
+				}
+			
 				$sql = sprintf('INSERT INTO '
 									. $this->tablePrefix .'_upload
-									(userId, latitude, longitude, altitude, uploadtime)
-								SELECT Id, %s, %s, %s, NOW()
+									(userId, latitude, longitude, altitude, uploadtime, publicData)
+								SELECT Id, %s, %s, %s, NOW(), %d
 									FROM '. $this->tablePrefix .'_users
 								WHERE email = "%s" AND
 									  password = "%s"
-								LIMIT 1', $latitude, $longitude, $altitude,
+								LIMIT 1', $latitude, $longitude, $altitude, $publicData,
 									$email, $password);
 				if ($this->dbc->query($sql))
 				{
@@ -139,6 +147,7 @@ class DeviceManager extends Base
 						$out = SUCCESS; 						
 					}
 				}
+				
 			}
 			
 		}		
@@ -252,7 +261,7 @@ class DeviceManager extends Base
 	 */
 	private function registerUser($reqArray)
 	{	
-		$out = MISSING_PARAMETER;	
+		$out = MISSING_PARAMETER;
 		if (isset($reqArray['realname']) && $reqArray['realname'] != NULL 
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL     
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL 
@@ -265,7 +274,7 @@ class DeviceManager extends Base
 			$out = FAILED;
 			if ($this->usermanager != NULL) {
 				$out = $this->usermanager->registerUser($email, $realname, $password);
-			}							 							 
+			}									 							 
 		}
 		
 		return $out;		

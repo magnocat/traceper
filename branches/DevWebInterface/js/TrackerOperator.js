@@ -136,8 +136,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
-					location.href = 'index.php';
+				var value = $(result).find("result").attr('value'); //find("realname").text();
+				if (value == "1") {					
+					//location.href = 'index.php';
+					var realname = $(result).find("result").find("realname").text();
+					TRACKER.getFriendList(1);
+					$("#username").html(realname);
+					$("#loginBlock").hide();
+					$("#userBlock").show();
+					$('#userLoginForm').mb_close();
+					
 				}
 				else {
 					if (typeof(callback) == "function") {
