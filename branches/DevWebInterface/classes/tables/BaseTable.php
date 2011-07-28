@@ -38,6 +38,8 @@ class BaseTable
 		}
 		
 		$sql .= ' LIMIT '. $limit;
+		
+		echo $sql;
 
 		$result = false;
 		if($this->dbc->query($sql) != false)
@@ -68,16 +70,14 @@ public function select($values, $conditions, $limit=1) {
 		}
 		
 		$sql .= ' LIMIT '. $limit;
-					
-		$result = false;
-		if(($res = $this->dbc->query($sql)) != false)
-		{
-			$result = true;
-		}
 		
-		echo "Number Of Rows:".$this->dbc->numRows($res);
+		//echo $sql;
+
+		$result = $this->dbc->query($sql);
 		
-		return $result;
+		echo "Number Of Rows:".$this->dbc->numRows($result);
+		
+		return $this->dbc->numRows($result);
 	}	
 	
 	public function insert($elements, $values) {
@@ -93,7 +93,7 @@ public function select($values, $conditions, $limit=1) {
 			$result = true;
 		}
 		
-		echo $sql;
+		//echo $sql;
 		
 		return $result;
 	}	
