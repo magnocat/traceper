@@ -29,7 +29,7 @@ function MapOperator() {
 
 	/*
 	 * puts a marker at that coordinate,
-	 * latitude and longitude is mandatory,
+	 * location is mandatory and defined in MapStructs.js,
 	 * other params are optional.
 	 */
 	MAP_OPERATOR.putMarker = function(location, image, visible) {
@@ -60,6 +60,16 @@ function MapOperator() {
 	MAP_OPERATOR.setMarkerVisible = function(marker, visible) {
 		marker.setVisible(visible);
 	}
+	
+	
+	/*
+	 * marker is the type that returns from putMarker,
+	 * location is defined in MapStructs.js,
+	 */
+	MAP_OPERATOR.setMarkerPosition = function(marker,location) {
+		var position = new google.maps.LatLng(location.latitude, location.longitude);
+		marker.setPosition(position);
+	}
 
 	/*
 	 * contentString is the string that is shown in infowindow
@@ -77,7 +87,28 @@ function MapOperator() {
 	 * there is no close function for infowindow
 	 */
 	MAP_OPERATOR.openInfoWindow = function(infowindow,marker) {
-		infowindow.open(map,marker);		
+		
+		infowindow.open(MAP_OPERATOR.map,marker);		
+	}
+	
+	
+	/*
+	 *
+	 */
+	MAP_OPERATOR.closeInfoWindow = function(infowindow) {
+		
+		infowindow.close();		
+	}
+	
+	/*
+	 * marker is the type that returns from putMarker
+	 * functionName is the function that is called when clicked marker
+	 */
+	MAP_OPERATOR.setMarkerClickListener = function(marker,functionName) {
+		google.maps.event.addListener(marker, 'click', function(){
+			functionName();
+		});
+
 	}
 
 	/*
@@ -104,19 +135,36 @@ function MapOperator() {
 	}
 
 	/*
-	 * updates polyline
+	 * adding point to the polyline end
 	 * poly is type that used
 	 * loc is type that is added to the polyline
 	 */
-	MAP_OPERATOR.updatePolyline = function(poly,loc) {
+	MAP_OPERATOR.addPointToPolyline = function(poly,loc) {
 		var path = poly.getPath();
 
 		// Because path is an MVCArray, we can simply append a new coordinate
 		// and it will automatically appear
 
-		var locations = new google.maps.LatLng(loc.latitude, loc.longitude);
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
 
-		path.push(locations);
+		path.push(location);
+	}
+	
+	/*
+	 * insert point to the polyline at specified index 
+	 * poly is type that used
+	 * loc is type that is added to the polyline
+	 * index  is the specified index.
+	 */
+	MAP_OPERATOR.insertPointToPolyline = function(poly,loc,index) {
+		var path = poly.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+
+		path.insertAt(index,location);
 	}
 
 	/*
@@ -128,6 +176,14 @@ function MapOperator() {
 			functionName(event);			
 		});
 
+	}
+	
+	/*
+	 *location is defined in MapStructs.js,
+	 */
+	MAP_OPERATOR.panMapTo = function(location) {
+		var position = new google.maps.LatLng(location.latitude, location.longitude);
+		MAP_OPERATOR.map.panTo(position);		
 	}
 
 	/*

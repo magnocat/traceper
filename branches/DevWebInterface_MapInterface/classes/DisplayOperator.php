@@ -336,14 +336,14 @@ EOT;
 			try 
 			{
 				var mapStruct = new MapStruct();
-			    var initialLoc = new mapStruct.Location({latitude:39.504041,
+			    var initialLoc = new MapStruct.Location({latitude:39.504041,
 			    								  longitude:35.024414}); 
-			    var initialLoc2 = new mapStruct.Location({latitude:40.504041,
-			    								  longitude:36.024414});	
-			    var initialLoc3 = new mapStruct.Location({latitude:40.504041,
-			    								  longitude:37.024414});
-			    var initialLoc4 = new mapStruct.Location({latitude:39.504041,
-			    								  longitude:35.024414}); 
+			 //   var initialLoc2 = new mapStruct.Location({latitude:40.504041,
+			 //   								  longitude:36.024414});	
+			 //   var initialLoc3 = new mapStruct.Location({latitude:40.504041,
+			 //   								  longitude:37.024414});
+			 //   var initialLoc4 = new mapStruct.Location({latitude:39.504041,
+			 //   								  longitude:35.024414}); 
 			    
 				mapOperator.initialize(initialLoc);
 				
@@ -390,20 +390,20 @@ EOT;
 				mapOperator.setContentOfInfoWindow(ab,contentString2);
 				alert(3);
 				*/
-				var poly=mapOperator.initializePolyline();	
-				alert(4);
-				//mapOperator.clickFunction(mapOperator.abc);
 				
+				var poly=mapOperator.initializePolyline();	
+//				alert(4);
+				//mapOperator.clickFunction(mapOperator.abc);
+/*				
     			mapOperator.updatePolyline(poly,initialLoc);
 				mapOperator.updatePolyline(poly,initialLoc2);
 				mapOperator.updatePolyline(poly,initialLoc3);
 				mapOperator.updatePolyline(poly,initialLoc4);
 				
    				alert(5);			
-   				var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);
-   							
+*/							
 
-   				
+ /*  				
    				var personIcon = new GIcon(G_DEFAULT_ICON);
 				personIcon.image = "images/person.png";
 				personIcon.iconSize = new GSize(24,24);
@@ -435,6 +435,9 @@ EOT;
   					TRACKER.users[$userId].pastPointsGMarker = new Array(TRACKER.users[$userId].gmarker);
   				}
 				map.addOverlay(TRACKER.users[$userId].gmarker);
+*/
+			
+   				var trackerOp = new TrackerOperator('$callbackURL', mapOperator, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp, $userId);
    				trackerOp.getFriendList(1); 	
    				
 			}

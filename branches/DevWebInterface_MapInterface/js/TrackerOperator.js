@@ -89,6 +89,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var deviceId;
 		var message;
 		var gmarker;
+		var infoWindow;
 		var pastPointsGMarker;
 		var infoWindowIsOpened = false;
 		var polyline = null;		
@@ -392,7 +393,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		TRACKER.ajaxReq(params, function(result){			
 			TRACKER.friendListPageNo = TRACKER.getPageNo(result);
 			TRACKER.friendListPageCount = TRACKER.getPageCount(result);
-
+			
 			var str = processXML(MAP, result, true);
 
 			if (str != null) {
@@ -648,8 +649,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.trackUser = function(userId){
 		if (TRACKER.users[userId].friendshipStatus == "1" &&  TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
 		{
-			MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
-			TRACKER.openMarkerInfoWindow(userId);		
+			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
+			MAP.panMapTo(location);
+			MAP.openInfoWindow(TRACKER.users[userId].infoWindow, TRACKER.users[userId].gmarker);
 		}
 	};
 
@@ -710,6 +712,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.openMarkerInfoWindow = function(userId){
+/*		
 		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'														   
 				+ '<br/>' + TRACKER.users[userId].realname  
 				+ '<br/>' + TRACKER.users[userId].time
@@ -734,6 +737,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				+'</li>'
 				+ '</ul>'
 		);
+*/
 	};
 
 	this.showImageWindow = function(imageId){
