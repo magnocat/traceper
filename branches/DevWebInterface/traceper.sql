@@ -94,7 +94,7 @@ CREATE TABLE  `traceper_upload` (
   KEY `new_index` (`userId`),
   KEY `index2` (`uploadTime`),
   KEY `publicData` (`publicData`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Definition of table `php`.`traceper_user_candidates`
