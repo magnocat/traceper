@@ -145,7 +145,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					$("#loginBlock").hide();
 					$("#userBlock").show();
 					$('#userLoginForm').mb_close();
-					
+				}
+				else if (value == "-4"){								
+					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });
+				}
+				else if(value == "-2") {
+					TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+				}
+				else if (value == "-1"){
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 				}
 				else {
 					if (typeof(callback) == "function") {
