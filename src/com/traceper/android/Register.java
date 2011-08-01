@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,6 +35,7 @@ public class Register extends Activity {
 	private static final int SIGN_UP_SUCCESSFULL = 4;
 	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
 	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
+	private ProgressDialog progressDialog;
 	
 	private EditText passwordText;
 	private EditText eMailText;
@@ -81,6 +83,7 @@ public class Register extends Activity {
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
+					progressDialog = ProgressDialog.show(Register.this, "Register", "Saving...");
 					if (passwordText.length() > 0 && 
 						passwordAgainText.length() > 0 &&
 						eMailText.length() > 0 &&
@@ -124,20 +127,24 @@ public class Register extends Activity {
 												}
 		
 											});
+										progressDialog.dismiss();
 										}
 		
 									};
 									thread.start();
 							}
 							else{
+								progressDialog.dismiss();
 								showDialog(EMAIL_AND_PASSWORD_LENGTH_SHORT);
 							}							
 						}
 						else {
+							progressDialog.dismiss();
 							showDialog(TYPE_SAME_PASSWORD_IN_PASSWORD_FIELDS);
 						}						
 					}
 					else {
+						progressDialog.dismiss();
 						showDialog(FILL_ALL_FIELDS);
 						
 					}				
