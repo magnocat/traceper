@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +16,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.traceper.R;
@@ -45,6 +48,7 @@ public class Login extends Activity {
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
     private IAppService appManager;
+	private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
@@ -88,7 +92,6 @@ public class Login extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
 
-        
         setContentView(R.layout.login_screen);
         setTitle("Login - " + Configuration.APPLICATION_NAME);
         
@@ -105,7 +108,8 @@ public class Login extends Activity {
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
-			{			
+			{	
+				progressDialog = ProgressDialog.show(Login.this, "Traceper-Login", "Loading...", true, false);	
 				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
 				editor.commit();
@@ -127,6 +131,7 @@ public class Login extends Activity {
 						private Handler handler = new Handler();
 						@Override
 						public void run() {
+							
 							String password = null;
 							try {
 								password = AeSimpleMD5.MD5(passwordText.getText().toString());
@@ -136,7 +141,6 @@ public class Login extends Activity {
 								e.printStackTrace();
 							}
 							int result = appManager.authenticateUser(emailText.getText().toString(), password);
-							
 							if (result == IAppService.HTTP_RESPONSE_SUCCESS){
 								SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 								
@@ -185,15 +189,20 @@ public class Login extends Activity {
 										showDialog(UNKNOWN_ERROR_OCCURED);
 									}});					
 							}							
+						progressDialog.dismiss();
 						}
 					};
-					loginThread.start();					
+					
+					loginThread.start();
+					
 				}
 				else {
 					// Username or Password is not filled, alert the user					 
 					showDialog(FILL_BOTH_USERNAME_AND_PASSWORD);
-				}				
-			}       	
+					progressDialog.dismiss();
+				}
+			}
+			
         });
         
         cancelButton.setOnClickListener(new OnClickListener(){
