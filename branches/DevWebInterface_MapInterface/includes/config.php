@@ -18,7 +18,7 @@ $dbHost = "localhost";
 // database user name
 $dbUsername = "root";
 // password to connect to database
-$dbPassword = "21236161";
+$dbPassword = "";
 // database name
 $dbName = "php";
 

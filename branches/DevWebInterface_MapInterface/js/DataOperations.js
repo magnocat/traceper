@@ -15,18 +15,24 @@ function processUserPastLocationsXML (MAP, xml) {
 		var longitude = $(location).attr('longitude');
 		var time = $(location).find('time').text();
 		var deviceId = $(location).find('deviceId').text();
-		var point = new GLatLng(latitude, longitude);
+		
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		//var point = new GLatLng(latitude, longitude);
 		pastPoints.push(point);
-		var gmarker = new GMarker(point);
+		
+		//var gmarker = new GMarker(point);
+		var gmarker = MAP.putMarker(point, "images/person.png", visible);
 
-		GEvent.addListener(gmarker, "click", function(){
+		//GEvent.addListener(gmarker, "click", function(){
+		MAP.setMarkerClickListener(gmarker,function (){
 
 			var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
 			var previousGMarkerIndex = tr + 1; // it is reverse because 
 			var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 			// attention similar function is used in 
 			// processXML function				
-			gmarker.openInfoWindowHtml("<div>" 
+			var content =
+					"<div>" 
 					+ "<b>" + TRACKER.users[userId].realname + "</b> " 
 					+ TRACKER.langOperator.wasHere 
 					+ '<br/>' + TRACKER.langOperator.time + ": " + time
@@ -67,24 +73,32 @@ function processUserPastLocationsXML (MAP, xml) {
 					+ "</li>"
 					+"</ul>");	
 		});
+		var infoWindow = MAP.initializeInfoWindow(content);
+		MAP.openInfoWindow(infoWindow, gMarker);
 		index++;
-		MAP.addOverlay(gmarker);			
+		//MAP.addOverlay(gmarker);			
 		pastPointsGMarker.push(gmarker)
 	});
 
 	if (typeof TRACKER.users[userId].polyline == "undefined") 
 	{
+		/*
 		var firstPoint= [new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude)];
 		TRACKER.users[userId].polyline = new GPolyline(firstPoint.concat(pastPoints), "#ff0000", 10);;
 		MAP.addOverlay(TRACKER.users[userId].polyline);
+		*/
+		var firstPoint = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
+		TRACKER.users[userId].polyline = MAP.initializePolyline();
+		MAP.addPointToPolyline(TRACKER.users[userId].polyline,firstPoint);
 	}
 	else {
 		var len = pastPoints.length;
 		var i;
-		var vertexIndex = TRACKER.users[userId].polyline.getVertexCount();
+		//var vertexIndex = TRACKER.users[userId].polyline.getVertexCount();
 		for (i = 0; i < len; i++){
-			TRACKER.users[userId].polyline.insertVertex(vertexIndex, pastPoints[i]);
-			vertexIndex++;
+			//TRACKER.users[userId].polyline.insertVertex(vertexIndex, pastPoints[i]);
+			//vertexIndex++;
+			MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
 		}
 	}
 	var tmp = TRACKER.users[userId].pastPointsGMarker;	
@@ -142,7 +156,7 @@ function processXML(MAP, xml, isFriendList)
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
-				
+
 				var userMarker = MAP.putMarker(location, "images/person.png", visible);
 				TRACKER.users[userId] = new TRACKER.User( {//username:username,
 					realname:realname,
@@ -155,7 +169,7 @@ function processXML(MAP, xml, isFriendList)
 					deviceId:$(user).find("deviceId").text(),
 					gmarker:userMarker, //new GMarker(point, markerOptions)
 				});
-				
+
 				var content =  '<div>'														   
 					+ '<br/>' + TRACKER.users[userId].realname  
 					+ '<br/>' + TRACKER.users[userId].time
@@ -188,7 +202,7 @@ function processXML(MAP, xml, isFriendList)
 					visible = true;
 //					MAP.addOverlay(TRACKER.users[userId].gmarker);
 				}
-				
+
 
 				MAP.setMarkerClickListener(TRACKER.users[userId].gmarker,function (){
 
@@ -282,7 +296,7 @@ function processXML(MAP, xml, isFriendList)
 				if (isWindowOpen == true) {
 					TRACKER.openMarkerInfoWindow(userId);
 				}
-				*/
+				 */
 
 			}
 
@@ -317,7 +331,9 @@ function processImageXML(MAP, xml){
 		var latitude = $(image).attr('latitude');
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
-		var point = new GLatLng(latitude, longitude);
+		//var point = new GLatLng(latitude, longitude);
+
+		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 
 		list += "<li>";
 
@@ -344,11 +360,17 @@ function processImageXML(MAP, xml){
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
 
+			/*
 			var personIcon = new GIcon(G_DEFAULT_ICON);
 			personIcon.image = imageURL + TRACKER.imageThumbSuffix;
 			//		personIcon.iconSize = new GSize(24,24);
 			personIcon.shadow = null;
 			markerOptions = { icon:personIcon, hide:hideMarker };
+			 */
+			image = imageURL + TRACKER.imageThumbSuffix;
+
+			var userMarker = MAP.putMarker(location, image, visible);
+
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
 				userId:userId,
@@ -356,20 +378,50 @@ function processImageXML(MAP, xml){
 				latitude:latitude,
 				longitude:longitude,
 				time:time,
-				gmarker:new GMarker(point, markerOptions),
+				gmarker:userMarker,
 			});
+
+			var content =  '<div>'														   
+				+ '<br/>' + TRACKER.users[userId].realname  
+				+ '<br/>' + TRACKER.users[userId].time
+				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
+				//+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
+				;
+
+			var infoWindow = MAP.initializeInfoWindow(content);
+
+
+			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker,function (){
+
+				TRACKER.showImageWindow(imageId);
+				
+			});
+			
+			//TODO: show image icerisinde info window acilmakta
+			// Bu yuzden infowindow open listener i duzenlenmeli
+			
+			MAP.setInfoWindowCloseListener(infoWindow,function (){
+				if ($('#showPhotosOnMap').attr('checked') == false){
+					MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
+				}
+			});
+
+			/*
 			GEvent.addListener(TRACKER.images[imageId].gmarker, "click", function() {
 				TRACKER.showImageWindow(imageId);	
 			});
+
 			GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowopen",function(){
 				TRACKER.images[imageId].gmarker.show();
 			});
+			 
 			GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowclose",function(){
 				if ($('#showPhotosOnMap').attr('checked') == false){
 					TRACKER.images[imageId].gmarker.hide();
 				}
 			});
-			MAP.addOverlay(TRACKER.images[imageId].gmarker);
+			*/
+			//MAP.addOverlay(TRACKER.images[imageId].gmarker);
 		}
 
 	});
@@ -383,7 +435,7 @@ function processImageXML(MAP, xml){
 }
 //TODO: latitude longitude -> location a cevrilsin
 function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, latitude, longitude, nextGMarkerIndex) {
-	
+
 	var content = "<div>" 
 		+ "<b>" + TRACKER.users[userId].realname + "</b> " 
 		+ TRACKER.langOperator.wasHere 
@@ -424,7 +476,7 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+'</a>'
 		+ "</li>"
 		+"</ul>";
-	
+
 	return content;
-	
+
 }

@@ -101,6 +101,17 @@ function MapOperator() {
 	}
 	
 	/*
+	 * infoWindow is the type that returns from initializeInfoWindow
+	 * functionName is the function that is called when closed infoWindow
+	 */
+	MAP_OPERATOR.setInfoWindowCloseListener = function(infoWindow,functionName) {
+		google.maps.event.addListener(infoWindow, 'closeclick', function(){
+			functionName();
+		});
+
+	}
+	
+	/*
 	 * marker is the type that returns from putMarker
 	 * functionName is the function that is called when clicked marker
 	 */
