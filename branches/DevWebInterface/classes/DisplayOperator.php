@@ -249,7 +249,6 @@ EOT;
 		$deviceId = "";	
 		$userArea = "";
 		$forms = "";
-		$startScript = "";
 		$hideUserArea = "";
 		if ($userInfo != null) 
 		{
@@ -259,13 +258,9 @@ EOT;
 			$longitude = $userInfo->longitude;
 			$time = $userInfo->time;
 			$deviceId = $userInfo->deviceId;	
-			$startScript = "trackerOp.getFriendList(1);
-   						    "; 	
-
 		}
 		else {
-			$startScript = "";  // langOp is initialized before document.ready function in str variable 
-			
+			// langOp is initialized before document.ready function in str variable 
 			$userArea = <<<USER_AREA
 							<div id="loginBlock">
 	 						<div style="clear:both" id="loginLink" class="userOperations"></div>
@@ -361,7 +356,7 @@ USER_AREA;
 					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers)	   	
 					trackerOp.setLangOperator(langOp),
 					trackerOp.setUserId($userId);
-		  			$startScript
+		  			trackerOp.getFriendList(1);
    				}
 			}
    			catch (e) {

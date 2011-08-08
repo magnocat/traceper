@@ -393,6 +393,8 @@ class WebClientManager extends Base
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
 		{
+			// if user authenticated return the friends and public data
+			// public data hasnt been implemented yet here...
 			$userId = $this->usermanager->getUserId();
 			$out = FAILED;
 			$pageNo = 1;
@@ -526,6 +528,10 @@ class WebClientManager extends Base
 			
 			$out = $this->prepareXML($sql, $pageNo, $pageCount);
 			
+		}
+		else {
+			// if user is not authenticated just return no data
+			$out = $this->addXMLEnvelope(0, 0, "");
 		}
 		return $out;		
 	}
@@ -661,14 +667,15 @@ class WebClientManager extends Base
 	private function getImageList($reqArray, $elementCountInAPage)
 	{
 		$out = UNAUTHORIZED_ACCESS;
+		$pageNo = 1;
+		if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
+					$pageNo = (int) $reqArray['pageNo'];
+		}
+		$offset = ($pageNo - 1) * $elementCountInAPage;
 		if ($this->isUserAuthenticated() == true)
 		{
+			// if user is authenticated returns friends' image and public image
 			$out = FAILED;
-			$pageNo = 1;
-			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
-					$pageNo = (int) $reqArray['pageNo'];
-			}
-			$offset = ($pageNo - 1) * $elementCountInAPage;
 			$userId = $this->usermanager->getUserId();
 			$sql = 'SELECT 
 							u.Id, u.userId, usr.realname, u.latitude, 
@@ -683,6 +690,7 @@ class WebClientManager extends Base
 							 SELECT friend2 FROM '.$this->tablePrefix.'_friends
 							 WHERE friend1 = '. $userId .' and status = 1)
 						  OR u.userId = '. $userId .'
+						  OR u.publicData = 1
 					ORDER BY 
 						u.Id 
 					DESC
@@ -699,19 +707,41 @@ class WebClientManager extends Base
 									 	UNION 
 									 	SELECT friend2 FROM '.$this->tablePrefix.'_friends
 									 		WHERE friend1 = '. $userId .' and status = 1)
-						  		  OR u.userId = '. $userId;
-			 					 	
-			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
-			if ($pageNo == $pageCount
-				&& $pageCount != 0) 
-			{
-				$this->imageFetchedTime = time();
-				$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
-			}
-			
-			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
-			 					 	
+						  		  OR u.userId = '. $userId . '  
+						  		  OR u.publicData = 1';
 		}
+		else {
+			// if user is not authenticated return just public image... 
+			$sql = 'SELECT 
+							u.Id, u.userId, usr.realname, u.latitude, 
+							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+					FROM '. $this->tablePrefix . '_upload u
+					LEFT JOIN '. $this->tablePrefix .'_users usr
+						ON  usr.Id = u.userId
+					WHERE
+						u.publicData = 1
+					ORDER BY 
+						u.Id 
+					DESC
+					LIMIT 
+							' . $offset . ',' . $elementCountInAPage;
+		
+			$sqlItemCount = 'SELECT
+			 						ceil(count(Id)/'.$elementCountInAPage.')
+			 				 FROM '
+			 					 	. $this->tablePrefix .'_upload u
+			 				 WHERE u.publicData = 1';
+			
+		}	 					 	
+		$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
+		if ($pageNo == $pageCount
+			&& $pageCount != 0) 
+		{
+			$this->imageFetchedTime = time();
+			$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
+		}
+		
+		$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
 		return $out;
 	}
 	
@@ -813,16 +843,33 @@ class WebClientManager extends Base
 		if (isset($reqArray['imageId']) && !empty($reqArray['imageId']))
 		{
 			$out = UNAUTHORIZED_ACCESS;
+			$imageId = (int) $reqArray['imageId'];
 			if ($this->isUserAuthenticated() == true)	
 			{
-				$imageId = (int) $reqArray['imageId'];
-				$thumb = false;
-				if (isset($reqArray['thumb']) && $reqArray['thumb']=='ok')
-				{ $thumb = true;
-				}					
-				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
-				$out = $thumbCreator->getImage($imageId, $thumb);					
+				//TODO: check if user is authorised to see this image
+				$out = SUCCESS;
 			}
+			else {
+				// checking image is public or not...
+				$sqlIsPublic = sprintf('SELECT publicData 
+										FROM ' .$this->tablePrefix.'_upload		
+										WHERE id = %d 
+										LIMIT 1', $imageId);
+				$isPublic = $this->dbc->getUniqueField($sqlIsPublic);
+				if ($isPublic == "1") {	
+					$out = SUCCESS;
+				}
+				// if image is not public, returns UNAUTHORIAZED_ACCESS					
+			}
+			$thumb = false;
+			if (isset($reqArray['thumb']) && $reqArray['thumb']=='ok')
+			{ $thumb = true;
+			}
+			
+			if ($out === SUCCESS) {
+				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
+				$out = $thumbCreator->getImage($imageId, $thumb);
+			}	
 		}		
 		return $out;	
 	}
@@ -920,27 +967,38 @@ class WebClientManager extends Base
 		}
 		
 		
-		
-		$pageNo = $pageCount == 0 ? 0 : $pageNo;
-		
-		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
+		$extra = "";
 		
 		if ($this->pastPointsFetchedUserId != NULL) {
-			$pageStr .= ' userId="'.$this->pastPointsFetchedUserId.'"';
+			$extra .= ' userId="'.$this->pastPointsFetchedUserId.'"';
 		}
 		if ( $type == "imageList" || $this->includeImageInUpdatedUserListReq == true)
 		{
-			$pageStr.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
+			$extra.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
 		}
+
+		$pageNo = $pageCount == 0 ? 0 : $pageNo;
+/*		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+//				.'<page '. $pageStr . ' >'					
+//					. $str
+//			   .'</page>';
+*/
+		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);		
+	}
+
+	private function addXMLEnvelope($pageNo, $pageCount, $str, $extra = ""){
+			
+		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
 		
 		header("Content-type: application/xml; charset=utf-8");
 		$out = '<?xml version="1.0" encoding="UTF-8"?>'
-				.'<page '. $pageStr . ' >'					
+				.'<page '. $pageStr . '  '. $extra .' >'					
 					. $str
 			   .'</page>';
 
 		return $out;		
-	}	
+	}
+	
 	
 	private function getImageXMLItem($row)
 	{
