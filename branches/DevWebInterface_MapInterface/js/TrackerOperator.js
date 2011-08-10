@@ -121,6 +121,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			$("#changePassword").hide();
 		}
 	}
+	
+	this.getMap = function (){
+		return MAP;
+	}
 
 	this.authenticateUser = function(username, password, rememberMe, callback)
 	{
@@ -684,11 +688,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			});
 		}
 		else {			
-			TRACKER.users[userId].polyline.show();
-
+			//TRACKER.users[userId].polyline.show();
+			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
+			
 			for (var i in TRACKER.users[userId].pastPointsGMarker) { 
 				if (TRACKER.users[userId].pastPointsGMarker[i] != null){
-					TRACKER.users[userId].pastPointsGMarker[i].show();
+					MAP.setMarkerVisible(TRACKER.users[userId].pastPointsGMarker[i], true);
 				}
 			}
 		}		
@@ -699,13 +704,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	{
 		if (typeof TRACKER.users[userId].polyline != 'undefined')
 		{
-			TRACKER.users[userId].polyline.hide();
+			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, false);
 			var len = TRACKER.users[userId].pastPointsGMarker.length;
 
 			for (var i = 1; i < len; i++) { 
 				if (TRACKER.users[userId].pastPointsGMarker[i] != null) {
-					TRACKER.users[userId].pastPointsGMarker[i].hide();
-					TRACKER.users[userId].pastPointsGMarker[i].closeInfoWindow();
+					MAP.setMarkerVisible(TRACKER.users[userId].pastPointsGMarker[i], false);
+					//TRACKER.users[userId].pastPointsGMarker[i].hide();
+					
+					//TRACKER.users[userId].pastPointsGMarker[i].closeInfoWindow();
 				}
 			}
 		}
@@ -741,6 +748,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.showImageWindow = function(imageId){
+		MAP.trigger(TRACKER.images[imageId].gmarker, 'click');
+	
+/*		
 		var image = new Image();
 
 		image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
@@ -769,7 +779,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					+ '</ul>'
 					+ "</div>");
 
-		});		
+		});	
+*/	
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
@@ -777,6 +788,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.zoomPoint = function (latitude, longitude) {
 
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		MAP.zoomPoint(point);
+/*		
 		var zoomlevel = MAP.getZoom();
 		var incZoomlevel;
 		if (zoomlevel < 6) {
@@ -799,10 +813,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var ltlng = new GLatLng(latitude, longitude);
 
 		MAP.setCenter(ltlng, zoomlevel);		
+*/
 	}
 
 	this.zoomMaxPoint = function(latitude, longitude)
 	{
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		MAP.zoomMaxPoint(point);
+/*		
 		var ltlng = new GLatLng(latitude, longitude);
 
 		if (typeof TRACKER.maxZoomlevel[latitude] == "undefined" ||
@@ -820,6 +838,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		else {
 			MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
 		}
+*/
 	};
 
 
@@ -828,6 +847,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 * previous point are clicked.
 	 */
 	this.showPointGMarkerInfoWin = function(gMarkerIndex, userId){
+		
 		if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined" ||	
 				typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
 		{ 
@@ -847,7 +867,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 				}
 				else {
-					GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");
+					MAP.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], 'click');
 				}			
 
 			});
@@ -856,12 +876,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
-			if (userId != TRACKER.traceLineDrawedUserId ||
-					TRACKER.users[userId].polyline.isHidden() == true) 
+			
+			
+			if (userId != TRACKER.traceLineDrawedUserId ) // ||
+				//	TRACKER.users[userId].polyline.isHidden() == true) 
 			{				
 				TRACKER.drawTraceLine(userId);
 			}
-			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
+			MAP.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
 		}
 	}
 	this.showMessage = function(message, type, callback)

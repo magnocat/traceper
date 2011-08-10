@@ -21,7 +21,7 @@ function processUserPastLocationsXML (MAP, xml) {
 		pastPoints.push(point);
 		
 		//var gmarker = new GMarker(point);
-		var gmarker = MAP.putMarker(point, "images/person.png", visible);
+		var gmarker = MAP.putMarker(point);
 
 		//GEvent.addListener(gmarker, "click", function(){
 		MAP.setMarkerClickListener(gmarker,function (){
@@ -71,10 +71,11 @@ function processUserPastLocationsXML (MAP, xml) {
 					+ TRACKER.langOperator.nextPoint 
 					+'</a>'
 					+ "</li>"
-					+"</ul>");	
+					+"</ul>";	
+					var infoWindow = MAP.initializeInfoWindow(content);
+					MAP.openInfoWindow(infoWindow, gmarker);
 		});
-		var infoWindow = MAP.initializeInfoWindow(content);
-		MAP.openInfoWindow(infoWindow, gMarker);
+		
 		index++;
 		//MAP.addOverlay(gmarker);			
 		pastPointsGMarker.push(gmarker)
@@ -91,16 +92,16 @@ function processUserPastLocationsXML (MAP, xml) {
 		TRACKER.users[userId].polyline = MAP.initializePolyline();
 		MAP.addPointToPolyline(TRACKER.users[userId].polyline,firstPoint);
 	}
-	else {
-		var len = pastPoints.length;
-		var i;
-		//var vertexIndex = TRACKER.users[userId].polyline.getVertexCount();
-		for (i = 0; i < len; i++){
-			//TRACKER.users[userId].polyline.insertVertex(vertexIndex, pastPoints[i]);
-			//vertexIndex++;
-			MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
-		}
+	
+	var len = pastPoints.length;
+	var i;
+	//var vertexIndex = TRACKER.users[userId].polyline.getVertexCount();
+	for (i = 0; i < len; i++){
+		//TRACKER.users[userId].polyline.insertVertex(vertexIndex, pastPoints[i]);
+		//vertexIndex++;
+		MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
 	}
+
 	var tmp = TRACKER.users[userId].pastPointsGMarker;	
 	TRACKER.users[userId].pastPointsGMarker = tmp.concat(pastPointsGMarker);
 }
@@ -152,6 +153,11 @@ function processXML(MAP, xml, isFriendList)
 		}
 		list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 
+		var visible = false;
+		if (isFriend == "1") {
+			visible = true;
+//			MAP.addOverlay(TRACKER.users[userId].gmarker);
+		}
 		//		if (isFriend == "1")
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
@@ -197,11 +203,7 @@ function processXML(MAP, xml, isFriendList)
 					+ '</div>';
 
 				TRACKER.users[userId].infoWindow = MAP.initializeInfoWindow(content);
-				var visible = false;
-				if (isFriend == "1") {
-					visible = true;
-//					MAP.addOverlay(TRACKER.users[userId].gmarker);
-				}
+				
 
 
 				MAP.setMarkerClickListener(TRACKER.users[userId].gmarker,function (){
@@ -369,7 +371,7 @@ function processImageXML(MAP, xml){
 			 */
 			image = imageURL + TRACKER.imageThumbSuffix;
 
-			var userMarker = MAP.putMarker(location, image, visible);
+			var userMarker = MAP.putMarker(location, image);
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -381,30 +383,48 @@ function processImageXML(MAP, xml){
 				gmarker:userMarker,
 			});
 
-			var content =  '<div>'														   
-				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + TRACKER.users[userId].time
-				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-				//+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
-				;
+			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker, function (){
+				var image = new Image();
 
-			var infoWindow = MAP.initializeInfoWindow(content);
+				image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
+				$("#loading").show();
+				$(image).load(function(){
+					$("#loading").hide();
 
+					var content = "<div class='origImageContainer'>"
+							+ "<div>"
+							+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+							+ "</div>"
+							+ "<div>"
+							+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+							+ "<br/>"
+							+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
+							+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+							+ "</div>"
+							+ '<ul class="sf-menu"> '
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoom
+							+'</a>'+ '</li>'
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoomMax
+							+'</a>'+'</li>'
+							+'</li>'
+							+ '</ul>'
+							+ "</div>";
+					var infoWindow = MAP.initializeInfoWindow(content);
+					MAP.openInfoWindow(infoWindow, TRACKER.images[imageId].gmarker);
+					
+					MAP.setInfoWindowCloseListener(infoWindow, function (){
+						if ($('#showPhotosOnMap').attr('checked') == false){
+							MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
+						}
+					});
 
-			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker,function (){
-
-				TRACKER.showImageWindow(imageId);
+				});		
 				
 			});
 			
-			//TODO: show image icerisinde info window acilmakta
-			// Bu yuzden infowindow open listener i duzenlenmeli
 			
-			MAP.setInfoWindowCloseListener(infoWindow,function (){
-				if ($('#showPhotosOnMap').attr('checked') == false){
-					MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
-				}
-			});
 
 			/*
 			GEvent.addListener(TRACKER.images[imageId].gmarker, "click", function() {

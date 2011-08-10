@@ -196,33 +196,60 @@ function MapOperator() {
 		var position = new google.maps.LatLng(location.latitude, location.longitude);
 		MAP_OPERATOR.map.panTo(position);		
 	}
-
-	/*
-	MAP_OPERATOR.drawPolygon = function(locationArray) {
-		var triangleCoords = new google.maps.LatLng(locationArray.latitude, locationArray.longitude);
-
-		// Construct the polygon
-	    bermudaTriangle = new google.maps.Polygon({
-	      paths: triangleCoords,
-	      strokeColor: "#FF0000",
-	      strokeOpacity: 0.8,
-	      strokeWeight: 2,
-	      fillColor: "#FF0000",
-	      fillOpacity: 0.35
-	    });
-
-	   bermudaTriangle.setMap(map);		
-	}
+	
+	/**
+	 * This function trigs an event specified by eventName(String) on the object parameter
 	 */
+	MAP_OPERATOR.trigger = function (object, eventName) {
+		google.maps.event.trigger(object, eventName);
+	}
+	
+	MAP_OPERATOR.setPolylineVisibility = function (object, visible){
+		var opacity = 0;
+		if (visible == true) {
+			opacity = 1;
+		}
+		object.setOptions({strokeOpacity:opacity});
+	}
 
-	// open info window, (marker)
-	// close info window
-	// initialize info window, (content string), return info window 
+	MAP_OPERATOR.zoomMaxPoint = function(point) {
+		
+		var zoomService = new google.maps.MaxZoomService();
+		var position = new google.maps.LatLng(point.latitude, point.longitude);
+		
+		zoomService.getMaxZoomAtLatLng(position,function(maxResult){
+			
+			MAP_OPERATOR.map.setCenter(position);
+			MAP_OPERATOR.map.setZoom(maxResult.zoom);
+		});
+	}
+	
+	MAP_OPERATOR.zoomPoint = function(point) {
+		
+		var zoomlevel = MAP_OPERATOR.map.getZoom();
+		var incZoomlevel;
+		if (zoomlevel < 6) {
+			incZoomlevel = 5;
+		}
+		else if (zoomlevel < 10) {
+			incZoomlevel = 4;
+		}
+		else if (zoomlevel < 13) {
+			incZoomlevel = 3;
+		}
+		else if (zoomlevel < 15) {
+			incZoomlevel = 2;
+		}
+		else {
+			incZoomlevel = 1;
+		}
 
-	// click function
-
-	//polygon cizilecek, parametre location array alacak
-
+		zoomlevel += incZoomlevel;
+		
+		var position = new google.maps.LatLng(point.latitude, point.longitude);
+		MAP_OPERATOR.map.setCenter(position);
+		MAP_OPERATOR.map.setZoom(zoomlevel);
+	}
 
 
 }
