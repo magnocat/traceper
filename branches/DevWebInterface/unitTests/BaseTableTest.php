@@ -3,7 +3,7 @@
 require_once('..\classes\tables\BaseTable.php');
 require_once('..\classes\MySQLOperator.php');
 
-require_once('..\classes\tables\Rating.php');
+require_once('..\classes\tables\RatingPlugin.php');
 
 class BaseTableTest extends PHPUnit_Framework_TestCase {
     
@@ -12,7 +12,7 @@ class BaseTableTest extends PHPUnit_Framework_TestCase {
 	
 	public function setUp()
     {
-		$this->dbc = new MySQLOperator("localhost","root","","php");
+		$this->dbc = new MySQLOperator("localhost","root","","traceper");
     	$this->baseTable = new BaseTable("traceper_upload_rating", $this->dbc);
     }
 
@@ -23,24 +23,23 @@ class BaseTableTest extends PHPUnit_Framework_TestCase {
 	
 	public function testUpdate() 
 	{
-		$updateArray = array(Rating::field_voting_count => Rating::field_voting_count. "+1", Rating::field_points => Rating::field_points ."+10");
-		$condArr = array(Rating::field_upload_id => "20");	
+		$updateArray = array(RatingPlugin::field_voting_count => RatingPlugin::field_voting_count. "+1", RatingPlugin::field_points => RatingPlugin::field_points ."+10");
+		$condArr = array(RatingPlugin::field_upload_id => "1");	
 
-		$this->assertTrue($this->baseTable->update($updateArray, $condArr));
+		$this->assertEquals(1,$this->baseTable->update($updateArray, $condArr));
 	}	
     
     public function testInsert() 
 	{
-		$fieldsArray = array(Rating::field_points);
-		$values = array(30);	
+		$fieldsArray = array(RatingPlugin::field_upload_id => 20, RatingPlugin::field_points => 30);
 
-		$this->assertTrue($this->baseTable->insert($fieldsArray, $values));
+		$this->assertTrue($this->baseTable->insert($fieldsArray));
 	}
 	
 	public function testSelect() 
 	{
-		$fieldsArray = array(Rating::field_points);
-		$condArr = array(Rating::field_upload_id => "2");	
+		$fieldsArray = array(RatingPlugin::field_points);
+		$condArr = array(RatingPlugin::field_upload_id => "2");	
 
 		$this->assertGreaterThan(0, $this->baseTable->select($fieldsArray, $condArr), 'No rows could be selected!');
 	}	
