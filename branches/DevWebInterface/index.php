@@ -19,7 +19,20 @@ $out = NULL;
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) 
 {
 	$action = $_REQUEST['action'];	
-	if (strpos($action, WEB_CLIENT_ACTION_PREFIX) === 0)
+	if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
+	{
+		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
+		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
+								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
+		$dm->setUploadPath(UPLOAD_DIRECTORY);
+		$tdo = new TempDataStoreOperator();
+		
+		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
+		$dm->setUserManager($usermanager);
+	
+		$out = $dm->process($_REQUEST);
+	}
+	else //(strpos($action, WEB_CLIENT_ACTION_PREFIX) === 0)
 	{
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
@@ -41,19 +54,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		
 		$out = $wcm->process($_REQUEST);	
 	}
-	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
-	{
-		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
-		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
-								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
-		$dm->setUploadPath(UPLOAD_DIRECTORY);
-		$tdo = new TempDataStoreOperator();
-		
-		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
-		$dm->setUserManager($usermanager);
 	
-		$out = $dm->process($_REQUEST);
-	}
 }
 else {	
 	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
@@ -77,20 +78,7 @@ else {
 		$userInfo = $auth->getUserInfo();
 	}
 	
-//	$arr = array(Rating::field_voting_count => Rating::field_voting_count. "+1", Rating::field_points => Rating::field_points ."+10");
-//	$arr2 = array(Rating::field_points);
-//	
-//	$condArr = array(Rating::field_upload_id => "1");	
-//	$values = array(40);
-//	
-//	$ratingTable = new Rating(TABLE_PREFIX, $dbc);
-	
-
 	$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);
-
-	//$ratingTable->update($arr, $condArr);
-	
-	//$ratingTable->insert($arr2, $values);
 }
 echo $out;
 //error_log($out, 3, "log.txt");
