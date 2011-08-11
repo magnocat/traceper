@@ -355,3 +355,7 @@ a {
 .link{
 cursor:pointer;
 }
+
+.rating{
+	padding-left:15px;
+}
