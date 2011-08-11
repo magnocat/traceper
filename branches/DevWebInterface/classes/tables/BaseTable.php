@@ -38,15 +38,13 @@ class BaseTable
 		}
 		
 		$sql .= ' LIMIT '. $limit;
-		
-		echo $sql;
 
 		$result = false;
 		if($this->dbc->query($sql) != false)
 		{
-			$result = true;
+			$result = $this->dbc->getAffectedRows();
 		}
-
+		
 		return $result;
 	}
 	
@@ -77,13 +75,21 @@ public function select($values, $conditions, $limit=1) {
 		
 		echo "Number Of Rows:".$this->dbc->numRows($result);
 		
-		return $this->dbc->numRows($result);
+		return $result;
 	}	
 	
-	public function insert($elements, $values) {
+	public function insert($elements) {
 		
-		$sqlElementsPart = implode(',', $elements);
-		$sqlValuesPart = implode(',', $values);
+		$keysArray = array();
+		$valuesArray = array();
+		foreach ($elements as $key => $value)
+		{
+			array_push($keysArray, $key);
+			array_push($valuesArray, $value);
+		}
+
+		$sqlElementsPart = implode(',', $keysArray);
+		$sqlValuesPart = implode(',', $valuesArray);
 
 		$sql = 'INSERT INTO ' . $this->tableName . '(' . $sqlElementsPart . ')' . 'VALUES(' . $sqlValuesPart .')';
 					
