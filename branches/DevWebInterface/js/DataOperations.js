@@ -306,10 +306,11 @@ function processImageXML(MAP, xml){
 		var latitude = $(image).attr('latitude');
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
+		var rating = $(image).attr('rating');
 		var point = new GLatLng(latitude, longitude);
 		
 		list += "<li>";
-				
+			
 		if (TRACKER.userId == userId) {
 			// add delete image button if logged in user and image uploader are same
 			list += "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
@@ -323,8 +324,11 @@ function processImageXML(MAP, xml){
 								+ "<br/>"
 								/* + TRACKER.langOperator.time + ": " */ +  time									
 							+ "</div>"
+							+ "<div class='rating' id='uploadRating"+ imageId +"' imageId='"+ imageId +"'></div>"
 						+ "</a>"
 					+"</li>";
+		
+		
 
 		if ($.inArray(imageId, TRACKER.imageIds) == -1)
 		{
@@ -345,6 +349,7 @@ function processImageXML(MAP, xml){
 												latitude:latitude,
 												longitude:longitude,
 												time:time,
+												rating:rating,
 												gmarker:new GMarker(point, markerOptions),
 												});
 			GEvent.addListener(TRACKER.images[imageId].gmarker, "click", function() {
