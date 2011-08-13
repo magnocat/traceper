@@ -48,6 +48,12 @@ public class Register extends Activity {
         
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+			
             appService = ((AppService.IMBinder)service).getService(); 
             appService.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
             
@@ -83,7 +89,7 @@ public class Register extends Activity {
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
-					progressDialog = ProgressDialog.show(Register.this, "Register", "Saving...");
+					progressDialog = ProgressDialog.show(Register.this, getString(R.string.traceper_register), getString(R.string.saving));
 					if (passwordText.length() > 0 && 
 						passwordAgainText.length() > 0 &&
 						eMailText.length() > 0 &&
