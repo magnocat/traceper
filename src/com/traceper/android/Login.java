@@ -16,7 +16,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +24,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.traceper.R;
@@ -109,7 +107,7 @@ public class Login extends Activity {
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
 			{	
-				progressDialog = ProgressDialog.show(Login.this, "Traceper-Login", "Loading...", true, false);	
+				progressDialog = ProgressDialog.show(Login.this, getString(R.string.traceper_login), getString(R.string.loading), true, false);	
 				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
 				editor.commit();
