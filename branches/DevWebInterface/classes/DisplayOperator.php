@@ -316,7 +316,8 @@ USER_AREA;
 	<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
-  	<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script> 
+  	<script type="text/javascript" src="js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script>
+  	<script type="text/javascript" src="js/jquery/plugins/rating/jquery.raty.min.js"></script> 
 	
   	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="js/DataOperations.js"></script>
@@ -439,7 +440,7 @@ USER_AREA;
 	</div>
 	
 	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
-	</div>
+	Adnan Hocam</div>
 	
 	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350', title:'<div id=\'inviteUserFormTitle\'></div>',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
