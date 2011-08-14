@@ -57,4 +57,8 @@
 <string name="make_it_private">No, make it private to my friends</string>
 <string name="cancel_upload">Cancel Upload</string>
 <string name="uploading">Uploading, please wait...</string>
+<string name="loading">loading, please wait...</string>
+<string name="traceper_login">Traceper-Login</string>
+<string name="traceper_register">Traceper-Register</string>
+<string name="saving">saving...</string>
 </resources>
