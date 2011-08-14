@@ -46,6 +46,7 @@ public class Login extends Activity {
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
     private IAppService appManager;
+    private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
@@ -123,9 +124,11 @@ public class Login extends Activity {
 				//TODO: check whether email format is valid.
 				else if (emailText.length() > 0 && passwordText.length() > 0)
 				{					
+					progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);	
+					
 					Thread loginThread = new Thread(){
-					ProgressDialog	progressDialog = ProgressDialog.show(Login.this, getString(R.string.traceper_login), getString(R.string.loading), true, false);	
 						private Handler handler = new Handler();
+						int result;
 						@Override
 						public void run() {
 							
@@ -137,56 +140,48 @@ public class Login extends Activity {
 							} catch (UnsupportedEncodingException e) {
 								e.printStackTrace();
 							}
-							int result = appManager.authenticateUser(emailText.getText().toString(), password);
-							progressDialog.dismiss();
-							if (result == IAppService.HTTP_RESPONSE_SUCCESS){
-								SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-								
-								if (rememberMeCheckBox.isChecked() == true) {									
-		                        	editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
-		                        	editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
-								}
-								else {
-									editor.remove(Configuration.PREFERENCES_USEREMAIL);
-									editor.remove(Configuration.PREFERENCES_PASSWORD);
-								}
-								editor.commit();	
-								
-								handler.post(new Runnable(){
-									public void run() {										
+							result = appManager.authenticateUser(emailText.getText().toString(), password);
+							
+							handler.post(new Runnable(){
+								public void run() {										
+									progressDialog.dismiss();
+									
+									if (result == IAppService.HTTP_RESPONSE_SUCCESS){
+										SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+										
+										if (rememberMeCheckBox.isChecked() == true) {									
+				                        	editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
+				                        	editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
+										}
+										else {
+											editor.remove(Configuration.PREFERENCES_USEREMAIL);
+											editor.remove(Configuration.PREFERENCES_PASSWORD);
+										}
+										editor.commit();	
+																		
 										Intent i = new Intent(Login.this, Main.class);												
 										//i.putExtra(FRIEND_LIST, result);						
 										startActivity(i);	
 										Login.this.finish();										
-									}									
-								});											
-							}
-							else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
-							{
-								// Authentication failed, inform the user								 
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
+									{
+										// Authentication failed, inform the user								 
 										showDialog(MAKE_SURE_USERNAME_AND_PASSWORD_CORRECT);
-									}});														
-							}
-							else if (result == IAppService.HTTP_REQUEST_FAILED){
-								handler.post(new Runnable(){
-									public void run() {										
+													
+									}
+									else if (result == IAppService.HTTP_REQUEST_FAILED){
 										showDialog(HTTP_REQUEST_FAILED);
-									}});
-							}
-							else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
 										showDialog(HTTP_MISSING_PARAMETER);
-									}});
-							}
-							else {							
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else {							
 										showDialog(UNKNOWN_ERROR_OCCURED);
-									}});					
-							}							
+									}
+								}									
+							});
+														
 						}
 					};
 					
