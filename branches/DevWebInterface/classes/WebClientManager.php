@@ -42,6 +42,19 @@ class WebClientManager extends Base
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
 	}
 	
+	private function getRatingPlugin()
+	{
+		static $staRatingPlugin = NULL;
+		
+		if($staRatingPlugin == NULL)
+		{
+			$staRatingPlugin = new RatingPlugin($this->tablePrefix, $this->dbc);	
+		}
+	
+		return $staRatingPlugin;
+		
+	}
+	
 	public function setUserManager($usermanager){
 		$this->usermanager = $usermanager;
 	}
@@ -168,7 +181,13 @@ class WebClientManager extends Base
 			case $this->actionPrefix . "GetFriendRequests":
 		
 				$out = $this->usermanager->getFriendRequests($reqArray['pageNo'], $this->elementCountInAPage);
-				break;		
+				break;	
+			case "SetUploadRating":
+		
+				$out = $this->getRatingPlugin()->process($reqArray);
+				break;				
+
+				
 			default:				
 				$out = UNSUPPORTED_ACTION;
 				if (class_exists("FacebookConnect")) 
@@ -679,10 +698,13 @@ class WebClientManager extends Base
 			$userId = $this->usermanager->getUserId();
 			$sql = 'SELECT 
 							u.Id, u.userId, usr.realname, u.latitude, 
-							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime,
+							rating.points/rating.voting_count as rating
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
 						ON  usr.Id = u.userId
+					LEFT JOIN '. $this->tablePrefix .'_upload_rating rating
+						ON rating.upload_id = u.Id
 					WHERE u.userId in 
 							(SELECT friend1 FROM '.$this->tablePrefix.'_friends
 							 WHERE friend2 = '. $userId .' and status = 1
@@ -1009,9 +1031,10 @@ class WebClientManager extends Base
 		$row->Id = isset($row->Id) ? $row->Id : null;
 		$row->userId = isset($row->userId) ? $row->userId : null;
 		$row->realname = isset($row->realname) ? $row->realname : null;
+		$row->rating = isset($row->rating) ? $row->rating : null;
 
 
-		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'"  time="'.$row->uploadTime.'"/>';
+		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'" rating="'. $row->rating .'" time="'.$row->uploadTime.'" />';
 
 		return $str;
 	}
