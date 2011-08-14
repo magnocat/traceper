@@ -95,7 +95,7 @@ class UserManager extends AuthenticateManager implements IUserManagement
 	  	return true;
 	}
 	
-	public function registerUser($email, $name, $password, $invitedUser)
+	public function registerUser($email, $name, $password, $invitedUser=false)
 	{
 		$out = EMAIL_NOT_VALID;
 		if (preg_match("/^([a-zA-Z0-9])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]+)+/", $email))
