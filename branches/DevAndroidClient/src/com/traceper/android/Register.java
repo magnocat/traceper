@@ -40,6 +40,7 @@ public class Register extends Activity {
 	private EditText passwordAgainText;
 	private EditText realnameText;
 	private IAppService appService;
+	private ProgressDialog progressDialog;
 	private Handler handler = new Handler();
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -100,9 +101,10 @@ public class Register extends Activity {
 						
 							if (eMailText.length() >= 5 && passwordText.length() >= 5) {
 							
+									progressDialog = ProgressDialog.show(Register.this, "", getString(R.string.saving));
+								
 									Thread thread = new Thread(){
 										int result;
-										ProgressDialog progressDialog = ProgressDialog.show(Register.this, getString(R.string.traceper_register), getString(R.string.saving));
 										public void run() {
 											String password = null;
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
@@ -111,11 +113,12 @@ public class Register extends Activity {
 											result = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
 																			 realnameText.getText().toString());
-											progressDialog.dismiss();
+											
 		
 											handler.post(new Runnable(){
 		
 												public void run() {
+													progressDialog.dismiss();
 													if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
 														showDialog(SIGN_UP_SUCCESSFULL);
 													}
