@@ -298,20 +298,8 @@ USER_AREA;
 	<head>
 		<title></title>
 		  $head		
-     <script type="text/javascript" src="http://www.google.com/jsapi?key=$apiKey">
- 	 </script>
-    
-      <script type="text/javascript" charset="utf-8">
-        google.load("maps", "2.x",{"other_params":"sensor=true"});
-      </script>
-      	  
-   <link type="text/css" href="js/jquery/plugins/superfish/css/superfish.css" rel="stylesheet" media="screen"/>
-	 <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
+   	 <link rel="stylesheet" type="text/css" href="js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
   
-<!--	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
--->
-<!--	<script type="text/javascript" src="js/jquery/jquery.min.js"></script> -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery/plugins/jquery.cookie.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
@@ -321,17 +309,22 @@ USER_AREA;
 	
   	<script type="text/javascript" src="js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="js/DataOperations.js"></script>
-			
+
+	<script type="text/javascript" src="js/maps/MapStructs.js"></script>	
+	<script type="text/javascript" src="js/maps/GMapOperator.js"></script>
 	<script type="text/javascript" src="js/TrackerOperator.js"></script>
 	<script type="text/javascript" src="js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="js/bindings.js"></script>	
+
 	<script type="text/javascript">		
 		var langOp = new LanguageOperator();
 		var fetchPhotosDefaultValue =  $fetchPhotosInInitialization;
-		langOp.load("$language"); 	
-				
-		$(document).ready(function(){			
-				
+		langOp.load("$language");
+		
+		var mapOperator = new MapOperator();
+		
+		$(document).ready( function(){
+							
 			var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
 			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
@@ -344,21 +337,19 @@ USER_AREA;
 			}
 			$('#showPhotosOnMap').attr('checked', checked);
 			
-			var map;
+			
 			try 
 			{
-				if (GBrowserIsCompatible()) 
-				{
-   					map = new GMap2(document.getElementById("map"));
-   					map.setCenter(new GLatLng(39.504041,35.024414), 3);
-					map.setUIToDefault();					
-					map.setMapType(G_HYBRID_MAP);	
-					map.enableRotation();
-					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers)	   	
-					trackerOp.setLangOperator(langOp),
-					trackerOp.setUserId($userId);
-		  			trackerOp.getFriendList(1);
-   				}
+				
+				var mapStruct = new MapStruct();
+			    var initialLoc = new MapStruct.Location({latitude:39.504041,
+			    								  longitude:35.024414}); 
+				mapOperator.initialize(initialLoc);
+   				var trackerOp = new TrackerOperator('$callbackURL', mapOperator, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers)	   	
+				trackerOp.setLangOperator(langOp),
+				trackerOp.setUserId($userId);
+		  		trackerOp.getFriendList(1);	
+   				
 			}
    			catch (e) {
 				
@@ -377,9 +368,9 @@ USER_AREA;
       			     		
 		});	
 	</script>
-	
+   
 	</head>
-	<body  onunload="GUnload();" >	
+	<body>	
 	$pluginScript
 	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
@@ -420,7 +411,7 @@ USER_AREA;
 																																									
 				</div>
 				
-				<div id='map'>MAP</div>	
+				<div id="map"></div>					
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
 	</div>
@@ -440,7 +431,7 @@ USER_AREA;
 	</div>
 	
 	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
-	Adnan Hocam</div>
+	</div>
 	
 	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350', title:'<div id=\'inviteUserFormTitle\'></div>',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
@@ -483,8 +474,7 @@ USER_AREA;
 MAIN_PAGE;
 
 		  return $str;
-}
-	
+}	
 	public static function showErrorMessage($message) {
 		return $message;
 	}

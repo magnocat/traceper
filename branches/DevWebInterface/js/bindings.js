@@ -42,14 +42,16 @@ function bindElements(langOperator, trackerOp)
 		var checked = $(this).attr('checked');
 		$.cookie(showPhotosOnMapCookieId, checked, {expires:15});
 
+		var MAP = TRACKER.getMap();
 		if (checked == true){
 			$(TRACKER.imageIds).each(function(){
-				TRACKER.images[this].gmarker.show();
+				MAP.setMarkerVisible(TRACKER.images[this].gmarker, true);
+				//TRACKER.images[this].gmarker.show();
 			});
 		}
 		else {
 			$(TRACKER.imageIds).each(function(){
-				TRACKER.images[this].gmarker.hide();
+				MAP.setMarkerVisible(TRACKER.images[this].gmarker, false);
 			});
 		}		
 	});
