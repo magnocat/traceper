@@ -35,8 +35,6 @@ public class Register extends Activity {
 	private static final int SIGN_UP_SUCCESSFULL = 4;
 	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
 	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
-	private ProgressDialog progressDialog;
-	
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
@@ -89,7 +87,7 @@ public class Register extends Activity {
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
-					progressDialog = ProgressDialog.show(Register.this, getString(R.string.traceper_register), getString(R.string.saving));
+					
 					if (passwordText.length() > 0 && 
 						passwordAgainText.length() > 0 &&
 						eMailText.length() > 0 &&
@@ -104,15 +102,16 @@ public class Register extends Activity {
 							
 									Thread thread = new Thread(){
 										int result;
+										ProgressDialog progressDialog = ProgressDialog.show(Register.this, getString(R.string.traceper_register), getString(R.string.saving));
 										public void run() {
 											String password = null;
-										
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
 											password = passwordText.getText().toString();
 											
 											result = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
 																			 realnameText.getText().toString());
+											progressDialog.dismiss();
 		
 											handler.post(new Runnable(){
 		
@@ -133,24 +132,20 @@ public class Register extends Activity {
 												}
 		
 											});
-										progressDialog.dismiss();
 										}
 		
 									};
 									thread.start();
 							}
 							else{
-								progressDialog.dismiss();
 								showDialog(EMAIL_AND_PASSWORD_LENGTH_SHORT);
 							}							
 						}
 						else {
-							progressDialog.dismiss();
 							showDialog(TYPE_SAME_PASSWORD_IN_PASSWORD_FIELDS);
 						}						
 					}
 					else {
-						progressDialog.dismiss();
 						showDialog(FILL_ALL_FIELDS);
 						
 					}				
