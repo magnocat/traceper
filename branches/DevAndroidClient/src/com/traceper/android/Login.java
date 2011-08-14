@@ -46,7 +46,6 @@ public class Login extends Activity {
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
     private IAppService appManager;
-	private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
@@ -107,7 +106,6 @@ public class Login extends Activity {
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
 			{	
-				progressDialog = ProgressDialog.show(Login.this, getString(R.string.traceper_login), getString(R.string.loading), true, false);	
 				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
 				editor.commit();
@@ -126,6 +124,7 @@ public class Login extends Activity {
 				else if (emailText.length() > 0 && passwordText.length() > 0)
 				{					
 					Thread loginThread = new Thread(){
+					ProgressDialog	progressDialog = ProgressDialog.show(Login.this, getString(R.string.traceper_login), getString(R.string.loading), true, false);	
 						private Handler handler = new Handler();
 						@Override
 						public void run() {
@@ -139,6 +138,7 @@ public class Login extends Activity {
 								e.printStackTrace();
 							}
 							int result = appManager.authenticateUser(emailText.getText().toString(), password);
+							progressDialog.dismiss();
 							if (result == IAppService.HTTP_RESPONSE_SUCCESS){
 								SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 								
@@ -187,7 +187,6 @@ public class Login extends Activity {
 										showDialog(UNKNOWN_ERROR_OCCURED);
 									}});					
 							}							
-						progressDialog.dismiss();
 						}
 					};
 					
@@ -197,7 +196,6 @@ public class Login extends Activity {
 				else {
 					// Username or Password is not filled, alert the user					 
 					showDialog(FILL_BOTH_USERNAME_AND_PASSWORD);
-					progressDialog.dismiss();
 				}
 			}
 			
