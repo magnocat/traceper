@@ -29,6 +29,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionAddFriendRequest = "WebClientAddFriendRequest";
 	this.actionGetFriendRequests = "WebClientGetFriendRequests";	
 	this.actionConfirmFriendship = "WebClientConfirmFriendship";
+	this.actionSetUploadRating = "SetUploadRating";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -107,6 +108,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var latitude;
 		var longitude;
 		var time;
+		var rating;
 		var gmarker;
 
 		for (var n in arguments[0]) { 
@@ -572,6 +574,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			$('#photos').slideUp('fast',function(){
 				$('#photos').html(str);
 				$('#photos').slideDown();
+				
+		
+				for (var n in TRACKER.images) { 
+			
+					$('#uploadRating'+TRACKER.images[n].imageId).raty({path:'js/jquery/plugins/rating/img/',
+						  											   start:TRACKER.images[n].rating,
+						  											   click:function(score, evt) {
+																			var params = "action=" + TRACKER.actionSetUploadRating + "&uploadId=" + this.attr('imageId') + "&points=" + score;
+						
+																			TRACKER.ajaxReq(params, function(result){
+																			});
+																		}
+																	  }); 
+				}
+			
 			});
 
 			if (typeof callback == 'function'){
@@ -765,11 +782,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var image = new Image();
 
 		image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
-		$("#loading").show();
+		$("#loading").show();	
 		$(image).load(function(){
 			$("#loading").hide();
 
-			TRACKER.images[imageId].gmarker.openInfoWindowHtml("<div class='origImageContainer'>"
+			//TRACKER.images[imageId].gmarker.openInfoWindow(document.getElementById("friendRequestsList"));
+			
+			TRACKER.images[imageId].gmarker.openInfoWindow("<div class='origImageContainer'>"
 					+ "<div>"
 					+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
 					+ "</div>"
@@ -778,6 +797,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					+ "<br/>"
 					+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
 					+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+					+ "</div>"
+					+ "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js\"></script>"
+					+ "<script type=\"text/javascript\" src=\"js/jquery/plugins/rating/jquery.raty.min.js\"></script>"
+					+ "<div>"
+					+ "<script type=\"text/javascript\"> alert('hello2');</script>"
 					+ "</div>"
 					+ '<ul class="sf-menu"> '
 					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
