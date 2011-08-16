@@ -51,9 +51,20 @@ class WebClientManager extends Base
 			$staRatingPlugin = new RatingPlugin($this->tablePrefix, $this->dbc);	
 		}
 	
-		return $staRatingPlugin;
-		
+		return $staRatingPlugin;		
 	}
+	
+	private function getUploadUserRelationTable()
+	{
+		static $staUploadUserRelationTable = NULL;
+		
+		if($staUploadUserRelationTable == NULL)
+		{
+			$staUploadUserRelationTable = new UploadUserRelation($this->tablePrefix, $this->dbc);	
+		}
+	
+		return $staUploadUserRelationTable;		
+	}	
 	
 	public function setUserManager($usermanager){
 		$this->usermanager = $usermanager;
@@ -183,8 +194,21 @@ class WebClientManager extends Base
 				$out = $this->usermanager->getFriendRequests($reqArray['pageNo'], $this->elementCountInAPage);
 				break;	
 			case "SetUploadRating":
+						
+				$userId = $this->usermanager->getUserId();
+
+				$fieldsArray = array(UploadUserRelation::field_id);
+				$condArr = array(UploadUserRelation::field_upload_id => $imageId, UploadUserRelation::field_user_id => $userId);	
 		
-				$out = $this->getRatingPlugin()->process($reqArray);
+				if($this->getUploadUserRelationTable()->select($fieldsArray, $condArr) == 0) //if the person has not given any rating for the photo, then let him to give
+				{	
+					$out = $this->getRatingPlugin()->process($reqArray);	
+				}
+				else
+				{
+					//This person has given some rating for the photo before, so do not let him anymore
+				}
+								
 				break;				
 
 				
@@ -914,6 +938,12 @@ class WebClientManager extends Base
 				$sql = sprintf ('DELETE FROM '.$this->tablePrefix.'_upload
 				                 WHERE id = %d and userId = %d
 				                 LIMIT 1', $imageId, $userId );
+				
+				$condArr = array(RatingPlugin::field_upload_id => $imageId);
+				$this->getRatingPlugin()->delete($condArr);
+				
+				$condArr = array(UploadUserRelation::field_upload_id => $imageId);
+				$this->getUploadUserRelationTable()->delete($condArr);
 				
 			 	$out = FAILED;
 			    if	($this->dbc->query($sql) != false && 
