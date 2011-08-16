@@ -48,7 +48,7 @@ class BaseTable
 		return $result;
 	}
 	
-public function select($values, $conditions, $limit=1) {
+	public function select($values, $conditions, $limit=1) {
 		
 		$sqlSelectPart = implode(',', $values);
 
@@ -73,7 +73,7 @@ public function select($values, $conditions, $limit=1) {
 
 		$result = $this->dbc->query($sql);
 		
-		echo "Number Of Rows:".$this->dbc->numRows($result);
+		//echo "Number Of Rows:".$this->dbc->numRows($result);
 		
 		return $result;
 	}	
@@ -104,6 +104,42 @@ public function select($values, $conditions, $limit=1) {
 		return $result;
 	}	
 	
+	public function delete($conditions, $limit=1) {
+		
+		$sql = 'DELETE FROM ' . $this->tableName;				
+		
+		if(!empty($conditions) && is_array($conditions))
+		{
+			$conditionValuePair = array();
+			foreach ($conditions as $key => $value)
+			{
+				array_push($conditionValuePair, $key .'='. $value);
+			}
+	
+			$sqlConditionPart = implode(',', $conditionValuePair);
+			
+			$sql .= ' WHERE ' . $sqlConditionPart;
+		}
+		
+		$sql .= ' LIMIT '. $limit;
+		
+		//echo $sql;
+
+		$result = false;
+		if($this->dbc->query($sql) != false)
+		{
+			$result = true;
+		}		
+		
+		//echo "Number Of Rows:".$this->dbc->numRows($result);
+		
+		return $result;
+	}
+		
+	
+	
+	
+	/*
 	//Eren tarafýndan eklendi, veritabanýndan veri silme yöntemi saðlamak için
 	public function delete($values)
 	{
@@ -129,6 +165,8 @@ public function select($values, $conditions, $limit=1) {
 
 		return $result;
 	}
+	*/
+	
 }
 
 ?>
