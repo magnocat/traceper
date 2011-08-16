@@ -24,14 +24,14 @@ class BaseTableTest extends PHPUnit_Framework_TestCase {
 	public function testUpdate() 
 	{
 		$updateArray = array(RatingPlugin::field_voting_count => RatingPlugin::field_voting_count. "+1", RatingPlugin::field_points => RatingPlugin::field_points ."+10");
-		$condArr = array(RatingPlugin::field_upload_id => "1");	
+		$condArr = array(RatingPlugin::field_upload_id => 1);	
 
 		$this->assertEquals(1,$this->baseTable->update($updateArray, $condArr));
 	}	
     
     public function testInsert() 
 	{
-		$fieldsArray = array(RatingPlugin::field_upload_id => 20, RatingPlugin::field_points => 30);
+		$fieldsArray = array(RatingPlugin::field_upload_id => 2, RatingPlugin::field_points => 100);
 
 		$this->assertTrue($this->baseTable->insert($fieldsArray));
 	}
@@ -39,9 +39,16 @@ class BaseTableTest extends PHPUnit_Framework_TestCase {
 	public function testSelect() 
 	{
 		$fieldsArray = array(RatingPlugin::field_points);
-		$condArr = array(RatingPlugin::field_upload_id => "2");	
+		$condArr = array(RatingPlugin::field_upload_id => 2);	
 
 		$this->assertGreaterThan(0, $this->baseTable->select($fieldsArray, $condArr), 'No rows could be selected!');
+	}	
+	
+	public function testDelete() 
+	{
+		$condArr = array(RatingPlugin::field_upload_id => 2);	
+
+		$this->assertTrue($this->baseTable->delete($condArr));
 	}	
 }
 ?>
