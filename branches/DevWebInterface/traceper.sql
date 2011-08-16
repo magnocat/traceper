@@ -178,6 +178,15 @@ CREATE TABLE  `traceper_upload_rating` (
   PRIMARY KEY (`upload_id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `traceper_upload_user_relation`;
+CREATE TABLE`traceper_upload_user_relation` (
+ `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+ `upload_id` INT UNSIGNED NOT NULL ,
+ `user_id` INT UNSIGNED NOT NULL ,
+ INDEX (`upload_id` ,`user_id`) 
+) ENGINE=MYISAM ; 
+
+
 --
 -- Dumping data for table `php`.`traceper_users`
 --
