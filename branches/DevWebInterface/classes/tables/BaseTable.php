@@ -135,38 +135,7 @@ class BaseTable
 		
 		return $result;
 	}
-		
-	
-	
-	
-	/*
-	//Eren tarafýndan eklendi, veritabanýndan veri silme yöntemi saðlamak için
-	public function delete($values)
-	{
-		$keyValuePair = array();
-		foreach ($values as $key => $value)
-		{
-			array_push($keyValuePair, $key .'='. $value);
-		}
-		
-		$sqlDeletePart = implode(',', $keyValuePair);
-		
-		
-		$sql = 'DELETE ' . $this->tableName
-				.' WHERE ' . $sqlDeletePart;
-
-		echo $sql;
-
-		$result = false;
-		if($this->dbc->query($sql) != false)
-		{
-			$result = true;
-		}
-
-		return $result;
-	}
-	*/
-	
+			
 }
 
 ?>

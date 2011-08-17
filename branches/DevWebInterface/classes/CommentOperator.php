@@ -2,19 +2,13 @@
 /*
  * 03.08.2011 Eren Alp Celik
  * 
- * Ahmet'in MySQLOperator içerisinde sunduğu komutları kullanarak
- * kullanıcıların resimler altına girdiği mesajları veritabanına
- * gönderir veya mevcut mesajlarda güncellemeler silmeler yapar. 
- * 
- * Çalışmalar sonucunda Adnan'ın BaseTable sınıfı bu durum için kullanışlı olmadı
- * 
  */
 require_once('..\classes\tables\BaseTable.php');
 require_once('..\classes\MySQLOperator.php');
 require_once('..\classes\tables\UploadComment.php');
 
-//şimdilik sadece resimler altına yorum koymak için kullanılacak
-//sonradan başka itemlara da yorum koyabilecek.
+//ï¿½imdilik sadece resimler altï¿½na yorum koymak iï¿½in kullanï¿½lacak
+//sonradan baï¿½ka itemlara da yorum koyabilecek.
 class CommentOperator{
     
     private $baseTable;
@@ -24,92 +18,53 @@ class CommentOperator{
     private $comment;
     private $result;
 	
-	public function __construct($userId, $dbc)
+	public function __construct($dbc)
     {
-    	//Kullanıcı yorum yazmaya yeltendiğinde ilk veritabanı bağlantısı kurulsun
-    	$this->userId=$userId;
-    	$this->dbc=$dbc;
-    	
-		$this->dbc = new MySQLOperator("localhost","root","","php");
-    	$this->baseTable = new BaseTable("traceper_upload_comment", $this->dbc);
+    	$this->dbc=$dbc;   	
     }
 
-	//Gerekli mi bilmiyorum ama ben yine de koydum
     function __destruct() {
     }
 	
-	//bir resme baktığında onun hakkında yapılmış tüm yorumları datetime sırasında getir
-	public function fetchComments($photoId) 
+	public function getComments($photoId) 
 	{
-		$valuesArray = array(UploadComment::photo_id, UploadComment::user_id, UploadComment::comment_time, UploadComment::comment);
+		$valuesArray = array(UploadComment::commentId, UploadComment::photo_id, UploadComment::user_id, UploadComment::comment_time, UploadComment::comment);
 		$condArr = array(UploadComment::photo_id => $photo_id);	
 		
-		$this->assertTrue($this->baseTable->select($valuesArray, $condArr));
-		
-		//Select ile ilgili resim için yazılmış tüm mesajlar çekilecek v ekrana parse edilecek
-		//ilgili yorumun KİŞİ, ZAMAN ve İÇERİK bilgileri çekilir
-		//$sqlQuery="Select ".UploadComment::photo_id.",".UploadComment::user_id.",".
-		//          UploadComment::comment_time.",".UploadComment::comment.
-		//          "FROM traceper_upload_comment Where photo_id=".$photoId;
-		//this->result=$this->dbc->query($sqlQuery);
+		return $this->baseTable->select($valuesArray, $condArr);
+
 	}
 
-    //bir yorumu değiştirir
-	public function editComment($photoId, $comment, $newComment, $commentTime) 
+	public function editComment($userId, $photoId, $comment, $newComment, $commentTime) 
 	{
-		//Önce değiştirilecek yorumun id si çekilir.
 		$fieldsArray = array(UploadComment::comment_id);
-		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$this->usedId,UploadComment::comment=>$comment );	
+		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$userId, UploadComment::comment=>$comment );	
 		$this->comment=$this->baseTable->select($fieldsArray, $condArr);
 				
 		$updateArray=array(UploadComment::comment => $comment,UploadComment::comment_time => $commentTime )
 	    $condArr = array(UploadComment::comment_id => $this->comment);
-	    $this->assertTrue($this->baseTable->update($updateArray, $condArr));
 	    
-		//$sqlQuery="Select ".UploadComment::comment_id.",".
-		//          "FROM traceper_upload_comment Where photo_id=".$photoId.
-		//          " AND user_id=".$userId." AND comment=".$comment;
-		//result ilgili yorumun id sini çeker, birazdan değiştirilecek
-		//this->result=$this->dbc->query($sqlQuery);
-		
-		//$sqlQuery="UPDATE traceper_upload_comment ".
-        //          "SET comment=".$newComment.", comment_time=".$commentTime.
-        //         "WHERE ".UploadComment::comment_id."=".$result;
-		//$this->dbc->query($sqlQuery);	
-
+	    return $this->baseTable->update($updateArray, $condArr);
 	}	
     
-	//yeni yorum gir
-    public function insertNewComment($photoId, $commentTime, $comment) 
+    public function insertNewComment($userId, $photoId, $commentTime, $comment) 
 	{
 		$elementsArray=array(UploadComment::photo_id,UploadComment::user_id, UploadComment::comment, UploadComment::comment_time);
-		$valuesArray=array($photoId, $this->userId, $commentTime, $comment);
-		$this->assertTrue($this->baseTable->insert($elementsArray, $valuesArray));		
+		$valuesArray=array($photoId, $userId, $commentTime, $comment);
 		
-		//$sqlQuery="INSERT INTO table_name (photo_id, user_id, comment, comment_time) ".
-		//"VALUES (".$photoId.",".$this->userId.",".$commentTime.",".$comment.")";
-		//this->dbc->query($sqlQuery);
+		return $this->baseTable->insert($elementsArray, $valuesArray);		
 	}
 	
-	//gerekli durumlarda ilgili yorumların silinmesi için
-	public function deleteComments($photoId)
+	public function deleteComments($userId, $photoId, $comment, $commentTime) 
 	{
-		//Önce silinecek yorumun id si çekilir.
 		$fieldsArray = array(UploadComment::comment_id);
-		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$this->usedId,UploadComment::comment=>$comment );	
+		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$userId,UploadComment::comment=>$comment );	
 		$this->result=$this->baseTable->select($fieldsArray, $condArr);
-		
+				
 		$deleteArray=array(UploadComment::comment_id => $this->result);
-		$this->result=$this->assertTrue($this->baseTable->delete($deleteArray));
-		
-		//$sqlQuery="Select ".UploadComment::comment_id.",".
-		//          "FROM traceper_upload_comment Where photo_id=".$photoId.
-		//          " AND user_id=".$this->userId." AND comment=".$comment;
-	
- 		//result silinecek yorumun id sini çeker, birazdan silinecek
-		//this->result=$this->dbc->query($sqlQuery);
-		//$sqlQuery="DELETE FROM traceper_upload_comment WHERE ".
-		//			UploadComment::comment_id."=".$result;
+		$this->result=$this->baseTable->delete($deleteArray);
+
+		return $this->result;
 		
 	}
 }

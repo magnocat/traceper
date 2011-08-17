@@ -54,6 +54,18 @@ class WebClientManager extends Base
 		return $staRatingPlugin;		
 	}
 	
+	private function getCommentOperator()
+	{
+		static $staCommentOperator=NULL;
+		
+		if($staCommentOperator == NULL)
+		{
+			$staCommentOperator=new CommentOperator($this->dbc);
+		} 
+		
+		return $staCommentOperator;
+	}
+	
 	private function getUploadUserRelationTable()
 	{
 		static $staUploadUserRelationTable = NULL;
@@ -209,8 +221,12 @@ class WebClientManager extends Base
 					//This person has given some rating for the photo before, so do not let him anymore
 				}
 								
-				break;				
-
+				break;	
+			case $this->actionPrefix . "ObserveComments":		
+					
+			case $this->actionPrefix . "AddComment":
+				
+			case $this->actionPrefix . "DeleteComment":
 				
 			default:				
 				$out = UNSUPPORTED_ACTION;
