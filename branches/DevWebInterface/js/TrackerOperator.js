@@ -79,9 +79,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.imageIds = [];
 	this.imageThumbSuffix;
 	this.imageOrigSuffix;
-
+	
 	this.User = function(){
-		//var username;
 		var realname;
 		var latitude;
 		var longitude;
@@ -89,9 +88,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var time;
 		var deviceId;
 		var message;
-		var gmarker;
-		var infoWindow;
-		var pastPointsGMarker;
+		var mapMarker;
 		var infoWindowIsOpened = false;
 		var polyline = null;		
 		var maxZoomLevel = null;
@@ -697,7 +694,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{
 			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 			MAP.panMapTo(location);
-			MAP.openInfoWindow(TRACKER.users[userId].infoWindow, TRACKER.users[userId].gmarker);
+			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 		}
 	};
 
@@ -730,12 +727,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			});
 		}
 		else {			
-			//TRACKER.users[userId].polyline.show();
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			
-			for (var i in TRACKER.users[userId].pastPointsGMarker) { 
-				if (TRACKER.users[userId].pastPointsGMarker[i] != null){
-					MAP.setMarkerVisible(TRACKER.users[userId].pastPointsGMarker[i], true);
+			for (var i in TRACKER.users[userId].mapMarker) { 
+				if (TRACKER.users[userId].mapMarker[i].marker != null){
+					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, true);
 				}
 			}
 		}		
@@ -747,89 +743,23 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (typeof TRACKER.users[userId].polyline != 'undefined')
 		{
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, false);
-			var len = TRACKER.users[userId].pastPointsGMarker.length;
+			var len = TRACKER.users[userId].mapMarker.length;
 
 			for (var i = 1; i < len; i++) { 
-				if (TRACKER.users[userId].pastPointsGMarker[i] != null) {
-					MAP.setMarkerVisible(TRACKER.users[userId].pastPointsGMarker[i], false);
-					//TRACKER.users[userId].pastPointsGMarker[i].hide();
+				if (TRACKER.users[userId].mapMarker[i].marker != null) {
+					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
 					
-					//TRACKER.users[userId].pastPointsGMarker[i].closeInfoWindow();
 				}
 			}
 		}
 	};
 
 	this.openMarkerInfoWindow = function(userId){
-/*		
-		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'														   
-				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + TRACKER.users[userId].time
-				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-				//+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
-
-				+'</div>'
-				+ '<ul class="sf-menu"> '
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
-				+ TRACKER.langOperator.previousPoint 
-				+'</a>'+ '</li>'
-				+ '<li>'+ '<a class="infoWinOperations" href="#">'
-				+ TRACKER.langOperator.operations
-				+'</a>'
-				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoom
-				+'</a>'+ '</li>'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoomMax
-				+'</a>'+'</li>'
-				+'</ul>'
-				+'</li>'
-				+ '</ul>'
-		);
-*/
 	};
 
 	this.showImageWindow = function(imageId){
-		MAP.trigger(TRACKER.images[imageId].gmarker, 'click');
-	
-/*		
-		var image = new Image();
-
-		image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
-		$("#loading").show();	
-		$(image).load(function(){
-			$("#loading").hide();
-
-			//TRACKER.images[imageId].gmarker.openInfoWindow(document.getElementById("friendRequestsList"));
-			
-			TRACKER.images[imageId].gmarker.openInfoWindow("<div class='origImageContainer'>"
-					+ "<div>"
-					+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
-					+ "</div>"
-					+ "<div>"
-					+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
-					+ "<br/>"
-					+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
-					+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
-					+ "</div>"
-					+ "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js\"></script>"
-					+ "<script type=\"text/javascript\" src=\"js/jquery/plugins/rating/jquery.raty.min.js\"></script>"
-					+ "<div>"
-					+ "<script type=\"text/javascript\"> alert('hello2');</script>"
-					+ "</div>"
-					+ '<ul class="sf-menu"> '
-					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-					+ TRACKER.langOperator.zoom
-					+'</a>'+ '</li>'
-					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-					+ TRACKER.langOperator.zoomMax
-					+'</a>'+'</li>'
-					+'</li>'
-					+ '</ul>'
-					+ "</div>");
-
-		});	
-*/	
+		MAP.trigger(TRACKER.images[imageId].gmarker, 'click');	
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
@@ -839,55 +769,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		MAP.zoomPoint(point);
-/*		
-		var zoomlevel = MAP.getZoom();
-		var incZoomlevel;
-		if (zoomlevel < 6) {
-			incZoomlevel = 5;
-		}
-		else if (zoomlevel < 10) {
-			incZoomlevel = 4;
-		}
-		else if (zoomlevel < 13) {
-			incZoomlevel = 3;
-		}
-		else if (zoomlevel < 15) {
-			incZoomlevel = 2;
-		}
-		else {
-			incZoomlevel = 1;
-		}
-
-		zoomlevel += incZoomlevel;
-		var ltlng = new GLatLng(latitude, longitude);
-
-		MAP.setCenter(ltlng, zoomlevel);		
-*/
 	}
 
 	this.zoomMaxPoint = function(latitude, longitude)
 	{
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		MAP.zoomMaxPoint(point);
-/*		
-		var ltlng = new GLatLng(latitude, longitude);
-
-		if (typeof TRACKER.maxZoomlevel[latitude] == "undefined" ||
-				typeof TRACKER.maxZoomlevel[latitude][longitude] == "undefined") 
-		{
-			TRACKER.maxZoomlevel[latitude] = [];
-			G_SATELLITE_MAP.getMaxZoomAtLatLng(ltlng, function(response) {
-				if (response && response['status'] == G_GEO_SUCCESS) {
-					TRACKER.maxZoomlevel[latitude][longitude] = response['zoom'];					
-				}
-				MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
-
-			});
-		}
-		else {
-			MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
-		}
-*/
 	};
 
 
@@ -895,51 +782,55 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 * this function is used to open info windows of markers when next point or
 	 * previous point are clicked.
 	 */
-	this.showPointGMarkerInfoWin = function(gMarkerIndex, userId){
+	this.showPointGMarkerInfoWin = function(currentMarkerIndex,nextMarkerIndex, userId){
 		
-		if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined" ||	
-				typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
+		if (typeof TRACKER.users[userId].mapMarker == "undefined" ||	
+				typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") 
 		{ 
-			if (gMarkerIndex == "1") {
+			if (nextMarkerIndex == "1") {
 				TRACKER.pastPointsPageNo = 0;
 			}
 			var reqPageNo = TRACKER.pastPointsPageNo + 1;
 			TRACKER.drawTraceLine(userId, reqPageNo, function(){
 				// if it goes into this if statement it means that there is no available
 				// past point in database
-				if (typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") {
+				if (typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") {
 					// the statement below add a new element to array with null value
 					// it is useful when understanding no previous point exists
 					// but it is required to check value if it is null when hiding or
 					// showing markers...
-					TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] = null;
+					TRACKER.users[userId].mapMarker[nextMarkerIndex] = null;
 					TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 				}
 				else {
-					MAP.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], 'click');
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+					MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
 				}			
 
 			});
 		}
-		else if (TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == null){
+		else if (TRACKER.users[userId].mapMarker[nextMarkerIndex] == null){
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
 			
 			
 			if (userId != TRACKER.traceLineDrawedUserId ) // ||
-				//	TRACKER.users[userId].polyline.isHidden() == true) 
 			{				
 				TRACKER.drawTraceLine(userId);
 			}
-			MAP.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
+			if (typeof TRACKER.users[userId].polyline != 'undefined')
+			{
+				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
+			}
+			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+			MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, "click");			
 		}
 	}
 	this.showMessage = function(message, type, callback)
 	{
 		//message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
 
-		//$("#message").html(message);
 
 		var object = "#message_info";
 		if (type == "warning") {

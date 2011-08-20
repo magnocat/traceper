@@ -6,8 +6,8 @@
 function processUserPastLocationsXML (MAP, xml) {
 	var userId = $(xml).find("page").attr('userId');
 	var pastPoints = []; 
-	var pastPointsGMarker = [];
-	var index = TRACKER.users[userId].pastPointsGMarker.length;
+	var mapMarker = [];
+	var index = TRACKER.users[userId].mapMarker.length;
 
 	$(xml).find("page").find("location").each(function(){
 		var location = $(this);
@@ -15,79 +15,73 @@ function processUserPastLocationsXML (MAP, xml) {
 		var longitude = $(location).attr('longitude');
 		var time = $(location).find('time').text();
 		var deviceId = $(location).find('deviceId').text();
-		
-		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
-		//var point = new GLatLng(latitude, longitude);
-		pastPoints.push(point);
-		
-		//var gmarker = new GMarker(point);
-		var gmarker = MAP.putMarker(point);
 
-		//GEvent.addListener(gmarker, "click", function(){
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		pastPoints.push(point);
+
+		var gmarker = MAP.putMarker(point);
+		var iWindow = MAP.initializeInfoWindow();
+		var markerInfoWindow = new MapStruct.MapMarker({marker:gmarker, infoWindow:iWindow});
+
+
 		MAP.setMarkerClickListener(gmarker,function (){
 
-			var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(gmarker);
+			var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
 			var previousGMarkerIndex = tr + 1; // it is reverse because 
 			var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 			// attention similar function is used in 
 			// processXML function				
 			var content =
-					"<div>" 
-					+ "<b>" + TRACKER.users[userId].realname + "</b> " 
-					+ TRACKER.langOperator.wasHere 
-					+ '<br/>' + TRACKER.langOperator.time + ": " + time
-					+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
-					+ "</div>"
-					+ '<ul class="sf-menu"> '
-					+ "<li>"
-					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
-					+ TRACKER.langOperator.previousPoint 
-					+'</a>'
-					+ "</li>"
-					+ "<li>"
-					+"<a href='#' class='infoWinOperations'>" 
-					+ TRACKER.langOperator.operations
-					+"</a>"
-					+"<ul>"
-					+"<li>"
-					+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
-					+ TRACKER.langOperator.zoom 
-					+'</a>' 		
-					+"</li>"
-					+"<li>"
-					+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
-					+ TRACKER.langOperator.zoomMax
-					+'</a>'
-					+"</li>"
-					+"<li>"
-					+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
-					+ TRACKER.langOperator.clearTraceLines
-					+'</a>'
-					+"</li>"
-					+"</ul>"
-					+ "</li>"
-					+ "<li>"
-					+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
-					+ TRACKER.langOperator.nextPoint 
-					+'</a>'
-					+ "</li>"
-					+"</ul>";	
-					var infoWindow = MAP.initializeInfoWindow(content);
-					MAP.openInfoWindow(infoWindow, gmarker);
+				"<div>" 
+				+ "<b>" + TRACKER.users[userId].realname + "</b> " 
+				+ TRACKER.langOperator.wasHere 
+				+ '<br/>' + TRACKER.langOperator.time + ": " + time
+				+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
+				+ "</div>"
+				+ '<ul class="sf-menu"> '
+				+ "<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +','+ previousGMarkerIndex +','+ userId +')">'
+				+ TRACKER.langOperator.previousPoint 
+				+'</a>'
+				+ "</li>"
+				+ "<li>"
+				+"<a href='#' class='infoWinOperations'>" 
+				+ TRACKER.langOperator.operations
+				+"</a>"
+				+"<ul>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoom 
+				+'</a>' 		
+				+"</li>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoomMax
+				+'</a>'
+				+"</li>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+				+ TRACKER.langOperator.clearTraceLines
+				+'</a>'
+				+"</li>"
+				+"</ul>"
+				+ "</li>"
+				+ "<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +',' + nextGMarkerIndex +','+ userId +')">'
+				+ TRACKER.langOperator.nextPoint 
+				+'</a>'
+				+ "</li>"
+				+"</ul>";
+			MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow,content);			
+			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
 		});
-		
+
 		index++;
-		//MAP.addOverlay(gmarker);			
-		pastPointsGMarker.push(gmarker)
+		mapMarker.push(markerInfoWindow)
 	});
 
 	if (typeof TRACKER.users[userId].polyline == "undefined") 
 	{
-		/*
-		var firstPoint= [new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude)];
-		TRACKER.users[userId].polyline = new GPolyline(firstPoint.concat(pastPoints), "#ff0000", 10);;
-		MAP.addOverlay(TRACKER.users[userId].polyline);
-		*/
 		var firstPoint = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 		TRACKER.users[userId].polyline = MAP.initializePolyline();
 		MAP.addPointToPolyline(TRACKER.users[userId].polyline,firstPoint);
@@ -95,15 +89,14 @@ function processUserPastLocationsXML (MAP, xml) {
 	
 	var len = pastPoints.length;
 	var i;
-	//var vertexIndex = TRACKER.users[userId].polyline.getVertexCount();
 	for (i = 0; i < len; i++){
-		//TRACKER.users[userId].polyline.insertVertex(vertexIndex, pastPoints[i]);
-		//vertexIndex++;
 		MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
 	}
+	
+	
 
-	var tmp = TRACKER.users[userId].pastPointsGMarker;	
-	TRACKER.users[userId].pastPointsGMarker = tmp.concat(pastPointsGMarker);
+	var tmp = TRACKER.users[userId].mapMarker;		
+	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
 }
 
 /**
@@ -119,7 +112,6 @@ function processXML(MAP, xml, isFriendList)
 		var user = $(this);			
 		var userId = $(user).find("Id").text();
 		var isFriend =  $(user).find("Id").attr('isFriend');
-//		var username = $(user).find("username").text();
 		var realname = $(user).find("realname").text();
 		var latitude = $(user).find("location").attr('latitude');
 		var longitude = $(user).find("location").attr('longitude');
@@ -156,14 +148,15 @@ function processXML(MAP, xml, isFriendList)
 		var visible = false;
 		if (isFriend == "1") {
 			visible = true;
-//			MAP.addOverlay(TRACKER.users[userId].gmarker);
 		}
-		//		if (isFriend == "1")
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
 
 				var userMarker = MAP.putMarker(location, "images/person.png", visible);
+				var iWindow = MAP.initializeInfoWindow();
+				var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+				
 				TRACKER.users[userId] = new TRACKER.User( {//username:username,
 					realname:realname,
 					latitude:latitude,
@@ -173,19 +166,18 @@ function processXML(MAP, xml, isFriendList)
 					message:$(user).find("message").text(),
 					status_message:status_message,
 					deviceId:$(user).find("deviceId").text(),
-					gmarker:userMarker, //new GMarker(point, markerOptions)
+					mapMarker:new Array(markerInfoWindow),
 				});
 
 				var content =  '<div>'														   
 					+ '<br/>' + TRACKER.users[userId].realname  
 					+ '<br/>' + TRACKER.users[userId].time
 					+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-					//+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
 
 					+'</div>'
 					+'<div>'
 					+ '<ul class="sf-menu"> '
-					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
+					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
 					+ TRACKER.langOperator.previousPoint 
 					+'</a>'+ '</li>'
 					+ '<li>'+ '<a class="infoWinOperations" href="#">'
@@ -202,30 +194,28 @@ function processXML(MAP, xml, isFriendList)
 					+ '</ul>'
 					+ '</div>';
 
-				TRACKER.users[userId].infoWindow = MAP.initializeInfoWindow(content);
-				
+				TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 
 
-				MAP.setMarkerClickListener(TRACKER.users[userId].gmarker,function (){
 
-					MAP.openInfoWindow(TRACKER.users[userId].infoWindow, TRACKER.users[userId].gmarker);	
+				MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
+
+					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);	
 				});
 
-				if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined") {
-					TRACKER.users[userId].pastPointsGMarker = new Array(TRACKER.users[userId].gmarker);
-				}
+				
 				//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
 				// pencerenin yeni konumda da açık olmasının sağlanması
 				/*
-						GEvent.addListener(TRACKER.users[userId].gmarker, "click", function() {
+						GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker, "click", function() {
 		  						TRACKER.openMarkerInfoWindow(userId);	
 		  				});
 
-						GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowopen",function(){
+						GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker,"infowindowopen",function(){
 							TRACKER.users[userId].infoWindowIsOpened = true;
 		  				});
 
-		  				GEvent.addListener(TRACKER.users[userId].gmarker,"infowindowclose",function(){
+		  				GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker,"infowindowclose",function(){
 		  					TRACKER.users[userId].infoWindowIsOpened = false;
 		  				});
 
@@ -237,14 +227,13 @@ function processXML(MAP, xml, isFriendList)
 
 				var time = $(user).find("time").text();
 				var deviceId = $(user).find("deviceId").text();
-				//var point = new GLatLng(latitude, longitude);	
-				MAP.setMarkerPosition(TRACKER.users[userId].gmarker,location);
+				MAP.setMarkerPosition(TRACKER.users[userId].mapMarker[0].marker,location);
 
 				if (isFriend == "1" && TRACKER.users[userId].latitude == "" && TRACKER.users[userId].longitude == "")
 				{
 					// if they have just become friend, there are no latitude and longitude data 
 					// so this statement will run and we update latitude and longitude
-					MAP.setMarkerVisible(TRACKER.users[userId].gmarker,true);						
+					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker,true);						
 				}
 
 				if ((TRACKER.users[userId].latitude != latitude ||
@@ -252,20 +241,19 @@ function processXML(MAP, xml, isFriendList)
 						typeof TRACKER.users[userId].polyline != "undefined")
 				{
 					//these "if" is for creating new gmarker when user polyline is already drawed
-					var userMarker = MAP.putMarker(location, "images/person.png", true);
-					/*
-						var gmarker = new GMarker(new GLatLng(TRACKER.users[userId].latitude, 
-															  TRACKER.users[userId].longitude));
-					 */
+					var userMarker = MAP.putMarker(location, "images/person.png", true);					
+					var iWindow = MAP.initializeInfoWindow();
+					var markerInfoWindow = new TRACKER.mapMarker({marker:userMarker, infoWindow:iWindow});
+					
 					MAP.insertPointToPolyline(TRACKER.users[userId].polyline,location,0);
-					//TRACKER.users[userId].polyline.insertVertex(0, point);
+					
 					var oldlatitude = TRACKER.users[userId].latitude;
 					var oldlongitude = TRACKER.users[userId].longitude;
 
 					MAP.setMarkerClickListener(userMarker,function (){
 						// attention similar function is used in 
 						// processUserPastLocationsXML function
-						var tr = TRACKER.users[userId].pastPointsGMarker.indexOf(userMarker);
+						var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
 						var previousGMarkerIndex = tr + 1; // it is reverse because 
 						var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 
@@ -274,8 +262,7 @@ function processXML(MAP, xml, isFriendList)
 						MAP.openInfoWindow(infoWindow, userMarker);	
 					});
 
-					TRACKER.users[userId].pastPointsGMarker.splice(1,0, userMarker);					
-					//MAP.addOverlay(gmarker);
+					TRACKER.users[userId].mapMarker.splice(1,0, markerInfoWindow);					
 
 					if (TRACKER.traceLineDrawedUserId != userId) {
 						// if traceline is not visible, hide the marker
@@ -284,6 +271,7 @@ function processXML(MAP, xml, isFriendList)
 
 
 				}
+				
 				TRACKER.users[userId].latitude = latitude;
 				TRACKER.users[userId].longitude = longitude;
 				TRACKER.users[userId].time = time;
@@ -334,30 +322,29 @@ function processImageXML(MAP, xml){
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
-		//var point = new GLatLng(latitude, longitude);
 
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 
 		list += "<li>";
-			
+
 		if (TRACKER.userId == userId) {
 			// add delete image button if logged in user and image uploader are same
 			list += "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
 		}				
 		list += "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
-							+ "<div>"
-								+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
-							+ "</div>"
-							+ "<div>"
-								+ TRACKER.langOperator.uploader + ": " + realname 
-								+ "<br/>"
-								/* + TRACKER.langOperator.time + ": " */ +  time									
-							+ "</div>"
-							+ "<div class='rating' id='uploadRating"+ imageId +"' imageId='"+ imageId +"'></div>"
-						+ "</a>"
-					+"</li>";
-		
-		
+		+ "<div>"
+		+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
+		+ "</div>"
+		+ "<div>"
+		+ TRACKER.langOperator.uploader + ": " + realname 
+		+ "<br/>"
+		/* + TRACKER.langOperator.time + ": " */ +  time									
+		+ "</div>"
+		+ "<div class='rating' id='uploadRating"+ imageId +"' imageId='"+ imageId +"'></div>"
+		+ "</a>"
+		+"</li>";
+
+
 
 		if ($.inArray(imageId, TRACKER.imageIds) == -1)
 		{
@@ -366,27 +353,20 @@ function processImageXML(MAP, xml){
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
 
-			/*
-			var personIcon = new GIcon(G_DEFAULT_ICON);
-			personIcon.image = imageURL + TRACKER.imageThumbSuffix;
-			//		personIcon.iconSize = new GSize(24,24);
-			personIcon.shadow = null;
-			markerOptions = { icon:personIcon, hide:hideMarker };
-			 */
 			image = imageURL + TRACKER.imageThumbSuffix;
 
 			var userMarker = MAP.putMarker(location, image);
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
-												imageURL:imageURL,
-												userId:userId,
-												realname:realname,
-												latitude:latitude,
-												longitude:longitude,
-												time:time,
-												rating:rating,
-												gmarker:userMarker,
-												});
+				imageURL:imageURL,
+				userId:userId,
+				realname:realname,
+				latitude:latitude,
+				longitude:longitude,
+				time:time,
+				rating:rating,
+				gmarker:userMarker,
+			});
 
 			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker, function (){
 				var image = new Image();
@@ -397,28 +377,28 @@ function processImageXML(MAP, xml){
 					$("#loading").hide();
 
 					var content = "<div class='origImageContainer'>"
-							+ "<div>"
-							+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
-							+ "</div>"
-							+ "<div>"
-							+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
-							+ "<br/>"
-							+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
-							+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
-							+ "</div>"
-							+ '<ul class="sf-menu"> '
-							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-							+ TRACKER.langOperator.zoom
-							+'</a>'+ '</li>'
-							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-							+ TRACKER.langOperator.zoomMax
-							+'</a>'+'</li>'
-							+'</li>'
-							+ '</ul>'
-							+ "</div>";
+						+ "<div>"
+						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+						+ "</div>"
+						+ "<div>"
+						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ "<br/>"
+						+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+						+ "</div>"
+						+ '<ul class="sf-menu"> '
+						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+						+ TRACKER.langOperator.zoom
+						+'</a>'+ '</li>'
+						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+						+ TRACKER.langOperator.zoomMax
+						+'</a>'+'</li>'
+						+'</li>'
+						+ '</ul>'
+						+ "</div>";
 					var infoWindow = MAP.initializeInfoWindow(content);
 					MAP.openInfoWindow(infoWindow, TRACKER.images[imageId].gmarker);
-					
+
 					MAP.setInfoWindowCloseListener(infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
 							MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
@@ -426,25 +406,8 @@ function processImageXML(MAP, xml){
 					});
 
 				});		
-				
-			});
 
-			/*
-			GEvent.addListener(TRACKER.images[imageId].gmarker, "click", function() {
-				TRACKER.showImageWindow(imageId);	
-			});
-
-			GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowopen",function(){
-				TRACKER.images[imageId].gmarker.show();
-			});
-			 
-			GEvent.addListener(TRACKER.images[imageId].gmarker,"infowindowclose",function(){
-				if ($('#showPhotosOnMap').attr('checked') == false){
-					TRACKER.images[imageId].gmarker.hide();
-				}
-			});
-			*/
-			//MAP.addOverlay(TRACKER.images[imageId].gmarker);
+			});			
 		}
 
 	});
@@ -467,7 +430,7 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+ "</div>"
 		+ '<ul class="sf-menu"> '
 		+ "<li>"
-		+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ previousGMarkerIndex +','+ userId +')">'
+		+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +',' + previousGMarkerIndex +','+ userId +')">'
 		+ TRACKER.langOperator.previousPoint 
 		+'</a>'
 		+ "</li>"
@@ -494,7 +457,7 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+"</ul>"
 		+ "</li>"
 		+ "<li>"
-		+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ nextGMarkerIndex +','+ userId +')">'
+		+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +',' + nextGMarkerIndex +','+ userId +')">'
 		+ TRACKER.langOperator.nextPoint 
 		+'</a>'
 		+ "</li>"

@@ -15,3 +15,12 @@ MapStruct.Location = function (){
 		this[n] = arguments[0][n]; 
 	}	
 }
+
+MapStruct.MapMarker = function(){
+	var marker;
+	var infoWindow;
+	
+	for (var n in arguments[0]) { 
+		this[n] = arguments[0][n]; 
+	}
+}

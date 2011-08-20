@@ -75,6 +75,11 @@ function MapOperator() {
 	 * contentString is the string that is shown in infowindow
 	 */
 	MAP_OPERATOR.initializeInfoWindow = function(contentString) {
+		if (typeof(contentString) == "undefined") {
+			contentString = "<div>" 				
+				+ "</div>"
+			;
+		} 
 		var infowindow = new google.maps.InfoWindow({
 			content: contentString
 		});
