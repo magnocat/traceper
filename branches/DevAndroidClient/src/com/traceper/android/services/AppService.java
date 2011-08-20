@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import android.R.bool;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -54,13 +55,14 @@ public class AppService extends Service implements IAppService{
 	private LocationManager locationManager = null;
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
+	private boolean regularUpdateFlag = true;
 	
 	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
 	private final static String HTTP_ACTION_AUTHENTICATE_ME = "DeviceAuthenticateMe";
 	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
 	private static final String LOCATION_CHANGED = "location changed";
 	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
-
+	
 
 	private final IBinder mBinder = new IMBinder();
 	
@@ -68,6 +70,7 @@ public class AppService extends Service implements IAppService{
 	private String email;
 	private String password;
 	private String authenticationServerAddress;
+	private String status;
 	private Long lastLocationSentTime;
 	
 	private LocationHandler locationHandler;
@@ -342,7 +345,9 @@ public class AppService extends Service implements IAppService{
 			          Looper.loop();
 			      }
 			};		      
-			locationUpdates.start();
+		
+			if(this.regularUpdateFlag)
+				locationUpdates.start();
 		}
 		else {
 			this.isUserAuthenticated = false;
@@ -407,6 +412,10 @@ public class AppService extends Service implements IAppService{
 		
 		return iresult;
 	}
+	
+	public void CancelRegularUpdate(){
+		this.regularUpdateFlag  = false;		
+	}
 
 	public void setAuthenticationServerAddress(String address) {
 		this.authenticationServerAddress = address;
@@ -462,6 +471,13 @@ public class AppService extends Service implements IAppService{
 			Log.i("location listener", "onProviderEnabled");	
 		}	
 		
+	}
+	
+	public int updateLocation(String status){
+		int retval = sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		this.status = status;
+
+		return retval;
 	}
 
 }
