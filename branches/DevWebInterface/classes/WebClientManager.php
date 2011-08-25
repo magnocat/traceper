@@ -505,7 +505,8 @@ class WebClientManager extends Base
 				
 				$sql = 'SELECT
 							u.Id, null as userId, u.status_message, u.latitude, u.longitude, u.altitude, 
-							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
+							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+							date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime, 
 							(unix_timestamp(u.dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
 							"user" as type, 1 as isFriend
 						FROM '
@@ -546,7 +547,8 @@ class WebClientManager extends Base
 				// this is the user list showing in left pane
 
 				$sql = 'SELECT u.Id, u.latitude, u.status_message, u.longitude, u.altitude, "user" as type,
-							   u.realname, u.deviceId,  "1" as isFriend, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+							   u.realname, u.deviceId,  "1" as isFriend, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+							   date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 						FROM '. $this->tablePrefix .'_friends f 
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
 						WHERE   ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
@@ -1098,12 +1100,13 @@ class WebClientManager extends Base
 		$row->message = isset($row->message) ? $row->message : null;
 		$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
 		$row->status_message = isset($row->status_message) ? $row->status_message : null;
+		$row->dataCalculatedTime = isset($row->dataCalculatedTime) ? $row->dataCalculatedTime : null;
 			
 		$str = '<user>'
 		. '<Id isFriend="'.$row->isFriend.'">'. $row->Id .'</Id>'
 //		. '<username>' . $row->username . '</username>'
 		. '<realname>' . $row->realname . '</realname>'
-		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
+		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" calculatedTime="' . $row->dataCalculatedTime . '"/>'
 		. '<time>' . $row->dataArrivedTime . '</time>'
 		. '<message>' . $row->message . '</message>'
 		. '<status_message>' . $row->status_message . '</status_message>'

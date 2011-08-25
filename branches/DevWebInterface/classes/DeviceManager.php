@@ -168,6 +168,7 @@ class DeviceManager extends Base
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL
 			&& isset($reqArray['deviceId']) && $reqArray['deviceId'] != NULL
+			&& isset($reqArray['time']) && $reqArray['time'] != NULL
 		)
 		{
 			$status_message = NULL;
@@ -186,6 +187,8 @@ class DeviceManager extends Base
 			$email = $this->checkVariable($reqArray['email']);
 			$password = $this->checkVariable($reqArray['password']);
 			$deviceId = $this->checkVariable($reqArray['deviceId']);
+			$calculatedTime = $this->checkVariable($reqArray['time']);
+			$calculatedTime = date('Y-m-d H:i:s', $calculatedTime);
 
 			$sql = sprintf('SELECT Id
 								FROM '. $this->tablePrefix.'_users 
@@ -208,22 +211,24 @@ class DeviceManager extends Base
 								  .'	longitude = %f , '
 								  .'	altitude = %f ,	'						 	
 								  .'	dataArrivedTime = NOW(), '
-								  .'	deviceId = "%s"	'
+								  .'	deviceId = "%s"	,'
+								  .'    dataCalculatedTime = "%s" '
 								  .	$status_message_query 						 	
 							   .' WHERE '
 								  .' Id = %d '
 							   .' LIMIT 1;', 
-							   $latitude, $longitude, $altitude, $deviceId, $userId);
+							   $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
 				
 							   
 				$sqlWasHere = sprintf('INSERT INTO '
 										. $this->tablePrefix . '_user_was_here
-											(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
-		    							 VALUES(%d,	%f, %f, %f, NOW(), "%s") 
+											(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
+		    							 VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s") 
 										',
-										$userId, $latitude, $longitude, $altitude, $deviceId, $email, $password);			   
+										$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);			   
 				
 				$out = FAILED;
+			
 				if ($this->dbc->query($sql)) {						
 						
 					if ($this->dbc->getAffectedRows() === 1) 
@@ -240,7 +245,6 @@ class DeviceManager extends Base
 							    		      $status_message, STATUS_MESSAGE_SOURCE_MOBILE, $userId, $locationId);
 							    
 							    $out = FAILED;
-							    echo $sql;
 							    if ($this->dbc->query($sql)){
 							    	$out = SUCCESS;
 							    }								    

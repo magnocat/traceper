@@ -115,6 +115,7 @@ function processXML(MAP, xml, isFriendList)
 		var realname = $(user).find("realname").text();
 		var latitude = $(user).find("location").attr('latitude');
 		var longitude = $(user).find("location").attr('longitude');
+		var locationCalculatedTime = $(user).find("location").attr('calculatedTime');
 		var status_message = $(user).find("status_message").text();
 
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
@@ -167,11 +168,12 @@ function processXML(MAP, xml, isFriendList)
 					status_message:status_message,
 					deviceId:$(user).find("deviceId").text(),
 					mapMarker:new Array(markerInfoWindow),
+					locationCalculatedTime:locationCalculatedTime
 				});
 
 				var content =  '<div>'														   
 					+ '<br/>' + TRACKER.users[userId].realname  
-					+ '<br/>' + TRACKER.users[userId].time
+					+ '<br/>' + TRACKER.users[userId].locationCalculatedTime
 					+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
 
 					+'</div>'
@@ -275,6 +277,7 @@ function processXML(MAP, xml, isFriendList)
 				TRACKER.users[userId].latitude = latitude;
 				TRACKER.users[userId].longitude = longitude;
 				TRACKER.users[userId].time = time;
+				TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
 				TRACKER.users[userId].deviceId = deviceId;
 				TRACKER.users[userId].friendshipStatus = isFriend;
 				//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde

@@ -93,6 +93,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var polyline = null;		
 		var maxZoomLevel = null;
 		var statusMessage = null;
+		var locationCalculatedTime = null;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
