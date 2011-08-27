@@ -83,6 +83,7 @@ public class AppService extends Service implements IAppService{
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
 	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
+	private boolean regularUpdateFlag;
 
 
 	public class IMBinder extends Binder {
@@ -374,6 +375,7 @@ public class AppService extends Service implements IAppService{
 				}
 			};		      
 			locationUpdates.start();
+	
 		}
 		else {
 			this.isUserAuthenticated = false;
@@ -437,6 +439,11 @@ public class AppService extends Service implements IAppService{
 		}
 
 		return iresult;
+	}
+	
+	public void CancelRegularUpdate(){
+		this.regularUpdateFlag  = false;
+		locationManager.removeUpdates(locationHandler);
 	}
 
 	public void setAuthenticationServerAddress(String address) {
@@ -508,7 +515,15 @@ public class AppService extends Service implements IAppService{
 		public void onStatusChanged(String provider, int status, Bundle extras){															
 			Log.i("location listener", "onProviderEnabled");	
 		}	
-
+		
+	}
+	
+	public int updateLocation(String status){
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, locationHandler);
+		int retval = sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		//this.status = status;
+		locationManager.removeUpdates(locationHandler);
+		return retval;
 	}
 
 }
