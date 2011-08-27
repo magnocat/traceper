@@ -373,7 +373,8 @@ public class AppService extends Service implements IAppService{
 
 					Looper.loop();
 				}
-			};		      
+			};
+		if(this.regularUpdateFlag)
 			locationUpdates.start();
 	
 		}
