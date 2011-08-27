@@ -24,3 +24,12 @@ MapStruct.MapMarker = function(){
 		this[n] = arguments[0][n]; 
 	}
 }
+
+MapStruct.GeoFence = function(){
+	var geoFenceId;
+	var polygon;
+	
+	for (var n in arguments[0]) { 
+		this[n] = arguments[0][n]; 
+	}
+}

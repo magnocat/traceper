@@ -60,8 +60,8 @@ function MapOperator() {
 	MAP_OPERATOR.setMarkerVisible = function(marker, visible) {
 		marker.setVisible(visible);
 	}
-	
-	
+
+
 	/*
 	 * marker is the type that returns from putMarker,
 	 * location is defined in MapStructs.js,
@@ -78,7 +78,7 @@ function MapOperator() {
 		if (typeof(contentString) == "undefined") {
 			contentString = "<div>" 				
 				+ "</div>"
-			;
+				;
 		} 
 		var infowindow = new google.maps.InfoWindow({
 			content: contentString
@@ -92,19 +92,19 @@ function MapOperator() {
 	 * there is no close function for infowindow
 	 */
 	MAP_OPERATOR.openInfoWindow = function(infowindow,marker) {
-		
+
 		infowindow.open(MAP_OPERATOR.map,marker);		
 	}
-	
-	
+
+
 	/*
 	 *
 	 */
 	MAP_OPERATOR.closeInfoWindow = function(infowindow) {
-		
+
 		infowindow.close();		
 	}
-	
+
 	/*
 	 * infoWindow is the type that returns from initializeInfoWindow
 	 * functionName is the function that is called when closed infoWindow
@@ -115,7 +115,7 @@ function MapOperator() {
 		});
 
 	}
-	
+
 	/*
 	 * marker is the type that returns from putMarker
 	 * functionName is the function that is called when clicked marker
@@ -165,7 +165,7 @@ function MapOperator() {
 
 		path.push(location);
 	}
-	
+
 	/*
 	 * insert point to the polyline at specified index 
 	 * poly is type that used
@@ -184,6 +184,134 @@ function MapOperator() {
 	}
 
 	/*
+	 * setting the polyline visibility
+	 * poly is type that used
+	 * visible is type that is setting visibility
+	 */
+	MAP_OPERATOR.setPolylineVisibility = function (poly, visible){
+		var opacity = 0;
+		if (visible == true) {
+			opacity = 1;
+		}
+		poly.setOptions({strokeOpacity:opacity});
+	}
+
+	/*
+	 * initialize polygon
+	 */
+	MAP_OPERATOR.initializePolygon = function() {
+		var polyOptions = {
+				strokeColor: '#FF0000',
+				strokeOpacity: 5.0,
+				strokeWeight: 3
+		}
+		polygon = new google.maps.Polygon(polyOptions);
+		polygon.setMap(MAP_OPERATOR.map);
+		return polygon;
+
+	}
+
+
+	/*
+	 * adding point to the geofence end
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 */
+	MAP_OPERATOR.addPointToGeoFence = function(geoFence,loc) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+
+		path.push(location);
+	}
+
+	/*
+	 * insert point to the geofence at specified index 
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 * index  is the specified index.
+	 */
+	MAP_OPERATOR.insertPointToGeoFence = function(geoFence,loc,index) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+
+		path.insertAt(index,location);
+	}
+	/*
+	 * get the point number of the geofence path 
+	 * geoFence is type that defined in MapStructs.js
+	 * returns the point number of geoFence path
+	 */
+	MAP_OPERATOR.getPointNumberOfGeoFencePath = function(geoFence) {
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var pointNumber = vertices.length;
+		return pointNumber;
+	}
+
+
+	/*
+	 * get the location of the geofence path in specified index
+	 * geoFence is type that defined in MapStructs.js 
+	 * index  is the specified index.
+	 * returns the location of geoFence path in specified index
+	 */
+	MAP_OPERATOR.getPointOfGeoFencePath = function(geoFence,index) {
+
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var xy = vertices.getAt(index);
+		var location = new MapStruct.Location({latitude:xy.lat(),
+			longitude:xy.lng()});
+		return location;		
+	}
+
+	/*
+	 * set the location of the geofence path in specified index
+	 * loc is type that is added to the polygon 
+	 * index  is the specified index.
+	 * geoFence is type that defined in MapStructs.js
+	 */
+	MAP_OPERATOR.setPointOfGeoFencePath = function(geoFence,loc,index) {
+
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+		vertices.setAt(index,location);		
+	}
+
+	/*
+	 * setting the geofence visibility
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 */
+	MAP_OPERATOR.setGeoFenceVisibility = function(geoFence,visible) {
+		var opacity = 0.0;
+
+		if (visible == true)
+		{
+			opacity=0.6;
+		}
+
+		var options = {
+				fillColor: '#FF0000',
+				fillOpacity: opacity,
+				strokeOpacity: opacity,
+		}
+		geoFence.polygon.setOptions(options);
+	}
+
+	/*
 	 * clickFunction
 	 * functionName is the type that is called when clicked
 	 */
@@ -193,7 +321,7 @@ function MapOperator() {
 		});
 
 	}
-	
+
 	/*
 	 *location is defined in MapStructs.js,
 	 */
@@ -201,36 +329,34 @@ function MapOperator() {
 		var position = new google.maps.LatLng(location.latitude, location.longitude);
 		MAP_OPERATOR.map.panTo(position);		
 	}
-	
-	/**
+
+	/*
 	 * This function trigs an event specified by eventName(String) on the object parameter
 	 */
 	MAP_OPERATOR.trigger = function (object, eventName) {
 		google.maps.event.trigger(object, eventName);
 	}
-	
-	MAP_OPERATOR.setPolylineVisibility = function (object, visible){
-		var opacity = 0;
-		if (visible == true) {
-			opacity = 1;
-		}
-		object.setOptions({strokeOpacity:opacity});
-	}
 
+	/*
+	 * This function provides maximum zoom at given point
+	 */
 	MAP_OPERATOR.zoomMaxPoint = function(point) {
-		
+
 		var zoomService = new google.maps.MaxZoomService();
 		var position = new google.maps.LatLng(point.latitude, point.longitude);
-		
+
 		zoomService.getMaxZoomAtLatLng(position,function(maxResult){
-			
+
 			MAP_OPERATOR.map.setCenter(position);
 			MAP_OPERATOR.map.setZoom(maxResult.zoom);
 		});
 	}
-	
+
+	/*
+	 * This function provides zooming at given point
+	 */
 	MAP_OPERATOR.zoomPoint = function(point) {
-		
+
 		var zoomlevel = MAP_OPERATOR.map.getZoom();
 		var incZoomlevel;
 		if (zoomlevel < 6) {
@@ -250,16 +376,10 @@ function MapOperator() {
 		}
 
 		zoomlevel += incZoomlevel;
-		
+
 		var position = new google.maps.LatLng(point.latitude, point.longitude);
 		MAP_OPERATOR.map.setCenter(position);
 		MAP_OPERATOR.map.setZoom(zoomlevel);
 	}
-
-
 }
-
-
-
-
 
