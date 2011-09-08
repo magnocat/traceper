@@ -2,26 +2,15 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -65,9 +54,15 @@ public class AppService extends Service implements IAppService{
 
 	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
 	private final static String HTTP_ACTION_AUTHENTICATE_ME = "DeviceAuthenticateMe";
+	private final static String HTTP_ACTION_AUTHENTICATE_CAR = "DeviceAuthenticateCar";
+	private final static String HTTP_ACTION_GET_CAR_OPTIONS = "DeviceGetCarOptions";
+	private final static String HTTP_ACTION_SET_CAR_SERVICES = "DeviceSetCarServices";
+	private final static String HTTP_ACTION_SET_USER_STATUS = "DeviceSetUserStatus";
+	private final static String HTTP_ACTION_SET_USER_WITHIN_DISTANCE = "DeviceSetUserWithInDistance";	
 	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
 	private static final String LOCATION_CHANGED = "location changed";
 	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
+	
 
 
 	private final IBinder mBinder = new IMBinder();
@@ -383,6 +378,36 @@ public class AppService extends Service implements IAppService{
 		}
 		return result;
 	}	
+	
+	@Override
+	public int authenticateCar(String carname, String password) {
+
+		String[] name = new String[5];
+		String[] value = new String[5];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "car_login";
+		name[4] = "car_password";
+
+		value[0] = HTTP_ACTION_AUTHENTICATE_CAR;
+		value[1] = this.email;
+		value[2] = this.password;
+		value[3] = carname;
+		value[4] = password;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+
+		int result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+
+		if (result == HTTP_RESPONSE_SUCCESS) 
+		{			
+	
+		}
+		else {
+		}
+		return result;
+	}
 
 	private int evaluateResult(String result)
 	{
@@ -432,6 +457,15 @@ public class AppService extends Service implements IAppService{
 			case HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID:
 				Log.w("HTTP_RESPONSE", "failed registration: email is not valid");
 				break;
+			case HTTP_RESPONSE_ERROR_USER_NOT_VALID:
+				Log.w("HTTP_RESPONSE", "HTTP_RESPONSE_ERROR_USER_NOT_VALID");
+				break;
+			case HTTP_RESPONSE_ERROR_USER_ACCOUNT_EXPIRED:
+				Log.w("HTTP_RESPONSE", "HTTP_RESPONSE_ERROR_USER_ACCOUNT_EXPIRED");
+				break;	
+			case HTTP_RESPONSE_ERROR_CAR_IN_USE:
+				Log.w("HTTP_RESPONSE", "HTTP_RESPONSE_ERROR_CAR_IN_USE");
+				break;		
 			default:
 				iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
 				Log.w("HTTP_RESPONSE", "failed: unknown response returned from server");
@@ -525,6 +559,97 @@ public class AppService extends Service implements IAppService{
 		//this.status = status;
 		locationManager.removeUpdates(locationHandler);
 		return retval;
+	}
+
+	@Override
+	public ArrayList<CarOptions> getCarOptions() {
+
+		String[] name = new String[1];
+		String[] value = new String[1];
+		name[0] = "action";
+
+		value[0] = HTTP_ACTION_GET_CAR_OPTIONS;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		SAXParser sp;
+		try {
+			sp = SAXParserFactory.newInstance().newSAXParser();
+			xmlHandler.cleanCarOptions();
+			sp.parse(new ByteArrayInputStream(httpRes.getBytes()), xmlHandler);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (FactoryConfigurationError e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return xmlHandler.getCarOptions();
+	}
+	@Override
+	public int sendCarServices(long id) {
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "serviceId";
+		
+		value[0] = HTTP_ACTION_SET_CAR_SERVICES;
+		value[1] = this.email;
+		value[2] = this.password;
+		value[3] = String.valueOf(id);
+		
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		return this.evaluateResult(httpRes);
+		
+	}
+
+
+	@Override
+	public int setUserStatus(boolean userOnline) {
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "statusOnline";
+		
+		value[0] = HTTP_ACTION_SET_USER_STATUS;
+		value[1] = this.email;
+		value[2] = this.password;
+		if (userOnline == true) value[3] = "1";
+		else value[3] = "0";
+		
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		return this.evaluateResult(httpRes);
+	}
+	
+	@Override
+	public int setUserWithInDistance(String distance) 
+	{
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "action";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "withInDistance";
+		
+		value[0] = HTTP_ACTION_SET_USER_WITHIN_DISTANCE;
+		value[1] = this.email;
+		value[2] = this.password;
+		value[3] = distance;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+		
+		return this.evaluateResult(httpRes);
 	}
 
 }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical"
+      android:padding="10dp">
+      
+      <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"    
+        android:text="@string/driver_services"
+        android:textSize="25dp"
+        android:paddingBottom="15dp"
+    	/>
+
+     <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"    
+        android:text="@string/choose_car_services"
+        android:textSize="20dp"
+    	/>
+
+     <Spinner   
+        android:id="@+id/spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/select_car_service"
+     />
+    	
+    <Button 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"     
+        android:text="@string/next"
+        android:id="@+id/car_services_selected"
+    	/>
+    <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/load_car_services"
+        android:textSize="20dp"
+    	/>
+    	
+    <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/car_login"
+        android:paddingLeft="0dp"
+    	/>
+    	 <EditText 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/car_login_text"
+    	/>
+    	    <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/car_password"
+    	/>
+    	<EditText 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/car_password_text"
+        android:password="true"
+    	/>
+    
+     <Button 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next"
+        android:id="@+id/car_login"
+    	/>	
+</LinearLayout>
