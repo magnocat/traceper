@@ -30,6 +30,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionGetFriendRequests = "WebClientGetFriendRequests";	
 	this.actionConfirmFriendship = "WebClientConfirmFriendship";
 	this.actionSetUploadRating = "SetUploadRating";
+	this.actionSendNewComment = "SendNewComment";
+	this.actionGetComments = "GetComments";
+	this.actionDeleteComment= "DeleteComment";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -271,7 +274,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.changePassword = function(newPassword, currentPassword){
 		var params = "action=" + TRACKER.actionChangePassword + "&newPassword=" + newPassword + "&currentPassword=" + currentPassword;
-
+		
 		if (newPassword != "" && currentPassword != "")
 		{
 			TRACKER.ajaxReq(params, function (result){
@@ -288,6 +291,66 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 
+	//****************************************************************************20.08.2011 EAC
+	this.sendNewComment= function(userId, photoId, comment){
+		var params= "action=" + TRACKER.actionSendNewComment + "&userId="+ userId + "&photoId=" + photoId + "&comment=" + comment;
+		
+		if (comment != ""){
+			TRACKER.ajaxReq(params, function (result){
+				if (result == "1") {	
+					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+			});
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.deleteComment=function (commentId){
+		var params="action=" + TRACKER.actionDeleteComment + "&commentId=" + commentId;
+		
+		if (commentId != ""){
+			TRACKER.ajaxReq(params, function (result){
+				if (result == "1") {	
+					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+			});
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	//*****************************************************************************************
+	
+	this.getComments=function(photoId)
+	{
+		var params= "action=" + TRACKER.actionSendNewComment + "&photoId=" + photoId;
+		
+		if (photoId != ""){
+			
+			TRACKER.ajaxReq(params, function (result){
+				
+				if (result == "1") {	
+					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+			});
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	//********************************************************************************************
+	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
 		TRACKER.ajaxReq(params, function (result){	

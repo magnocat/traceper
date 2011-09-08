@@ -400,7 +400,9 @@ USER_AREA;
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
-									<div id="photos"></div>
+									<div id="photos">
+										<a href='#displayComments', id="commentsWindow"></a>
+										</div>
 									<div class='searchResults'>
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
 										<div id='results'></div>								
@@ -468,7 +470,15 @@ USER_AREA;
 	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
 	</div>
 	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
-	</div>				
+	</div>
+
+	<div id="photoCommentForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png', width:'400', height:'400', title:'Comment Window', closed:'true' }">
+		<div id="photoCommentLabel">Comment:</div>
+		<textarea id="photoCommentTextBox" cols="40" rows="7">Enter your comments here...	</textarea><br/>
+		<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
+		<input type="button" id="deleteCommentButton" value="Delete Comment" />	 
+	</div>
+	
 	</body>
 </html>
 MAIN_PAGE;
