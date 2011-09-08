@@ -81,7 +81,28 @@ function bindElements(langOperator, trackerOp)
 		$('#photo_title div').removeClass('arrowImageRight');		
 		$('#user_title').removeClass('active_title');
 		
+        //**************************************************************************20.08.2011 EAC
+		$('#photoCommentForm').mb_open();
+		$('#photoCommentForm').mb_centerOnWindow(true);
+		
+		//$('#photoCommentForm').onCreate(function()
+		//{
+			//gelen yorum sayýsý kadar dongü
+		//}
+		
+		$('#sendCommentButton').click(function(){			
+				var photoId=1;
+				var userId=1;
+				var comment=$('#photoCommentTextBox').val();
+				trackerOp.sendNewComment(userId, photoId, comment);
+		});
+		
+		$('#deleteCommentButton').click(function(){	
+			var commentId=6;
+			trackerOp.deleteComment(commentId);
+		});
 	});
+	
 	
 	$('#user_title').click(function(){
 		$('#photosList').slideUp('fast',function(){
