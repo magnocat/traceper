@@ -41,6 +41,8 @@ public class Login extends Activity {
 	private static final int SETTINGS_DIALOG = 5;
 	private static final int HTTP_REQUEST_FAILED = 6;
 	private static final int HTTP_MISSING_PARAMETER = 7;
+	private static final int HTTP_ACCOUNT_EXPIRED = 8;
+	private static final int HTTP_USER_NOT_VALID = 9;
 	private EditText emailText;
     private EditText passwordText;
     private Button cancelButton;
@@ -66,7 +68,7 @@ public class Login extends Activity {
            
             if (appManager.isUserAuthenticated() == true)
             {
-            	Intent i = new Intent(Login.this, Main.class);																
+            	Intent i = new Intent(Login.this, DriverServices.class);																
 				startActivity(i);
 				Login.this.finish();
             }
@@ -143,6 +145,8 @@ public class Login extends Activity {
 							result = appManager.authenticateUser(emailText.getText().toString(), password);
 							
 							handler.post(new Runnable(){
+								
+
 								public void run() {										
 									progressDialog.dismiss();
 									
@@ -159,7 +163,8 @@ public class Login extends Activity {
 										}
 										editor.commit();	
 																		
-										Intent i = new Intent(Login.this, Main.class);												
+										//Intent i = new Intent(Login.this, Main.class);												
+										Intent i = new Intent(Login.this, DriverServices.class);												
 										//i.putExtra(FRIEND_LIST, result);						
 										startActivity(i);	
 										Login.this.finish();										
@@ -175,6 +180,12 @@ public class Login extends Activity {
 									}
 									else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
 										showDialog(HTTP_MISSING_PARAMETER);
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_USER_ACCOUNT_EXPIRED){
+										showDialog(HTTP_ACCOUNT_EXPIRED);
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_USER_NOT_VALID){
+										showDialog(HTTP_USER_NOT_VALID);
 									}
 									else {							
 										showDialog(UNKNOWN_ERROR_OCCURED);
@@ -314,7 +325,24 @@ public class Login extends Activity {
         			}
         		})        
         		.create(); 
-    		
+    		case HTTP_USER_NOT_VALID:
+    			return new AlertDialog.Builder(Login.this)       
+        		.setMessage(R.string.http_user_not_valid)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 
+    		case HTTP_ACCOUNT_EXPIRED:
+    			return new AlertDialog.Builder(Login.this)       
+        		.setMessage(R.string.http_account_expired)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 	
     		default:
     			return null;
     	}
