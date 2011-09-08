@@ -3,18 +3,24 @@
  * 03.08.2011 Eren Alp Celik
  * 
  */
+require_once('..\classes\tables\BaseTable.php');
+require_once('..\classes\MySQLOperator.php');
+require_once('..\classes\tables\UploadComment.php');
 
 //ï¿½imdilik sadece resimler altï¿½na yorum koymak iï¿½in kullanï¿½lacak
 //sonradan baï¿½ka itemlara da yorum koyabilecek.
 class CommentOperator{
     
-
-    private $uploadCommentTable;
+    private $baseTable;
+    private $dbc;
+    private $userId;
+    private $photoId;
+    private $comment;
+    private $result;
 	
-	public function __construct($tableprefix, $dbc)
-    {	
-    	
-    	$this->uploadCommentTable=new UploadComment($tableprefix, $dbc);
+	public function __construct($dbc)
+    {
+    	$this->dbc=$dbc;   	
     }
 
     function __destruct() {
@@ -25,35 +31,41 @@ class CommentOperator{
 		$valuesArray = array(UploadComment::commentId, UploadComment::photo_id, UploadComment::user_id, UploadComment::comment_time, UploadComment::comment);
 		$condArr = array(UploadComment::photo_id => $photo_id);	
 		
-		return $this->uploadCommentTable->select($valuesArray, $condArr);
+		return $this->baseTable->select($valuesArray, $condArr);
+
 	}
 
 	public function editComment($userId, $photoId, $comment, $newComment, $commentTime) 
 	{
-		//TODO: commentId direk kullanýlabilir durumda
 		$fieldsArray = array(UploadComment::comment_id);
 		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$userId, UploadComment::comment=>$comment );	
-		$this->comment=$this->uploadCommentTable->select($fieldsArray, $condArr);
+		$this->comment=$this->baseTable->select($fieldsArray, $condArr);
 				
 		$updateArray=array(UploadComment::comment => $comment,UploadComment::comment_time => $commentTime );
 	    $condArr = array(UploadComment::comment_id => $this->comment);
 	    
-	    return $this->uploadCommentTable->update($updateArray, $condArr);
+	    return $this->baseTable->update($updateArray, $condArr);
 	}	
     
-    public function insertNewComment($userId, $photoId, $comment) 
+    public function insertNewComment($userId, $photoId, $commentTime, $comment) 
 	{
-		$elementsArray=array(UploadComment::field_photo_id=>$photoId, UploadComment::field_user_id=>$userId, UploadComment::field_comment=>"\"" . $comment . "\"", UploadComment::field_comment_time=>"NOW()");
+		$elementsArray=array(UploadComment::photo_id,UploadComment::user_id, UploadComment::comment, UploadComment::comment_time);
+		$valuesArray=array($photoId, $userId, $commentTime, $comment);
 		
-		return $this->uploadCommentTable->insert($elementsArray);		
+		return $this->baseTable->insert($elementsArray, $valuesArray);		
 	}
 	
-	public function deleteComment($commentId) 
+	public function deleteComments($userId, $photoId, $comment, $commentTime) 
 	{
-		$deleteArray=array(UploadComment::field_upload_id => $commentId);
-		$this->result=$this->uploadCommentTable->delete($deleteArray);
-		
+		$fieldsArray = array(UploadComment::comment_id);
+		$condArr = array(UploadComment::photo_id => $photo_id, UploadComment::user_id=>$userId,UploadComment::comment=>$comment );	
+		$this->result=$this->baseTable->select($fieldsArray, $condArr);
+				
+		$deleteArray=array(UploadComment::comment_id => $this->result);
+		$this->result=$this->baseTable->delete($deleteArray);
+
 		return $this->result;
+		
 	}
 }
 ?>

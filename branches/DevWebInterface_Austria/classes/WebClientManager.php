@@ -60,7 +60,7 @@ class WebClientManager extends Base
 		
 		if($staCommentOperator == NULL)
 		{
-			$staCommentOperator=new CommentOperator($this->tablePrefix, $this->dbc);
+			$staCommentOperator=new CommentOperator($this->dbc);
 		} 
 		
 		return $staCommentOperator;
@@ -221,21 +221,13 @@ class WebClientManager extends Base
 					//This person has given some rating for the photo before, so do not let him anymore
 				}
 								
-				break;
-			case "GetComments":
-				$photoId=$_REQUEST["photoId"];
-				$out = $this-> getCommentOperator()-> getComments($photoId);
-				break;
-			case "SendNewComment":
-				$userId = 1;
-				$photoId=$_REQUEST["photoId"];
-				$comment=$_REQUEST["comment"];
-				$out = $this-> getCommentOperator()->insertNewComment($userId, $photoId, $comment);
-				break;
-			case "DeleteComment":
-				$commentId=$_REQUEST["commentId"];
-				$out = $this-> getCommentOperator()->deleteComment($commentId); 
 				break;	
+			case $this->actionPrefix . "ObserveComments":		
+					
+			case $this->actionPrefix . "AddComment":
+				
+			case $this->actionPrefix . "DeleteComment":
+				
 			default:				
 				$out = UNSUPPORTED_ACTION;
 				if (class_exists("FacebookConnect")) 

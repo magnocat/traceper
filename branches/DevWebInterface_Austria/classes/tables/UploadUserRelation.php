@@ -13,4 +13,5 @@ class UploadUserRelation extends BaseTable {
 	const field_id='Id';
 	const field_upload_id = 'upload_id';	
 	const field_user_id = 'user_id';
+}
 ?>
