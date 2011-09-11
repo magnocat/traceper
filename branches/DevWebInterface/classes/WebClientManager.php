@@ -202,25 +202,28 @@ class WebClientManager extends Base
 				$out = $this->addFriendRequest($reqArray);
 				break;
 			case $this->actionPrefix . "GetFriendRequests":
-		
 				$out = $this->usermanager->getFriendRequests($reqArray['pageNo'], $this->elementCountInAPage);
 				break;	
-			case "SetUploadRating":
-						
+			case "SetUploadRating":						
 				$userId = $this->usermanager->getUserId();
-
-				$fieldsArray = array(UploadUserRelation::field_id);
-				$condArr = array(UploadUserRelation::field_upload_id => $imageId, UploadUserRelation::field_user_id => $userId);	
-		
-				if($this->getUploadUserRelationTable()->select($fieldsArray, $condArr) == 0) //if the person has not given any rating for the photo, then let him to give
-				{	
-					$out = $this->getRatingPlugin()->process($reqArray);	
-				}
-				else
+				$out = MISSING_PARAMETER;
+				if (isset($reqArray['uploadId']) && $reqArray['uploadId'] != null)
 				{
-					//This person has given some rating for the photo before, so do not let him anymore
-				}
-								
+					$imageId = (int)$reqArray['uploadId'];;
+					
+					$fieldsArray = array(UploadUserRelation::field_id);
+					$condArr = array(UploadUserRelation::field_upload_id => $imageId, UploadUserRelation::field_user_id => $userId);	
+					$result = $this->getUploadUserRelationTable()->select($fieldsArray, $condArr);
+					
+					if( $this->dbc->numRows($result) == 0) //if the person has not given any rating for the photo, then let him to give
+					{	
+						$out = $this->getRatingPlugin()->process($reqArray);	
+					}
+					else
+					{
+						//This person has given some rating for the photo before, so do not let him anymore
+					}
+				}								
 				break;
 			case "GetComments":
 				$photoId=$_REQUEST["photoId"];

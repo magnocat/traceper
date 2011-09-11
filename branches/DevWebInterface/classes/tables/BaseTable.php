@@ -62,15 +62,13 @@ class BaseTable
 				array_push($conditionValuePair, $key .'='. $value);
 			}
 	
-			$sqlConditionPart = implode(',', $conditionValuePair);
+			$sqlConditionPart = implode(' AND ', $conditionValuePair);
 			
 			$sql .= ' WHERE ' . $sqlConditionPart;
 		}
 		
 		$sql .= ' LIMIT '. $limit;
 		
-		//echo $sql;
-
 		$result = $this->dbc->query($sql);
 		
 		//echo "Number Of Rows:".$this->dbc->numRows($result);
