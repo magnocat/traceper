@@ -396,6 +396,8 @@ function processImageXML(MAP, xml){
 						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
 						+ TRACKER.langOperator.zoomMax
 						+'</a>'+'</li>'
+						+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+						+'</a>'+'</li>'
 						+'</li>'
 						+ '</ul>'
 						+ "</div>";
@@ -467,5 +469,35 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+"</ul>";
 
 	return content;
+}
 
+function processCommentXML(xml){
+		
+	var list = "";
+	$(xml).find("page").find("comment").each(function(){
+	
+		var comment = $(this);
+		var commentText = $(comment).text();
+		var commentId = $(comment).attr("Id");
+		var commentTime =  $(comment).attr("time");
+		var userId = $(comment).attr("userId");
+		var userName = $(comment).attr("userName");
+
+		list += "<li>"
+		// add delete image button if logged in user and image uploader are same
+		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+")' src='images/delete.png' />"
+		+ "<div>"
+		+ TRACKER.langOperator.uploader + ": " + userName 
+		+ "<br/>"
+		/* + TRACKER.langOperator.time + ": " */ +  commentTime
+		+ "</a>"
+		+ "<br/>"
+		+ "<div class='comment' id='viewComment"+ commentId +"' commentId='" + commentId +"'>" 
+		+ commentText
+		+ "</div>"
+		+ "<br/>"
+		+ "</li>";
+	});
+	
+	return list;
 }

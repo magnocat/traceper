@@ -291,12 +291,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 
-	//****************************************************************************20.08.2011 EAC
 	this.sendNewComment= function(userId, photoId, comment){
 		var params= "action=" + TRACKER.actionSendNewComment + "&userId="+ userId + "&photoId=" + photoId + "&comment=" + comment;
 		
 		if (comment != ""){
 			TRACKER.ajaxReq(params, function (result){
+			
+				TRACKER.showCommentWindow(1);
+				
 				if (result == "1") {	
 					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
 				}
@@ -315,27 +317,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 		if (commentId != ""){
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {	
-					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
-				}
-				else if (result == "-7"){
-					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
-				}
-			});
-		}
-		else {
-			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
-		}
-	}
-	//*****************************************************************************************
-	
-	this.getComments=function(photoId)
-	{
-		var params= "action=" + TRACKER.actionSendNewComment + "&photoId=" + photoId;
-		
-		if (photoId != ""){
-			
-			TRACKER.ajaxReq(params, function (result){
+				
+				TRACKER.showCommentWindow(1);
 				
 				if (result == "1") {	
 					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
@@ -349,7 +332,42 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
-	//********************************************************************************************
+	
+	this.getComments=function(photoId, callback)
+	{
+		var params= "action=" + TRACKER.actionGetComments + "&photoId=" + photoId;
+		
+		if (photoId != ""){
+			
+			TRACKER.ajaxReq(params, function (result){
+					
+				if (result == "1") {	
+					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+				
+				var str = processCommentXML(result); 
+
+				callback(str);
+			});
+			
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.showCommentWindow=function(uploadId)
+	{
+		$('#photoCommentForm').mb_open();
+		$('#photoCommentForm').mb_centerOnWindow(true);
+			
+		TRACKER.getComments(uploadId, function(result){
+			$('#photoCommentForm').find(".mbcontainercontent:first #photoComments").html(result);
+		});
+	}
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
