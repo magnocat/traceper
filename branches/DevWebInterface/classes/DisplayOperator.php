@@ -471,11 +471,10 @@ USER_AREA;
 	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
 	</div>
 
-	<div id="photoCommentForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'photo_container.png', width:'400', height:'1000', title:'Comment Window', closed:'true' }">
+	<div id="photoCommentForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'photo_container.png', width:'400', height:'600',dock:'right', title:'Comment Window', closed:'true' }" style="top:1px; right:1px">
 		<div id="photoComments"></div>
 		<div id="photoCommentForm">	
-			<div id="photoCommentLabel">Comment:</div>
-			<textarea id="photoCommentTextBox" cols="40" rows="7">Enter your comments here...	</textarea><br/>
+			<textarea id="photoCommentTextBox" cols="40" rows="7">Enter your comments here...</textarea><br/>
 			<input type="button" id="sendCommentButton" value="Send Comment"/><br/>
 		</div> 
 	</div>

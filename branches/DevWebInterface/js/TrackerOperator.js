@@ -312,21 +312,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 	
-	this.deleteComment=function (commentId){
+	this.deleteComment=function (commentId, userId){
 		var params="action=" + TRACKER.actionDeleteComment + "&commentId=" + commentId;
 		
 		if (commentId != ""){
-			TRACKER.ajaxReq(params, function (result){
+			if (TRACKER.userId == userId){
+				TRACKER.ajaxReq(params, function (result){
 				
-				TRACKER.showCommentWindow(1);
+					TRACKER.showCommentWindow(1);
 				
-				if (result == "1") {	
-					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
-				}
-				else if (result == "-7"){
-					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
-				}
-			});
+					if (result == "-1") {	
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+					}
+					else if (result == "-7"){
+						//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+					}
+				});
+			}
+			else {
+				TRACKER.showMessage(TRACKER.langOperator.unauthorizedCommentDeletion, "warning");
+			}
 		}
 		else {
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
@@ -336,23 +341,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.getComments=function(photoId, callback)
 	{
 		var params= "action=" + TRACKER.actionGetComments + "&photoId=" + photoId;
-		
 		if (photoId != ""){
-			
-			TRACKER.ajaxReq(params, function (result){
-					
-				if (result == "1") {	
-					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+			TRACKER.ajaxReq(params, function (result){				
+				if (result == "-1") {	
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 				}
 				else if (result == "-7"){
 					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
-				}
-				
+				}				
 				var str = processCommentXML(result); 
-
 				callback(str);
-			});
-			
+			});			
 		}
 		else {
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
@@ -362,7 +361,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.showCommentWindow=function(uploadId)
 	{
 		$('#photoCommentForm').mb_open();
-		$('#photoCommentForm').mb_centerOnWindow(true);
+		//$('#photoCommentForm').mb_centerOnWindow(true);
 			
 		TRACKER.getComments(uploadId, function(result){
 			$('#photoCommentForm').find(".mbcontainercontent:first #photoComments").html(result);

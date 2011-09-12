@@ -482,12 +482,12 @@ function processCommentXML(xml){
 		var commentTime =  $(comment).attr("time");
 		var userId = $(comment).attr("userId");
 		var userName = $(comment).attr("userName");
-
+	
 		list += "<li>"
 		// add delete image button if logged in user and image uploader are same
-		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+")' src='images/delete.png' />"
+		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+","+userId+")' src='images/delete.png' />"
 		+ "<div>"
-		+ TRACKER.langOperator.uploader + ": " + userName 
+		/*+ TRACKER.langOperator.uploader + ": " */ + userName 
 		+ "<br/>"
 		/* + TRACKER.langOperator.time + ": " */ +  commentTime
 		+ "</a>"
@@ -496,6 +496,7 @@ function processCommentXML(xml){
 		+ commentText
 		+ "</div>"
 		+ "<br/>"
+		+ "<hr>"
 		+ "</li>";
 	});
 	

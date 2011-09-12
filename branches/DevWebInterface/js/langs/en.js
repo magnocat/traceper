@@ -75,5 +75,6 @@ LAN_OPERATOR.addIndexes({
 			invitationSentSuccesfull:'All invitation has been sent successfully',
 			invitationSentPartial:'Invitations has been sent, but wrong-formatted e-mail address found',
 			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)',
-			registerLabel:'Register'
+			registerLabel:'Register',
+			unauthorizedCommentDeletion:'You are not allowed to delete this comment.'
 	});
