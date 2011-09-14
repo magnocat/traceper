@@ -211,6 +211,114 @@ function MapOperator() {
 
 	}
 
+	/**
+	 * Extend for polygon specific implementation
+	 * @param {GMap2} map The map that has had this ExtMapTypeControl added to it.
+	 * @return {DOM Object} Div that holds the control
+	 */ 
+	MAP_OPERATOR.initializePolygonControl = function(){
+
+		var container = document.createElement('DIV');
+		container.id = "mymaps-control-polygon";
+
+		var opts = {
+				button_opts:{
+			img_up_url:'http://www.google.com/intl/en_us/mapfiles/ms/t/Bpu.png',
+			img_down_url:'http://www.google.com/intl/en_us/mapfiles/ms/t/Bpd.png',
+			name:'polygon',
+			tooltip:'Draw a shape'
+		},
+		position:{
+			controlPosition:[245,3]
+		},
+		tooltip:{
+			anchor:[-30,-8],
+			cursor_on:"", //only for overriding default digitizing cursor
+			cursor_off:"",
+			titles:{
+			start:"Click to start drawing a shape",
+			middle:"Click to continue drawing a shape",
+			end:"Click a vertex once, or double click on the map to end this shape"
+		},
+		callback:null      
+		},
+		newGeometryOptions: { 
+			strokeColor:"#000000",
+			strokeWeight:3,
+			strokeOpacity:0.25,
+			fillColor:"#0000FF",
+			fillOpacity:0.45,
+			opts:{
+			clickable:true
+		}
+		},
+		geometryListenerOpts:{
+			mouseoverEditingEnabled:true,
+			infoWindowHtmlEnabled:true,
+			mouseoverHighlightingEnabled:true,
+			infoWindowTabsEnabled:false,
+			/**
+			 * Optional function to load up additional information from html template for tabs
+			 * If the original infoWindowHtml content is desired, add it as the first tab in the array.
+			 */
+			/*
+			assembleInfoWindowTabs:function(){
+			me.infoWindowTabs.push(new GInfoWindowTab("Geometry Controls", me.infoWindowHtml));
+			me.infoWindowTabs.push(new GInfoWindowTab("Example Tab", me.zuper.infoWindowHtmlTemplates["infoWindowTabContent1"]));
+
+		}  */    
+		},
+		multiEdit:false, //allows for digitzing multiple geometries, useful for points, should polys support it too?
+		htmlTemplateParams:{},
+		cssId:"emmc-polygon",
+		optionalGeometryListeners:null,
+		autoSave:false     
+		};
+
+		var button = {};
+		button.opts = opts.button_opts;
+		var button_img = document.createElement('img');
+
+		button_img.style.cursor = button.opts.buttonCursor || 'pointer';
+		button_img.width = button.opts.buttonWidth || '33';
+		button_img.height = button.opts.buttonHeight || '33';
+		button_img.border = button.opts.buttonBorder || '0';
+		button_img.src = button.opts.img_up_url;
+		button_img.title = button.opts.tooltip;
+
+		button.img = button_img;
+		
+
+		//Button toggle. First click turns it on (and other buttons off), triggers bound events. Second click turns it off
+		google.maps.event.addDomListener(button.img, "click", function() {
+			alert(1);
+			if(button.img.getAttribute("src") === button.opts.img_up_url){
+				/*
+				me.toggleButtons(opts.controlName);
+				opts.startDigitizing();
+				*/
+			} else {
+				/*
+				me.toggleButtons(opts.controlName);
+				opts.stopDigitizing();
+				*/
+			}    
+		});  
+
+		/*
+		buttons_[opts.controlName] = button;
+		stopDigitizingFuncs_[opts.controlName] = opts.stopDigitizing;
+		*/
+
+		container.appendChild(button.img);
+		MAP_OPERATOR.map.getDiv().appendChild(container);
+		
+		/*
+		me.runInitFunctions();
+		 */
+		return container;
+
+	};
 
 	/*
 	 * adding point to the geofence end
