@@ -214,13 +214,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 				@Override
 				public void run() {
 					BitmapFactory.Options options = new BitmapFactory.Options();
-					int inSampleSize = 2;
-					int quality = 75;
-					if (picture.length > 1000000) {
-						inSampleSize = 6;
-						quality = 50;
-					}
-					
+					int inSampleSize = 10;
+					int quality = 60;
 					options.inSampleSize = inSampleSize;
 					Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
 					int byteCount = bitmap.getRowBytes();

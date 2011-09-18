@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ApplicationName">Traceper</string>
+    <string name="ApplicationName">Public Reporter</string>
     <string name="hello">Hello World, startApp</string>
     <string name="friend_list">Friend List</string>
     

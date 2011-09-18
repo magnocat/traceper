@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.traceper.R;
@@ -90,7 +89,9 @@ public class Main extends Activity
 			}
 		});
 	//	lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
-
+		
+//		AdView adView = (AdView)findViewById(R.id.adView);
+//	   adView.loadAd(new AdRequest());
     }
 
 	@Override
