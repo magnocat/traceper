@@ -229,6 +229,10 @@ public class AppService extends Service implements IAppService{
 		return connected; 
 	}
 	
+	public boolean isGPSEnabled() {
+		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+	}
+	
 	public void onDestroy() {
 		Log.i("Traceper-AppService is being destroyed", "...");
 		super.onDestroy();

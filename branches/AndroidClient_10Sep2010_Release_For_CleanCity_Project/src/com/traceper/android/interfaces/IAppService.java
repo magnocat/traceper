@@ -46,6 +46,8 @@ public interface IAppService {
 	
 	public void updateLocationData(ISimpleLocationListener listener);
 	
+	public boolean isGPSEnabled();
+	
 	
 	
 }

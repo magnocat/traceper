@@ -52,6 +52,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private static final int TAKE_ANOTHER_PHOTO = Menu.FIRST + 1;
 	private static final int BACK = Menu.FIRST + 2;
 	private static final int NOTIFICATION_ID = 0;
+	protected static final int DIALOG_ENABLE_GPS = 0;
 	private byte[] picture;
 	private IAppService appService = null;
 	private boolean pictureTaken = false;
@@ -83,6 +84,9 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		public void onServiceConnected(ComponentName className, IBinder service) {          
 			appService = ((AppService.IMBinder)service).getService();    			
 			locationUpdated = false;
+			if (appService.isGPSEnabled() == false){
+				showDialog(DIALOG_ENABLE_GPS);
+			}
 			appService.updateLocationData(new ISimpleLocationListener() {
 				@Override
 				public void locationReceived(Location loc) {
@@ -99,6 +103,23 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private NotificationManager mManager;
 
 
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) 
+    	{
+    		case DIALOG_ENABLE_GPS:
+    		
+    			return new AlertDialog.Builder(CameraController.this)       
+        		.setMessage(R.string.enable_gps)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				finish();
+        			}
+        		})        
+        		.create();    
+    	}
+		return super.onCreateDialog(id);
+	}
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

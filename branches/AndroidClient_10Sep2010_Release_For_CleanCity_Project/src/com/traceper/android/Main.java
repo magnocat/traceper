@@ -5,9 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -29,6 +32,7 @@ public class Main extends Activity
 {
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
+	protected static final int DIALOG_ENABLE_GPS = 0;
 	private IAppService appService = null;
 //	private TextView lastDataSentTimeText;
 	private Button takePhoto;
@@ -84,8 +88,13 @@ public class Main extends Activity
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				Intent i = new Intent(Main.this, CameraController.class);
-				startActivity(i);
+				if (appService.isGPSEnabled() == true) { 
+					Intent i = new Intent(Main.this, CameraController.class);
+					startActivity(i);
+				}
+				else {
+					showDialog(DIALOG_ENABLE_GPS);
+				}
 			}
 		});
 	//	lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
@@ -93,6 +102,24 @@ public class Main extends Activity
 //		AdView adView = (AdView)findViewById(R.id.adView);
 //	   adView.loadAd(new AdRequest());
     }
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) 
+    	{
+    		case DIALOG_ENABLE_GPS:
+    		
+    			return new AlertDialog.Builder(Main.this)       
+        		.setMessage(R.string.enable_gps)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create();    
+    	}
+		return super.onCreateDialog(id);
+	}
 
 	@Override
 	protected void onPause() 
