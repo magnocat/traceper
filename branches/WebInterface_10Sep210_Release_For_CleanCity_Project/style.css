@@ -112,8 +112,13 @@ a {
 }
 
 #logo, .logo, .logo_inFullMap, #loginLogo {
+	height:100px;
+	background: url("images/logo_small.png") no-repeat center;
+	cursor:pointer;		
+}
+#traceper_logo {
 	height:70px;
-	background: url("images/logo.png") no-repeat center;
+	background: url("images/traceper.png") no-repeat center;
 	cursor:pointer;		
 }
 #loginLogo {

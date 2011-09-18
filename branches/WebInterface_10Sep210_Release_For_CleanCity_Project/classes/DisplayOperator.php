@@ -220,11 +220,36 @@ EOT;
 			{
 				if (GBrowserIsCompatible()) 
 				{
-   					map = new GMap2(document.getElementById("map"));
+					  var mapOptions = {
+									    googleBarOptions : {
+									      style : "new",
+									      adsOptions: {
+									        client: "pub-1149341712136417",
+									        channel: "AdSense for Search channel",
+									        adsafe: "high",
+									        language: "en"
+									      }
+									    }
+									  }
+   					map = new GMap2(document.getElementById("map"), mapOptions);
    					map.setCenter(new GLatLng(26.915641,75.807724), 12);
 					map.setUIToDefault();					
 					map.setMapType(G_NORMAL_MAP); //map.setMapType(G_HYBRID_MAP);	
 					map.enableRotation();
+					map.enableGoogleBar();
+					
+				//	var publisher_id = yourPublisherID;
+
+					var adsManagerOptions = {
+					  maxAdsOnMap : 2,
+					  style: G_ADSMANAGER_STYLE_ADUNIT,
+					  // The channel field is optional - replace this field with a channel number 
+					  // for Google AdSense tracking
+					  channel: '6407716131'  
+					};
+					
+					adsManager = new GAdsManager(map, "pub-1149341712136417", adsManagerOptions);
+					adsManager.enable();
 	   	
    					var trackerOp = new TrackerOperator('$callbackURL', map, $fetchPhotosInInitialization, $updateUserListInterval, $queryIntervalForChangedUsers, langOp);			
    			//		trackerOp.getUserList(1); 	
@@ -302,8 +327,22 @@ MAIN_PAGE_1;
 							<!-- <div id='footer'>							
 									<a href='#auLink'></a>								
 								</div>
-							-->					
-							</div>							
+							-->		
+								 								
+							</div>	
+							<div id='add'>
+	 							<script type="text/javascript"><!--
+								google_ad_client = "ca-pub-1149341712136417";
+								/* PublicReporter */
+								google_ad_slot = "6031991797";
+								google_ad_width = 180;
+								google_ad_height = 150;
+								//-->
+								</script>
+								<script type="text/javascript"
+								src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+								</script>
+	 						</div>						
 					</div>
 																																									
 				</div>
