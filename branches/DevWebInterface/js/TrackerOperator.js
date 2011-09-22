@@ -922,7 +922,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		$(object + ' .mbcontainercontent:first').html(message);
 		$(object).mb_open();
 		$(object).mb_centerOnWindow(true);
-		$(object).mb_switchAlwaisOnTop(); 
+		//$(object).mb_switchAlwaisOnTop();		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
