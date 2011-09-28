@@ -50,4 +50,33 @@
 <string name="http_request_failed">Http request failed, please make sure that URL is valid in Settings and you are connected to the Internet...</string>
 <string name="take_photo">Take photo</string>
 <string name="http_missing_parameter">Missing parameter, please consult the developer</string>
+
+ <string name="description_logo">Traceper</string>
+
+    <string name="description_about">About</string>
+    <string name="description_home">Home</string>
+    <string name="description_search">Search</string>
+    <string name="description_feature1">Send Location</string>
+    <string name="description_feature2">Auto Location</string>
+    <string name="description_feature3">Take Photo</string>
+    <string name="description_feature4">Setting</string>
+    <string name="description_feature5">History</string>
+    <string name="description_feature6">Exit</string>
+
+    <string name="title_about">About</string>
+    <string name="title_home">Home</string>
+    <string name="title_search">Search</string>
+    <string name="send_location">Send Location</string>
+    <string name="auto_location">Auto Location</string>
+    <string name="take_photo_b">Take Photo</string>
+    <string name="setting_b">Setting</string>
+    <string name="history_b">History</string>
+    <string name="exit_b">Exit</string>
+
+ 
+
+    <string name="about_intro">This app is ....</string>
+    <string name="search_intro">Search page goes here...</string>
+
+
 </resources>
