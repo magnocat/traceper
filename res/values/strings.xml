@@ -61,35 +61,4 @@
 <string name="traceper_login">Traceper-Login</string>
 <string name="traceper_register">Traceper-Register</string>
 <string name="saving">Saving, please wait...</string>
-<string name="choose_car_services">1. Choose Car Services</string>
-<string name="load_car_services">2. Load car services by car login</string>
-<string name="next">Next</string>
-<string name="car_login">Car Login</string>
-<string name="car_password">Car Password</string>
-<string name="driver_services">Driver Services</string>
-<string name="http_account_expired">User account expired...</string>
-<string name="http_user_not_valid">User is not validated...</string>
-  <string name="select_car_service">Select service</string>
-  <string name="fill_both_carname_and_password">Please fill both carname and password</string>
-  <string name="make_sure_carname_and_password_correct">Please make sure  carname and password are correct...</string>
-  <string name="car_in_use">This car is in use by someone else...</string>
-  <string name="driver_console">Driver Console</string>
-  <string name="online_status">User Status</string>
-  <string name="withIn_Distance">With In Distance (km)</string>
- <string-array name="user_status">
-        <item>Offline</item>
-        <item>Online</item>        
-</string-array>
- <string-array name="distance">
-        <item>0.5</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-</string-array>
-  
-
 </resources>

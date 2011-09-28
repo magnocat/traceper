@@ -14,9 +14,6 @@ public class Configuration {
 	
 	
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
-	protected static final String PREFRENCES_CAR_SERVICE_SELECTED_ITEM = "PREFRENCES_CAR_SERVICE_SELECTED_ITEM";
-	protected static final String PREFRENCES_STATUS_SELECTED_ITEM = "PREFRENCES_STATUS_SELECTED_ITEM";
-	protected static String PREFRENCES_WITHIN_DISTANCE_SELECTED_ITEM = "PREFRENCES_WITHIN_DISTANCE_SELECTED_ITEM";
 	
 
 }
