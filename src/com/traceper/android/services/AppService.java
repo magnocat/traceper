@@ -83,7 +83,7 @@ public class AppService extends Service implements IAppService{
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
 	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-	private boolean regularUpdateFlag;
+
 
 
 	public class IMBinder extends Binder {
@@ -374,7 +374,6 @@ public class AppService extends Service implements IAppService{
 					Looper.loop();
 				}
 			};
-		if(this.regularUpdateFlag)
 			locationUpdates.start();
 	
 		}
@@ -443,7 +442,6 @@ public class AppService extends Service implements IAppService{
 	}
 	
 	public void CancelRegularUpdate(){
-		this.regularUpdateFlag  = false;
 		locationManager.removeUpdates(locationHandler);
 	}
 
