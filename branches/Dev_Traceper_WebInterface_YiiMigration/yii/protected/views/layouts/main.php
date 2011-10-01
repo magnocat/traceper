@@ -84,6 +84,35 @@
    
 	</head>
 	<body>	
+	<?php
+
+	
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'userLoginWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Login'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false      
+	    ),
+	));
+	
+	echo	'<div id="userLoginForm" class="">	
+					<div id="usernameLabel"></div>
+					<input type="text" name="email" id="emailLogin" />
+					<div id="passwordLabel"></div>
+					<input type="password" name="password" id="password"/>
+					<div class="link" id="forgotPasswordLink"></div>
+					<input type="checkbox" name="rememberMe" id="rememberMe"/>
+					<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
+				    <input type="button" id="submitLoginFormButton" value=""/> <br/>
+				</div>';
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
+	
+?>
+	
 	
 	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
@@ -92,7 +121,13 @@
 					<div id='content'>						
 	 						<div id='logo'></div>
 	 						<div id="loginBlock">
+	 								<?php echo CHtml::link(Yii::t('general', 'Login'), '#', array(
+	    											'onclick'=>'$("#userLoginWindow").dialog("open"); return false;',
+												)); 
+									?>
+									<!--  
 	 								<div style="clear:both" id="loginLink" class="userOperations"></div>
+	 								-->
 	 								<div class="userOperations" id="registerLink"></div>
 	 						</div>
 	 						<div id="userBlock" style="display:none">
@@ -176,16 +211,7 @@
 		
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
-	<div id="userLoginForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', height:'250', closed:'true' }">	
-			<div id="usernameLabel"></div>
-			<input type="text" name="email" id="emailLogin" />
-			<div id="passwordLabel"></div>
-			<input type="password" name="password" id="password"/>
-			<div class="link" id="forgotPasswordLink"></div>
-			<input type="checkbox" name="rememberMe" id="rememberMe"/>
-			<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
-		    <input type="button" id="submitLoginFormButton" value=""/> <br/>
-	</div>
+	
 	<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
 		<div id="emailLabel"></div>
 		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>

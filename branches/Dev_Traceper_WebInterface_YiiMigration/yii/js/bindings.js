@@ -268,7 +268,7 @@ function bindElements(langOperator, trackerOp)
 				});						
 		});	
 	});
-	
+/*	
 	$('#loginLink').click(function(){
 		$('#userLoginForm').mb_open();
 		$('#userLoginForm').mb_centerOnWindow(true);
@@ -276,6 +276,10 @@ function bindElements(langOperator, trackerOp)
 		$('#submitLoginFormButton').click(function(){
 			trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
 		});
+	});
+*/	
+	$('#submitLoginFormButton').click(function(){
+		trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
 	});
 	
 	$('#forgotPasswordLink').click(function(){
@@ -346,7 +350,7 @@ function setLanguage(langOperator){
 	$('#forgotPasswordLink').text(langOp.forgotPassword);
 	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
 	$('#registerLink').text(langOp.registerLabel);	
-	$('#loginLink').text(langOp.login);
+//	$('#loginLink').text("Edward hocam" + langOp.login);
 	$('#emailLabel').text(langOp.emailLabel + ":");	
 	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
 	$('#aboutusLink').text(langOp.aboutTitle);
