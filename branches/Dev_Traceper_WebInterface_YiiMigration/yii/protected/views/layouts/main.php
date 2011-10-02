@@ -146,11 +146,96 @@
 		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
 		<input type="button" id="registerButton" value="Register" />
 	</div>';
+				
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
+
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'changePasswordWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Change Password'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false      
+	    ),
+	));
 	
+	echo '	<div id="changePasswordForm" class="">  
+					<br/>
+		<div id="currentPasswordLabel"></div>
+		<div><input type="password" name="currentPassword" id="currentPassword" /></div>
+		<div id="newPasswordLabel"></div>
+		<div><input type="password" name="newPassword" id="newPassword" /></div>  
+		<div id="newPasswordAgainLabel"></div>
+		<div><input type="password" name="newPasswordAgain" id="newPasswordAgain" /></div>
+		<div></div>
+		<div><input type="button" name="changePassword" id="changePasswordButton" /> &nbsp; <input type="button" name="cancel" id="changePasswordCancel"/></div>
+	</div>';
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'inviteUserWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Send invitations to your friends'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=> '340px'      
+	    ),
+	));
 	
+	echo '<div id="InviteUserForm" class="">  
+		<div id="inviteUserEmailLabel"></div> 
+		<textarea name="useremail" id="useremail" style="width:300px; height:100px; resize:none"></textarea><br/>		
+		<div id="inviteUserInvitationMessage"></div>		
+		<textarea name="invitationMessage" id="invitationMessage" style="width:300px; height:100px; resize:none"></textarea><br/>		
+		<input type="button" name="inviteUserButton" id="inviteUserButton"/>&nbsp; <input type="button" name="cancel" id="inviteUserCancel"/></div>
+	</div>';
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'friendRequestsWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Friend Requests'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=> '400px',
+			'height'=> '550'    
+	    ),
+	));
+	
+	echo '<div id="friendRequestsList" class="">  
+	</div>';	
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 	
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'photoCommentWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Comment Window'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=> '400px',
+			'height'=> '300'     
+	    ),
+	));
+	
+	echo '	<div id="photoCommentForm" class="">
+		<div id="photoCommentLabel">Comment:</div>
+		<textarea id="photoCommentTextBox" cols="40" rows="7" style="resize:none">Enter your comments here...	</textarea><br/>
+		<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
+		<input type="button" id="deleteCommentButton" value="Delete Comment" />	 
+	</div>';
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');		
+
 ?>
 	
 	
@@ -162,10 +247,7 @@
  							<?php 
  										echo CHtml::link('<div id="logo"></div>', '#', array(
     										'onclick'=>'$("#Logo").dialog("open"); return false;',
-										));
-										
-                                        //echo CHtml::link('<img src="server/gallery/'.$data->gallery.'/th_'.$data->picturenumber.'.jpg" 
-                                        //alt="'.$data->picturenumber.'.jpg" />', array('view', 'id'=>$data->id));										
+										));									
 							?>											 						
 	 						<!-- 
 	 						<div id='logo'></div>
@@ -192,7 +274,9 @@
 	 						<div id="userBlock" style="display:none">
 								<ul id='userarea'><li id="username"><!--  $realname --></li>
 	 							</ul>
-	 							<div style="clear:both" id="changePassword" class="userOperations">	
+	 							 
+	 							<!--
+	 							<div style="clear:both" id="changePassword" class="userOperations">
 	 								<img src='images/changePassword.png'  /><div></div>
 	 							</div>
 	 							<div class="userOperations" id="inviteUser">
@@ -204,13 +288,46 @@
 	 							<div  class="userOperations" id="signout">	 			
 	 								<img src='images/signout.png'  /><div></div>		
 	 							</div>
+	 							-->	 							
+	 							
+	 							<?php 
+ 									echo CHtml::link('<div style="clear:both" id="changePassword" class="userOperations">	
+	 													<img src="images/changePassword.png"  /><div></div>
+	 												  </div>', '#', array(
+    												'onclick'=>'$("#changePasswordWindow").dialog("open"); return false;',
+									));	
+
+ 									echo CHtml::link('<div class="userOperations" id="inviteUser">
+	 													<img src="images/invite.png"  /><div></div>
+	 												 </div>', '#', array(
+    												'onclick'=>'$("#inviteUserWindow").dialog("open"); return false;',
+									));	
+									
+ 									echo CHtml::link('<div class="userOperations" id="friendRequests">	
+	 													<img src="images/friends.png"  /><div></div>
+	 												 </div>', '#', array(
+    												'onclick'=>'$("#friendRequestsWindow").dialog("open"); return false;',
+									));	
+
+ 									echo CHtml::link('<div  class="userOperations" id="signout">	 			
+	 													<img src="images/signout.png"  /><div></div>		
+	 												 </div>', '#', array());										
+	 							?>
 	 						</div>
-	 						<div id='lists'>	
+	 						
+	 						<div id='lists'> 	
 								<div class='titles'>									
 									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
-									<div class='title' id='photo_title'><div class='arrowImage'></div></div>	
-									<!-- <div class='title' id='friendRequest_title'><div class='arrowImage'>Friend Requests</div></div>-->							
-								</div>
+									<!--  
+									<div class='title' id='photo_title'><div class='arrowImage'></div></div>
+									-->
+								
+									<?php 	
+										echo CHtml::link('<div class="title" id="photo_title"><div class="arrowImage"></div></div>', '#', array(
+	    									'onclick'=>'$("#photoCommentWindow").dialog("open"); return false;',
+										));	
+									?>																											
+								</div>  
 								<div id='friendsList'>											
 									<div class='search'>						
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
@@ -220,7 +337,7 @@
 										<a href='#returnToUserList'></a>	
 										<div id='results'></div>								
 									</div>		
-								</div>
+								</div> 
 								<div id="photosList">									
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
@@ -233,7 +350,7 @@
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
 										<div id='results'></div>								
 									</div>
-								</div>				
+								</div>		
 							</div> 													
 					</div>
 																																									
@@ -247,7 +364,7 @@
 	<!-- 
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
-	-->
+	
 	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', height:'225', title:'<div id=\'changePasswordFormTitle\'></div>', closed:'true' }">  
 					<br/>
 		<div id="currentPasswordLabel"></div>
@@ -260,8 +377,13 @@
 		<div><input type='button' name='changePassword' id='changePasswordButton' /> &nbsp; <input type='button' name='cancel' id='changePasswordCancel'/></div>
 	</div>
 	
-	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
-	</div>
+	<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
+		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
+		<input type="button" id="registerButton" value="Register" />
+	</div>	
 	
 	<div id='InviteUserForm' class="containerPlus draggable {buttons:'c', skin:'default', width:'350', height:'350', title:'<div id=\'inviteUserFormTitle\'></div>',  closed:'true'}">  
 		<div id="inviteUserEmailLabel"></div> 
@@ -273,29 +395,25 @@
 		<input type='button' name='inviteUserButton' id='inviteUserButton'/>&nbsp; <input type='button' name='cancel' id='inviteUserCancel'/></div>
 	</div>	
 	
-	<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
-		<div id="emailLabel"></div>
-		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
-	</div>
+	<div id='friendRequestsList' class="containerPlus draggable {buttons:'c', icon:'friends.png' ,skin:'default', width:'400', height:'550', title:'<div id=\'friendRequestsListTitle\'></div>', closed:'true' }">  
+	</div>	
 	
-	<div id="registerForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'250', closed:'true' }">		
-		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
-		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
-		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
-		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
-		<input type="button" id="registerButton" value="Register" />
-	</div>
-	
-	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
-	</div>
-	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
-	</div>
-
 	<div id="photoCommentForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png', width:'400', height:'400', title:'Comment Window', closed:'true' }">
 		<div id="photoCommentLabel">Comment:</div>
 		<textarea id="photoCommentTextBox" cols="40" rows="7">Enter your comments here...	</textarea><br/>
 		<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
 		<input type="button" id="deleteCommentButton" value="Delete Comment" />	 
+	</div>		
+	-->
+
+	<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
+		<div id="emailLabel"></div>
+		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
+	</div>
+		
+	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
+	</div>
+	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
 	</div>
 	
 	</body>
