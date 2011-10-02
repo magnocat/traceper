@@ -358,7 +358,10 @@ function processImageXML(MAP, xml){
 
 			image = imageURL + TRACKER.imageThumbSuffix;
 
-			var userMarker = MAP.putMarker(location, image);
+			var userMarker = MAP.putMarker(location, image, false);
+			var iWindow = MAP.initializeInfoWindow();
+			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+			
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -368,17 +371,19 @@ function processImageXML(MAP, xml){
 				longitude:longitude,
 				time:time,
 				rating:rating,
-				gmarker:userMarker,
+				mapMarker:markerInfoWindow,
 			});
-
-			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker, function (){
+			
+			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
+	
+			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
 				image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
 				$("#loading").show();
 				$(image).load(function(){
 					$("#loading").hide();
-
+					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
@@ -401,12 +406,12 @@ function processImageXML(MAP, xml){
 						+'</li>'
 						+ '</ul>'
 						+ "</div>";
-					var infoWindow = MAP.initializeInfoWindow(content);
-					MAP.openInfoWindow(infoWindow, TRACKER.images[imageId].gmarker);
+					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
+					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
 
-					MAP.setInfoWindowCloseListener(infoWindow, function (){
+					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
-							MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
+							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
 						}
 					});
 

@@ -111,7 +111,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var longitude;
 		var time;
 		var rating;
-		var gmarker;
+		var mapMarker;
+		var infoWindowIsOpened = false;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -153,6 +154,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					$("#loginBlock").hide();
 					$("#userBlock").show();
 					$('#userLoginForm').mb_close();
+					$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });
 				}
 				else if (value == "-4"){								
 					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });
@@ -840,7 +842,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.showImageWindow = function(imageId){
-		MAP.trigger(TRACKER.images[imageId].gmarker, 'click');	
+		MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();

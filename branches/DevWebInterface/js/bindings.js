@@ -45,13 +45,12 @@ function bindElements(langOperator, trackerOp)
 		var MAP = TRACKER.getMap();
 		if (checked == true){
 			$(TRACKER.imageIds).each(function(){
-				MAP.setMarkerVisible(TRACKER.images[this].gmarker, true);
-				//TRACKER.images[this].gmarker.show();
+				MAP.setMarkerVisible(TRACKER.images[this].mapMarker.marker, true);
 			});
 		}
 		else {
 			$(TRACKER.imageIds).each(function(){
-				MAP.setMarkerVisible(TRACKER.images[this].gmarker, false);
+				MAP.setMarkerVisible(TRACKER.images[this].mapMarker.marker, false);
 			});
 		}		
 	});
