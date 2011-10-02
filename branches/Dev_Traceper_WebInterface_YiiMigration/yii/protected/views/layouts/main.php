@@ -85,6 +85,23 @@
 	</head>
 	<body>	
 	<?php
+	
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'Logo',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'About'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=> '600px'      
+	    ),
+	));
+	
+	echo '<div id="logo"></div>';	
+	echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Eren Alp Celik - erenalpcelik@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 
 	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -111,6 +128,29 @@
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'registerWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Register'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false      
+	    ),
+	));
+	
+	echo	'<div id="registerForm" class="">		
+		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
+		<input type="button" id="registerButton" value="Register" />
+	</div>';
+	
+	
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+	
 ?>
 	
 	
@@ -118,17 +158,36 @@
 				<div class='logo_inFullMap'></div>										
 				<div id='bar'></div>
 				<div id='sideBar'>						
-					<div id='content'>						
+					<div id='content'>	
+ 							<?php 
+ 										echo CHtml::link('<div id="logo"></div>', '#', array(
+    										'onclick'=>'$("#Logo").dialog("open"); return false;',
+										));
+										
+                                        //echo CHtml::link('<img src="server/gallery/'.$data->gallery.'/th_'.$data->picturenumber.'.jpg" 
+                                        //alt="'.$data->picturenumber.'.jpg" />', array('view', 'id'=>$data->id));										
+							?>											 						
+	 						<!-- 
 	 						<div id='logo'></div>
+	 						-->
 	 						<div id="loginBlock">
-	 								<?php echo CHtml::link(Yii::t('general', 'Login'), '#', array(
+	 								<?php 
+	 											echo CHtml::link(Yii::t('general', 'Login'), '#', array(
 	    											'onclick'=>'$("#userLoginWindow").dialog("open"); return false;',
 												)); 
+												
+												echo ' '; //To separate Login and Register
+												
+												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
+	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
+												));												
 									?>
 									<!--  
 	 								<div style="clear:both" id="loginLink" class="userOperations"></div>
 	 								-->
+	 								<!--
 	 								<div class="userOperations" id="registerLink"></div>
+	 								-->
 	 						</div>
 	 						<div id="userBlock" style="display:none">
 								<ul id='userarea'><li id="username"><!--  $realname --></li>
@@ -185,8 +244,10 @@
 				<div id='loading'></div>											
 	</div>
   	
+	<!-- 
 	<div id='aboutus' class="containerPlus draggable {buttons:'c',icon:'browser.png', skin:'default', width:'600', closed:'true'}">  
 	<div class="logo"></div></div>
+	-->
 	<div id='changePasswordForm' class="containerPlus draggable {buttons:'c', icon:'changePass.png' ,skin:'default', width:'250', height:'225', title:'<div id=\'changePasswordFormTitle\'></div>', closed:'true' }">  
 					<br/>
 		<div id="currentPasswordLabel"></div>
