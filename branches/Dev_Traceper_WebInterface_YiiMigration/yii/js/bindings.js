@@ -17,9 +17,13 @@ function bindElements(langOperator, trackerOp)
 			$(this).attr("value", "");
 		}
 	});
+	
+	/*
 	$("#signout").click(function(){
 		trackerOp.signout();
 	});
+	*/
+	
 	
 	/**
 	 * binding operations to search image
@@ -138,16 +142,20 @@ function bindElements(langOperator, trackerOp)
 		
 	});
 
+	/*
 	$("a[href=#auLink], #logo, .logo_inFullMap").click(function(){
 		$('#aboutus').mb_open();
 		$('#aboutus').mb_centerOnWindow(true);
 	});
+	*/
 	
+	/*
 	//this callback opens the change password window
 	$('#changePassword').click(function(){
 		$('#changePasswordForm').mb_open();
 		$('#changePasswordForm').mb_centerOnWindow(true);
 	});
+	*/
 	
 	$("#changePasswordButton").click(function(){
 		
@@ -202,6 +210,7 @@ function bindElements(langOperator, trackerOp)
 		$('#InviteUserForm').mb_close();
 	});
 	
+	/*
 	//this callback opens the friend requests window
 	$('#friendRequests').click(function(){
 		TRACKER.getFriendRequests(1,function(str){
@@ -211,6 +220,7 @@ function bindElements(langOperator, trackerOp)
 			$('#friendRequestsList').mb_centerOnWindow(true);
 		});		
 	});
+	*/
 	
 	
 	$("a[href=#returnToUserList]").click(function(){
@@ -255,7 +265,7 @@ function bindElements(langOperator, trackerOp)
 			});
 		}
 	});
-	
+/*	
 	$('#registerLink').click(function(){
 		$('#registerForm').mb_open();
 		$('#registerForm').mb_centerOnWindow(true);
@@ -268,6 +278,7 @@ function bindElements(langOperator, trackerOp)
 				});						
 		});	
 	});
+*/
 /*	
 	$('#loginLink').click(function(){
 		$('#userLoginForm').mb_open();
@@ -329,10 +340,10 @@ function setLanguage(langOperator){
 	$("#changePasswordCancel, #inviteUserCancel").val(langOperator.cancelFormButtonLabel);
 	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
-	$("#signout div").append(langOperator.signout);
-	$("#changePassword div").text(langOperator.changePassword);
+//	$("#signout div").append(langOperator.signout);
+//	$("#changePassword div").text(langOperator.changePassword);
 	$("#inviteUser div").append(langOperator.inviteUserLabel);
-	$("#friendRequests div").append(langOperator.friendRequests);
+//	$("#friendRequests div").append(langOperator.friendRequests);
 	
 	$("#inviteUserInvitationMessage").text(langOperator.invitationMessage);
 	$("#mailEntraceAlert").text(langOperator.mailEntranceRule);
@@ -349,7 +360,7 @@ function setLanguage(langOperator){
 	});
 	$('#forgotPasswordLink').text(langOp.forgotPassword);
 	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
-	$('#registerLink').text(langOp.registerLabel);	
+//	$('#registerLink').text(langOp.registerLabel);	
 //	$('#loginLink').text("Edward hocam" + langOp.login);
 	$('#emailLabel').text(langOp.emailLabel + ":");	
 	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
