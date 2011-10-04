@@ -152,7 +152,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					$("#username").html(realname);
 					$("#loginBlock").hide();
 					$("#userBlock").show();
-					$('#userLoginForm').mb_close();
+					//$('#userLoginForm').mb_close();
+					$("#userLoginWindow").dialog("close"); 
+					
 				}
 				else if (value == "-4"){								
 					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });

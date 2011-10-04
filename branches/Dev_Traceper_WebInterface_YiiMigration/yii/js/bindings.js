@@ -18,11 +18,11 @@ function bindElements(langOperator, trackerOp)
 		}
 	});
 	
-	/*
+	
 	$("#signout").click(function(){
 		trackerOp.signout();
 	});
-	*/
+	
 	
 	
 	/**
@@ -91,7 +91,7 @@ function bindElements(langOperator, trackerOp)
 		
 		//$('#photoCommentForm').onCreate(function()
 		//{
-			//gelen yorum sayýsý kadar dongü
+			//gelen yorum sayï¿½sï¿½ kadar dongï¿½
 		//}
 		
 		$('#sendCommentButton').click(function(){			
@@ -141,21 +141,6 @@ function bindElements(langOperator, trackerOp)
 		
 		
 	});
-
-	/*
-	$("a[href=#auLink], #logo, .logo_inFullMap").click(function(){
-		$('#aboutus').mb_open();
-		$('#aboutus').mb_centerOnWindow(true);
-	});
-	*/
-	
-	/*
-	//this callback opens the change password window
-	$('#changePassword').click(function(){
-		$('#changePasswordForm').mb_open();
-		$('#changePasswordForm').mb_centerOnWindow(true);
-	});
-	*/
 	
 	$("#changePasswordButton").click(function(){
 		
@@ -167,7 +152,7 @@ function bindElements(langOperator, trackerOp)
 			if	($('#newPassword').val() ==  $('#newPasswordAgain').val())
 			{
 				trackerOp.changePassword($('#newPassword').val(), $('#currentPassword').val());	
-				$('#changePasswordForm').mb_close();
+				$('#changePasswordWindow').dialog('close');
 				
 				$('#currentPassword').val('');
 				$('#newPassword').val('');
@@ -185,12 +170,7 @@ function bindElements(langOperator, trackerOp)
 	$("#changePasswordCancel").click(function()
 	{
 		$('#changePasswordForm input:text').attr('value','');
-		$('#changePasswordForm').mb_close();
-	});
-	
-	$("#inviteUser").click(function(){
-		$('#InviteUserForm').mb_open();
-		$('#InviteUserForm').mb_centerOnWindow(true);
+		$('#changePasswordWindow').dialog('close');
 	});
 	
 	$('#inviteUserButton').click(function(){
@@ -198,6 +178,7 @@ function bindElements(langOperator, trackerOp)
 		var invitationMessage = $('#invitationMessage').val();
 		if (useremail != ""){
 			TRACKER.inviteUser(useremail, invitationMessage);
+			$('#inviteUserWindow').dialog('close');
 		}
 		else {
 			TRACKER.showMessage(langOperator.warningMissingParameter, "warning");
@@ -207,7 +188,7 @@ function bindElements(langOperator, trackerOp)
 	$("#inviteUserCancel").click(function()
 	{
 		$('#InviteUserForm textarea').attr('value','');
-		$('#InviteUserForm').mb_close();
+		$('#inviteUserWindow').dialog('close');
 	});
 	
 	/*
@@ -265,30 +246,15 @@ function bindElements(langOperator, trackerOp)
 			});
 		}
 	});
-/*	
-	$('#registerLink').click(function(){
-		$('#registerForm').mb_open();
-		$('#registerForm').mb_centerOnWindow(true);
-		
-		$('#registerButton').click(function(){
-			trackerOp.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(),null, 
-				function(result){
-                    $('#registerForm input[type!=button]').attr('value', '');
-					$('#registerForm').mb_close();
-				});						
-		});	
-	});
-*/
-/*	
-	$('#loginLink').click(function(){
-		$('#userLoginForm').mb_open();
-		$('#userLoginForm').mb_centerOnWindow(true);
-		
-		$('#submitLoginFormButton').click(function(){
-			trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
-		});
-	});
-*/	
+
+	$('#registerButton').click(function(){
+		trackerOp.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(),null, 
+			function(result){
+                $('#registerForm input[type!=button]').attr('value', '');
+				$("#registerWindow").dialog("close");
+			});						
+	});	
+	
 	$('#submitLoginFormButton').click(function(){
 		trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
 	});
@@ -342,7 +308,7 @@ function setLanguage(langOperator){
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
 //	$("#signout div").append(langOperator.signout);
 //	$("#changePassword div").text(langOperator.changePassword);
-	$("#inviteUser div").append(langOperator.inviteUserLabel);
+//	$("#inviteUser div").append(langOperator.inviteUserLabel);
 //	$("#friendRequests div").append(langOperator.friendRequests);
 	
 	$("#inviteUserInvitationMessage").text(langOperator.invitationMessage);
