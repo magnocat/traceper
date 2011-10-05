@@ -45,6 +45,7 @@ public class Login extends Activity {
     private EditText passwordText;
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
+
     private IAppService appManager;
     private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
@@ -98,6 +99,7 @@ public class Login extends Activity {
         emailText = (EditText) findViewById(R.id.email);
         passwordText = (EditText) findViewById(R.id.password);   
         rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
+    
         
         SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
         emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
@@ -202,8 +204,18 @@ public class Login extends Activity {
 				appManager.exit();
 				finish();				
 			}        	
-        });        
+        });       
+        
+        
+        
+        
+     
+        
+        
     }
+    
+    
+    
     
     @Override
     protected Dialog onCreateDialog(int id) 
@@ -353,6 +365,7 @@ public class Login extends Activity {
 		return result;
 	}
 	
+
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 	    

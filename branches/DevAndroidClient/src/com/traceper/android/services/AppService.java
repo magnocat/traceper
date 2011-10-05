@@ -58,6 +58,7 @@ public class AppService extends Service implements IAppService{
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
 
+	
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
@@ -83,7 +84,6 @@ public class AppService extends Service implements IAppService{
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
 	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-
 
 
 	public class IMBinder extends Binder {
@@ -116,6 +116,30 @@ public class AppService extends Service implements IAppService{
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
 		registerReceiver(networkStateReceiver, filter);
 	}
+	
+	public void setAutoCheckin(boolean enable){
+		
+		if (enable == true) {
+			
+			Thread locationUpdates = new Thread() {
+				public void run() {
+					Looper.prepare();
+
+					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+							locationHandler);				       
+
+					Looper.loop();
+				}
+			};
+			locationUpdates.start();
+			
+		}else{
+			
+			locationManager.removeUpdates(locationHandler);
+		}
+		
+	}
+	
 	
 	
 	private void sendPendingLocations(){
@@ -364,17 +388,17 @@ public class AppService extends Service implements IAppService{
 			this.minDataSentInterval = xmlHandler.getGpsMinDataSentInterval();
 			this.minDistanceInterval = xmlHandler.getGpsMinDistanceInterval();
 
-			Thread locationUpdates = new Thread() {
-				public void run() {
-					Looper.prepare();
+		//	Thread locationUpdates = new Thread() {
+				//public void run() {
+					//Looper.prepare();
 
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-							locationHandler);				       
+					//locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+						//	locationHandler);				       
 
-					Looper.loop();
-				}
-			};
-			locationUpdates.start();
+					//Looper.loop();
+				//}
+			//};
+			//locationUpdates.start();
 	
 		}
 		else {

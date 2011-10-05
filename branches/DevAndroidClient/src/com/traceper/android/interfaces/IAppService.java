@@ -28,6 +28,8 @@ public interface IAppService {
 	
 	public boolean isUserAuthenticated();
 	
+	public void setAutoCheckin(boolean enable);
+	
 	public Long getLastLocationSentTime();
 	
 	public void exit();
@@ -39,5 +41,7 @@ public interface IAppService {
 	public void setAuthenticationServerAddress(String address);
 	
 	public int sendImage(byte[] image, boolean publicData);
+	
+	
 	
 }
