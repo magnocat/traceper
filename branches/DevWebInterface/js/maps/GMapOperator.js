@@ -211,13 +211,143 @@ function MapOperator() {
 
 	}
 
+	
+
+	/*
+	 * adding point to the geofence end
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 */
+	MAP_OPERATOR.addPointToGeoFence = function(geoFence,loc) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+
+		path.push(location);
+	}
+
+	/*
+	 * insert point to the geofence at specified index 
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 * index  is the specified index.
+	 */
+	MAP_OPERATOR.insertPointToGeoFence = function(geoFence,loc,index) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+
+		path.insertAt(index,location);
+	}
+	
+	/*
+	 * remove point from the geofence at specified index 
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 * index  is the specified index.
+	 */
+	MAP_OPERATOR.removePointFromGeoFence = function(geoFence,index) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		path.removeAt(index);
+	}
+	
+	/*
+	 * remove all points from the geofence 
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 * index  is the specified index.
+	 */
+	MAP_OPERATOR.removeAllPointsFromGeoFence = function(geoFence) {
+		var path = geoFence.polygon.getPath();
+
+		// Because path is an MVCArray, we can simply append a new coordinate
+		// and it will automatically appear
+
+		path.clear();
+	}
+	
+	/*
+	 * get the point number of the geofence path 
+	 * geoFence is type that defined in MapStructs.js
+	 * returns the point number of geoFence path
+	 */
+	MAP_OPERATOR.getPointNumberOfGeoFencePath = function(geoFence) {
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var pointNumber = vertices.length;
+		return pointNumber;
+	}
+
+
+	/*
+	 * get the location of the geofence path in specified index
+	 * geoFence is type that defined in MapStructs.js 
+	 * index  is the specified index.
+	 * returns the location of geoFence path in specified index
+	 */
+	MAP_OPERATOR.getPointOfGeoFencePath = function(geoFence,index) {
+
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var xy = vertices.getAt(index);
+		var location = new MapStruct.Location({latitude:xy.lat(),
+			longitude:xy.lng()});
+		return location;		
+	}
+
+	/*
+	 * set the location of the geofence path in specified index
+	 * loc is type that is added to the polygon 
+	 * index  is the specified index.
+	 * geoFence is type that defined in MapStructs.js
+	 */
+	MAP_OPERATOR.setPointOfGeoFencePath = function(geoFence,loc,index) {
+
+		// Since this Polygon only has one path, we can call getPath()
+		// to return the MVCArray of LatLngs
+		var vertices = geoFence.polygon.getPath();
+		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
+		vertices.setAt(index,location);		
+	}
+
+	/*
+	 * setting the geofence visibility
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 */
+	MAP_OPERATOR.setGeoFenceVisibility = function(geoFence,visible) {
+		var opacity = 0.0;
+
+		if (visible == true)
+		{
+			opacity=0.6;
+		}
+
+		var options = {
+				fillColor: '#FF0000',
+				fillOpacity: opacity,
+				strokeOpacity: opacity,
+		}
+		geoFence.polygon.setOptions(options);
+	}
+	
 	/**
 	 * Extend for polygon specific implementation
-	 * @param {GMap2} map The map that has had this ExtMapTypeControl added to it.
-	 * @return {DOM Object} Div that holds the control
+	 * @return container that holds the control
 	 */ 
-	MAP_OPERATOR.initializePolygonControl = function(){
-
+	MAP_OPERATOR.initializeGeoFenceControl = function(geoFence){		
 		var container = document.createElement('DIV');
 		container.id = "mymaps-control-polygon";
 
@@ -285,24 +415,41 @@ function MapOperator() {
 		button_img.border = button.opts.buttonBorder || '0';
 		button_img.src = button.opts.img_up_url;
 		button_img.title = button.opts.tooltip;
+		button_img.style.zIndex = 1009999900;
 
 		button.img = button_img;
 		
-
+		var clickPointNumber = 0;
+		var removeGeoFence = false;
+		
 		//Button toggle. First click turns it on (and other buttons off), triggers bound events. Second click turns it off
 		google.maps.event.addDomListener(button.img, "click", function() {
-			alert(1);
 			if(button.img.getAttribute("src") === button.opts.img_up_url){
-				/*
-				me.toggleButtons(opts.controlName);
-				opts.startDigitizing();
-				*/
-			} else {
-				/*
-				me.toggleButtons(opts.controlName);
-				opts.stopDigitizing();
-				*/
-			}    
+				
+				google.maps.event.addListener(MAP_OPERATOR.map, 'click', function(event) {
+					if (removeGeoFence)
+					{
+						MAP_OPERATOR.removeAllPointsFromGeoFence(geoFence);
+						removeGeoFence = false;
+					}
+					var location = new MapStruct.Location({latitude:event.latLng.lat(),
+						  longitude:event.latLng.lng()}); 
+					clickPointNumber++;
+					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
+					MAP_OPERATOR.addPointToGeoFence(geoFence,location);
+					if (clickPointNumber==3)
+					{
+						MAP_OPERATOR.setGeoFenceVisibility(geoFence,true);
+						MAP_OPERATOR.map.setCenter(event.latLng);
+						removeGeoFence = true;
+						clickPointNumber = 0;
+					}
+				  });				
+				} else {
+					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
+					clickPointNumber = 0;
+					geoFence.polygon.getPath().clear();
+				}    
 		});  
 
 		/*
@@ -311,7 +458,8 @@ function MapOperator() {
 		*/
 
 		container.appendChild(button.img);
-		MAP_OPERATOR.map.getDiv().appendChild(container);
+		//MAP_OPERATOR.map.getDiv().appendChild(container);
+		$('#friendsList').append(container);
 		
 		/*
 		me.runInitFunctions();
@@ -319,105 +467,6 @@ function MapOperator() {
 		return container;
 
 	};
-
-	/*
-	 * adding point to the geofence end
-	 * geoFence is type that defined in MapStructs.js
-	 * loc is type that is added to the polygon
-	 */
-	MAP_OPERATOR.addPointToGeoFence = function(geoFence,loc) {
-		var path = geoFence.polygon.getPath();
-
-		// Because path is an MVCArray, we can simply append a new coordinate
-		// and it will automatically appear
-
-		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
-
-		path.push(location);
-	}
-
-	/*
-	 * insert point to the geofence at specified index 
-	 * geoFence is type that defined in MapStructs.js
-	 * loc is type that is added to the polygon
-	 * index  is the specified index.
-	 */
-	MAP_OPERATOR.insertPointToGeoFence = function(geoFence,loc,index) {
-		var path = geoFence.polygon.getPath();
-
-		// Because path is an MVCArray, we can simply append a new coordinate
-		// and it will automatically appear
-
-		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
-
-		path.insertAt(index,location);
-	}
-	/*
-	 * get the point number of the geofence path 
-	 * geoFence is type that defined in MapStructs.js
-	 * returns the point number of geoFence path
-	 */
-	MAP_OPERATOR.getPointNumberOfGeoFencePath = function(geoFence) {
-		// Since this Polygon only has one path, we can call getPath()
-		// to return the MVCArray of LatLngs
-		var vertices = geoFence.polygon.getPath();
-		var pointNumber = vertices.length;
-		return pointNumber;
-	}
-
-
-	/*
-	 * get the location of the geofence path in specified index
-	 * geoFence is type that defined in MapStructs.js 
-	 * index  is the specified index.
-	 * returns the location of geoFence path in specified index
-	 */
-	MAP_OPERATOR.getPointOfGeoFencePath = function(geoFence,index) {
-
-		// Since this Polygon only has one path, we can call getPath()
-		// to return the MVCArray of LatLngs
-		var vertices = geoFence.polygon.getPath();
-		var xy = vertices.getAt(index);
-		var location = new MapStruct.Location({latitude:xy.lat(),
-			longitude:xy.lng()});
-		return location;		
-	}
-
-	/*
-	 * set the location of the geofence path in specified index
-	 * loc is type that is added to the polygon 
-	 * index  is the specified index.
-	 * geoFence is type that defined in MapStructs.js
-	 */
-	MAP_OPERATOR.setPointOfGeoFencePath = function(geoFence,loc,index) {
-
-		// Since this Polygon only has one path, we can call getPath()
-		// to return the MVCArray of LatLngs
-		var vertices = geoFence.polygon.getPath();
-		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
-		vertices.setAt(index,location);		
-	}
-
-	/*
-	 * setting the geofence visibility
-	 * geoFence is type that defined in MapStructs.js
-	 * loc is type that is added to the polygon
-	 */
-	MAP_OPERATOR.setGeoFenceVisibility = function(geoFence,visible) {
-		var opacity = 0.0;
-
-		if (visible == true)
-		{
-			opacity=0.6;
-		}
-
-		var options = {
-				fillColor: '#FF0000',
-				fillOpacity: opacity,
-				strokeOpacity: opacity,
-		}
-		geoFence.polygon.setOptions(options);
-	}
 
 	/*
 	 * clickFunction
