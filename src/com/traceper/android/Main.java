@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,6 +95,19 @@ public class Main extends Activity
 		});
 		lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
 
+		
+		
+		   final CheckBox checkbox = (CheckBox) findViewById(R.id.auto_check);
+	        checkbox.setOnClickListener(new OnClickListener() {
+	            public void onClick(View v) {
+	                  if (((CheckBox) v).isChecked()) {
+	                	  appService.setAutoCheckin(true);
+	                } else {
+	                	appService.setAutoCheckin(false);
+	                }
+	            }
+	        });
+		
     }
 
 	@Override

@@ -42,4 +42,6 @@
     		
     	/>
     </LinearLayout>
+    <CheckBox android:layout_width="wrap_content" 
+     android:layout_height="wrap_content" android:text="Auto Send" android:id="@+id/auto_check"></CheckBox>
 </LinearLayout>
