@@ -1,10 +1,10 @@
 
-function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval, langOp, userId){
+function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserInterval){
 
 	TRACKER = this;	
 	MAP = map;
-	this.langOperator = langOp;
-	this.userId = userId;
+	this.langOperator;
+	this.userId;
 	this.language = "en";
 	this.ajaxUrl = url;
 	this.facebookId = null;
@@ -29,6 +29,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.actionAddFriendRequest = "WebClientAddFriendRequest";
 	this.actionGetFriendRequests = "WebClientGetFriendRequests";	
 	this.actionConfirmFriendship = "WebClientConfirmFriendship";
+	this.actionSetUploadRating = "SetUploadRating";
+	this.actionSendNewComment = "SendNewComment";
+	this.actionGetComments = "GetComments";
+	this.actionDeleteComment= "DeleteComment";
 	this.userListPageNo = 1;	
 	this.userListPageCount = 0;
 	this.friendListPageNo = 1;
@@ -78,9 +82,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.imageIds = [];
 	this.imageThumbSuffix;
 	this.imageOrigSuffix;
-
+	
 	this.User = function(){
-		//var username;
 		var realname;
 		var latitude;
 		var longitude;
@@ -88,12 +91,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var time;
 		var deviceId;
 		var message;
-		var gmarker;
-		var pastPointsGMarker;
+		var mapMarker;
 		var infoWindowIsOpened = false;
 		var polyline = null;		
 		var maxZoomLevel = null;
 		var statusMessage = null;
+		var locationCalculatedTime = null;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -107,11 +110,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var latitude;
 		var longitude;
 		var time;
-		var gmarker;
+		var rating;
+		var mapMarker;
+		var infoWindowIsOpened = false;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
 		}
+	}
+	
+	this.setLangOperator = function(langOperator) {
+		TRACKER.langOperator = langOperator;		
+	}
+	
+	this.setUserId = function(userId) {
+		TRACKER.userId = userId;
 	}
 
 	this.setFacebookId = function(facebookId){
@@ -119,6 +132,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.facebookId = facebookId;
 			$("#changePassword").hide();
 		}
+	}
+	
+	this.getMap = function (){
+		return MAP;
 	}
 
 	this.authenticateUser = function(username, password, rememberMe, callback)
@@ -128,8 +145,25 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (username != "" && password != "" ) 
 		{
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {					
-					location.href = 'index.php';
+				var value = $(result).find("result").attr('value'); //find("realname").text();
+				if (value == "1") {					
+					//location.href = 'index.php';
+					var realname = $(result).find("result").find("realname").text();
+					TRACKER.getFriendList(1);
+					$("#username").html(realname);
+					$("#loginBlock").hide();
+					$("#userBlock").show();
+					$('#userLoginForm').mb_close();
+					$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });
+				}
+				else if (value == "-4"){								
+					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });
+				}
+				else if(value == "-2") {
+					TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+				}
+				else if (value == "-1"){
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
 				}
 				else {
 					if (typeof(callback) == "function") {
@@ -242,7 +276,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.changePassword = function(newPassword, currentPassword){
 		var params = "action=" + TRACKER.actionChangePassword + "&newPassword=" + newPassword + "&currentPassword=" + currentPassword;
-
+		
 		if (newPassword != "" && currentPassword != "")
 		{
 			TRACKER.ajaxReq(params, function (result){
@@ -259,6 +293,83 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 
+	this.sendNewComment= function(userId, photoId, comment){
+		var params= "action=" + TRACKER.actionSendNewComment + "&userId="+ userId + "&photoId=" + photoId + "&comment=" + comment;
+		
+		if (comment != ""){
+			TRACKER.ajaxReq(params, function (result){
+			
+				TRACKER.showCommentWindow(1);
+				
+				if (result == "1") {	
+					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}
+			});
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.deleteComment=function (commentId, userId){
+		var params="action=" + TRACKER.actionDeleteComment + "&commentId=" + commentId;
+		
+		if (commentId != ""){
+			if (TRACKER.userId == userId){
+				TRACKER.ajaxReq(params, function (result){
+				
+					TRACKER.showCommentWindow(1);
+				
+					if (result == "-1") {	
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+					}
+					else if (result == "-7"){
+						//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+					}
+				});
+			}
+			else {
+				TRACKER.showMessage(TRACKER.langOperator.unauthorizedCommentDeletion, "warning");
+			}
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.getComments=function(photoId, callback)
+	{
+		var params= "action=" + TRACKER.actionGetComments + "&photoId=" + photoId;
+		if (photoId != ""){
+			TRACKER.ajaxReq(params, function (result){				
+				if (result == "-1") {	
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}				
+				var str = processCommentXML(result); 
+				callback(str);
+			});			
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.showCommentWindow=function(uploadId)
+	{
+		$('#photoCommentForm').mb_open();
+		//$('#photoCommentForm').mb_centerOnWindow(true);
+			
+		TRACKER.getComments(uploadId, function(result){
+			$('#photoCommentForm').find(".mbcontainercontent:first #photoComments").html(result);
+		});
+	}
+	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
 		TRACKER.ajaxReq(params, function (result){	
@@ -392,7 +503,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		TRACKER.ajaxReq(params, function(result){			
 			TRACKER.friendListPageNo = TRACKER.getPageNo(result);
 			TRACKER.friendListPageCount = TRACKER.getPageCount(result);
-
+			
 			var str = processXML(MAP, result, true);
 
 			if (str != null) {
@@ -446,8 +557,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (TRACKER.friendPageResetCount > 0) 
 		{
 			var getImages = "&";
-			if ($('#showPhotosOnMap').attr('checked') == true)
-			{ 	getImages = "&include=image"; }
+			if ($('#showPhotosOnMap').prop('checked') == true)
+			{ 	
+				getImages = "&include=image"; 
+			}
 
 			params = "action=" + TRACKER.actionGetUpdatedFriendList + "&pageNo=" + TRACKER.updateFriendListPageNo
 			+ getImages;
@@ -472,9 +585,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
 				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
 
-				var showPhotosOnMap = $('#showPhotosOnMap').attr('checked');
-				if (TRACKER.friendPageResetCount >= 1 &&
-						showPhotosOnMap == true)
+				var showPhotosOnMap = $('#showPhotosOnMap').prop('checked');
+				if (TRACKER.friendPageResetCount >= 1 && showPhotosOnMap == true)
 				{
 					processImageXML(MAP, result);
 				}
@@ -547,6 +659,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			$('#photos').slideUp('fast',function(){
 				$('#photos').html(str);
 				$('#photos').slideDown();
+				
+		
+				for (var n in TRACKER.images) { 
+			
+					$('#uploadRating'+TRACKER.images[n].imageId).raty({path:'js/jquery/plugins/rating/img/',
+						  											   start:TRACKER.images[n].rating,
+						  											   click:function(score, evt) {
+																			var params = "action=" + TRACKER.actionSetUploadRating + "&uploadId=" + this.attr('imageId') + "&points=" + score;
+						
+																			TRACKER.ajaxReq(params, function(result){
+																			});
+																		}
+																	  }); 
+				}
+			
 			});
 
 			if (typeof callback == 'function'){
@@ -648,8 +775,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.trackUser = function(userId){
 		if (TRACKER.users[userId].friendshipStatus == "1" &&  TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
 		{
-			MAP.panTo(new GLatLng(TRACKER.users[userId].latitude, TRACKER.users[userId].longitude));
-			TRACKER.openMarkerInfoWindow(userId);		
+			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
+			MAP.panMapTo(location);
+			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 		}
 	};
 
@@ -682,11 +810,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			});
 		}
 		else {			
-			TRACKER.users[userId].polyline.show();
-
-			for (var i in TRACKER.users[userId].pastPointsGMarker) { 
-				if (TRACKER.users[userId].pastPointsGMarker[i] != null){
-					TRACKER.users[userId].pastPointsGMarker[i].show();
+			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
+			
+			for (var i in TRACKER.users[userId].mapMarker) { 
+				if (TRACKER.users[userId].mapMarker[i].marker != null){
+					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, true);
 				}
 			}
 		}		
@@ -697,75 +825,24 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	{
 		if (typeof TRACKER.users[userId].polyline != 'undefined')
 		{
-			TRACKER.users[userId].polyline.hide();
-			var len = TRACKER.users[userId].pastPointsGMarker.length;
+			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, false);
+			var len = TRACKER.users[userId].mapMarker.length;
 
 			for (var i = 1; i < len; i++) { 
-				if (TRACKER.users[userId].pastPointsGMarker[i] != null) {
-					TRACKER.users[userId].pastPointsGMarker[i].hide();
-					TRACKER.users[userId].pastPointsGMarker[i].closeInfoWindow();
+				if (TRACKER.users[userId].mapMarker[i].marker != null) {
+					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
+					
 				}
 			}
 		}
 	};
 
 	this.openMarkerInfoWindow = function(userId){
-		TRACKER.users[userId].gmarker.openInfoWindowHtml( '<div>'														   
-				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + TRACKER.users[userId].time
-				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-				//+ '<br/>' + TRACKER.users[userId].deviceId + " (" + TRACKER.langOperator.deviceId +") "
-
-				+'</div>'
-				+ '<ul class="sf-menu"> '
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin(1,'+ userId +')">'
-				+ TRACKER.langOperator.previousPoint 
-				+'</a>'+ '</li>'
-				+ '<li>'+ '<a class="infoWinOperations" href="#">'
-				+ TRACKER.langOperator.operations
-				+'</a>'
-				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoom
-				+'</a>'+ '</li>'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoomMax
-				+'</a>'+'</li>'
-				+'</ul>'
-				+'</li>'
-				+ '</ul>'
-		);
 	};
 
 	this.showImageWindow = function(imageId){
-		var image = new Image();
-
-		image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
-		$("#loading").show();
-		$(image).load(function(){
-			$("#loading").hide();
-
-			TRACKER.images[imageId].gmarker.openInfoWindowHtml("<div class='origImageContainer'>"
-					+ "<div>"
-					+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
-					+ "</div>"
-					+ "<div>"
-					+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
-					+ "<br/>"
-					+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
-					+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
-					+ "</div>"
-					+ '<ul class="sf-menu"> '
-					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-					+ TRACKER.langOperator.zoom
-					+'</a>'+ '</li>'
-					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-					+ TRACKER.langOperator.zoomMax
-					+'</a>'+'</li>'
-					+'</li>'
-					+ '</ul>'
-					+ "</div>");
-
-		});		
+		MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
@@ -773,49 +850,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.zoomPoint = function (latitude, longitude) {
 
-		var zoomlevel = MAP.getZoom();
-		var incZoomlevel;
-		if (zoomlevel < 6) {
-			incZoomlevel = 5;
-		}
-		else if (zoomlevel < 10) {
-			incZoomlevel = 4;
-		}
-		else if (zoomlevel < 13) {
-			incZoomlevel = 3;
-		}
-		else if (zoomlevel < 15) {
-			incZoomlevel = 2;
-		}
-		else {
-			incZoomlevel = 1;
-		}
-
-		zoomlevel += incZoomlevel;
-		var ltlng = new GLatLng(latitude, longitude);
-
-		MAP.setCenter(ltlng, zoomlevel);		
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		MAP.zoomPoint(point);
 	}
 
 	this.zoomMaxPoint = function(latitude, longitude)
 	{
-		var ltlng = new GLatLng(latitude, longitude);
-
-		if (typeof TRACKER.maxZoomlevel[latitude] == "undefined" ||
-				typeof TRACKER.maxZoomlevel[latitude][longitude] == "undefined") 
-		{
-			TRACKER.maxZoomlevel[latitude] = [];
-			G_SATELLITE_MAP.getMaxZoomAtLatLng(ltlng, function(response) {
-				if (response && response['status'] == G_GEO_SUCCESS) {
-					TRACKER.maxZoomlevel[latitude][longitude] = response['zoom'];					
-				}
-				MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
-
-			});
-		}
-		else {
-			MAP.setCenter(ltlng, TRACKER.maxZoomlevel[latitude][longitude]);
-		}
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		MAP.zoomMaxPoint(point);
 	};
 
 
@@ -823,48 +865,55 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 * this function is used to open info windows of markers when next point or
 	 * previous point are clicked.
 	 */
-	this.showPointGMarkerInfoWin = function(gMarkerIndex, userId){
-		if (typeof TRACKER.users[userId].pastPointsGMarker == "undefined" ||	
-				typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") 
+	this.showPointGMarkerInfoWin = function(currentMarkerIndex,nextMarkerIndex, userId){
+		
+		if (typeof TRACKER.users[userId].mapMarker == "undefined" ||	
+				typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") 
 		{ 
-			if (gMarkerIndex == "1") {
+			if (nextMarkerIndex == "1") {
 				TRACKER.pastPointsPageNo = 0;
 			}
 			var reqPageNo = TRACKER.pastPointsPageNo + 1;
 			TRACKER.drawTraceLine(userId, reqPageNo, function(){
 				// if it goes into this if statement it means that there is no available
 				// past point in database
-				if (typeof TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == "undefined") {
+				if (typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") {
 					// the statement below add a new element to array with null value
 					// it is useful when understanding no previous point exists
 					// but it is required to check value if it is null when hiding or
 					// showing markers...
-					TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] = null;
+					TRACKER.users[userId].mapMarker[nextMarkerIndex] = null;
 					TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 				}
 				else {
-					GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+					MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
 				}			
 
 			});
 		}
-		else if (TRACKER.users[userId].pastPointsGMarker[gMarkerIndex] == null){
+		else if (TRACKER.users[userId].mapMarker[nextMarkerIndex] == null){
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
-			if (userId != TRACKER.traceLineDrawedUserId ||
-					TRACKER.users[userId].polyline.isHidden() == true) 
+			
+			
+			if (userId != TRACKER.traceLineDrawedUserId ) // ||
 			{				
 				TRACKER.drawTraceLine(userId);
 			}
-			GEvent.trigger(TRACKER.users[userId].pastPointsGMarker[gMarkerIndex], "click");			
+			if (typeof TRACKER.users[userId].polyline != 'undefined')
+			{
+				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
+			}
+			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+			MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, "click");			
 		}
 	}
 	this.showMessage = function(message, type, callback)
 	{
 		//message = '<div style="padding:5px;text-align:center;font-family:verdana;color:#FF6600">' + message + '</div>';
 
-		//$("#message").html(message);
 
 		var object = "#message_info";
 		if (type == "warning") {
@@ -875,7 +924,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		$(object + ' .mbcontainercontent:first').html(message);
 		$(object).mb_open();
 		$(object).mb_centerOnWindow(true);
-		$(object).mb_switchAlwaisOnTop(); 
+		//$(object).mb_switchAlwaisOnTop();		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 

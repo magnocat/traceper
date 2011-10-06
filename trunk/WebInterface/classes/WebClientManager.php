@@ -42,6 +42,42 @@ class WebClientManager extends Base
 		$this->elementCountInPhotoPage = $elementCountInPhotoPage;
 	}
 	
+	private function getRatingPlugin()
+	{
+		static $staRatingPlugin = NULL;
+		
+		if($staRatingPlugin == NULL)
+		{
+			$staRatingPlugin = new RatingPlugin($this->tablePrefix, $this->dbc);	
+		}
+	
+		return $staRatingPlugin;		
+	}
+	
+	private function getCommentOperator()
+	{
+		static $staCommentOperator=NULL;
+		
+		if($staCommentOperator == NULL)
+		{
+			$staCommentOperator=new CommentOperator($this->tablePrefix, $this->dbc);
+		} 
+		
+		return $staCommentOperator;
+	}
+	
+	private function getUploadUserRelationTable()
+	{
+		static $staUploadUserRelationTable = NULL;
+		
+		if($staUploadUserRelationTable == NULL)
+		{
+			$staUploadUserRelationTable = new UploadUserRelation($this->tablePrefix, $this->dbc);	
+		}
+	
+		return $staUploadUserRelationTable;		
+	}	
+	
 	public function setUserManager($usermanager){
 		$this->usermanager = $usermanager;
 	}
@@ -89,13 +125,13 @@ class WebClientManager extends Base
 				$out = $this->getFriendList($reqArray, $this->elementCountInLocationsPage,"userListReq");
 				break;		
 			case $this->actionPrefix . "GetUpdatedFriendList":
-				if ($this->tdo == NULL || 
+				if ($this->tdo != NULL && 
 					($this->dataFetchedTime = $this->tdo->getValue(self::dataFetchedTimeStoreKey)) == NULL)
 				{
 						$this->dataFetchedTime = time();
 						$this->tdo->save(self::dataFetchedTimeStoreKey, $this->dataFetchedTime);
 				}
-				if ($this->tdo == NULL || 
+				if ($this->tdo != NULL && 
 					($this->imageFetchedTime = $this->tdo->getValue(self::imageFetchedTimeStoreKey)) == NULL)
 				{
 						$this->imageFetchedTime = time();
@@ -166,9 +202,43 @@ class WebClientManager extends Base
 				$out = $this->addFriendRequest($reqArray);
 				break;
 			case $this->actionPrefix . "GetFriendRequests":
-		
 				$out = $this->usermanager->getFriendRequests($reqArray['pageNo'], $this->elementCountInAPage);
-				break;		
+				break;	
+			case "SetUploadRating":						
+				$userId = $this->usermanager->getUserId();
+				$out = MISSING_PARAMETER;
+				if (isset($reqArray['uploadId']) && $reqArray['uploadId'] != null)
+				{
+					$imageId = (int)$reqArray['uploadId'];;
+					
+					$fieldsArray = array(UploadUserRelation::field_id);
+					$condArr = array(UploadUserRelation::field_upload_id => $imageId, UploadUserRelation::field_user_id => $userId);	
+					$result = $this->getUploadUserRelationTable()->select($fieldsArray, $condArr);
+					
+					if( $this->dbc->numRows($result) == 0) //if the person has not given any rating for the photo, then let him to give
+					{	
+						$out = $this->getRatingPlugin()->process($reqArray);	
+					}
+					else
+					{
+						//This person has given some rating for the photo before, so do not let him anymore
+					}
+				}								
+				break;
+			case "GetComments":
+				$photoId=$_REQUEST["photoId"];
+				$out = $this-> getCommentOperator()-> getComments($photoId);
+				break;
+			case "SendNewComment":
+				$userId = 1;
+				$photoId=$_REQUEST["photoId"];
+				$comment=$_REQUEST["comment"];
+				$out = $this-> getCommentOperator()->insertNewComment($userId, $photoId, $comment);
+				break;
+			case "DeleteComment":
+				$commentId=$_REQUEST["commentId"];
+				$out = $this-> getCommentOperator()->deleteComment($commentId); 
+				break;	
 			default:				
 				$out = UNSUPPORTED_ACTION;
 				if (class_exists("FacebookConnect")) 
@@ -193,6 +263,7 @@ class WebClientManager extends Base
 	private function authenticateUser($reqArray)
 	{
 		$out = MISSING_PARAMETER;
+		$realName = "";
 		if (isset($reqArray['username']) && $reqArray['username'] != null &&
 			isset($reqArray['password']) && $reqArray['password'] != null
 		    )
@@ -209,10 +280,19 @@ class WebClientManager extends Base
 			    ($this->usermanager !== null && 
 			    $this->usermanager->authenticateUser($reqArray['username'], md5($reqArray['password']), $keepUserLoggedIn) !== null)) 
 			{
-				$out = SUCCESS;						
+				$userInfo = $this->usermanager->getUserInfo();
+				$out = SUCCESS; 
+				$realName = '<realname>'. $userInfo->realname .'</realname>';	
 			}	
 			
-		}		
+		}	
+		header("Content-type: application/xml; charset=utf-8");
+		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+				.'<result value="'. $out .'">'
+					. $realName
+				.'</result>';
+
+		
 		return $out;
 	}
 	
@@ -343,7 +423,8 @@ class WebClientManager extends Base
 		 	$name = $this->checkVariable($reqArray['name']);
 		 	$password = $this->checkVariable($reqArray['password']);	
 		 	 	
-		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);			
+		 	$out = $this->usermanager->registerUser($email, $name, $password, $invitedUser);
+		 				
 		 }
 		 return $out;
 		
@@ -382,6 +463,8 @@ class WebClientManager extends Base
 		$out = UNAUTHORIZED_ACCESS;
 		if ($this->isUserAuthenticated() == true)
 		{
+			// if user authenticated return the friends and public data
+			// public data hasnt been implemented yet here...
 			$userId = $this->usermanager->getUserId();
 			$out = FAILED;
 			$pageNo = 1;
@@ -400,9 +483,9 @@ class WebClientManager extends Base
 					$this->includeImageInUpdatedUserListReq = true;
 					$sqlImageUnion = 'UNION
 									  SELECT 
-										u.Id, u.userId, u.latitude, u.longitude, u.altitude, 
+										u.Id, u.userId, null, u.latitude, u.longitude, u.altitude, 
 										null, null,  date_format(u.uploadTime,"%d %b %Y %T") as dataArrivedTime,
-										(unix_timestamp(u.uploadTime) - '. $this->imageFetchedTime .')  as timeDif, "image" as type
+										(unix_timestamp(u.uploadTime) - '. $this->imageFetchedTime .')  as timeDif, "image" as type, null
 									  FROM '. $this->tablePrefix .'_upload u
 									  LEFT JOIN '. $this->tablePrefix .'_users usr
 									  ON  
@@ -433,7 +516,8 @@ class WebClientManager extends Base
 				
 				$sql = 'SELECT
 							u.Id, null as userId, u.status_message, u.latitude, u.longitude, u.altitude, 
-							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
+							u.realname, u.deviceId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+							date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime, 
 							(unix_timestamp(u.dataArrivedTime) - '.$this->dataFetchedTime.') as timeDif,
 							"user" as type, 1 as isFriend
 						FROM '
@@ -468,14 +552,14 @@ class WebClientManager extends Base
 										unix_timestamp(u.dataArrivedTime) >= '. $this->dataFetchedTime .'		
 						  			'. $sqlImagePageCountUnion .'
 							 		  ) t';
-							
 			}
 			else //if ($req == 'userListReq') 
 			{
 				// this is the user list showing in left pane
 
 				$sql = 'SELECT u.Id, u.latitude, u.status_message, u.longitude, u.altitude, "user" as type,
-							   u.realname, u.deviceId,  "1" as isFriend, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+							   u.realname, u.deviceId,  "1" as isFriend, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+							   date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 						FROM '. $this->tablePrefix .'_friends f 
 						LEFT JOIN '. $this->tablePrefix .'_users u ON (u.Id = f.friend1 OR u.Id = f.friend2) AND u.Id != '. $userId .'
 						WHERE   ( ( (f.friend1 = '. $userId .') OR (f.friend2 = '. $userId .') 
@@ -516,6 +600,10 @@ class WebClientManager extends Base
 			
 			$out = $this->prepareXML($sql, $pageNo, $pageCount);
 			
+		}
+		else {
+			// if user is not authenticated just return no data
+			$out = $this->addXMLEnvelope(0, 0, "");
 		}
 		return $out;		
 	}
@@ -651,21 +739,25 @@ class WebClientManager extends Base
 	private function getImageList($reqArray, $elementCountInAPage)
 	{
 		$out = UNAUTHORIZED_ACCESS;
+		$pageNo = 1;
+		if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
+					$pageNo = (int) $reqArray['pageNo'];
+		}
+		$offset = ($pageNo - 1) * $elementCountInAPage;
 		if ($this->isUserAuthenticated() == true)
 		{
+			// if user is authenticated returns friends' image and public image
 			$out = FAILED;
-			$pageNo = 1;
-			if (isset($reqArray['pageNo']) && $reqArray['pageNo'] > 0) {
-					$pageNo = (int) $reqArray['pageNo'];
-			}
-			$offset = ($pageNo - 1) * $elementCountInAPage;
 			$userId = $this->usermanager->getUserId();
 			$sql = 'SELECT 
 							u.Id, u.userId, usr.realname, u.latitude, 
-							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime,
+							rating.points/rating.voting_count as rating
 					FROM '. $this->tablePrefix . '_upload u
 					LEFT JOIN '. $this->tablePrefix .'_users usr
 						ON  usr.Id = u.userId
+					LEFT JOIN '. $this->tablePrefix .'_upload_rating rating
+						ON rating.upload_id = u.Id
 					WHERE u.userId in 
 							(SELECT friend1 FROM '.$this->tablePrefix.'_friends
 							 WHERE friend2 = '. $userId .' and status = 1
@@ -673,6 +765,7 @@ class WebClientManager extends Base
 							 SELECT friend2 FROM '.$this->tablePrefix.'_friends
 							 WHERE friend1 = '. $userId .' and status = 1)
 						  OR u.userId = '. $userId .'
+						  OR u.publicData = 1
 					ORDER BY 
 						u.Id 
 					DESC
@@ -689,19 +782,41 @@ class WebClientManager extends Base
 									 	UNION 
 									 	SELECT friend2 FROM '.$this->tablePrefix.'_friends
 									 		WHERE friend1 = '. $userId .' and status = 1)
-						  		  OR u.userId = '. $userId;
-			 					 	
-			$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
-			if ($pageNo == $pageCount
-				&& $pageCount != 0) 
-			{
-				$this->imageFetchedTime = time();
-				$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
-			}
-			
-			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
-			 					 	
+						  		  OR u.userId = '. $userId . '  
+						  		  OR u.publicData = 1';
 		}
+		else {
+			// if user is not authenticated return just public image... 
+			$sql = 'SELECT 
+							u.Id, u.userId, usr.realname, u.latitude, 
+							u.altitude, u.longitude, date_format(u.uploadTime,"%d %b %Y %H:%i") uploadTime
+					FROM '. $this->tablePrefix . '_upload u
+					LEFT JOIN '. $this->tablePrefix .'_users usr
+						ON  usr.Id = u.userId
+					WHERE
+						u.publicData = 1
+					ORDER BY 
+						u.Id 
+					DESC
+					LIMIT 
+							' . $offset . ',' . $elementCountInAPage;
+		
+			$sqlItemCount = 'SELECT
+			 						ceil(count(Id)/'.$elementCountInAPage.')
+			 				 FROM '
+			 					 	. $this->tablePrefix .'_upload u
+			 				 WHERE u.publicData = 1';
+			
+		}	 					 	
+		$pageCount = $this->dbc->getUniqueField($sqlItemCount);			 	
+		if ($pageNo == $pageCount
+			&& $pageCount != 0) 
+		{
+			$this->imageFetchedTime = time();
+			$this->tdo->save(self::imageFetchedTimeStoreKey, $this->imageFetchedTime);
+		}
+		
+		$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
 		return $out;
 	}
 	
@@ -803,16 +918,33 @@ class WebClientManager extends Base
 		if (isset($reqArray['imageId']) && !empty($reqArray['imageId']))
 		{
 			$out = UNAUTHORIZED_ACCESS;
+			$imageId = (int) $reqArray['imageId'];
 			if ($this->isUserAuthenticated() == true)	
 			{
-				$imageId = (int) $reqArray['imageId'];
-				$thumb = false;
-				if (isset($reqArray['thumb']) && $reqArray['thumb']=='ok')
-				{ $thumb = true;
-				}					
-				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
-				$out = $thumbCreator->getImage($imageId, $thumb);					
+				//TODO: check if user is authorised to see this image
+				$out = SUCCESS;
 			}
+			else {
+				// checking image is public or not...
+				$sqlIsPublic = sprintf('SELECT publicData 
+										FROM ' .$this->tablePrefix.'_upload		
+										WHERE id = %d 
+										LIMIT 1', $imageId);
+				$isPublic = $this->dbc->getUniqueField($sqlIsPublic);
+				if ($isPublic == "1") {	
+					$out = SUCCESS;
+				}
+				// if image is not public, returns UNAUTHORIAZED_ACCESS					
+			}
+			$thumb = false;
+			if (isset($reqArray['thumb']) && $reqArray['thumb']=='ok')
+			{ $thumb = true;
+			}
+			
+			if ($out === SUCCESS) {
+				$thumbCreator = new ImageOperator($this->imageDirectory, $this->missingImage);
+				$out = $thumbCreator->getImage($imageId, $thumb);
+			}	
 		}		
 		return $out;	
 	}
@@ -835,6 +967,12 @@ class WebClientManager extends Base
 				$sql = sprintf ('DELETE FROM '.$this->tablePrefix.'_upload
 				                 WHERE id = %d and userId = %d
 				                 LIMIT 1', $imageId, $userId );
+				
+				$condArr = array(RatingPlugin::field_upload_id => $imageId);
+				$this->getRatingPlugin()->delete($condArr);
+				
+				$condArr = array(UploadUserRelation::field_upload_id => $imageId);
+				$this->getUploadUserRelationTable()->delete($condArr);
 				
 			 	$out = FAILED;
 			    if	($this->dbc->query($sql) != false && 
@@ -909,27 +1047,39 @@ class WebClientManager extends Base
 			}	
 		}
 		
-		header("Content-type: application/xml; charset=utf-8");
 		
-		$pageNo = $pageCount == 0 ? 0 : $pageNo;
-		
-		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
+		$extra = "";
 		
 		if ($this->pastPointsFetchedUserId != NULL) {
-			$pageStr .= ' userId="'.$this->pastPointsFetchedUserId.'"';
+			$extra .= ' userId="'.$this->pastPointsFetchedUserId.'"';
 		}
 		if ( $type == "imageList" || $this->includeImageInUpdatedUserListReq == true)
 		{
-			$pageStr.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
+			$extra.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
 		}
+
+		$pageNo = $pageCount == 0 ? 0 : $pageNo;
+/*		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+//				.'<page '. $pageStr . ' >'					
+//					. $str
+//			   .'</page>';
+*/
+		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);		
+	}
+
+	private function addXMLEnvelope($pageNo, $pageCount, $str, $extra = ""){
+			
+		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
 		
+		header("Content-type: application/xml; charset=utf-8");
 		$out = '<?xml version="1.0" encoding="UTF-8"?>'
-				.'<page '. $pageStr . ' >'					
+				.'<page '. $pageStr . '  '. $extra .' >'					
 					. $str
 			   .'</page>';
 
 		return $out;		
-	}	
+	}
+	
 	
 	private function getImageXMLItem($row)
 	{
@@ -940,9 +1090,10 @@ class WebClientManager extends Base
 		$row->Id = isset($row->Id) ? $row->Id : null;
 		$row->userId = isset($row->userId) ? $row->userId : null;
 		$row->realname = isset($row->realname) ? $row->realname : null;
+		$row->rating = isset($row->rating) ? $row->rating : null;
 
 
-		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'"  time="'.$row->uploadTime.'"/>';
+		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'" rating="'. $row->rating .'" time="'.$row->uploadTime.'" />';
 
 		return $str;
 	}
@@ -960,12 +1111,13 @@ class WebClientManager extends Base
 		$row->message = isset($row->message) ? $row->message : null;
 		$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
 		$row->status_message = isset($row->status_message) ? $row->status_message : null;
+		$row->dataCalculatedTime = isset($row->dataCalculatedTime) ? $row->dataCalculatedTime : null;
 			
 		$str = '<user>'
 		. '<Id isFriend="'.$row->isFriend.'">'. $row->Id .'</Id>'
 //		. '<username>' . $row->username . '</username>'
 		. '<realname>' . $row->realname . '</realname>'
-		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" />'
+		. '<location latitude="' . $row->latitude . '"  longitude="' . $row->longitude . '" altitude="' . $row->altitude . '" calculatedTime="' . $row->dataCalculatedTime . '"/>'
 		. '<time>' . $row->dataArrivedTime . '</time>'
 		. '<message>' . $row->message . '</message>'
 		. '<status_message>' . $row->status_message . '</status_message>'
