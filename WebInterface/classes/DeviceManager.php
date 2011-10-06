@@ -43,7 +43,7 @@ class DeviceManager extends Base
 	 * @return unknown_type
 	 */
 	public function process($reqArray) {
-		
+
 		$out = NULL;
 		if (isset($reqArray['action']))
 		{			
@@ -122,22 +122,32 @@ class DeviceManager extends Base
 				$altitude = (float) $reqArray['altitude'];
 				$email = $this->checkVariable($reqArray['email']);
 				$password = $this->checkVariable($reqArray['password']);
-
+				
+				$publicData = 0;
+				if (isset($reqArray['publicData']) && $reqArray['publicData'] != NULL) {
+					$tmp = (int) $this->checkVariable($reqArray['publicData']);
+					if ($tmp == 1) {
+						$publicData = 1;
+					}
+				}
+			
 				$sql = sprintf('INSERT INTO '
 									. $this->tablePrefix .'_upload
-									(userId, latitude, longitude, altitude, uploadtime)
-								SELECT Id, %s, %s, %s, NOW()
+									(userId, latitude, longitude, altitude, uploadtime, publicData)
+								SELECT Id, %s, %s, %s, NOW(), %d
 									FROM '. $this->tablePrefix .'_users
 								WHERE email = "%s" AND
 									  password = "%s"
-								LIMIT 1', $latitude, $longitude, $altitude,
+								LIMIT 1', $latitude, $longitude, $altitude, $publicData,
 									$email, $password);
-				if ($this->dbc->query($sql)){
+				if ($this->dbc->query($sql))
+				{
 					if (move_uploaded_file($uploadedFile["image"]["tmp_name"], $this->uploadPath .'/'.$this->dbc->lastInsertId() . '.jpg'))
 					{
 						$out = SUCCESS; 						
 					}
 				}
+				
 			}
 			
 		}		
@@ -158,6 +168,7 @@ class DeviceManager extends Base
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL
 			&& isset($reqArray['deviceId']) && $reqArray['deviceId'] != NULL
+			&& isset($reqArray['time']) && $reqArray['time'] != NULL
 		)
 		{
 			$status_message = NULL;
@@ -176,6 +187,8 @@ class DeviceManager extends Base
 			$email = $this->checkVariable($reqArray['email']);
 			$password = $this->checkVariable($reqArray['password']);
 			$deviceId = $this->checkVariable($reqArray['deviceId']);
+			$calculatedTime = $this->checkVariable($reqArray['time']);
+			$calculatedTime = date('Y-m-d H:i:s', $calculatedTime);
 
 			$sql = sprintf('SELECT Id
 								FROM '. $this->tablePrefix.'_users 
@@ -198,22 +211,24 @@ class DeviceManager extends Base
 								  .'	longitude = %f , '
 								  .'	altitude = %f ,	'						 	
 								  .'	dataArrivedTime = NOW(), '
-								  .'	deviceId = "%s"	'
+								  .'	deviceId = "%s"	,'
+								  .'    dataCalculatedTime = "%s" '
 								  .	$status_message_query 						 	
 							   .' WHERE '
 								  .' Id = %d '
 							   .' LIMIT 1;', 
-							   $latitude, $longitude, $altitude, $deviceId, $userId);
+							   $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
 				
 							   
 				$sqlWasHere = sprintf('INSERT INTO '
 										. $this->tablePrefix . '_user_was_here
-											(userId, latitude, longitude, altitude, dataArrivedTime, deviceId)
-		    							 VALUES(%d,	%f, %f, %f, NOW(), "%s") 
+											(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
+		    							 VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s") 
 										',
-										$userId, $latitude, $longitude, $altitude, $deviceId, $email, $password);			   
+										$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);			   
 				
 				$out = FAILED;
+			
 				if ($this->dbc->query($sql)) {						
 						
 					if ($this->dbc->getAffectedRows() === 1) 
@@ -230,7 +245,6 @@ class DeviceManager extends Base
 							    		      $status_message, STATUS_MESSAGE_SOURCE_MOBILE, $userId, $locationId);
 							    
 							    $out = FAILED;
-							    echo $sql;
 							    if ($this->dbc->query($sql)){
 							    	$out = SUCCESS;
 							    }								    
@@ -251,7 +265,7 @@ class DeviceManager extends Base
 	 */
 	private function registerUser($reqArray)
 	{	
-		$out = MISSING_PARAMETER;	
+		$out = MISSING_PARAMETER;
 		if (isset($reqArray['realname']) && $reqArray['realname'] != NULL 
 			&& isset($reqArray['email']) && $reqArray['email'] != NULL     
 			&& isset($reqArray['password']) && $reqArray['password'] != NULL 
@@ -264,7 +278,7 @@ class DeviceManager extends Base
 			$out = FAILED;
 			if ($this->usermanager != NULL) {
 				$out = $this->usermanager->registerUser($email, $realname, $password);
-			}							 							 
+			}									 							 
 		}
 		
 		return $out;		

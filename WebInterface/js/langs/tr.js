@@ -74,5 +74,6 @@ LAN_OPERATOR.addIndexes({
 			invitationSentSuccesfull:'Davetiyeler başarıyla gönderildi.',
 			invitationSentPartial:'Davetiyeler gönderildi yalnız uygun formatta olmayan e-posta adresleri bulundu',
 			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.',
-			registerLabel:'Kayıt Ol'
+			registerLabel:'Kayıt Ol',
+			unauthorizedCommentDeletion:'Bu yorumu silmeye yetkiniz yoktur.'
 		});

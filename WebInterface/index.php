@@ -19,7 +19,20 @@ $out = NULL;
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action'])) 
 {
 	$action = $_REQUEST['action'];	
-	if (strpos($action, WEB_CLIENT_ACTION_PREFIX) === 0)
+	if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
+	{
+		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
+		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
+								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
+		$dm->setUploadPath(UPLOAD_DIRECTORY);
+		$tdo = new TempDataStoreOperator();
+		
+		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
+		$dm->setUserManager($usermanager);
+	
+		$out = $dm->process($_REQUEST);
+	}
+	else //(strpos($action, WEB_CLIENT_ACTION_PREFIX) === 0)
 	{
 		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
 		$wcm = new WebClientManager($dbc, WEB_CLIENT_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
@@ -41,20 +54,7 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']))
 		
 		$out = $wcm->process($_REQUEST);	
 	}
-	else if (strpos($action, DEVICE_ACTION_PREFIX) === 0)
-	{
-		$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
-		$dm = new DeviceManager($dbc, DEVICE_ACTION_PREFIX, STAFF_TRACKER_TABLE_PREFIX, 
-								GPS_MIN_DATA_SENT_INTERVAL, GPS_MIN_DISTANCE_INTERVAL);
-		$dm->setUploadPath(UPLOAD_DIRECTORY);
-		$tdo = new TempDataStoreOperator();
-		
-		$usermanager = new UserManager($dbc, $tdo, STAFF_TRACKER_TABLE_PREFIX);			
-		$dm->setUserManager($usermanager);
-		
-		
-		$out = $dm->process($_REQUEST);
-	}
+	
 }
 else {	
 	$dbc = getMySQLOperator($dbc, $dbHost,$dbUsername,$dbPassword,$dbName);
@@ -67,23 +67,18 @@ else {
 		$auth->setFacebookConnectOperator($fbc);
 	}
 	
+	$userInfo = null;
+	$pluginScript = "";
 	if ($auth->isUserAuthenticated() === true) 
 	{  
-		DisplayOperator::setUsernameAndId($auth->getRealName(), $auth->getUserId());
-		$pluginScript = "";
+	//	$pluginScript = "";
 		if ($fbc != NULL){
 			//$pluginScript = $fbc->getMainScript();	
 		}
 		$userInfo = $auth->getUserInfo();
-		$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);	
 	}
-	else {	
-		$pluginScript = "";
-		if ($fbc != NULL){
-			//$pluginScript = $fbc->getLoginScript();	
-		}	
-		$out .= DisplayOperator::getLoginPage($_SERVER['PHP_SELF'], $_SERVER['PHP_SELF'], LANGUAGE, $pluginScript);
-	}
+	
+	$out = DisplayOperator::getMainPage($_SERVER['PHP_SELF'], $userInfo, FETCH_PHOTOS_IN_INITIALIZATION, UPDATE_USER_LIST_INTERVAL, QUERYING_UPDATED_USER_LIST_INTERVAL, GOOGLE_MAP_API_KEY, LANGUAGE, $pluginScript);
 }
 echo $out;
 //error_log($out, 3, "log.txt");
@@ -101,6 +96,9 @@ function __autoload($class_name) {
 	}
 	else if (file_exists(dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php')){
 		require_once dirname(__FILE__) .'/plugins/' . $class_name . '/'. $class_name .'.php';
+	}
+	else if (file_exists(dirname(__FILE__) .'/classes/tables/' . $class_name . '.php')) {
+    	require_once dirname(__FILE__) .'/classes/tables/' . $class_name . '.php';
 	}
 }
 ?>
