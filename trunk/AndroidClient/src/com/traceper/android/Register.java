@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,19 +35,27 @@ public class Register extends Activity {
 	private static final int SIGN_UP_SUCCESSFULL = 4;
 	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
 	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
-	
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
 	private EditText realnameText;
 	private IAppService appService;
+	private ProgressDialog progressDialog;
 	private Handler handler = new Handler();
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
         
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
-            appService = ((AppService.IMBinder)service).getService();              
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+			
+            appService = ((AppService.IMBinder)service).getService(); 
+            appService.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
+            
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -79,6 +88,7 @@ public class Register extends Activity {
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
+					
 					if (passwordText.length() > 0 && 
 						passwordAgainText.length() > 0 &&
 						eMailText.length() > 0 &&
@@ -91,21 +101,24 @@ public class Register extends Activity {
 						
 							if (eMailText.length() >= 5 && passwordText.length() >= 5) {
 							
+									progressDialog = ProgressDialog.show(Register.this, "", getString(R.string.saving));
+								
 									Thread thread = new Thread(){
 										int result;
 										public void run() {
 											String password = null;
-										
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
 											password = passwordText.getText().toString();
 											
 											result = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
 																			 realnameText.getText().toString());
+											
 		
 											handler.post(new Runnable(){
 		
 												public void run() {
+													progressDialog.dismiss();
 													if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
 														showDialog(SIGN_UP_SUCCESSFULL);
 													}
