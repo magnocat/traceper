@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,6 +46,7 @@ public class Login extends Activity {
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
     private IAppService appManager;
+    private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
@@ -88,7 +90,6 @@ public class Login extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
 
-        
         setContentView(R.layout.login_screen);
         setTitle("Login - " + Configuration.APPLICATION_NAME);
         
@@ -105,7 +106,7 @@ public class Login extends Activity {
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
-			{			
+			{	
 				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
 				editor.commit();
@@ -123,10 +124,14 @@ public class Login extends Activity {
 				//TODO: check whether email format is valid.
 				else if (emailText.length() > 0 && passwordText.length() > 0)
 				{					
+					progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);	
+					
 					Thread loginThread = new Thread(){
 						private Handler handler = new Handler();
+						int result;
 						@Override
 						public void run() {
+							
 							String password = null;
 							try {
 								password = AeSimpleMD5.MD5(passwordText.getText().toString());
@@ -135,65 +140,60 @@ public class Login extends Activity {
 							} catch (UnsupportedEncodingException e) {
 								e.printStackTrace();
 							}
-							int result = appManager.authenticateUser(emailText.getText().toString(), password);
+							result = appManager.authenticateUser(emailText.getText().toString(), password);
 							
-							if (result == IAppService.HTTP_RESPONSE_SUCCESS){
-								SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-								
-								if (rememberMeCheckBox.isChecked() == true) {									
-		                        	editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
-		                        	editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
-								}
-								else {
-									editor.remove(Configuration.PREFERENCES_USEREMAIL);
-									editor.remove(Configuration.PREFERENCES_PASSWORD);
-								}
-								editor.commit();	
-								
-								handler.post(new Runnable(){
-									public void run() {										
+							handler.post(new Runnable(){
+								public void run() {										
+									progressDialog.dismiss();
+									
+									if (result == IAppService.HTTP_RESPONSE_SUCCESS){
+										SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+										
+										if (rememberMeCheckBox.isChecked() == true) {									
+				                        	editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
+				                        	editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
+										}
+										else {
+											editor.remove(Configuration.PREFERENCES_USEREMAIL);
+											editor.remove(Configuration.PREFERENCES_PASSWORD);
+										}
+										editor.commit();	
+																		
 										Intent i = new Intent(Login.this, Main.class);												
 										//i.putExtra(FRIEND_LIST, result);						
 										startActivity(i);	
 										Login.this.finish();										
-									}									
-								});											
-							}
-							else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
-							{
-								// Authentication failed, inform the user								 
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
+									{
+										// Authentication failed, inform the user								 
 										showDialog(MAKE_SURE_USERNAME_AND_PASSWORD_CORRECT);
-									}});														
-							}
-							else if (result == IAppService.HTTP_REQUEST_FAILED){
-								handler.post(new Runnable(){
-									public void run() {										
+													
+									}
+									else if (result == IAppService.HTTP_REQUEST_FAILED){
 										showDialog(HTTP_REQUEST_FAILED);
-									}});
-							}
-							else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
 										showDialog(HTTP_MISSING_PARAMETER);
-									}});
-							}
-							else {							
-								handler.post(new Runnable(){
-									public void run() {										
+									}
+									else {							
 										showDialog(UNKNOWN_ERROR_OCCURED);
-									}});					
-							}							
+									}
+								}									
+							});
+														
 						}
 					};
-					loginThread.start();					
+					
+					loginThread.start();
+					
 				}
 				else {
 					// Username or Password is not filled, alert the user					 
 					showDialog(FILL_BOTH_USERNAME_AND_PASSWORD);
-				}				
-			}       	
+				}
+			}
+			
         });
         
         cancelButton.setOnClickListener(new OnClickListener(){
