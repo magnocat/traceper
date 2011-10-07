@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -20,8 +21,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Handler;
+
 
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
@@ -29,11 +34,18 @@ import com.traceper.android.services.AppService;
 
 public class Main extends Activity 
 {
+	
+	
+	
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
+	private CheckBox AutoCheckbox; 
+	private Handler handler = new Handler();
+	
+	
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
 			
@@ -85,8 +97,15 @@ public class Main extends Activity
 	{		
 		super.onCreate(savedInstanceState);   
 		setContentView(R.layout.main);
+		AutoCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
+		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
+		AutoCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
+		
+		
+	
+		
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				Intent i = new Intent(Main.this, CameraController.class);
@@ -95,21 +114,50 @@ public class Main extends Activity
 		});
 		lastDataSentTimeText = (TextView)findViewById(R.id.lastLocationDataSentAtTime);
 
+		AutoCheckbox.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME,0).edit();
+            	editor.putBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX,AutoCheckbox.isChecked());
+            	editor.commit();
+            	
+            	           	
+                  if (((CheckBox) v).isChecked()) {
+                	appService.setAutoCheckin(true);
+                } else {
+                	appService.setAutoCheckin(false);
+                }
+            }
+        });
 		
+	
 		
-		   final CheckBox checkbox = (CheckBox) findViewById(R.id.auto_check);
-	        checkbox.setOnClickListener(new OnClickListener() {
-	            public void onClick(View v) {
-	                  if (((CheckBox) v).isChecked()) {
-	                	  appService.setAutoCheckin(true);
-	                } else {
-	                	appService.setAutoCheckin(false);
-	                }
-	            }
-	        });
+
+		AutoCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() { 
+
+		@Override 
+		public void onCheckedChanged(CompoundButton buttonView, 
+		boolean isChecked) { 
+		// TODO Auto-generated method stub 
+		if (buttonView.isChecked()) { 
+		Toast.makeText(getBaseContext(), "Checked", 
+		Toast.LENGTH_SHORT).show(); 
+		} 
+		else 
+		{ 
+		Toast.makeText(getBaseContext(), "UnChecked", 
+		Toast.LENGTH_SHORT).show(); 
+		} 
+
+		} 
+		}); 
+
+		
+	
 		
     }
 
+	
+	
 	@Override
 	protected void onPause() 
 	{
@@ -128,7 +176,12 @@ public class Main extends Activity
 		
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
+		
+	
+		
+		
 	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {		
 		boolean result = super.onCreateOptionsMenu(menu);		
@@ -141,6 +194,9 @@ public class Main extends Activity
 		return result;
 	}
 
+
+	
+	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) 
 	{		
