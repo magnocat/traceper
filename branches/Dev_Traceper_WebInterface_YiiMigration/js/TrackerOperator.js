@@ -111,7 +111,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var longitude;
 		var time;
 		var rating;
-		var gmarker;
+		var mapMarker;
+		var infoWindowIsOpened = false;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -153,6 +154,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					$("#loginBlock").hide();
 					$("#userBlock").show();
 					$('#userLoginForm').mb_close();
+					$('#friendsList > .searchResults').slideUp(function(){ $('#friendsList > #friends').slideDown(); });
 				}
 				else if (value == "-4"){								
 					TRACKER.showMessage(TRACKER.langOperator.incorrectPassOrUsername, "warning", function(){ location.href = "index.php"; });
@@ -291,51 +293,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 
-	//****************************************************************************20.08.2011 EAC
 	this.sendNewComment= function(userId, photoId, comment){
 		var params= "action=" + TRACKER.actionSendNewComment + "&userId="+ userId + "&photoId=" + photoId + "&comment=" + comment;
 		
 		if (comment != ""){
 			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {	
-					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
-				}
-				else if (result == "-7"){
-					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
-				}
-			});
-		}
-		else {
-			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
-		}
-	}
-	
-	this.deleteComment=function (commentId){
-		var params="action=" + TRACKER.actionDeleteComment + "&commentId=" + commentId;
-		
-		if (commentId != ""){
-			TRACKER.ajaxReq(params, function (result){
-				if (result == "1") {	
-					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
-				}
-				else if (result == "-7"){
-					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
-				}
-			});
-		}
-		else {
-			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
-		}
-	}
-	//*****************************************************************************************
-	
-	this.getComments=function(photoId)
-	{
-		var params= "action=" + TRACKER.actionSendNewComment + "&photoId=" + photoId;
-		
-		if (photoId != ""){
 			
-			TRACKER.ajaxReq(params, function (result){
+				TRACKER.showCommentWindow(1);
 				
 				if (result == "1") {	
 					//TRACKER.showMessage(TRACKER.langOperator.passwordChanged, "info");
@@ -349,7 +313,62 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
-	//********************************************************************************************
+	
+	this.deleteComment=function (commentId, userId){
+		var params="action=" + TRACKER.actionDeleteComment + "&commentId=" + commentId;
+		
+		if (commentId != ""){
+			if (TRACKER.userId == userId){
+				TRACKER.ajaxReq(params, function (result){
+				
+					TRACKER.showCommentWindow(1);
+				
+					if (result == "-1") {	
+						TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+					}
+					else if (result == "-7"){
+						//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+					}
+				});
+			}
+			else {
+				TRACKER.showMessage(TRACKER.langOperator.unauthorizedCommentDeletion, "warning");
+			}
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.getComments=function(photoId, callback)
+	{
+		var params= "action=" + TRACKER.actionGetComments + "&photoId=" + photoId;
+		if (photoId != ""){
+			TRACKER.ajaxReq(params, function (result){				
+				if (result == "-1") {	
+					TRACKER.showMessage(TRACKER.langOperator.errorInOperation, "warning");
+				}
+				else if (result == "-7"){
+					//TRACKER.showMessage(TRACKER.langOperator.currentPasswordDoesntMatch, "warning");
+				}				
+				var str = processCommentXML(result); 
+				callback(str);
+			});			
+		}
+		else {
+			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
+		}
+	}
+	
+	this.showCommentWindow=function(uploadId)
+	{
+		$('#photoCommentForm').mb_open();
+		//$('#photoCommentForm').mb_centerOnWindow(true);
+			
+		TRACKER.getComments(uploadId, function(result){
+			$('#photoCommentForm').find(".mbcontainercontent:first #photoComments").html(result);
+		});
+	}
 	
 	this.signout = function(){
 		var params = "action=" + TRACKER.actionSignout;
@@ -823,7 +842,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.showImageWindow = function(imageId){
-		MAP.trigger(TRACKER.images[imageId].gmarker, 'click');	
+		MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
@@ -905,7 +924,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		$(object + ' .mbcontainercontent:first').html(message);
 		$(object).mb_open();
 		$(object).mb_centerOnWindow(true);
-		$(object).mb_switchAlwaisOnTop(); 
+		//$(object).mb_switchAlwaisOnTop();		
 	}
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 

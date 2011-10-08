@@ -195,6 +195,22 @@ CREATE TABLE`traceper_upload_user_relation` (
 
 INSERT INTO `traceper_users` VALUES (1,'827ccb0eea8a706c4c34a16891f84e7b',0,'49.920925','22.868595','32.868595','Test','test@traceper.com','2011-06-22 23:46:33','351751049911319',0,'', 1,'2010-10-31 20:10:09', NOW());
 
+--
+-- Tablo için tablo yapısı `traceper_upload_comment`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_upload_comment` (
+  `upload_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `photo_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `comment_time` datetime NOT NULL,
+  `comment` text NOT NULL,
+  PRIMARY KEY (`upload_id`)
+) ENGINE=InnoDB  ;
+
+--
+-- Tablo döküm verisi `traceper_upload_comment`
+--
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

@@ -20,34 +20,34 @@ class RatingPlugin extends BaseTable {
 		switch ($reqArray['action'])
 		{
 			case "SetUploadRating":
-			$out = MISSING_PARAMETER;
-
-			if (isset($reqArray['uploadId']) && $reqArray['uploadId'] != null &&
-			isset($reqArray['points']) && $reqArray['points'] != null
-			)
-			{
-				$points = (int)$reqArray['points'];
-				$uploadId = (int)$reqArray['uploadId'];
-					
-				$updateArray = array(RatingPlugin::field_voting_count => RatingPlugin::field_voting_count. "+1", RatingPlugin::field_points => RatingPlugin::field_points.'+'.$points);
-				$condArr = array(RatingPlugin::field_upload_id => $uploadId);
-					
-				$result = $this->update($updateArray, $condArr);
-				$out = FAILED;
-					
-				if($result > 0)
+				$out = MISSING_PARAMETER;
+	
+				if (isset($reqArray['uploadId']) && $reqArray['uploadId'] != null &&
+				isset($reqArray['points']) && $reqArray['points'] != null
+				)
 				{
-					$out = SUCCESS;
-				}
-				else if($result === 0)
-				{
-					$insertArray = array(RatingPlugin::field_upload_id => $uploadId, RatingPlugin::field_points => $points);
+					$points = (int)$reqArray['points'];
+					$uploadId = (int)$reqArray['uploadId'];
+						
+					$updateArray = array(RatingPlugin::field_voting_count => RatingPlugin::field_voting_count. "+1", RatingPlugin::field_points => RatingPlugin::field_points.'+'.$points);
+					$condArr = array(RatingPlugin::field_upload_id => $uploadId);
+						
+					$result = $this->update($updateArray, $condArr);
 					$out = FAILED;
-					if ($this->insert($insertArray)) {
+						
+					if($result > 0)
+					{
 						$out = SUCCESS;
 					}
+					else if($result === 0)
+					{
+						$insertArray = array(RatingPlugin::field_upload_id => $uploadId, RatingPlugin::field_points => $points);
+						$out = FAILED;
+						if ($this->insert($insertArray)) {
+							$out = SUCCESS;
+						}
+					}
 				}
-			}
 			break;
 			case "GetUploadRating":
 				

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'BaseTable.php';
+require_once("BaseTable.php");
 
 class UploadComment extends BaseTable {
 

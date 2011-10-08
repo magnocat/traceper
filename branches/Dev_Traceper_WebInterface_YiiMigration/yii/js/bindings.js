@@ -17,13 +17,9 @@ function bindElements(langOperator, trackerOp)
 			$(this).attr("value", "");
 		}
 	});
-	
-	
 	$("#signout").click(function(){
 		trackerOp.signout();
 	});
-	
-	
 	
 	/**
 	 * binding operations to search image
@@ -49,19 +45,17 @@ function bindElements(langOperator, trackerOp)
 		var MAP = TRACKER.getMap();
 		if (checked == true){
 			$(TRACKER.imageIds).each(function(){
-				MAP.setMarkerVisible(TRACKER.images[this].gmarker, true);
-				//TRACKER.images[this].gmarker.show();
+				MAP.setMarkerVisible(TRACKER.images[this].mapMarker.marker, true);
 			});
 		}
 		else {
 			$(TRACKER.imageIds).each(function(){
-				MAP.setMarkerVisible(TRACKER.images[this].gmarker, false);
+				MAP.setMarkerVisible(TRACKER.images[this].mapMarker.marker, false);
 			});
 		}		
 	});
 	
 	$('#photo_title').click(function(){
-
 		if ($('#photos').children().size() == 0){
 			trackerOp.getImageList(1, function(){
 				$('#friendsList').slideUp('fast',function(){
@@ -84,30 +78,9 @@ function bindElements(langOperator, trackerOp)
 		$('#user_title div').addClass('arrowImageRight');
 		$('#photo_title div').removeClass('arrowImageRight');		
 		$('#user_title').removeClass('active_title');
-		
-        //**************************************************************************20.08.2011 EAC
-		$('#photoCommentForm').mb_open();
-		$('#photoCommentForm').mb_centerOnWindow(true);
-		
-		//$('#photoCommentForm').onCreate(function()
-		//{
-			//gelen yorum say�s� kadar dong�
-		//}
-		
-		$('#sendCommentButton').click(function(){			
-				var photoId=1;
-				var userId=1;
-				var comment=$('#photoCommentTextBox').val();
-				trackerOp.sendNewComment(userId, photoId, comment);
-		});
-		
-		$('#deleteCommentButton').click(function(){	
-			var commentId=6;
-			trackerOp.deleteComment(commentId);
-		});
+	
 	});
-	
-	
+		
 	$('#user_title').click(function(){
 		$('#photosList').slideUp('fast',function(){
 			$('#friendsList').slideDown('fast');
@@ -141,7 +114,7 @@ function bindElements(langOperator, trackerOp)
 		
 		
 	});
-	
+
 	$("#changePasswordButton").click(function(){
 		
 		if ($('#currentPassword').val() != '' && 
@@ -246,7 +219,7 @@ function bindElements(langOperator, trackerOp)
 			});
 		}
 	});
-
+	
 	$('#registerButton').click(function(){
 		trackerOp.registerUser($('#registerEmail').val(), $('#registerName').val(), $('#registerPassword').val(), $('#registerConfirmPassword').val(),null, 
 			function(result){
@@ -281,7 +254,14 @@ function bindElements(langOperator, trackerOp)
 		if (event.keyCode == '13'){
 			authenticateUser();
 		}						
-	});	
+	});
+	
+	$('#sendCommentButton').click(function(){			
+		var photoId=1;
+		var userId=1;
+		var comment=$('#photoCommentTextBox').val();
+		TRACKER.sendNewComment(userId, photoId, comment);
+	});
 	
 	
 
@@ -327,7 +307,7 @@ function setLanguage(langOperator){
 	$('#forgotPasswordLink').text(langOp.forgotPassword);
 	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
 //	$('#registerLink').text(langOp.registerLabel);	
-//	$('#loginLink').text("Edward hocam" + langOp.login);
+//	$('#loginLink').text(langOp.login);
 	$('#emailLabel').text(langOp.emailLabel + ":");	
 	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
 	$('#aboutusLink').text(langOp.aboutTitle);

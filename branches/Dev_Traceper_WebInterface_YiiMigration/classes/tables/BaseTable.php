@@ -62,19 +62,18 @@ class BaseTable
 				array_push($conditionValuePair, $key .'='. $value);
 			}
 	
-			$sqlConditionPart = implode(',', $conditionValuePair);
+			$sqlConditionPart = implode(' AND ', $conditionValuePair);
 			
 			$sql .= ' WHERE ' . $sqlConditionPart;
 		}
 		
-		$sql .= ' LIMIT '. $limit;
+		if ($limit!=1)
+		{
+			$sql .= ' LIMIT '. $limit;
+		}
 		
-		//echo $sql;
-
 		$result = $this->dbc->query($sql);
-		
-		//echo "Number Of Rows:".$this->dbc->numRows($result);
-		
+			
 		return $result;
 	}	
 	
@@ -92,7 +91,9 @@ class BaseTable
 		$sqlValuesPart = implode(',', $valuesArray);
 
 		$sql = 'INSERT INTO ' . $this->tableName . '(' . $sqlElementsPart . ')' . 'VALUES(' . $sqlValuesPart .')';
-					
+
+		echo $sql;
+		
 		$result = false;
 		if($this->dbc->query($sql) != false)
 		{
@@ -119,6 +120,8 @@ class BaseTable
 			$sqlConditionPart = implode(',', $conditionValuePair);
 			
 			$sql .= ' WHERE ' . $sqlConditionPart;
+			
+			echo $sql;
 		}
 		
 		$sql .= ' LIMIT '. $limit;
@@ -130,9 +133,7 @@ class BaseTable
 		{
 			$result = true;
 		}		
-		
-		//echo "Number Of Rows:".$this->dbc->numRows($result);
-		
+				
 		return $result;
 	}
 			

@@ -301,11 +301,13 @@
 	 						<div id='lists'> 	
 								<div class='titles'>									
 									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
-								
-									<?php 	
+									<div class="title" id="photo_title"><div class="arrowImage"></div></div>
+									<?php
+									/* 	
 										echo CHtml::link('<div class="title" id="photo_title"><div class="arrowImage"></div></div>', '#', array(
 	    									'onclick'=>'$("#photoCommentWindow").dialog("open"); return false;',
-										));	
+										));
+									*/	
 									?>																											
 								</div>  
 								<div id='friendsList'>											
@@ -324,7 +326,6 @@
 									</div>
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
 									<div id="photos">
-										<a href='#displayComments', id="commentsWindow"></a>
 										</div>
 									<div class='searchResults'>
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	

@@ -3,18 +3,18 @@
  * 03.08.2011 Eren Alp Celik
  * 
  */
-
-//ï¿½imdilik sadece resimler altï¿½na yorum koymak iï¿½in kullanï¿½lacak
-//sonradan baï¿½ka itemlara da yorum koyabilecek.
 class CommentOperator{
-    
 
-    private $uploadCommentTable;
+	private $uploadCommentTable;
+	private $dbc;
+	
+	private $dbc_mySqlOperator;
 	
 	public function __construct($tableprefix, $dbc)
     {	
     	
     	$this->uploadCommentTable=new UploadComment($tableprefix, $dbc);
+    	$this->dbc=$dbc;
     }
 
     function __destruct() {
@@ -22,12 +22,38 @@ class CommentOperator{
 	
 	public function getComments($photoId) 
 	{
-		$valuesArray = array(UploadComment::commentId, UploadComment::photo_id, UploadComment::user_id, UploadComment::comment_time, UploadComment::comment);
-		$condArr = array(UploadComment::photo_id => $photo_id);	
+		$this->dbc_mySqlOperator=new MySQLOperator("localhost","root","","traceper");
 		
-		return $this->uploadCommentTable->select($valuesArray, $condArr);
+		$valuesArray = array(UploadComment::field_upload_id, UploadComment::field_photo_id, UploadComment::field_user_id, UploadComment::field_comment_time, UploadComment::field_comment);
+		$condArr = array(UploadComment::field_photo_id => $photoId);	
+		
+		$result=$this->uploadCommentTable->select($valuesArray, $condArr);
+		
+		$str='<page pageNo="1" pageCount="1">';
+		
+		$uploadId=UploadComment::field_upload_id;
+		$time=UploadComment::field_comment_time;
+		$userId=UploadComment::field_user_id;
+		$comment=UploadComment::field_comment;
+		
+		while ($row = $this->dbc->fetchObject($result) ){
+			
+			
+			$sql_query='SELECT realname FROM traceper_users WHERE Id='.$row->$userId;		
+			$userName=$this->dbc_mySqlOperator->getUniqueField($sql_query);
+		
+			$str.='<comment Id="'.$row->$uploadId.'" time="'.$row->$time.'" userId="'.$row->$userId.'" userName="'.$userName.'" >'.$row->$comment.'</comment>';
+		
+		}
+	
+		$str .= "</page>";
+		
+		header("Content-type: application/xml; charset=utf-8");
+		
+		return $str;
 	}
 
+	//Not In-use
 	public function editComment($userId, $photoId, $comment, $newComment, $commentTime) 
 	{
 		//TODO: commentId direk kullanýlabilir durumda

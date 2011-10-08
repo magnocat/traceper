@@ -358,7 +358,10 @@ function processImageXML(MAP, xml){
 
 			image = imageURL + TRACKER.imageThumbSuffix;
 
-			var userMarker = MAP.putMarker(location, image);
+			var userMarker = MAP.putMarker(location, image, false);
+			var iWindow = MAP.initializeInfoWindow();
+			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+			
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -368,17 +371,19 @@ function processImageXML(MAP, xml){
 				longitude:longitude,
 				time:time,
 				rating:rating,
-				gmarker:userMarker,
+				mapMarker:markerInfoWindow,
 			});
-
-			MAP.setMarkerClickListener(TRACKER.images[imageId].gmarker, function (){
+			
+			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
+	
+			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
 				image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
 				$("#loading").show();
 				$(image).load(function(){
 					$("#loading").hide();
-
+					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
@@ -396,15 +401,17 @@ function processImageXML(MAP, xml){
 						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
 						+ TRACKER.langOperator.zoomMax
 						+'</a>'+'</li>'
+						+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+						+'</a>'+'</li>'
 						+'</li>'
 						+ '</ul>'
 						+ "</div>";
-					var infoWindow = MAP.initializeInfoWindow(content);
-					MAP.openInfoWindow(infoWindow, TRACKER.images[imageId].gmarker);
+					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
+					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
 
-					MAP.setInfoWindowCloseListener(infoWindow, function (){
+					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
-							MAP.setMarkerVisible(TRACKER.images[imageId].gmarker,false);
+							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
 						}
 					});
 
@@ -467,5 +474,36 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+"</ul>";
 
 	return content;
+}
 
+function processCommentXML(xml){
+		
+	var list = "";
+	$(xml).find("page").find("comment").each(function(){
+	
+		var comment = $(this);
+		var commentText = $(comment).text();
+		var commentId = $(comment).attr("Id");
+		var commentTime =  $(comment).attr("time");
+		var userId = $(comment).attr("userId");
+		var userName = $(comment).attr("userName");
+	
+		list += "<li>"
+		// add delete image button if logged in user and image uploader are same
+		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+","+userId+")' src='images/delete.png' />"
+		+ "<div>"
+		/*+ TRACKER.langOperator.uploader + ": " */ + userName 
+		+ "<br/>"
+		/* + TRACKER.langOperator.time + ": " */ +  commentTime
+		+ "</a>"
+		+ "<br/>"
+		+ "<div class='comment' id='viewComment"+ commentId +"' commentId='" + commentId +"'>" 
+		+ commentText
+		+ "</div>"
+		+ "<br/>"
+		+ "<hr>"
+		+ "</li>";
+	});
+	
+	return list;
 }
