@@ -134,7 +134,6 @@ public class AppService extends Service implements IAppService{
 			locationUpdates.start();
 			
 		}else{
-			
 			locationManager.removeUpdates(locationHandler);
 		}
 		
@@ -387,19 +386,6 @@ public class AppService extends Service implements IAppService{
 			this.isUserAuthenticated = true;
 			this.minDataSentInterval = xmlHandler.getGpsMinDataSentInterval();
 			this.minDistanceInterval = xmlHandler.getGpsMinDistanceInterval();
-
-		//	Thread locationUpdates = new Thread() {
-				//public void run() {
-					//Looper.prepare();
-
-					//locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-						//	locationHandler);				       
-
-					//Looper.loop();
-				//}
-			//};
-			//locationUpdates.start();
-	
 		}
 		else {
 			this.isUserAuthenticated = false;
