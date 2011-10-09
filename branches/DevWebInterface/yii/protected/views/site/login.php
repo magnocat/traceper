@@ -1,49 +1,63 @@
-<?php
-$this->pageTitle=Yii::app()->name . ' - Login';
-$this->breadcrumbs=array(
-	'Login',
-);
+<?php 
+$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'userLoginWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Login'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false      
+	    ),
+	));
 ?>
-
-<h1>Login</h1>
-
-<p>Please fill out the following form with your login credentials:</p>
-
-<div class="form">
-<?php $form=$this->beginWidget('CActiveForm', array(
-	'id'=>'login-form',
-	'enableClientValidation'=>true,
-	'clientOptions'=>array(
-		'validateOnSubmit'=>true,
-	),
-)); ?>
-
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'username'); ?>
-		<?php echo $form->textField($model,'username'); ?>
-		<?php echo $form->error($model,'username'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'password'); ?>
-		<?php echo $form->passwordField($model,'password'); ?>
-		<?php echo $form->error($model,'password'); ?>
-		<p class="hint">
-			Hint: You may login with <tt>demo/demo</tt> or <tt>admin/admin</tt>.
-		</p>
-	</div>
-
-	<div class="row rememberMe">
-		<?php echo $form->checkBox($model,'rememberMe'); ?>
-		<?php echo $form->label($model,'rememberMe'); ?>
-		<?php echo $form->error($model,'rememberMe'); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Login'); ?>
-	</div>
-
-<?php $this->endWidget(); ?>
-</div><!-- form -->
+	<div class="form">
+	<?php $form=$this->beginWidget('CActiveForm', array(
+		'id'=>'login-form',
+		'enableClientValidation'=>true,
+	
+	)); ?>
+		<div class="row">
+			<?php echo $form->labelEx($model,'email'); ?><br/>
+			<?php echo $form->textField($model,'email'); ?>
+			<?php echo $form->error($model,'email'); ?>
+		</div>
+	
+		<div class="row">
+			<?php echo $form->labelEx($model,'password'); ?><br/>
+			<?php echo $form->passwordField($model,'password'); ?>
+			<?php echo $form->error($model,'password'); ?>
+		</div>
+	
+		<div class="row rememberMe">
+			<?php echo $form->checkBox($model,'rememberMe'); ?>
+			<?php echo $form->label($model,'rememberMe'); ?>
+			<?php echo $form->error($model,'rememberMe'); ?>
+		</div>
+	
+		<div class="row buttons">
+			<?php echo CHtml::ajaxSubmitButton('Login', $this->createUrl('site/login'), 
+												array(
+													'success'=> 'function(result){ 
+																	try {
+																		var obj = jQuery.parseJSON(result);
+																		if (obj.result && obj.result == "1") 
+																		{
+																			$("#username").html(obj.realname);
+																			$("#loginBlock").hide();
+																			$("#userBlock").show();
+																			$("#userLoginWindow").dialog("close");
+																		}
+																	}
+																	catch (error){
+																		$("#userLoginWindow").html(result);
+																	}
+																 }',
+													 ),
+												null); ?>
+		</div>
+	
+	<?php $this->endWidget(); ?>
+</div>
+<?php 
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
+?>

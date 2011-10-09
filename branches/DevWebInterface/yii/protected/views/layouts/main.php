@@ -9,11 +9,14 @@
 
 		<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon"/>
    	 <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
-  
+<!-- 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+-->  
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/jquery.cookie.js"></script>
+<!-- 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
+-->
+     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
   	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script>
   	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/rating/jquery.raty.min.js"></script> 
 	
@@ -26,19 +29,11 @@
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>	
 
-	<script type="text/javascript">		
-		var langOp = new LanguageOperator();
-		var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
-		langOp.load("en");  //TODO: itshould be parametric
-		
-		var mapOperator = new MapOperator();
-		
-		$(document).ready( function(){
-							
-			var checked = false;
+	<?php 
+		Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 			// showPhotosOnMapCookieId defined in bindings.js
 			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
-				if ($.cookie(showPhotosOnMapCookieId) == "true"){
+				if ($.cookie(showPhotosOnMapCookieId) == 'true'){
 					checked = true;
 				}				
 			}
@@ -56,8 +51,8 @@
 			    								  longitude:35.024414}); 
 				mapOperator.initialize(initialLoc);
 				//TODO: ../index.php should be changed 
-				//TODO: $updateUserListInterval 
-				//TODO: $queryIntervalForChangedUsers 
+				//TODO: updateUserListInterval 
+				//TODO: queryIntervalForChangedUsers 
    				var trackerOp = new TrackerOperator('../index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
 				trackerOp.setLangOperator(langOp),
 				//TODO: setUserId should be a real id
@@ -67,23 +62,31 @@
    			catch (e) {
 				
 			}    			
-			    $(".containerPlus").buildContainers({
-			        containment:"document",
-			        elementsPath:"js/jquery/plugins/mb.containerPlus/elements/",
+			    $('.containerPlus').buildContainers({
+			        containment:'document',
+			        elementsPath:'js/jquery/plugins/mb.containerPlus/elements/',
 			        onClose:function(o){},
 			        onIconize:function(o){},
 			        effectDuration:10,
-			        zIndexContext:"auto" 
+			        zIndexContext:'auto' 
       			});
       			setLanguage(langOp);
       			bindElements(langOp, trackerOp);			    
-      			$('#user_title').click();
-      			     		
-		});	
+      			$('#user_title').click();",
+		CClientScript::POS_READY);
+	
+	?>
+	<script type="text/javascript">		
+		var langOp = new LanguageOperator();
+		var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
+		langOp.load("en");  //TODO: itshould be parametric
+		
+		var mapOperator = new MapOperator();
 	</script>
    
 	</head>
 	<body>	
+	
 	<?php
 
 ///////////////////////////// About traceper Window ///////////////////////////	
@@ -105,6 +108,8 @@
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 
 ///////////////////////////// User Login Window ///////////////////////////	
+	echo '<div id="userLoginWindow"></div>';
+/*	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'userLoginWindow',
 	    // additional javascript options for the dialog plugin
@@ -126,9 +131,9 @@
 					<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
 				    <input type="button" id="submitLoginFormButton" value=""/> <br/>
 				</div>';
-			
+		
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
-
+*/
 ///////////////////////////// Register Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'registerWindow',
@@ -257,17 +262,23 @@
 										));									
 							?>											 						
 	 						<div id="loginBlock">
+	 						
 	 								<?php 
-	 											echo CHtml::link(Yii::t('general', 'Login'), '#', array(
-	    											'onclick'=>'$("#userLoginWindow").dialog("open"); return false;',
-												)); 
-												
-												echo ' '; //To separate Login and Register
-												
-												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
-	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
-												));												
-									?>		
+				
+											echo CHtml::ajaxLink(Yii::t('general', 'Login'), $this->createUrl('site/login'), 
+ 												array(
+    												'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
+ 													'update'=> '#userLoginWindow',
+												),
+												array(
+													'id'=>'showLoginWindow')); 
+											
+											echo ' '; //To separate Login and Register
+											
+											echo CHtml::link(Yii::t('general', 'Register'), '#', array(
+    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
+											));												
+								?>		
 	 						</div>
 	 						<div id="userBlock" style="display:none">
 								<ul id='userarea'><li id="username"><!--  $realname --></li>
@@ -336,7 +347,7 @@
 					</div>
 																																									
 				</div>
-				
+	
 				<div id="map"></div>					
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
