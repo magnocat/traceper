@@ -137,7 +137,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.getMap = function (){
 		return MAP;
 	}
-
+/*
 	this.authenticateUser = function(username, password, rememberMe, callback)
 	{
 		var params = "action=" + TRACKER.actionAuthenticateUser + "&username=" + username + "&password=" + password + "&keepUserLoggedIn=" + rememberMe;
@@ -176,7 +176,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	};
-
+*/
 	this.inviteUser = function(email, message) {
 
 		var params = "action=" + TRACKER.actionInviteUser + "&email=" + email + "&message=" + message;

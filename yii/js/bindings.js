@@ -227,11 +227,11 @@ function bindElements(langOperator, trackerOp)
 				$("#registerWindow").dialog("close");
 			});						
 	});	
-	
+/*	
 	$('#submitLoginFormButton').click(function(){
 		trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
 	});
-	
+*/	
 	$('#forgotPasswordLink').click(function(){
 		$('#forgotPasswordForm').mb_open();
 		$('#forgotPasswordForm').mb_centerOnWindow(true);
@@ -250,12 +250,13 @@ function bindElements(langOperator, trackerOp)
 			sendNewPassword();	
 		}
 	});
+/*	
 	$('#username , #password').keypress(function(event){
 		if (event.keyCode == '13'){
 			authenticateUser();
 		}						
 	});
-	
+*/	
 	$('#sendCommentButton').click(function(){			
 		var photoId=1;
 		var userId=1;
@@ -277,7 +278,7 @@ function setLanguage(langOperator){
 	$("#photosList .searchResults a[href=#returnToPhotoList]").html(langOperator.returnToPhotoListLink)
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);
 	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
-	$("#aboutus").append(langOperator.aboutus);
+//	$("#aboutus").append(langOperator.aboutus);
 	
 	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
 	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
@@ -298,18 +299,18 @@ function setLanguage(langOperator){
 	$("#changePasswordFormTitle").text(langOperator.changePassword);
 	
 	
-	$('#usernameLabel').text(langOp.emailLabel+":");	
-	$('#passwordLabel').text(langOp.passwordLabel+":");
-	$('#rememberMeLabel').text(langOp.rememberMeLabel).click(function(){
-		$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
+//	$('#usernameLabel').text(langOp.emailLabel+":");	
+//	$('#passwordLabel').text(langOp.passwordLabel+":");
+//	$('#rememberMeLabel').text(langOp.rememberMeLabel).click(function(){
+//		$('#rememberMe').attr('checked', !($('#rememberMe').attr('checked')));
 			
-	});
+//	});
 	$('#forgotPasswordLink').text(langOp.forgotPassword);
 	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
 //	$('#registerLink').text(langOp.registerLabel);	
 //	$('#loginLink').text(langOp.login);
 	$('#emailLabel').text(langOp.emailLabel + ":");	
-	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
-	$('#aboutusLink').text(langOp.aboutTitle);
+//	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
+//	$('#aboutusLink').text(langOp.aboutTitle);
 	
 }

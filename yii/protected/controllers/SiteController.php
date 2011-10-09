@@ -8,16 +8,16 @@ class SiteController extends Controller
 	public function actions()
 	{
 		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
+		// captcha action renders the CAPTCHA image displayed on the contact page
 			'captcha'=>array(
 				'class'=>'CCaptchaAction',
 				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
+		),
+		// page action renders "static" pages stored under 'protected/views/site/pages'
+		// They can be accessed via: index.php?r=site/page&view=FileName
 			'page'=>array(
 				'class'=>'CViewAction',
-			),
+		),
 		);
 	}
 
@@ -37,13 +37,13 @@ class SiteController extends Controller
 	 */
 	public function actionError()
 	{
-	    if($error=Yii::app()->errorHandler->error)
-	    {
-	    	if(Yii::app()->request->isAjaxRequest)
-	    		echo $error['message'];
-	    	else
-	        	$this->render('error', $error);
-	    }
+		if($error=Yii::app()->errorHandler->error)
+		{
+			if(Yii::app()->request->isAjaxRequest)
+			echo $error['message'];
+			else
+			$this->render('error', $error);
+		}
 	}
 
 	/**
@@ -67,29 +67,38 @@ class SiteController extends Controller
 	}
 
 	/**
-	 * Displays the login page
+	 * Displays the login page,
+	 * If there is an error in validation or parameters it returns the form code with errors
+	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
 	 */
 	public function actionLogin()
 	{
-		$model=new LoginForm;
+		$model = new LoginForm;
 
-		// if it is ajax validation request
-		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-
+		$processOutput = true;
 		// collect user input data
 		if(isset($_POST['LoginForm']))
 		{
 			$model->attributes=$_POST['LoginForm'];
-			// validate user input and redirect to the previous page if valid
-			if($model->validate() && $model->login())
-				$this->redirect(Yii::app()->user->returnUrl);
+			// validate user input and if ok return json data and end application.
+			if($model->validate() && $model->login()) {
+				echo CJSON::encode(array(
+								"result"=> "1",
+								"realname"=>$model->getName(),
+				));
+				Yii::app()->end();
+			}
+				
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+
+			}
 		}
-		// display the login form
-		$this->render('login',array('model'=>$model));
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+
+		$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 	}
 
 	/**
