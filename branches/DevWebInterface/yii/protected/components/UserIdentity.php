@@ -8,6 +8,7 @@
 class UserIdentity extends CUserIdentity
 {
 	private $realname;
+	private $userId;
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -18,9 +19,12 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		$user = User::model()->find("email=:email", 
-							array(":email"=>$this->username));
-
+		$criteria=new CDbCriteria;
+		$criteria->select='Id,realname,password';  
+		$criteria->condition='email=:email';
+		$criteria->params=array(':email'=>$this->username);
+		$user = Users::model()->find($criteria); // $params is not needed
+		
 		if ($user == null) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
 		}
@@ -30,12 +34,17 @@ class UserIdentity extends CUserIdentity
 		else {
 			$this->errorCode = self::ERROR_NONE;
 			$this->realname = $user->realname;
+			$this->userId = $user->Id;
 		}
 		return !$this->errorCode;
 	}
 	
 	public function getName() {
 		return $this->realname;
+	}
+	
+	public function getId(){
+		return $this->userId;
 	}
 	
 }
