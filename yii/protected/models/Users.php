@@ -18,12 +18,16 @@
  * @property integer $status_source
  * @property string $status_message_time
  * @property string $dataCalculatedTime
+ *
+ * The followings are the available model relations:
+ * @property TraceperFriends[] $traceperFriends
+ * @property TraceperFriends[] $traceperFriends1
  */
-class User extends CActiveRecord
+class Users extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return User the static model class
+	 * @return Users the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -72,6 +76,8 @@ class User extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
+			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
 		);
 	}
 
