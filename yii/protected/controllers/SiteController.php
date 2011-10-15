@@ -109,4 +109,38 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
 	}
+	
+	/**
+	 * Changes the user's current password with the new one
+	 */	
+	public function actionChangePassword()
+	{
+		$model = new ChangePasswordForm;
+
+		$processOutput = true;
+		// collect user input data
+		if(isset($_POST['ChangePasswordForm']))
+		{
+			$model->attributes=$_POST['ChangePasswordForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {
+				$users=Users::model()->findByPk(Yii::app()->user->id);
+				$users->password=$model->newPassword;
+				$users->save(); // save the change to database
+				Yii::app()->end();
+			}
+				
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+
+			}
+		}	
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+
+		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);		
+		
+		
+	}	
 }
