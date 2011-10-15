@@ -157,6 +157,9 @@
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 
 ///////////////////////////// Change Password Window ///////////////////////////
+	echo '<div id="changePasswordWindow"></div>';
+	
+	/*
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'changePasswordWindow',
 	    // additional javascript options for the dialog plugin
@@ -181,6 +184,7 @@
 	</div>';
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+	*/
 
 	
 ///////////////////////////// Invite User Window ///////////////////////////
@@ -285,11 +289,25 @@
 	 							</ul>							
 	 							
 	 							<?php 
- 									echo CHtml::link('<div style="clear:both" id="changePassword" class="userOperations">	
+ 									/*
+	 								echo CHtml::link('<div style="clear:both" id="changePassword" class="userOperations">	
 	 													<img src="images/changePassword.png"  /><div></div>
 	 												  </div>', '#', array(
     												'onclick'=>'$("#changePasswordWindow").dialog("open"); return false;',
 									));	
+									*/
+									
+									
+	 								echo CHtml::ajaxLink('<div style="clear:both" id="changePassword" class="userOperations">	
+	 													<img src="images/changePassword.png"  /><div></div>
+	 												  </div>', $this->createUrl('site/changePassword'), 
+ 										array(
+    										'complete'=> 'function() { $("#changePasswordWindow").dialog("open"); return false;}',
+ 											'update'=> '#changePasswordWindow',
+										),
+										array(
+											'id'=>'showChangePasswordWindow')); 	
+																			
 
  									echo CHtml::link('<div class="userOperations" id="inviteUser">
 	 													<img src="images/invite.png"  /><div></div>
