@@ -21,31 +21,32 @@ public final class R {
         public static final int stat_sample=0x7f020007;
     }
     public static final class id {
-        public static final int auto_check=0x7f05000d;
+        public static final int auto_check=0x7f05000e;
         public static final int cancel_login=0x7f05000a;
-        public static final int cancel_signUp=0x7f050018;
+        public static final int cancel_signUp=0x7f050019;
         public static final int email=0x7f050006;
         public static final int icon=0x7f050002;
         public static final int lastLocationDataSentAtTime=0x7f05000b;
         public static final int login=0x7f050009;
-        public static final int message=0x7f05000f;
-        public static final int messageHistory=0x7f05000e;
+        public static final int message=0x7f050010;
+        public static final int messageHistory=0x7f05000f;
         public static final int password=0x7f050007;
-        public static final int passwordAgain=0x7f050016;
-        public static final int realname=0x7f050015;
-        public static final int register=0x7f050017;
+        public static final int passwordAgain=0x7f050017;
+        public static final int realname=0x7f050016;
+        public static final int register=0x7f050018;
         public static final int remember_me_checkbox=0x7f050008;
-        public static final int scrollview=0x7f050014;
-        public static final int sendMessageButton=0x7f050010;
-        public static final int server_address_edit=0x7f050013;
+        public static final int scrollview=0x7f050015;
+        public static final int sendMessageButton=0x7f050011;
+        public static final int send_location=0x7f05000c;
+        public static final int server_address_edit=0x7f050014;
         public static final int start=0x7f050004;
         public static final int stop=0x7f050005;
         public static final int surface=0x7f050001;
         public static final int takePictureButton=0x7f050000;
-        public static final int take_upload_photo_button=0x7f05000c;
+        public static final int take_upload_photo_button=0x7f05000d;
         public static final int text=0x7f050003;
-        public static final int text1=0x7f050011;
-        public static final int username_view=0x7f050012;
+        public static final int text1=0x7f050012;
+        public static final int username_view=0x7f050013;
     }
     public static final class layout {
         public static final int camera_view=0x7f030000;

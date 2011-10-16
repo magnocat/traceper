@@ -46,6 +46,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
@@ -57,6 +58,7 @@ public class AppService extends Service implements IAppService{
 	private LocationManager locationManager = null;
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
+	private boolean sendlocation= false;
 
 	
 	/**
@@ -139,6 +141,29 @@ public class AppService extends Service implements IAppService{
 		
 	}
 	
+public void sendLocationNow(boolean enable){
+		
+		if (enable == true) {
+			
+			sendlocation=true;
+			
+			Thread locationUpdates = new Thread() {
+				public void run() {
+					Looper.prepare();
+
+					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+							locationHandler);				       
+
+					Looper.loop();
+				}
+			};
+			locationUpdates.start();
+			
+		}else{
+			locationManager.removeUpdates(locationHandler);
+		}
+		
+	}
 	
 	
 	private void sendPendingLocations(){
@@ -507,7 +532,11 @@ public class AppService extends Service implements IAppService{
 					// send pending locations if any...
 					sendPendingLocations();
 					// send last location data
-					result = sendLocationDataAndParseResult(loc);					
+					result = sendLocationDataAndParseResult(loc);	
+					// remove location update
+					if (sendlocation==true) {
+						locationManager.removeUpdates(locationHandler);			
+					}
 				}
 				if (connected == false || result != HTTP_RESPONSE_SUCCESS){
 					pendingLocations.add(loc);

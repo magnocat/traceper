@@ -30,6 +30,8 @@ public interface IAppService {
 	
 	public void setAutoCheckin(boolean enable);
 	
+	public void sendLocationNow(boolean enable);
+	
 	public Long getLastLocationSentTime();
 	
 	public void exit();
