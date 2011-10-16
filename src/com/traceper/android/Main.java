@@ -42,6 +42,7 @@ public class Main extends Activity
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
+	private Button sendLocation;
 	private CheckBox autoSendLocationCheckbox; 
 	private Handler handler = new Handler();
 
@@ -76,6 +77,12 @@ public class Main extends Activity
 				if (dt != null) {
 					lastDataSentTimeText.setText(getFormattedDate(dt));
 				}
+				if (autoSendLocationCheckbox.isChecked()==true){
+					appService.setAutoCheckin(true);
+					sendLocation.setEnabled(false);
+					Toast.makeText(getBaseContext(), "Auto sending is ready!", Toast.LENGTH_SHORT).show();
+					
+				};
 			}
 			else {
 				Intent i = new Intent(Main.this, Login.class);																
@@ -99,7 +106,11 @@ public class Main extends Activity
 		setContentView(R.layout.main);
 		autoSendLocationCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
+		sendLocation = (Button) findViewById(R.id.send_location);
+		
+		
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
+		sendLocation.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
@@ -120,17 +131,30 @@ public class Main extends Activity
 				editor.commit();
 				if (isChecked) { 
 					appService.setAutoCheckin(true);
-					Toast.makeText(getBaseContext(), "Checked", Toast.LENGTH_SHORT).show(); 
+					sendLocation.setEnabled(false);
+					Toast.makeText(getBaseContext(), "Auto sending is ready!", Toast.LENGTH_SHORT).show(); 
 				} 
 				else 
 				{ 
 					appService.setAutoCheckin(false);
-					Toast.makeText(getBaseContext(), "UnChecked", Toast.LENGTH_SHORT).show(); 
+					sendLocation.setEnabled(true);
+					Toast.makeText(getBaseContext(), "Auto sending is disable!", Toast.LENGTH_SHORT).show(); 
 				} 
 
 			} 
 		}); 
+		
+		sendLocation.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				         if (autoSendLocationCheckbox.isChecked()) {
+				        	 autoSendLocationCheckbox.setChecked(false);
+		         }
+				appService.sendLocationNow(true);
+			}
+	
+		});
 
 
 
