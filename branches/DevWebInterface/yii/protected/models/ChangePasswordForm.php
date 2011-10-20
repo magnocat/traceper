@@ -22,9 +22,9 @@ class ChangePasswordForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('currentPassword', 'newPassword', 'newPasswordAgain', 'required'),
+			array('currentPassword, newPassword, newPasswordAgain', 'required'),
 			// password needs to be authenticated
-			array('newPassword', 'compare', 'newPasswordAgain'),
+			array('newPassword', 'compare', 'compareAttribute'=>'newPasswordAgain'),
 		);
 	}
 
