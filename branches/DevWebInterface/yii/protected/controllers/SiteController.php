@@ -124,9 +124,18 @@ class SiteController extends Controller
 			$model->attributes=$_POST['ChangePasswordForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-				$users=Users::model()->findByPk(Yii::app()->user->id);
-				$users->password=$model->newPassword;
-				$users->save(); // save the change to database
+				//$users=Users::model()->findByPk(Yii::app()->user->id);
+				//$users->password=md5($model->newPassword);
+				
+				//if($users->save()) // save the change to database
+				if(Users::model()->updateByPk(Yii::app()->user->id,array("password"=>md5($model->newPassword)),'password=:password', array(':password'=> md5($model->currentPassword)))) // save the change to database
+				{
+					echo CJSON::encode(array("result"=> "1"));				
+				} 
+				else 
+				{
+					echo CJSON::encode(array("result"=> "0"));				
+				}
 				Yii::app()->end();
 			}
 				
