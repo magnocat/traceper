@@ -28,10 +28,38 @@ class UsersController extends Controller
 			$this->render('error', $error);
 		}
 	}
-	
-	public function actionGetFriendList(){
-	
-	
+
+	public function actionGetFriendList()
+	{
+		$sqlCount = 'SELECT count(*)
+					 FROM '. Friends::model()->tableName() . ' f 
+					 WHERE (friend1 = '.Yii::app()->user->id.' 
+						OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+		
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		
+		$sql = 'SELECT u.Id as id, u.realname, u.latitude, u.longitude 
+				FROM '. Friends::model()->tableName() . ' f 
+				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+				WHERE (friend1 = '.Yii::app()->user->id.' 
+						OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
+		
+		$dataProvider = new CSqlDataProvider($sql, array(
+		    											'totalItemCount'=>$count,
+													    'sort'=>array(
+						        							'attributes'=>array(
+						             									'id', 'realname',
+															),
+														),
+													    'pagination'=>array(
+													        'pageSize'=>5,
+														),
+													));
+											
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		$this->renderPartial('userList',array('dataProvider'=>$dataProvider), false, true);
+
 	}
 
 
