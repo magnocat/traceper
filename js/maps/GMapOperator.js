@@ -211,7 +211,7 @@ function MapOperator() {
 
 	}
 
-	
+
 
 	/*
 	 * adding point to the geofence end
@@ -245,7 +245,7 @@ function MapOperator() {
 
 		path.insertAt(index,location);
 	}
-	
+
 	/*
 	 * remove point from the geofence at specified index 
 	 * geoFence is type that defined in MapStructs.js
@@ -260,7 +260,7 @@ function MapOperator() {
 
 		path.removeAt(index);
 	}
-	
+
 	/*
 	 * remove all points from the geofence 
 	 * geoFence is type that defined in MapStructs.js
@@ -275,7 +275,7 @@ function MapOperator() {
 
 		path.clear();
 	}
-	
+
 	/*
 	 * get the point number of the geofence path 
 	 * geoFence is type that defined in MapStructs.js
@@ -321,6 +321,33 @@ function MapOperator() {
 		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
 		vertices.setAt(index,location);		
 	}
+	
+	/*
+	 * check the location point on geofence or not according to Ray Casting algorithm.
+	 * geoFence is type that defined in MapStructs.js
+	 * loc is type that is added to the polygon
+	 */
+	MAP_OPERATOR.isGeoFenceContainsLocation = function(geoFence,location) {
+
+		// Raycast point in polygon method
+		var numPoints = MAP_OPERATOR.getPointNumberOfGeoFencePath(geoFence);
+		var inPoly = false;
+		var i;
+		var j = numPoints-1;
+		
+		for(var i=0; i < numPoints; i++) { 
+			
+			var vertex1 = MAP_OPERATOR.getPointOfGeoFencePath(geoFence,i);
+			var vertex2 = MAP_OPERATOR.getPointOfGeoFencePath(geoFence,j);
+			if (vertex1.longitude < location.longitude && vertex2.longitude >= location.longitude || vertex2.longitude < location.longitude && vertex1.longitude >= location.longitude)	 {
+				if (vertex1.latitude + (location.longitude - vertex1.longitude) / (vertex2.longitude - vertex1.longitude) * (vertex2.latitude - vertex1.latitude) < location.latitude) {
+					inPoly = !inPoly;
+				}
+			}
+			j = i;
+		}
+		return inPoly;
+	}
 
 	/*
 	 * setting the geofence visibility
@@ -342,7 +369,7 @@ function MapOperator() {
 		}
 		geoFence.polygon.setOptions(options);
 	}
-	
+
 	/**
 	 * Extend for polygon specific implementation
 	 * @return container that holds the control
@@ -418,14 +445,14 @@ function MapOperator() {
 		button_img.style.zIndex = 1009999900;
 
 		button.img = button_img;
-		
+
 		var clickPointNumber = 0;
 		var removeGeoFence = false;
-		
+
 		//Button toggle. First click turns it on (and other buttons off), triggers bound events. Second click turns it off
 		google.maps.event.addDomListener(button.img, "click", function() {
 			if(button.img.getAttribute("src") === button.opts.img_up_url){
-				
+
 				google.maps.event.addListener(MAP_OPERATOR.map, 'click', function(event) {
 					if (removeGeoFence)
 					{
@@ -433,7 +460,7 @@ function MapOperator() {
 						removeGeoFence = false;
 					}
 					var location = new MapStruct.Location({latitude:event.latLng.lat(),
-						  longitude:event.latLng.lng()}); 
+						longitude:event.latLng.lng()}); 
 					clickPointNumber++;
 					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
 					MAP_OPERATOR.addPointToGeoFence(geoFence,location);
@@ -443,30 +470,39 @@ function MapOperator() {
 						MAP_OPERATOR.map.setCenter(event.latLng);
 						removeGeoFence = true;
 						clickPointNumber = 0;
+						
+						/*
+						var initialLoc = new MapStruct.Location({latitude:39.504041,
+							  longitude:35.024414}); 
+						var sonuc=MAP_OPERATOR.isGeoFenceContainsLocation(geoFence,initialLoc);
+					    alert(sonuc);
+					    */
 					}
-				  });				
-				} else {
-					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
-					clickPointNumber = 0;
-					geoFence.polygon.getPath().clear();
-				}    
+				});				
+			} else {
+				MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
+				clickPointNumber = 0;
+				geoFence.polygon.getPath().clear();
+			}    
 		});  
 
 		/*
 		buttons_[opts.controlName] = button;
 		stopDigitizingFuncs_[opts.controlName] = opts.stopDigitizing;
-		*/
+		 */
 
 		container.appendChild(button.img);
 		//MAP_OPERATOR.map.getDiv().appendChild(container);
 		$('#friendsList').append(container);
-		
+
 		/*
 		me.runInitFunctions();
 		 */
 		return container;
 
 	};
+
+	
 
 	/*
 	 * clickFunction
