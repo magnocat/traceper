@@ -43,7 +43,15 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#username").html(obj.realname);
-																			TRACKER.getFriendList(1);
+																			//TRACKER.getFriendList(1);
+																		'.
+																		CHtml::ajax(
+																			array(
+																			'url'=>$this->createUrl('users/getFriendList'),
+																			'update'=>'#friends',
+																			)
+																		)
+																		 .'	
 																			$("#loginBlock").hide();
 																			$("#userBlock").show();
 																			$("#userLoginWindow").dialog("close");

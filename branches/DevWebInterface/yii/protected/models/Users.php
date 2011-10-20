@@ -75,10 +75,12 @@ class Users extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
-			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
-			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
-		);
+		return array();
+		
+//		return array(
+//			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
+//			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
+//		);
 	}
 
 	/**
