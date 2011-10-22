@@ -273,7 +273,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
-
+/*
 	this.changePassword = function(newPassword, currentPassword){
 		var params = "action=" + TRACKER.actionChangePassword + "&newPassword=" + newPassword + "&currentPassword=" + currentPassword;
 		
@@ -292,7 +292,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showMessage(TRACKER.langOperator.warningMissingParameter, "warning");
 		}
 	}
-
+*/
 	this.sendNewComment= function(userId, photoId, comment){
 		var params= "action=" + TRACKER.actionSendNewComment + "&userId="+ userId + "&photoId=" + photoId + "&comment=" + comment;
 		
