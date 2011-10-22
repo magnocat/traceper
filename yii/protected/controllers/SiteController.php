@@ -128,7 +128,7 @@ class SiteController extends Controller
 				//$users->password=md5($model->newPassword);
 				
 				//if($users->save()) // save the change to database
-				if(Users::model()->updateByPk(Yii::app()->user->id,array("password"=>md5($model->newPassword)),'password=:password', array(':password'=> md5($model->currentPassword)))) // save the change to database
+				if(Users::model()->updateByPk(Yii::app()->user->id, array("password"=>md5($model->newPassword)))) // save the change to database
 				{
 					echo CJSON::encode(array("result"=> "1"));				
 				} 
