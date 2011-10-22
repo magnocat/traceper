@@ -17,10 +17,11 @@ function bindElements(langOperator, trackerOp)
 			$(this).attr("value", "");
 		}
 	});
+/*	
 	$("#signout").click(function(){
 		trackerOp.signout();
 	});
-	
+*/	
 	/**
 	 * binding operations to search image
 	 */
@@ -114,7 +115,7 @@ function bindElements(langOperator, trackerOp)
 		
 		
 	});
-
+/*
 	$("#changePasswordButton").click(function(){
 		
 		if ($('#currentPassword').val() != '' && 
@@ -145,7 +146,7 @@ function bindElements(langOperator, trackerOp)
 		$('#changePasswordForm input:text').attr('value','');
 		$('#changePasswordWindow').dialog('close');
 	});
-	
+*/	
 	$('#inviteUserButton').click(function(){
 		var useremail = $('#useremail').val();
 		var invitationMessage = $('#invitationMessage').val();
@@ -244,13 +245,13 @@ function bindElements(langOperator, trackerOp)
 				});
 		});
 	});
-	
+/*	
 	$('#email').keypress(function(event){
 		if (event.keyCode == '13'){
 			sendNewPassword();	
 		}
 	});
-/*	
+	
 	$('#username , #password').keypress(function(event){
 		if (event.keyCode == '13'){
 			authenticateUser();
@@ -280,11 +281,11 @@ function setLanguage(langOperator){
 	$("#friendsList .search #searchBox").attr('value', langOperator.usersSearchBox);
 //	$("#aboutus").append(langOperator.aboutus);
 	
-	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
-	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
-	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel + " :");
-	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
-	$("#changePasswordCancel, #inviteUserCancel").val(langOperator.cancelFormButtonLabel);
+//	$("#currentPasswordLabel").text(langOperator.currentPasswordLabel + " :");
+//	$("#newPasswordLabel").text(langOperator.newPasswordLabel + " :");
+//	$("#newPasswordAgainLabel").text(langOperator.newPasswordAgainLabel + " :");
+//	$("#changePasswordButton").val(langOperator.submitFormButtonLabel);
+//	$("#changePasswordCancel, #inviteUserCancel").val(langOperator.cancelFormButtonLabel);
 	$("#inviteUserEmailLabel").text(langOperator.emailLabel);
 	$("#inviteUserButton").val(langOperator.inviteUserLabel);
 //	$("#signout div").append(langOperator.signout);
@@ -309,7 +310,7 @@ function setLanguage(langOperator){
 	$('#sendNewPassword').attr('value', langOp.sendNewPassword);	
 //	$('#registerLink').text(langOp.registerLabel);	
 //	$('#loginLink').text(langOp.login);
-	$('#emailLabel').text(langOp.emailLabel + ":");	
+//	$('#emailLabel').text(langOp.emailLabel + ":");	
 //	$("#submitLoginFormButton").val(langOp.submitFormButtonLabel);	
 //	$('#aboutusLink').text(langOp.aboutTitle);
 	
