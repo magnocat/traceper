@@ -36,7 +36,7 @@ class UserIdentity extends CUserIdentity
 			$this->realname = $user->realname;
 			$this->userId = $user->Id;
 		}
-		return !$this->errorCode;
+		return $this->errorCode;
 	}
 	
 	public function getName() {
