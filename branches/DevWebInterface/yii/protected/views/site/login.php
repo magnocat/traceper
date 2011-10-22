@@ -17,15 +17,23 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 		<div class="row">
-			<?php echo $form->labelEx($model,'email'); ?><br/>
-			<?php echo $form->textField($model,'email'); ?>
-			<?php echo $form->error($model,'email'); ?>
+			<?php echo $form->labelEx($model,'email'); ?>
+			<?php echo $form->textField($model,'email'
+			
+			); ?>
+			<?php $errorMessage = $form->error($model,'email'); 
+				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+				  else { echo $errorMessage; }
+			?>			
 		</div>
 	
 		<div class="row">
-			<?php echo $form->labelEx($model,'password'); ?><br/>
+			<?php echo $form->labelEx($model,'password'); ?>
 			<?php echo $form->passwordField($model,'password'); ?>
-			<?php echo $form->error($model,'password'); ?>
+			<?php $errorMessage = $form->error($model,'password'); 
+				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+				  else { echo $errorMessage; }
+			?>
 		</div>
 	
 		<div class="row rememberMe">
