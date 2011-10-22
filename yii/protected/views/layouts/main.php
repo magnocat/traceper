@@ -6,7 +6,8 @@
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source GPS tracking system" />
 		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css" media="screen, projection" />
-
+		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
 		<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon"/>
    	 <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
 <!-- 
@@ -109,31 +110,6 @@
 
 ///////////////////////////// User Login Window ///////////////////////////	
 	echo '<div id="userLoginWindow"></div>';
-/*	
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'userLoginWindow',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Login'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false      
-	    ),
-	));
-	
-	echo	'<div id="userLoginForm" class="">	
-					<div id="usernameLabel"></div>
-					<input type="text" name="email" id="emailLogin" />
-					<div id="passwordLabel"></div>
-					<input type="password" name="password" id="password"/>
-					<div class="link" id="forgotPasswordLink"></div>
-					<input type="checkbox" name="rememberMe" id="rememberMe"/>
-					<div style="display:inline" class="link" id="rememberMeLabel"></div><br/>
-				    <input type="button" id="submitLoginFormButton" value=""/> <br/>
-				</div>';
-		
-	$this->endWidget('zii.widgets.jui.CJuiDialog');
-*/
 ///////////////////////////// Register Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'registerWindow',
@@ -158,35 +134,6 @@
 
 ///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
-	
-	/*
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'changePasswordWindow',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Change Password'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false      
-	    ),
-	));
-	
-	echo '	<div id="changePasswordForm" class="">  
-					<br/>
-		<div id="currentPasswordLabel"></div>
-		<div><input type="password" name="currentPassword" id="currentPassword" /></div>
-		<div id="newPasswordLabel"></div>
-		<div><input type="password" name="newPassword" id="newPassword" /></div>  
-		<div id="newPasswordAgainLabel"></div>
-		<div><input type="password" name="newPasswordAgain" id="newPasswordAgain" /></div>
-		<div></div>
-		<div><input type="button" name="changePassword" id="changePasswordButton" /> &nbsp; <input type="button" name="cancel" id="changePasswordCancel"/></div>
-	</div>';
-			
-	$this->endWidget('zii.widgets.jui.CJuiDialog');	
-	*/
-
-	
 ///////////////////////////// Invite User Window ///////////////////////////
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'inviteUserWindow',
@@ -264,41 +211,38 @@
  										echo CHtml::link('<div id="logo"></div>', '#', array(
     										'onclick'=>'$("#Logo").dialog("open"); return false;',
 										));									
-							?>											 						
-	 						<div id="loginBlock">
+							?>		
+							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
+		 						<div id="loginBlock">
+		 								
+		 								<?php 				
+												echo CHtml::ajaxLink(Yii::t('general', 'Login'), $this->createUrl('site/login'), 
+	 												array(
+	    												'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
+	 													'update'=> '#userLoginWindow',
+													),
+													array(
+														'id'=>'showLoginWindow')); 
+												
+												echo ' '; //To separate Login and Register
+												
+												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
+	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
+												));												
+									?>		
+		 						</div>
+	 						<?php }?>
 	 						
-	 								<?php 
-				
-											echo CHtml::ajaxLink(Yii::t('general', 'Login'), $this->createUrl('site/login'), 
- 												array(
-    												'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
- 													'update'=> '#userLoginWindow',
-												),
-												array(
-													'id'=>'showLoginWindow')); 
-											
-											echo ' '; //To separate Login and Register
-											
-											echo CHtml::link(Yii::t('general', 'Register'), '#', array(
-    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
-											));												
-								?>		
-	 						</div>
-	 						<div id="userBlock" style="display:none">
-								<ul id='userarea'><li id="username"><!--  $realname --></li>
+	 						<div id="userBlock" <?php if (Yii::app()->user->isGuest == true) {	echo "style='display:none'"; }  ?>>
+	 						
+								<ul id='userarea'><li id="username"><?php if (Yii::app()->user->isGuest == false){ 
+																				echo Yii::app()->user->name; 
+																			}?>
+												 </li>
 	 							</ul>							
 	 							
 	 							<?php 
- 									/*
-	 								echo CHtml::link('<div style="clear:both" id="changePassword" class="userOperations">	
-	 													<img src="images/changePassword.png"  /><div></div>
-	 												  </div>', '#', array(
-    												'onclick'=>'$("#changePasswordWindow").dialog("open"); return false;',
-									));	
-									*/
-									
-									
-	 								echo CHtml::ajaxLink('<div style="clear:both" id="changePassword" class="userOperations">	
+ 									echo CHtml::ajaxLink('<div style="clear:both" id="changePassword" class="userOperations">	
 	 													<img src="images/changePassword.png"  /><div></div>
 	 												  </div>', $this->createUrl('site/changePassword'), 
  										array(
@@ -323,7 +267,7 @@
 
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
-	 												 </div>', '#', array());										
+	 												 </div>', $this->createUrl('site/logout'), array());										
 	 							?>
 	 						</div>
 	 						
