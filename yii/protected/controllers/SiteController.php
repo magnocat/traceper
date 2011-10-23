@@ -148,8 +148,53 @@ class SiteController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);		
-		
-		
+		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);			
+	}
+
+	public function actionRegister()
+	{
+		$model = new RegisterForm;
+
+		$processOutput = true;
+		// collect user input data
+		if(isset($_POST['RegisterForm']))
+		{
+			$model->attributes = $_POST['RegisterForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {
+				//$users=Users::model()->findByPk(Yii::app()->user->id);
+				//$users->password=md5($model->newPassword);
+				
+				//if($users->save()) // save the change to database
+				
+				$users = new Users;
+				$users->realname = $model->name;
+				$users->email = $model->email;
+				$users->password = md5($model->password);
+				$users->save();
+				
+				if($users->save()) // save the change to database
+				{
+					echo CJSON::encode(array("result"=> "1"));				
+				} 
+				else 
+				{
+					echo CJSON::encode(array("result"=> "0"));				
+				}
+				Yii::app()->end();
+			}
+				
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+
+			}
+		}	
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+
+		$this->renderPartial('register',array('model'=>$model), false, $processOutput);		
 	}	
 }
+
+	
