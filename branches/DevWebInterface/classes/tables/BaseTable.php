@@ -92,7 +92,7 @@ class BaseTable
 
 		$sql = 'INSERT INTO ' . $this->tableName . '(' . $sqlElementsPart . ')' . 'VALUES(' . $sqlValuesPart .')';
 
-		echo $sql;
+		//echo $sql;
 		
 		$result = false;
 		if($this->dbc->query($sql) != false)
@@ -121,7 +121,7 @@ class BaseTable
 			
 			$sql .= ' WHERE ' . $sqlConditionPart;
 			
-			echo $sql;
+			//echo $sql;
 		}
 		
 		$sql .= ' LIMIT '. $limit;
