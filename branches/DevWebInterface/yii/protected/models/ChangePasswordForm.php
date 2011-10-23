@@ -3,7 +3,7 @@
 /**
  * ChangePasswordForm class.
  * ChangePasswordForm is the data structure for changing
- * user pasword. It is used by the 'changePassword' action of 'SiteController'.
+ * user password. It is used by the 'changePassword' action of 'SiteController'.
  */
 class ChangePasswordForm extends CFormModel
 {
@@ -13,8 +13,8 @@ class ChangePasswordForm extends CFormModel
 
 	/**
 	 * Declares the validation rules.
-	 * The rules state that username and password are required,
-	 * and password needs to be authenticated.
+	 * The rules state that currentPassword, newPassword and newPasswordAgain are required,
+	 * currentPassword needs to be checked.
 	 */
 	public function rules()
 	{
@@ -24,7 +24,7 @@ class ChangePasswordForm extends CFormModel
 			'message'=>'Field cannot be blank!'),
 			// current password needs to be checked
 			array('currentPassword', 'checkCurrentPassword'),			
-			// password needs to be authenticated
+			// password needs to be same
 			array('newPasswordAgain', 'compare', 'compareAttribute'=>'newPassword',
 			'message'=>'Passwords not same!'),
 			
