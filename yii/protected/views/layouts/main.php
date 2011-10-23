@@ -110,27 +110,29 @@
 
 ///////////////////////////// User Login Window ///////////////////////////	
 	echo '<div id="userLoginWindow"></div>';
-///////////////////////////// Register Window ///////////////////////////	
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'registerWindow',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Register'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false      
-	    ),
-	));
+///////////////////////////// Register Window ///////////////////////////
+	echo '<div id="registerWindow"></div>';	
 	
-	echo	'<div id="registerForm" class="">		
-		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
-		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
-		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
-		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
-		<input type="button" id="registerButton" value="Register" />
-	</div>';
-				
-	$this->endWidget('zii.widgets.jui.CJuiDialog');
+//	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+//	    'id'=>'registerWindow',
+//	    // additional javascript options for the dialog plugin
+//	    'options'=>array(
+//	        'title'=>Yii::t('general', 'Register'),
+//	        'autoOpen'=>false,
+//	        'modal'=>true, 
+//			'resizable'=>false      
+//	    ),
+//	));
+//	
+//	echo	'<div id="registerForm" class="">		
+//		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
+//		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
+//		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
+//		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
+//		<input type="button" id="registerButton" value="Register" />
+//	</div>';
+//				
+//	$this->endWidget('zii.widgets.jui.CJuiDialog');
 
 ///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
@@ -226,9 +228,18 @@
 												
 												echo ' '; //To separate Login and Register
 												
-												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
-	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
-												));												
+												echo CHtml::ajaxLink(Yii::t('general', 'Register'), $this->createUrl('site/register'), 
+	 												array(
+	    												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
+	 													'update'=> '#registerWindow',
+													),
+													array(
+														'id'=>'showRegisterWindow'));												
+												
+												
+//												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
+//	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
+//												));												
 									?>		
 		 						</div>
 	 						<?php }?>
