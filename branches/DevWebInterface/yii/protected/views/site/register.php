@@ -21,8 +21,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 						 ),
 	
 	)); ?>
-	
-
 		<div class="row">
 			<?php echo $form->labelEx($model,'email'); ?>
 			<?php echo $form->textField($model,'email'); ?>
@@ -68,6 +66,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#registerWindow").dialog("close");
+																			
+																			$("#messageWindow").dialog("open");
 																		}
 																	}
 																	catch (error){
@@ -88,4 +88,28 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 </div>
 <?php 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
+?>
+
+
+<?php 
+$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'messageWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Info Message'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=>'520px',
+			'rows'=>1,
+			'htmlOptions'=>array('style'=>'text-align: center'),
+	    ),
+	));
+?>	
+	
+	<div align="center" class="row"> <?php echo '<br/> An activation mail is sent to your e-mail address <br/><br/>'; ?> </div>
+	<div align="center" class="row buttons"> <?php echo CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#messageWindow").dialog("close"); return false;','width'=>'200px'), null); ?> </div>
+		 		
+<?php	
+$this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>
