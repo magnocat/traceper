@@ -102,63 +102,20 @@
 			'width'=> '600px'      
 	    ),
 	));
-	
+
 	echo '<div id="logo"></div>';	
-	echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Eren Alp Celik - erenalpcelik@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
+	echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 
 ///////////////////////////// User Login Window ///////////////////////////	
 	echo '<div id="userLoginWindow"></div>';
 ///////////////////////////// Register Window ///////////////////////////
-	echo '<div id="registerWindow"></div>';	
-	
-//	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-//	    'id'=>'registerWindow',
-//	    // additional javascript options for the dialog plugin
-//	    'options'=>array(
-//	        'title'=>Yii::t('general', 'Register'),
-//	        'autoOpen'=>false,
-//	        'modal'=>true, 
-//			'resizable'=>false      
-//	    ),
-//	));
-//	
-//	echo	'<div id="registerForm" class="">		
-//		<div id="registerEmailLabel">E-mail:</div><input class="registerFormText" type="text" id="registerEmail" /><br />
-//		<div id="registerNameLabel">Name:</div><input class="registerFormText" type="text" id="registerName" /><br />
-//		<div id="registerPasswordLabel">Password:</div><input class="registerFormText" type="password" id="registerPassword" /><br />
-//		<div id="registerConfirmPasswordLabel">Password Again:</div><input class="registerFormText" type="password" id="registerConfirmPassword" /><br />
-//		<input type="button" id="registerButton" value="Register" />
-//	</div>';
-//				
-//	$this->endWidget('zii.widgets.jui.CJuiDialog');
-
+	echo '<div id="registerWindow"></div>';
 ///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
 ///////////////////////////// Invite User Window ///////////////////////////
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'inviteUserWindow',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Send invitations to your friends'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false,
-			'width'=> '340px'      
-	    ),
-	));
-	
-	echo '<div id="InviteUserForm" class="">  
-		<div id="inviteUserEmailLabel"></div> 
-		<textarea name="useremail" id="useremail" style="width:300px; height:100px; resize:none"></textarea><br/>		
-		<div id="inviteUserInvitationMessage"></div>		
-		<textarea name="invitationMessage" id="invitationMessage" style="width:300px; height:100px; resize:none"></textarea><br/>		
-		<input type="button" name="inviteUserButton" id="inviteUserButton"/>&nbsp; <input type="button" name="cancel" id="inviteUserCancel"/></div>
-	</div>';
-			
-	$this->endWidget('zii.widgets.jui.CJuiDialog');	
-
+	echo '<div id="inviteUsersWindow"></div>';
 ///////////////////////////// Friend Request Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'friendRequestsWindow',
@@ -234,12 +191,7 @@
 	 													'update'=> '#registerWindow',
 													),
 													array(
-														'id'=>'showRegisterWindow'));												
-												
-												
-//												echo CHtml::link(Yii::t('general', 'Register'), '#', array(
-//	    											'onclick'=>'$("#registerWindow").dialog("open"); return false;',
-//												));												
+														'id'=>'showRegisterWindow'));																							
 									?>		
 		 						</div>
 	 						<?php }?>
@@ -261,14 +213,24 @@
  											'update'=> '#changePasswordWindow',
 										),
 										array(
-											'id'=>'showChangePasswordWindow')); 	
+											'id'=>'showChangePasswordWindow')); 
+
+ 									echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
+	 													<img src="images/invite.png"  /><div></div>
+	 												 </div>', $this->createUrl('site/inviteUsers'), 
+ 										array(
+    										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
+ 											'update'=> '#inviteUsersWindow',
+										),
+										array(
+											'id'=>'showInviteUsersWindow'));										
 																			
 
- 									echo CHtml::link('<div class="userOperations" id="inviteUser">
-	 													<img src="images/invite.png"  /><div></div>
-	 												 </div>', '#', array(
-    												'onclick'=>'$("#inviteUserWindow").dialog("open"); return false;',
-									));	
+// 									echo CHtml::link('<div class="userOperations" id="inviteUser">
+//	 													<img src="images/invite.png"  /><div></div>
+//	 												 </div>', '#', array(
+//    												'onclick'=>'$("#inviteUserWindow").dialog("open"); return false;',
+//									));	
 									
  									echo CHtml::link('<div class="userOperations" id="friendRequests">	
 	 													<img src="images/friends.png"  /><div></div>
@@ -278,7 +240,7 @@
 
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
-	 												 </div>', $this->createUrl('site/logout'), array());										
+	 												 </div>', $this->createUrl('site/logout'), array()); 																			
 	 							?>
 	 						</div>
 	 						
