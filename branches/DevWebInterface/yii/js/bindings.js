@@ -55,7 +55,7 @@ function bindElements(langOperator, trackerOp)
 			});
 		}		
 	});
-	
+/*	
 	$('#photo_title').click(function(){
 		if ($('#photos').children().size() == 0){
 			trackerOp.getImageList(1, function(){
@@ -96,7 +96,7 @@ function bindElements(langOperator, trackerOp)
 		$('#user_title div').removeClass('arrowImageRight');
 		$('#photo_title').removeClass('active_title');
 	});
-	
+*/	
 	/*$('#friendRequest_title').click(function(){
 		TRACKER.getFriendRequests(1);
 		$('#photosList').slideUp('fast',function(){
@@ -273,8 +273,8 @@ function setLanguage(langOperator){
 	
 	$('title').text(langOperator.mark);	
 	$('a[href=#auLink]').html(langOperator.aboutTitle);
-	$("#lists #user_title").append(langOperator.usersTitle);
-	$("#lists #photo_title").append(langOperator.photosTitle);
+//	$("#lists #user_title").append(langOperator.usersTitle);
+//	$("#lists #photo_title").append(langOperator.photosTitle);
 	$("#friendsList .searchResults a[href=#returnToUserList]").html(langOperator.returnToUserListLink);
 	$("#photosList .searchResults a[href=#returnToPhotoList]").html(langOperator.returnToPhotoListLink)
 	$("#photosList .search #searchBox").attr('value', langOperator.photosSearchBox);

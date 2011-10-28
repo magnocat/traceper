@@ -55,10 +55,10 @@
 				//TODO: updateUserListInterval 
 				//TODO: queryIntervalForChangedUsers 
    				var trackerOp = new TrackerOperator('../index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
-				trackerOp.setLangOperator(langOp),
+				trackerOp.setLangOperator(langOp);
 				//TODO: setUserId should be a real id
-				trackerOp.setUserId(0);
-		  		trackerOp.getFriendList(1);	   				
+//				trackerOp.setUserId(0);
+//		  		trackerOp.getFriendList(1);	   				
 			}
    			catch (e) {
 				
@@ -75,6 +75,15 @@
       			bindElements(langOp, trackerOp);			    
       			$('#user_title').click();",
 		CClientScript::POS_READY);
+		
+		 if (Yii::app()->user->isGuest == false){
+		 		Yii::app()->clientScript->registerScript('getFirstFriendListPage',
+		 												CHtml::ajax(array(
+																			'url'=>$this->createUrl('users/getFriendList'),
+																			'update'=>'#friends',
+																	)),
+		 												CClientScript::POS_READY); 				
+		 }
 	
 	?>
 	<script type="text/javascript">		
@@ -245,38 +254,69 @@
 	 						</div>
 	 						
 	 						<div id='lists'> 	
-								<div class='titles'>									
-									<div class='title active_title' id='user_title'><div class='arrowImage'></div></div>
-									<div class="title" id="photo_title"><div class="arrowImage"></div></div>
+								<div class='titles'>		
 									<?php
-									/* 	
-										echo CHtml::link('<div class="title" id="photo_title"><div class="arrowImage"></div></div>', '#', array(
-	    									'onclick'=>'$("#photoCommentWindow").dialog("open"); return false;',
-										));
-									*/	
+						 			
+										echo CHtml::ajaxLink('<div>Users</div>', $this->createUrl('users/getFriendList'), 
+ 														array(
+				 											'update'=> '#friends',
+				 											'complete'=>'function(result){ $("#friendsList").show();$("#photosList").hide(); return false;}',
+														), 
+														array(
+															'id'=>'kk',
+														)); 
+									?>								
+				
+						<!-- 			
+									<div class="title" id="photo_title"><div class="arrowImage"></div></div>
+						 -->
+						 
+						 			<?php
+									echo CHtml::ajaxLink('<div  id="image_title">Photos</div>', $this->createUrl('image/getList'), 
+ 														array(
+				 											'update'=> '#photos',
+				 											'complete'=>'function(result){ $("#friendsList").hide();$("#photosList").show(); return false;}',
+														), 
+														array(
+															'id'=>'imageTitle',
+														)); 
 									?>																											
 								</div>  
-								<div id='friendsList'>											
+								<div id='friendsList'>
+									<div id="userSearch">
+											<?php $this->renderPartial('//users/searchUser', array('model'=>new SearchForm())); ?>
+									</div>
+							<!-- 												
 									<div class='search'>						
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
+							 -->
 									<div id="friends"></div>
+							<!--  
 									<div class='searchResults'>
 										<a href='#returnToUserList'></a>	
 										<div id='results'></div>								
-									</div>		
+									</div>
+							-->				
 								</div> 
-								<div id="photosList">									
+								<div id="photosList">	
+									<div id="imageSearch">
+											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
+									</div>		
+							<!-- 															
 									<div class='search'>
 										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
 									</div>
+							
 									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
-									<div id="photos">
+							 -->		<div id="photos">
 										</div>
+							<!--  			
 									<div class='searchResults'>
 										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
 										<div id='results'></div>								
 									</div>
+							-->
 								</div>		
 							</div> 													
 					</div>
