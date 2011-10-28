@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 09, 2011 at 12:24 PM
+-- Generation Time: Oct 28, 2011 at 05:50 PM
 -- Server version: 5.1.54
 -- PHP Version: 5.3.5-1ubuntu7.2
 
@@ -28,19 +28,35 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `traceper_friends` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `friend1` int(11) DEFAULT NULL,
-  `friend2` int(11) DEFAULT NULL,
+  `friend1` int(11) unsigned NOT NULL,
+  `friend2` int(11) unsigned NOT NULL,
   `status` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `friend1` (`friend1`,`friend2`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=39 ;
+  KEY `friend1` (`friend1`),
+  KEY `friend2` (`friend2`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=17 ;
 
 --
 -- Dumping data for table `traceper_friends`
 --
 
 INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend2`, `status`) VALUES
-(1, 1, 2, 1);
+(1, 1, 2, 1),
+(2, 1, 3, 1),
+(3, 1, 4, 1),
+(4, 1, 5, 1),
+(5, 1, 6, 1),
+(6, 1, 7, 1),
+(7, 1, 8, 1),
+(8, 1, 9, 1),
+(9, 1, 10, 1),
+(10, 1, 11, 1),
+(11, 1, 12, 1),
+(12, 1, 13, 1),
+(13, 1, 14, 1),
+(14, 1, 15, 1),
+(15, 1, 16, 1),
+(16, 1, 17, 1);
 
 -- --------------------------------------------------------
 
@@ -110,14 +126,7 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   KEY `new_index` (`userId`),
   KEY `index2` (`uploadTime`),
   KEY `publicData` (`publicData`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
-
---
--- Dumping data for table `traceper_upload`
---
-
-INSERT INTO `traceper_upload` (`Id`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`) VALUES
-(1, 1, 0.000000, 0.000000, 0.000000, '0000-00-00 00:00:00', 0);
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 -- --------------------------------------------------------
 
@@ -175,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `traceper_upload_user_relation` (
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_users` (
-  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `password` char(32) NOT NULL,
   `group` int(10) unsigned NOT NULL DEFAULT '0',
   `latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
@@ -192,16 +201,39 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   PRIMARY KEY (`Id`),
   UNIQUE KEY `email` (`email`),
   KEY `dataArrivedTime` (`dataArrivedTime`),
-  KEY `realname` (`realname`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=3 ;
+  KEY `realname` (`realname`) USING BTREE,
+  KEY `password` (`password`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=25 ;
 
 --
 -- Dumping data for table `traceper_users`
 --
 
 INSERT INTO `traceper_users` (`Id`, `password`, `group`, `latitude`, `longitude`, `altitude`, `realname`, `email`, `dataArrivedTime`, `deviceId`, `status_message`, `status_source`, `status_message_time`, `dataCalculatedTime`) VALUES
-(1, 'e10adc3949ba59abbe56e057f20f883e', 0, 49.920925, 22.868595, 32.868595, 'Test', 'test@traceper.com', '2011-06-22 23:46:33', '351751049911319', '', 1, '2010-10-31 20:10:09', '2011-08-26 00:03:50'),
-(2, '', 0, 0.000000, 0.000000, 0.000000, 'test2', 'test2@traceper.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00');
+(1, 'e10adc3949ba59abbe56e057f20f883e', 0, 37.422005, -122.084095, -122.084095, 'Test', 'test@traceper.com', '2011-10-22 23:18:44', '000000000000000', '', 1, '2010-10-31 20:10:09', '2011-10-21 21:00:00'),
+(2, '', 0, 0.000000, 0.000000, 0.000000, 'test2', 'test2@traceper.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(3, '', 0, 0.000000, 0.000000, 0.000000, '1', '2', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(4, '', 0, 0.000000, 0.000000, 0.000000, '2', '3', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(5, '', 0, 0.000000, 0.000000, 0.000000, '4', '4', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(6, '', 0, 0.000000, 0.000000, 0.000000, '5', '5', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(7, '', 0, 0.000000, 0.000000, 0.000000, '6', '6', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(8, '', 0, 0.000000, 0.000000, 0.000000, '7', '7', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(9, '', 0, 0.000000, 0.000000, 0.000000, '8', '8', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(10, '', 0, 0.000000, 0.000000, 0.000000, '9', '9', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(11, '', 0, 0.000000, 0.000000, 0.000000, '10', '10', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(12, '', 0, 0.000000, 0.000000, 0.000000, '11', '11', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(13, '', 0, 0.000000, 0.000000, 0.000000, '12', '12', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(14, '', 0, 0.000000, 0.000000, 0.000000, '13', '13', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(15, '', 0, 0.000000, 0.000000, 0.000000, '14', '14', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(16, '', 0, 0.000000, 0.000000, 0.000000, '15', '15', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(17, '', 0, 0.000000, 0.000000, 0.000000, '16', '16', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(18, '', 0, 0.000000, 0.000000, 0.000000, '17', '17', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(19, '', 0, 0.000000, 0.000000, 0.000000, '18', '18', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(20, '', 0, 0.000000, 0.000000, 0.000000, '19', '19', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(21, '', 0, 0.000000, 0.000000, 0.000000, '20', '20', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(22, '', 0, 0.000000, 0.000000, 0.000000, '21', '21', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(23, '', 0, 0.000000, 0.000000, 0.000000, '22', '22', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00'),
+(24, '', 0, 0.000000, 0.000000, 0.000000, '23', '23', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -259,11 +291,74 @@ CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
   PRIMARY KEY (`Id`),
   KEY `new_index` (`userId`),
   KEY `time` (`dataArrivedTime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `traceper_user_was_here`
+--
+
+INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitude`, `altitude`, `longitude`, `deviceId`, `dataCalculatedTime`) VALUES
+(1, 1, '2011-10-22 23:18:44', 37.422005, -122.084095, -122.084095, '000000000000000', '2011-10-21 21:00:00');
 
 -- --------------------------------------------------------
 
+--
+-- Table structure for table `tree_elements`
+--
 
+CREATE TABLE IF NOT EXISTS `tree_elements` (
+  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `position` int(10) unsigned NOT NULL DEFAULT '0',
+  `ownerEl` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'parent',
+  `slave` binary(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=75 ;
+
+--
+-- Dumping data for table `tree_elements`
+--
+
+INSERT INTO `tree_elements` (`Id`, `name`, `position`, `ownerEl`, `slave`) VALUES
+(50, 'jhjhjhdd', 0, 51, '1'),
+(51, 'uhuhuh', 0, 0, '0'),
+(52, 'kskskskks', 4, 51, '1'),
+(53, 'latifdfd', 2, 51, '1'),
+(54, 'jnjnnj', 6, 51, '1'),
+(55, 'salih', 2, 63, '1'),
+(56, 'jjdjdjd', 7, 51, '1'),
+(58, 'kdkkd', 3, 51, '1'),
+(61, 'kdkd', 5, 51, '0'),
+(62, 'jdjdjd', 0, 61, '0'),
+(63, 'ueye', 8, 51, '0'),
+(64, 'kdkd', 0, 63, '1'),
+(65, 'nhb', 1, 63, '0'),
+(66, 'btry', 1, 51, '0'),
+(67, 'kdkd', 9, 51, '0'),
+(68, 'njhy', 0, 67, '0'),
+(69, 'bvc', 0, 68, '0'),
+(70, 'nht', 0, 69, '1'),
+(71, 'bgvf', 1, 69, '0'),
+(72, 'mnjh', 10, 51, '0'),
+(73, 'oooo', 11, 51, '1'),
+(74, 'nnnn', 12, 51, '1');
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `traceper_friends`
+--
+ALTER TABLE `traceper_friends`
+  ADD CONSTRAINT `traceper_friends_ibfk_1` FOREIGN KEY (`friend1`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `traceper_friends_ibfk_2` FOREIGN KEY (`friend2`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `traceper_upload`
+--
+ALTER TABLE `traceper_upload`
+  ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_friends` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
