@@ -164,9 +164,6 @@ a {
 	width:80px
 }
 
-#changePasswordForm #changePasswordButton, #changePasswordForm #changePasswordCancel{
-	width:80px;
-}
 #projectteam{
 	line-height: 20px;
 }
@@ -247,16 +244,20 @@ a {
 	background: url("../images/image.png") no-repeat 22px center;
 	position: relative;
 }
+/*
 #lists ul {
 	list-style:none;
 	display:block;
 	line-height:25px;
 	padding:0px;	
 }
+*/
+/*
 #lists li a{
 	display:block;
 	clear: both;
 }
+*/
 #lists #photosList li a{
 	padding:2px;
 	line-height:17px;

@@ -38,7 +38,7 @@ class UsersController extends Controller
 		
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		
-		$sql = 'SELECT u.Id as id, u.realname, u.latitude, u.longitude 
+		$sql = 'SELECT u.Id as id, u.realname
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
@@ -60,6 +60,45 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		$this->renderPartial('userList',array('dataProvider'=>$dataProvider), false, true);
 
+	}
+	
+	public function actionSearch() {
+		$model = new SearchForm();
+		
+		$dataProvider = null;
+		if(isset($_REQUEST['SearchForm'])) 
+		{
+			$model->attributes = $_REQUEST['SearchForm'];
+			if ($model->validate()) {
+				
+				$sqlCount = 'SELECT count(*)
+					 FROM '. Users::model()->tableName() . ' u 
+					 WHERE realname like "%'. $model->keyword .'%"';
+		
+				$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		
+				$sql = 'SELECT u.Id as id, u.realname 
+						FROM '. Users::model()->tableName() . ' u 
+						WHERE u.realname like "%'. $model->keyword .'%"' ;
+		
+				
+				$dataProvider = new CSqlDataProvider($sql, array(
+		    											'totalItemCount'=>$count,
+													    'sort'=>array(
+						        							'attributes'=>array(
+						             									'id', 'realname',
+															),
+														),
+													    'pagination'=>array(
+													        'pageSize'=>5,
+															'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
+														),
+													));
+											
+			}
+		}
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		$this->renderPartial('searchUser',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);	
 	}
 
 
