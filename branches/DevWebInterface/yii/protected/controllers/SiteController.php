@@ -182,8 +182,8 @@ class SiteController extends Controller
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 					$headers  .= 'From: contact@traceper.com' . "\r\n";
-					echo $message;
-					//mail($model->email, "Traceper Activation", $message, $headers);					
+					//echo $message;
+					mail($model->email, "Traceper Activation", $message, $headers);					
 					
 					echo CJSON::encode(array("result"=> "1"));				
 				} 
