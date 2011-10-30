@@ -30,6 +30,9 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -48,6 +51,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.traceper.R;
+import com.traceper.android.CameraController;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.tools.XMLHandler;
@@ -58,8 +63,9 @@ public class AppService extends Service implements IAppService{
 	private LocationManager locationManager = null;
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
-	private boolean sendlocation= false;
-
+	
+	private NotificationManager mManager;
+	private static int NOTIFICATION_ID = 0;
 	
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
@@ -86,8 +92,10 @@ public class AppService extends Service implements IAppService{
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
 	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-
-
+	private boolean gps_enabled = false;
+	private boolean network_enabled = false;
+	
+  
 	public class IMBinder extends Binder {
 		public IAppService getService() {
 			return AppService.this;
@@ -105,6 +113,8 @@ public class AppService extends Service implements IAppService{
 		xmlHandler = new XMLHandler();
 		locationHandler = new LocationHandler();
 
+	
+		
 		networkStateReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -122,21 +132,61 @@ public class AppService extends Service implements IAppService{
 	public void setAutoCheckin(boolean enable){
 		
 		if (enable == true) {
-			
-			Thread locationUpdates = new Thread() {
-				public void run() {
-					Looper.prepare();
 
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-							locationHandler);				       
+			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-					Looper.loop();
-				}
-			};
-			locationUpdates.start();
+			final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+			notification.setLatestEventInfo(AppService.this,
+					getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
+
+			mManager.notify(NOTIFICATION_ID , notification);
 			
-		}else{
-			locationManager.removeUpdates(locationHandler);
+			try {
+				gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			} catch (Exception ex) {
+			}
+			try {
+				network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+			} catch (Exception ex) {
+			}
+	
+
+			if (gps_enabled) {
+				Thread locationUpdates = new Thread() {
+					public void run() {
+						Looper.prepare();
+
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+								locationHandler);				       
+
+						Looper.loop();
+					}
+				};
+				locationUpdates.start();
+				
+			}else{
+				locationManager.removeUpdates(locationHandler);
+			}
+			if (network_enabled) {
+				Thread locationUpdates = new Thread() {
+					public void run() {
+						Looper.prepare();
+
+						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minDataSentInterval, minDistanceInterval, 
+								locationHandler);				       
+
+						Looper.loop();
+					}
+				};
+				locationUpdates.start();
+				
+			}else{
+				locationManager.removeUpdates(locationHandler);
+			}
+
 		}
 		
 	}
@@ -145,26 +195,65 @@ public void sendLocationNow(boolean enable){
 		
 		if (enable == true) {
 			
-			sendlocation=true;
-			
-			Thread locationUpdates = new Thread() {
-				public void run() {
-					Looper.prepare();
+			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-							locationHandler);				       
+			final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
-					Looper.loop();
-				}
-			};
-			locationUpdates.start();
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+			notification.setLatestEventInfo(AppService.this,
+					getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
+
+			mManager.notify(NOTIFICATION_ID , notification);
 			
-		}else{
-			locationManager.removeUpdates(locationHandler);
+			try {
+				gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			} catch (Exception ex) {
+			}
+			try {
+				network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+			} catch (Exception ex) {
+			}
+	
+
+			if (gps_enabled) {
+				Thread locationUpdates = new Thread() {
+					public void run() {
+						Looper.prepare();
+
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
+								locationOneTime);				       
+
+						Looper.loop();
+					}
+				};
+				locationUpdates.start();
+				
+			}else{
+				locationManager.removeUpdates(locationOneTime);
+			}
+			if (network_enabled) {
+				Thread locationUpdates = new Thread() {
+					public void run() {
+						Looper.prepare();
+
+						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minDataSentInterval, minDistanceInterval, 
+								locationOneTime);				       
+
+						Looper.loop();
+					}
+				};
+				locationUpdates.start();
+				
+			}else{
+				locationManager.removeUpdates(locationOneTime);
+			}
+			
 		}
 		
 	}
 	
+
 	
 	private void sendPendingLocations(){
 		Iterator<Location> iterator = pendingLocations.iterator();
@@ -533,10 +622,18 @@ public void sendLocationNow(boolean enable){
 					sendPendingLocations();
 					// send last location data
 					result = sendLocationDataAndParseResult(loc);	
-					// remove location update
-					if (sendlocation==true) {
-						locationManager.removeUpdates(locationHandler);			
-					}
+					
+					
+					mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+					final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+					final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+					
+					notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sent_succes), contentIntent);
+					mManager.notify(NOTIFICATION_ID, notification);
+			
 				}
 				if (connected == false || result != HTTP_RESPONSE_SUCCESS){
 					pendingLocations.add(loc);
@@ -555,6 +652,46 @@ public void sendLocationNow(boolean enable){
 		}	
 		
 	}
+	
+	 LocationListener locationOneTime = new LocationListener() {
+	        public void onLocationChanged(Location location) {
+	         
+	        	if (location != null) {
+					Log.i("location listener", "onLocationChanged");
+					boolean connected = isNetworkConnected();
+					Integer result = null;
+					if (connected == true) {
+						// send pending locations if any...
+						sendPendingLocations();
+						// send last location data
+						result = sendLocationDataAndParseResult(location);	
+						// remove location update
+																
+							locationManager.removeUpdates(locationOneTime);			
+						
+							mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+							final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+							final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+							
+							notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sent_succes), contentIntent);
+							mManager.notify(NOTIFICATION_ID, notification);
+							
+					}
+					if (connected == false || result != HTTP_RESPONSE_SUCCESS){
+						pendingLocations.add(location);
+					}
+
+				}
+	        	
+	        	
+	        }
+	        public void onProviderDisabled(String provider) {}
+	        public void onProviderEnabled(String provider) {}
+	        public void onStatusChanged(String provider, int status, Bundle extras) {}
+	    };
 	
 	public int updateLocation(String status){
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, locationHandler);
