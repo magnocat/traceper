@@ -5,13 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -107,13 +110,17 @@ public class Main extends Activity
 		autoSendLocationCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
 		sendLocation = (Button) findViewById(R.id.send_location);
-		
-		
+		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+		   
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 		sendLocation.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
+		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+	          createGpsDisabledAlert();
+	     }
+		
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				Intent i = new Intent(Main.this, CameraController.class);
@@ -131,13 +138,13 @@ public class Main extends Activity
 				editor.commit();
 				if (isChecked) { 
 					appService.setAutoCheckin(true);
-					sendLocation.setEnabled(false);
+					//sendLocation.setEnabled(false);
 					Toast.makeText(getBaseContext(), "Auto sending is ready!", Toast.LENGTH_SHORT).show(); 
 				} 
 				else 
 				{ 
 					appService.setAutoCheckin(false);
-					sendLocation.setEnabled(true);
+					//sendLocation.setEnabled(true);
 					Toast.makeText(getBaseContext(), "Auto sending is disable!", Toast.LENGTH_SHORT).show(); 
 				} 
 
@@ -149,9 +156,10 @@ public class Main extends Activity
 			@Override
 			public void onClick(View v) {
 				         if (autoSendLocationCheckbox.isChecked()) {
-				        	 autoSendLocationCheckbox.setChecked(false);
+				        	autoSendLocationCheckbox.setChecked(false);
 		         }
 				appService.sendLocationNow(true);
+				
 			}
 	
 		});
@@ -160,7 +168,32 @@ public class Main extends Activity
 
 	}
 
+//Gps provider status control
+	private void createGpsDisabledAlert(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Your GPS is disabled! Would you like to enable it?")
+		     .setCancelable(false)
+		     .setPositiveButton("Enable GPS",
+		          new DialogInterface.OnClickListener(){
+		          public void onClick(DialogInterface dialog, int id){
+		               showGpsOptions();
+		          }
+		     });
+		     builder.setNegativeButton("Do nothing",
+		          new DialogInterface.OnClickListener(){
+		          public void onClick(DialogInterface dialog, int id){
+		               dialog.cancel();
+		          }
+		     });
+		AlertDialog alert = builder.create();
+		alert.show();
+		}
 
+		private void showGpsOptions(){
+				Intent gpsOptionsIntent = new Intent(
+						android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+				startActivity(gpsOptionsIntent);
+		}
 
 	@Override
 	protected void onPause() 

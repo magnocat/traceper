@@ -61,4 +61,6 @@
 <string name="traceper_login">Traceper-Login</string>
 <string name="traceper_register">Traceper-Register</string>
 <string name="saving">Saving, please wait...</string>
+<string name="waiting_location">Waiting for location</string>
+<string name="sent_succes">Location sent successfully</string>
 </resources>
