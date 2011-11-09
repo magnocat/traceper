@@ -33,7 +33,12 @@
     		android:textSize="18px" 
     		android:text="calculating gps location..."   	
     	/>
-    	<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/send_location" android:text="Send Location" android:textSize="15px" android:width="200px"></Button>
+    	<Button android:layout_width="wrap_content"
+    	 android:layout_height="wrap_content" 
+    	 android:id="@+id/send_location" 
+    	 android:text="Send Location" 
+    	 android:textSize="15px" 
+    	 android:width="200px"></Button>
     	<Button 
     		android:id="@+id/take_upload_photo_button" 
     		android:text="Take and upload photo"
@@ -42,6 +47,12 @@
     		android:layout_height="wrap_content" 
     		
     	android:width="200px"/>
+    	<Button android:layout_width="wrap_content" 
+    	android:layout_height="wrap_content" 
+    	android:id="@+id/map_view"
+    	 android:textSize="15px" 
+    	 android:width="200px" 
+    	 android:text="Location On Map"></Button>
     </LinearLayout>
     <CheckBox android:layout_width="wrap_content" 
      android:layout_height="wrap_content" android:text="Auto Send" android:id="@+id/auto_check"></CheckBox>

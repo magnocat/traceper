@@ -16,4 +16,5 @@ public class Configuration {
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
 	
 
+	
 }

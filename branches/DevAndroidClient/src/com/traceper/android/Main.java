@@ -31,6 +31,8 @@ import android.widget.Toast;
 import android.os.Handler;
 
 
+
+
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
@@ -46,9 +48,11 @@ public class Main extends Activity
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
 	private Button sendLocation;
+	private Button mapviewb;	
 	private CheckBox autoSendLocationCheckbox; 
 	private Handler handler = new Handler();
-
+	private static double lati ;
+	private static double longi;
 
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
@@ -62,8 +66,39 @@ public class Main extends Activity
 				{
 					Long time = (Long) extra.getLong(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 					lastDataSentTimeText.setText(getFormattedDate(time));
+										
 				}
+				
+				
 			}
+			
+			Bundle latiextra = intent.getExtras();
+			if (latiextra != null)
+			{
+				String action = intent.getAction();
+				if (action.equals(IAppService.L_LATITUDE))
+				{
+					lati= (double) latiextra.getDouble(IAppService.L_LATITUDE);
+					
+										
+				}
+				
+				
+			}
+			Bundle longiextra = intent.getExtras();
+			if (longiextra != null)
+			{
+				String action = intent.getAction();
+				if (action.equals(IAppService.L_LONGITUDE))
+				{
+					longi = (double) longiextra.getDouble(IAppService.L_LONGITUDE);
+					
+										
+				}
+				
+				
+			}
+			
 		}
 
 	};
@@ -110,10 +145,13 @@ public class Main extends Activity
 		autoSendLocationCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
 		sendLocation = (Button) findViewById(R.id.send_location);
+		mapviewb = (Button) findViewById(R.id.map_view);
+		
 		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		   
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 		sendLocation.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
+		mapviewb.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mapmode,0,0,0);
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
@@ -164,7 +202,24 @@ public class Main extends Activity
 	
 		});
 
-
+		mapviewb.setOnClickListener(new OnClickListener() {
+		
+			@Override
+			public void onClick(View v) {
+				
+				if (lati != 0.0 & longi != 0.0){
+				
+				MapViewController.putLatLong(lati, longi);
+				Intent i = new Intent(Main.this, MapViewController.class);	
+				startActivity(i);
+			
+				}else{
+				Toast.makeText(getBaseContext(), "Please take location!", Toast.LENGTH_SHORT).show(); 
+				}
+					
+				
+			}
+		});
 
 	}
 
@@ -209,8 +264,9 @@ public class Main extends Activity
 		super.onResume();
 		bindService(new Intent(Main.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
 		IntentFilter i = new IntentFilter();
-		i.addAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);	
-
+		i.addAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+		i.addAction(IAppService.L_LATITUDE);	
+		i.addAction(IAppService.L_LONGITUDE);
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
 
