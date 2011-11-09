@@ -307,12 +307,26 @@ public void sendLocationNow(boolean enable){
 		int result = this.evaluateResult(httpRes);
 		if (result == HTTP_RESPONSE_SUCCESS)
 		{			
-			lastLocationSentTime = System.currentTimeMillis();
-			Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-			i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-			i.putExtra(IAppService.LAST_LOCATION_DATA_SENT_TIME, lastLocationSentTime);
-			sendBroadcast(i);
-			Log.i("broadcast sent", "sendLocationData broadcast sent");			
+			  lastLocationSentTime = System.currentTimeMillis();
+              Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+              i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+              i.putExtra(IAppService.LAST_LOCATION_DATA_SENT_TIME, lastLocationSentTime);
+              sendBroadcast(i);
+              Log.i("broadcast sent", "sendLocationData broadcast sent");		
+              
+              
+              Intent aa = new Intent(IAppService.L_LATITUDE);
+              aa.setAction(IAppService.L_LATITUDE);
+              aa.putExtra(IAppService.L_LATITUDE,latitude);
+              sendBroadcast(aa);
+              Log.i("broadcast sent", "sendLocationData broadcast sent");	
+              
+              Intent aaa = new Intent(IAppService.L_LONGITUDE);
+              aaa.setAction(IAppService.L_LONGITUDE);
+              aaa.putExtra(IAppService.L_LONGITUDE, longitude);
+              sendBroadcast(aaa);
+              Log.i("broadcast sent", "sendLocationData broadcast sent");	
+
 		}
 		return result;	
 	}
@@ -614,6 +628,7 @@ public void sendLocationNow(boolean enable){
 	private class LocationHandler implements LocationListener{
 		public void onLocationChanged(Location loc){	
 			if (loc != null) {
+				
 				Log.i("location listener", "onLocationChanged");
 				boolean connected = isNetworkConnected();
 				Integer result = null;
@@ -657,6 +672,9 @@ public void sendLocationNow(boolean enable){
 	        public void onLocationChanged(Location location) {
 	         
 	        	if (location != null) {
+	        		
+	     
+	        		
 					Log.i("location listener", "onLocationChanged");
 					boolean connected = isNetworkConnected();
 					Integer result = null;

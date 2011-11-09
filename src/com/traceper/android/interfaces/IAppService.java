@@ -16,11 +16,12 @@ public interface IAppService {
 	//self-defined error	
 	public static final int HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE = -100;
 
-	
+		
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
 	
-	
+	public static final String L_LONGITUDE = "FASULYA";
+	public static final String L_LATITUDE = "BAMYA";
 	
 	public String getUsername();
 	
@@ -44,6 +45,6 @@ public interface IAppService {
 	
 	public int sendImage(byte[] image, boolean publicData);
 	
-	
+
 	
 }
