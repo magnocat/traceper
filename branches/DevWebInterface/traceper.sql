@@ -343,6 +343,26 @@ INSERT INTO `tree_elements` (`Id`, `name`, `position`, `ownerEl`, `slave`) VALUE
 (73, 'oooo', 11, 51, '1'),
 (74, 'nnnn', 12, 51, '1');
 
+
+-- --------------------------------------------------------
+
+--
+-- Tablo yapýsý: `traceper_geofence`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_geofence` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
+
+
 --
 -- Constraints for dumped tables
 --
