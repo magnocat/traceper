@@ -258,7 +258,7 @@ class ImageController extends Controller
 				$str .= $this->getImageXMLItem($row);
 			}
 		}
-		$extra = "thumbSuffix='thumb=ok'";
+		$extra = "thumbSuffix=\"thumb=ok\"";
 		$pageNo = $pageCount == 0 ? 0 : $pageNo;
 		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
 	}
@@ -289,7 +289,7 @@ class ImageController extends Controller
 		$row['rating'] = isset($row['rating']) ? $row['rating'] : null;
 
 
-		$str = '<image url="'. Yii::app()->homeUrl .'?r=image/get&id='. $row['id'] .'"   id="'. $row['id']  .'" byUserId="'. $row['userId'] .'" byRealName="'. $row['realname'] .'" altitude="'.$row['altitude'].'" latitude="'. $row['latitude'].'"	longitude="'. $row['longitude'] .'" rating="'. $row['rating'] .'" time="'.$row['uploadTime'].'" />';
+		$str = '<image url="'. Yii::app()->homeUrl .urlencode('?r=image/get&id='. $row['id']) .'"   id="'. $row['id']  .'" byUserId="'. $row['userId'] .'" byRealName="'. $row['realname'] .'" altitude="'.$row['altitude'].'" latitude="'. $row['latitude'].'"	longitude="'. $row['longitude'] .'" rating="'. $row['rating'] .'" time="'.$row['uploadTime'].'" />';
 
 		return $str;
 	}

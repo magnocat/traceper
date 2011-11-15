@@ -580,14 +580,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
 				TRACKER.updateFriendListPageNo = 1;
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
-
-				if (TRACKER.friendPageResetCount >= 1)
-				{
-					processImageXML(MAP, result);
-				}
-				// this is about initialization, it fetches photos data from server
-				// after fetching users data
+				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;			
 			}
 			else{
 				TRACKER.updateFriendListPageNo++;
@@ -680,9 +673,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 		var params = "r=image/getImageListXML&pageNo="+ TRACKER.bgImageListPageNo +"&"; 
 
+		if (TRACKER.allImagesFetched == true) {
+			params += "list=onlyUpdated";
+		}
 
 		TRACKER.ajaxReq(params, function(result){	
-			
 			TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
 			TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
 			
@@ -691,14 +686,18 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 			if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 				TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
-				setTimeout(TRACKER.getImageListInBg, TRACKER.getUserListInterval);
+				setTimeout(TRACKER.getImageList, TRACKER.getUserListInterval);
 			}	
 			else if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount){
+				TRACKER.bgImageListPageNo = 1;
 				TRACKER.allImagesFetched = true;
+				setTimeout(TRACKER.getImageList, TRACKER.queryUpdatedUserInterval);
 			}
+			
+			
 		}, true);	
 	}
-
+/*
 	this.searchImage = function(realname,userId, pageNo){
 		var params = "";
 		if (userId != false){
@@ -738,7 +737,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			});	
 		}	
 	}
-
+/*
 	this.deleteImage = function(imageId){
 		if (confirm(TRACKER.langOperator.confirmationMessage)) 
 		{
@@ -758,7 +757,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 
 	};
-
+*/
 	this.trackUser = function(userId){
 		
 		if (TRACKER.users[userId].friendshipStatus == "1" &&  TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
