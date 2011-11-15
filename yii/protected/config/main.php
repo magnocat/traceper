@@ -91,6 +91,9 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'webmaster@example.com',
+		'itemCountInOnePage'=>5,  // this is the number of users that are shown in a page
+		'imageCountInOnePage'=>5, // this is the number of images that are shown in a page	
+		'itemCountInDataListPage'=>20,
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
 	),
 );

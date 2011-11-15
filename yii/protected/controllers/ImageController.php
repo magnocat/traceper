@@ -11,33 +11,33 @@ class ImageController extends Controller
 		if (isset($_REQUEST['id'])) {
 			$imageId = (int)$_REQUEST['id'];
 			//TODO: refactor not to fetch every item in user table, below line fetches everything
-			$image = Upload::model()->with("user")-> findBypk($imageId); 											
+			$image = Upload::model()->with("user")-> findBypk($imageId);
 			$result = "No image with specific id";
-			if ($image != null) 
+			if ($image != null)
 			{
 				$result = "not authorized to delete";
-				if ($image->user->Id == Yii::app()->user->id ) 
+				if ($image->user->Id == Yii::app()->user->id )
 				{
 					$result = "An error occured";
 					if ($image->delete()) {
 						if (file_exists($this->getFileName($imageId))) {
 							$result = "An error occured";
 							if (unlink($this->getFileName($imageId))) {
-								$result = 1;											
+								$result = 1;
 								if (file_exists($this->getFileName($imageId))) {
 									$result = "An error occured";
 									if (unlink($this->getFileName($imageId))) {
-										$result = 1;								
+										$result = 1;
 									}
-								}		
+								}
 							}
 						}
-																	
-					} 
+							
+					}
 				}
 			}
 		}
-		echo CJSON::encode(array("result"=> $result));	
+		echo CJSON::encode(array("result"=> $result));
 		Yii::app()->end();
 	}
 
@@ -65,7 +65,7 @@ class ImageController extends Controller
 		),
 		),
 													    'pagination'=>array(
-													        'pageSize'=>5,
+													        'pageSize'=>Yii::app()->params->imageCountInOnePage,
 		),
 		));
 			
@@ -103,7 +103,7 @@ class ImageController extends Controller
 				),
 				),
 													    'pagination'=>array(
-													        'pageSize'=>5,
+													        'pageSize'=>Yii::app()->params->imageCountInOnePage,
 															'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
 				),
 				));
@@ -179,6 +179,121 @@ class ImageController extends Controller
 		}
 
 	}
+
+	public function actionGetImageListXML()
+	{
+		$pageNo = 1;
+		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+			$pageNo = (int) $_REQUEST['pageNo'];
+		}
+		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+		$out = '';
+		$dataFetchedTimeKey = "ImageController.dataFetchedTime";
+		if (isset($_REQUEST['list'])) {
+			if ($_REQUEST['list'] == "onlyUpdated")
+			{
+				$time = Yii::app()->session[$dataFetchedTimeKey];
+				if ($time !== false)
+				{
+						$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+						$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+								 FROM '. Upload::model()->tableName() . ' u 
+								 WHERE (userId in ('. $friendList .') 
+								        OR userId = '. Yii::app()->user->id .')
+								        AND unix_timestamp(u.uploadTime) >= '. $time;
+			
+						$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+			
+						$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
+								 FROM '. Upload::model()->tableName() . ' u 
+								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+								 WHERE (userId in ('. $friendList .') 
+								 		OR userId = '. Yii::app()->user->id .')
+								 		AND unix_timestamp(u.uploadTime) >= '. $time;
+					
+					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
+				}
+
+			}
+		}
+		else {
+
+			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+					 FROM '. Upload::model()->tableName() . ' u 
+					 WHERE userId in ('. $friendList .') OR 
+					 	   userId = '. Yii::app()->user->id .'';
+
+			$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+			$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
+					 FROM '. Upload::model()->tableName() . ' u 
+					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+					 WHERE userId in ('. $friendList .') OR 
+					 	   userId = '. Yii::app()->user->id .'';
+				
+
+			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
+		}
+		echo $out;
+		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->end();
+	}
+
+	private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
+	{
+		$dataReader = NULL;
+		// if page count equal to 0 then there is no need to run query
+		//		echo $sql;
+		if ($pageCount >= $pageNo && $pageCount != 0) {
+			$dataReader = Yii::app()->db->createCommand($sql)->query();
+		}
+
+		$str = NULL;
+		$userId = NULL;
+		if ($dataReader != NULL )
+		{
+			while ( $row = $dataReader->read() )
+			{
+				$str .= $this->getImageXMLItem($row);
+			}
+		}
+		$extra = "thumbSuffix='thumb=ok'";
+		$pageNo = $pageCount == 0 ? 0 : $pageNo;
+		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
+	}
+
+	private function addXMLEnvelope($pageNo, $pageCount, $str, $extra = ""){
+			
+		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
+
+		header("Content-type: application/xml; charset=utf-8");
+		$out = '<?xml version="1.0" encoding="UTF-8"?>'
+		.'<page '. $pageStr . '  '. $extra .' >'
+		. $str
+		.'</page>';
+
+		return $out;
+	}
+
+
+	private function getImageXMLItem($row)
+	{
+		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
+		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
+		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
+		$row['uploadTime'] = isset($row['uploadTime']) ? $row['uploadTime'] : null;
+		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		$row['userId'] = isset($row['userId']) ? $row['userId'] : null;
+		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
+		$row['rating'] = isset($row['rating']) ? $row['rating'] : null;
+
+
+		$str = '<image url="'. Yii::app()->homeUrl .'?r=image/get&id='. $row['id'] .'"   id="'. $row['id']  .'" byUserId="'. $row['userId'] .'" byRealName="'. $row['realname'] .'" altitude="'.$row['altitude'].'" latitude="'. $row['latitude'].'"	longitude="'. $row['longitude'] .'" rating="'. $row['rating'] .'" time="'.$row['uploadTime'].'" />';
+
+		return $str;
+	}
+
 	// Uncomment the following methods and override them if needed
 	/*
 	public function filters()

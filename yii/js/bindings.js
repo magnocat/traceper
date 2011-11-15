@@ -5,6 +5,7 @@ function bindElements(langOperator, trackerOp)
 	/**
 	 * binding operation to search user
 	 */
+/*	
 	$('#friendsList .search #searchButton').click(function(){
 		trackerOp.searchUser($('#friendsList .search #searchBox').attr('value'), 1);					
 	});
@@ -17,14 +18,11 @@ function bindElements(langOperator, trackerOp)
 			$(this).attr("value", "");
 		}
 	});
-/*	
+	
 	$("#signout").click(function(){
 		trackerOp.signout();
 	});
-*/	
-	/**
-	 * binding operations to search image
-	 */
+	
 	$('#photosList .search #searchButton').click(function(){
 		trackerOp.searchImage($('#photosList .search #searchBox').attr('value'), false, 1);					
 	});
@@ -38,7 +36,7 @@ function bindElements(langOperator, trackerOp)
 		}
 		
 	});
-	
+*/	
 	$('#showPhotosOnMap').change(function(){
 		var checked = $(this).attr('checked');
 		$.cookie(showPhotosOnMapCookieId, checked, {expires:15});
@@ -146,7 +144,7 @@ function bindElements(langOperator, trackerOp)
 		$('#changePasswordForm input:text').attr('value','');
 		$('#changePasswordWindow').dialog('close');
 	});
-*/	
+	
 	$('#inviteUserButton').click(function(){
 		var useremail = $('#useremail').val();
 		var invitationMessage = $('#invitationMessage').val();
@@ -164,7 +162,7 @@ function bindElements(langOperator, trackerOp)
 		$('#InviteUserForm textarea').attr('value','');
 		$('#inviteUserWindow').dialog('close');
 	});
-	
+*/	
 	/*
 	//this callback opens the friend requests window
 	$('#friendRequests').click(function(){
@@ -210,7 +208,7 @@ function bindElements(langOperator, trackerOp)
 					
 				}
 	});	
-	
+/*	
 	$('#sendStatusMessageButton').click(function(){
 		var statusMessage = $('#statusMessage').val();
 		if (statusMessage != "") {
@@ -228,7 +226,7 @@ function bindElements(langOperator, trackerOp)
 				$("#registerWindow").dialog("close");
 			});						
 	});	
-/*	
+	
 	$('#submitLoginFormButton').click(function(){
 		trackerOp.authenticateUser($('#emailLogin').val(), $('#password').val(), $('#rememberMe').attr('checked'), function(){ $('#password').val(""); });			
 	});
@@ -257,14 +255,14 @@ function bindElements(langOperator, trackerOp)
 			authenticateUser();
 		}						
 	});
-*/	
+	
 	$('#sendCommentButton').click(function(){			
 		var photoId=1;
 		var userId=1;
 		var comment=$('#photoCommentTextBox').val();
 		TRACKER.sendNewComment(userId, photoId, comment);
 	});
-	
+*/	
 	
 
 };	
