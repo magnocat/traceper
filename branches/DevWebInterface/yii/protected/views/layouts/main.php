@@ -32,18 +32,6 @@
 
 	<?php 
 		Yii::app()->clientScript->registerScript('appStart',"var checked = false;
-			// showPhotosOnMapCookieId defined in bindings.js
-			if ($.cookie && $.cookie(showPhotosOnMapCookieId) != null){
-				if ($.cookie(showPhotosOnMapCookieId) == 'true'){
-					checked = true;
-				}				
-			}
-			else if (fetchPhotosDefaultValue == 1){
-				checked = true;
-			}
-			$('#showPhotosOnMap').attr('checked', checked);
-			
-			
 			try 
 			{
 				
@@ -54,15 +42,17 @@
 				//TODO: ../index.php should be changed 
 				//TODO: updateUserListInterval 
 				//TODO: queryIntervalForChangedUsers 
-   				var trackerOp = new TrackerOperator('../index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
+   				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
 				trackerOp.setLangOperator(langOp);
 				//TODO: setUserId should be a real id
 //				trackerOp.setUserId(0);
-//		  		trackerOp.getFriendList(1);	   				
+		  		trackerOp.getFriendList(1);	
+		  		trackerOp.getImageList();   				
 			}
    			catch (e) {
 				
-			}    			
+			}
+/*			    			
 			    $('.containerPlus').buildContainers({
 			        containment:'document',
 			        elementsPath:'js/jquery/plugins/mb.containerPlus/elements/',
@@ -71,9 +61,10 @@
 			        effectDuration:10,
 			        zIndexContext:'auto' 
       			});
-      			setLanguage(langOp);
-      			bindElements(langOp, trackerOp);			    
-      			$('#user_title').click();",
+ */
+  //    			setLanguage(langOp);
+  //    			bindElements(langOp, trackerOp);			    
+  //    			$('#user_title').click();",
 		CClientScript::POS_READY);
 		
 		 if (Yii::app()->user->isGuest == false){
@@ -86,6 +77,7 @@
 		 }
 	
 	?>
+ 
 	<script type="text/javascript">		
 		var langOp = new LanguageOperator();
 		var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
@@ -93,7 +85,7 @@
 		
 		var mapOperator = new MapOperator();
 	</script>
-   
+	   
 	</head>
 	<body>	
 	
@@ -126,6 +118,8 @@
 ///////////////////////////// Invite User Window ///////////////////////////
 	echo '<div id="inviteUsersWindow"></div>';
 ///////////////////////////// Friend Request Window ///////////////////////////	
+	echo '<div id="friendRequestsWindow"></div>';
+/*	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'friendRequestsWindow',
 	    // additional javascript options for the dialog plugin
@@ -143,7 +137,7 @@
 	</div>';	
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
-
+*/
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
@@ -241,11 +235,22 @@
 //    												'onclick'=>'$("#inviteUserWindow").dialog("open"); return false;',
 //									));	
 									
- 									echo CHtml::link('<div class="userOperations" id="friendRequests">	
+									echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
 	 													<img src="images/friends.png"  /><div></div>
-	 												 </div>', '#', array(
-    												'onclick'=>'$("#friendRequestsWindow").dialog("open"); return false;',
-									));	
+	 												 </div>', $this->createUrl('users/GetFriendRequestList'), 
+ 										array(
+    										'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
+ 											'update'=> '#friendRequestsWindow',
+										),
+										array(
+											'id'=>'showFriendRequestsWindow'));
+									
+									
+// 									echo CHtml::link('<div class="userOperations" id="friendRequests">	
+//	 													<img src="images/friends.png"  /><div></div>
+//	 												 </div>', '#', array(
+//   												'onclick'=>'$("#friendRequestsWindow").dialog("open"); return false;',
+//									));	
 
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
