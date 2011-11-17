@@ -182,6 +182,9 @@ class ImageController extends Controller
 
 	public function actionGetImageListXML()
 	{
+		if (Yii::app()->user->isGuest) {
+			return;
+		}
 		$pageNo = 1;
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int) $_REQUEST['pageNo'];
