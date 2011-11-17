@@ -119,6 +119,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 	}
 	
+	
 	this.setLangOperator = function(langOperator) {
 		TRACKER.langOperator = langOperator;		
 	}
@@ -824,6 +825,32 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 		}
 	};
+	
+	/*
+	 * sending GeoFence points to the server
+	 */
+	this.sendGeoFencePoints = function(geoFence) {
+		
+		loc1=MAP.getPointOfGeoFencePath(geoFence,0);
+		loc2=MAP.getPointOfGeoFencePath(geoFence,1);
+		loc3=MAP.getPointOfGeoFencePath(geoFence,2);
+
+		var params = "r=users/CreateGeofence&point1Latitude="+ loc1.latitude.toFixed(6) +"&point1Longitude="+ loc1.longitude.toFixed(6)+"&point2Latitude="+ loc2.latitude.toFixed(6) +"&point2Longitude="+ loc2.longitude.toFixed(6)+"&point3Latitude="+ loc3.latitude.toFixed(6) +"&point3Longitude="+ loc3.longitude.toFixed(6);
+		
+		//var params = "r=users/CreateGeofence&point1Latitude="+ 12.38 +"&point1Longitude="+ 12.38+"&point2Latitude="+ 12.38 +"&point2Longitude="+ 12.38+"&point3Latitude="+ 12.38 +"&point3Longitude="+ 12.38;
+
+		TRACKER.ajaxReq(params, function(response){			
+			var obj = jQuery.parseJSON(response);
+			
+			if (obj.result == 1) {
+				//alert('s');
+			}
+			else
+			{
+				alert('Error In Operation');
+			}
+		}, true);
+	}
 
 	this.openMarkerInfoWindow = function(userId){
 	};
