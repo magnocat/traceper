@@ -67,6 +67,9 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListXML()
 	{
+		if (Yii::app()->user->isGuest) {
+			return;
+		}
 		$pageNo = 1;
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int) $_REQUEST['pageNo'];
@@ -78,7 +81,7 @@ class UsersController extends Controller
 			if ($_REQUEST['list'] == "onlyUpdated")
 			{
 				$time = Yii::app()->session[$dataFetchedTimeKey];
-				if ($time !== null && $time !== false) 
+				if ($time !== null && $time !== false)
 				{
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 					 		FROM ' . Users::model()->tableName() . ' u
@@ -98,7 +101,7 @@ class UsersController extends Controller
 									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1
 									AND unix_timestamp(u.dataArrivedTime) >= '. $time . '
 							LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
-					
+
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
 				}
 
@@ -129,7 +132,42 @@ class UsersController extends Controller
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
-	
+
+	public function actionGetUserPastPointsXML(){
+
+		if (isset($_REQUEST['userId']))
+		{
+			$userId = (int) $_REQUEST['userId'];
+			$pageNo = 1;
+			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+				$pageNo = (int) $_REQUEST['pageNo'];
+			}
+			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+			$offset++;  // to not get the last location
+			$sql = 'SELECT
+							longitude, latitude, deviceId, 
+							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+					FROM ' . UserWasHere::model()->tableName() .'
+					WHERE 
+						userId = '. $userId . '
+					ORDER BY 
+						Id DESC
+					LIMIT '. $offset . ','
+						 . Yii::app()->params->itemCountInDataListPage;
+			
+						 // subtract 1 to not get the last location into consideration
+			$sqlPageCount = 'SELECT
+									ceil((count(Id)-1)/ '. Yii::app()->params->itemCountInDataListPage .')
+							 FROM '. UserWasHere::model()->tableName() .'
+							 WHERE 
+								 	userId = '. $userId;				
+			$pageCount = Yii::app()->db->createCommand($sqlPageCount)->queryScalar();
+			
+			$out = $this->prepareXML($sql, $pageNo, $pageCount, "userPastLocations", $userId);
+		}
+		echo $out;
+	}
+
 	public function actionSearch() {
 		$model = new SearchForm();
 
@@ -180,41 +218,41 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		$this->renderPartial('searchUser',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
-	
+
 	public function actionCreateGeofence() {
-		$fence=new Geofence; 		
+		$fence=new Geofence;
 		$result = "Missing parameter";
 		if (isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
-  			&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
-  			&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
-  			{
-  				$point1Lat = (float) $_REQUEST['point1Latitude'];
-  				$point1Long = (float) $_REQUEST['point1Longitude'];
-  				$point2Lat = (float) $_REQUEST['point2Latitude'];
-  				$point2Long = (float) $_REQUEST['point2Longitude'];
-  				$point3Lat = (float) $_REQUEST['point3Latitude'];
-  				$point3Long = (float) $_REQUEST['point3Longitude'];
-  				
-  				$fence->point1Latitude = $point1Lat;
-  				$fence->point1Longitude = $point1Long;
-  				$fence->point2Latitude = $point2Lat;
-  				$fence->point2Longitude = $point2Long;
-  				$fence->point3Latitude = $point3Lat;
-  				$fence->point3Longitude = $point3Long;
-  				
-  				$fence->userId = Yii::app()->user->id;  				
-  				
-  				$result = "Error in operation";
-				if ($fence->save()) {
-   					$result = 1;
-				}
-  				
-  				echo CJSON::encode(array(
+		&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
+		&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
+		{
+			$point1Lat = (float) $_REQUEST['point1Latitude'];
+			$point1Long = (float) $_REQUEST['point1Longitude'];
+			$point2Lat = (float) $_REQUEST['point2Latitude'];
+			$point2Long = (float) $_REQUEST['point2Longitude'];
+			$point3Lat = (float) $_REQUEST['point3Latitude'];
+			$point3Long = (float) $_REQUEST['point3Longitude'];
+
+			$fence->point1Latitude = $point1Lat;
+			$fence->point1Longitude = $point1Long;
+			$fence->point2Latitude = $point2Lat;
+			$fence->point2Longitude = $point2Long;
+			$fence->point3Latitude = $point3Lat;
+			$fence->point3Longitude = $point3Long;
+
+			$fence->userId = Yii::app()->user->id;
+
+			$result = "Error in operation";
+			if ($fence->save()) {
+				$result = 1;
+			}
+
+			echo CJSON::encode(array(
                                          	"result"=>$result,
-  										));
-  			}
+			));
+		}
 	}
-	
+
 
 	public function actionDeleteFriendShip(){
 		$result = 'Missing Data';
@@ -259,6 +297,8 @@ class UsersController extends Controller
 		 */
 		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, f.status,
 					   false as requester
+	
+					   
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = f.friend1
@@ -327,7 +367,7 @@ class UsersController extends Controller
 		));
 	}
 
-	private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
+	private function prepareXML($sql, $pageNo, $pageCount, $type="userList", $userId=NULL)
 	{
 		$dataReader = NULL;
 		// if page count equal to 0 then there is no need to run query
@@ -338,7 +378,6 @@ class UsersController extends Controller
 
 
 		$str = NULL;
-		$userId = NULL;
 		if ($dataReader != NULL )
 		{
 			if ($type == "userList")
@@ -350,17 +389,17 @@ class UsersController extends Controller
 			}
 			else if ($type == "userPastLocations")
 			{
-				while ( $row = $this->dbc->fetchObject($result) )
+				while ( $row = $dataReader->read() )
 				{
-					$row->latitude = isset($row->latitude) ? $row->latitude : null;
-					$row->longitude = isset($row->longitude) ? $row->longitude : null;
-					$row->altitude = isset($row->altitude) ? $row->altitude : null;
-					$row->dataArrivedTime = isset($row->dataArrivedTime) ? $row->dataArrivedTime : null;
-					$row->deviceId = isset($row->deviceId) ? $row->deviceId : null;
+					$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
+					$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
+					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
+					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
+					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
 
-					$str .= '<location latitude="'.$row->latitude.'"  longitude="'. $row->longitude .'" altitude="'.$row->altitude.'" >'
-					.'<time>'. $row->dataArrivedTime .'</time>'
-					.'<deviceId>'. $row->deviceId .'</deviceId>'
+					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" >'
+					.'<time>'. $row['dataArrivedTime'] .'</time>'
+					.'<deviceId>'. $row['deviceId'] .'</deviceId>'
 					.'</location>';
 				}
 			}
@@ -368,15 +407,9 @@ class UsersController extends Controller
 
 
 		$extra = "";
-
-		//		if ($this->pastPointsFetchedUserId != NULL) {
-		//			$extra .= ' userId="'.$this->pastPointsFetchedUserId.'"';
-		//		}
-		//		if ( $type == "imageList" || $this->includeImageInUpdatedUserListReq == true)
-		//		{
-		//			$extra.= ' thumbSuffix="&amp;thumb=ok" origSuffix="" ';
-		//		}
-
+		if ($type == "userPastLocations" && $userId != NULL) {
+			$extra = ' userId="' . $userId .'"';
+		}
 		$pageNo = $pageCount == 0 ? 0 : $pageNo;
 		/*		$out = '<?xml version="1.0" encoding="UTF-8"?>'
 		 //				.'<page '. $pageStr . ' >'
@@ -397,24 +430,6 @@ class UsersController extends Controller
 		.'</page>';
 
 		return $out;
-	}
-
-
-	private function getImageXMLItem($row)
-	{
-		$row->latitude = isset($row->latitude) ? $row->latitude : null;
-		$row->longitude = isset($row->longitude) ? $row->longitude : null;
-		$row->altitude = isset($row->altitude) ? $row->altitude : null;
-		$row->uploadTime = isset($row->uploadTime) ? $row->uploadTime : null;
-		$row->Id = isset($row->Id) ? $row->Id : null;
-		$row->userId = isset($row->userId) ? $row->userId : null;
-		$row->realname = isset($row->realname) ? $row->realname : null;
-		$row->rating = isset($row->rating) ? $row->rating : null;
-
-
-		$str = '<image url="'. $this->imageHandlerURL .'/'. urlencode('?action='. $this->actionPrefix .'GetImage&imageId='. $row->Id) .'"   id="'. $row->Id  .'" byUserId="'. $row->userId .'" byRealName="'. $row->realname .'" altitude="'.$row->altitude.'" latitude="'. $row->latitude.'"	longitude="'. $row->longitude .'" rating="'. $row->rating .'" time="'.$row->uploadTime.'" />';
-
-		return $str;
 	}
 
 	private function getUserXMLItem($row)

@@ -781,10 +781,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (typeof TRACKER.users[userId].polyline == "undefined" ||
 				pageNo > TRACKER.pastPointsPageNo ) 
 		{
-			var params = "action=" + TRACKER.actionGetUserPastPoints
-			+"&userId=" + userId
-			+"&pageNo=" + pageNo;
-
+			//var params = "action=" + TRACKER.actionGetUserPastPoints
+			//+"&userId=" + userId
+			//+"&pageNo=" + pageNo;
+			var params = "r=users/getUserPastPointsXML&userId=" + userId + "&pageNo=" + pageNo;
 			TRACKER.ajaxReq(params, function(result){
 				TRACKER.pastPointsPageNo =  Number(TRACKER.getPageNo(result));
 				TRACKER.pastPointsPageCount =  Number(TRACKER.getPageCount(result));

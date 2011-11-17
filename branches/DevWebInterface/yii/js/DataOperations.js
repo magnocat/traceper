@@ -7,7 +7,7 @@ function processUserPastLocationsXML (MAP, xml) {
 	var userId = $(xml).find("page").attr('userId');
 	var pastPoints = []; 
 	var mapMarker = [];
-	var index = TRACKER.users[userId].mapMarker.length;
+//	var index = TRACKER.users[userId].mapMarker.length;
 
 	$(xml).find("page").find("location").each(function(){
 		var location = $(this);
@@ -76,7 +76,7 @@ function processUserPastLocationsXML (MAP, xml) {
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
 		});
 
-		index++;
+//		index++;
 		mapMarker.push(markerInfoWindow)
 	});
 
@@ -93,8 +93,6 @@ function processUserPastLocationsXML (MAP, xml) {
 		MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
 	}
 	
-	
-
 	var tmp = TRACKER.users[userId].mapMarker;		
 	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
 }
