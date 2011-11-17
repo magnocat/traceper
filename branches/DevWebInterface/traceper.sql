@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 28, 2011 at 05:50 PM
+-- Generation Time: Nov 18, 2011 at 01:55 AM
 -- Server version: 5.1.54
 -- PHP Version: 5.3.5-1ubuntu7.2
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `php`
+-- Database: `test2`
 --
 
 -- --------------------------------------------------------
@@ -57,6 +57,24 @@ INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend2`, `status`) VALUES
 (14, 1, 15, 1),
 (15, 1, 16, 1),
 (16, 1, 17, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `traceper_geofence`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_geofence` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
 
@@ -116,17 +134,17 @@ CREATE TABLE IF NOT EXISTS `traceper_status_messages` (
 
 CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
+  `userId` int(11) unsigned NOT NULL,
   `latitude` decimal(8,6) NOT NULL,
   `longitude` decimal(9,6) NOT NULL,
   `altitude` decimal(15,6) NOT NULL,
   `uploadTime` datetime NOT NULL,
   `publicData` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`) USING BTREE,
-  KEY `new_index` (`userId`),
   KEY `index2` (`uploadTime`),
-  KEY `publicData` (`publicData`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
+  KEY `publicData` (`publicData`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -281,7 +299,7 @@ CREATE TABLE IF NOT EXISTS `traceper_user_group_relation` (
 
 CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
+  `userId` int(11) unsigned NOT NULL,
   `dataArrivedTime` datetime NOT NULL,
   `latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
   `altitude` decimal(15,6) NOT NULL DEFAULT '0.000000',
@@ -289,9 +307,9 @@ CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
   `deviceId` varchar(64) NOT NULL DEFAULT '0',
   `dataCalculatedTime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`Id`),
-  KEY `new_index` (`userId`),
-  KEY `time` (`dataArrivedTime`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  KEY `time` (`dataArrivedTime`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `traceper_user_was_here`
@@ -299,69 +317,6 @@ CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
 
 INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitude`, `altitude`, `longitude`, `deviceId`, `dataCalculatedTime`) VALUES
 (1, 1, '2011-10-22 23:18:44', 37.422005, -122.084095, -122.084095, '000000000000000', '2011-10-21 21:00:00');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tree_elements`
---
-
-CREATE TABLE IF NOT EXISTS `tree_elements` (
-  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `position` int(10) unsigned NOT NULL DEFAULT '0',
-  `ownerEl` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'parent',
-  `slave` binary(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=75 ;
-
---
--- Dumping data for table `tree_elements`
---
-
-INSERT INTO `tree_elements` (`Id`, `name`, `position`, `ownerEl`, `slave`) VALUES
-(50, 'jhjhjhdd', 0, 51, '1'),
-(51, 'uhuhuh', 0, 0, '0'),
-(52, 'kskskskks', 4, 51, '1'),
-(53, 'latifdfd', 2, 51, '1'),
-(54, 'jnjnnj', 6, 51, '1'),
-(55, 'salih', 2, 63, '1'),
-(56, 'jjdjdjd', 7, 51, '1'),
-(58, 'kdkkd', 3, 51, '1'),
-(61, 'kdkd', 5, 51, '0'),
-(62, 'jdjdjd', 0, 61, '0'),
-(63, 'ueye', 8, 51, '0'),
-(64, 'kdkd', 0, 63, '1'),
-(65, 'nhb', 1, 63, '0'),
-(66, 'btry', 1, 51, '0'),
-(67, 'kdkd', 9, 51, '0'),
-(68, 'njhy', 0, 67, '0'),
-(69, 'bvc', 0, 68, '0'),
-(70, 'nht', 0, 69, '1'),
-(71, 'bgvf', 1, 69, '0'),
-(72, 'mnjh', 10, 51, '0'),
-(73, 'oooo', 11, 51, '1'),
-(74, 'nnnn', 12, 51, '1');
-
-
--- --------------------------------------------------------
-
---
--- Tablo yapýsý: `traceper_geofence`
---
-
-CREATE TABLE IF NOT EXISTS `traceper_geofence` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
-  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`Id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
-
 
 --
 -- Constraints for dumped tables
@@ -378,7 +333,13 @@ ALTER TABLE `traceper_friends`
 -- Constraints for table `traceper_upload`
 --
 ALTER TABLE `traceper_upload`
-  ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_friends` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `traceper_user_was_here`
+--
+ALTER TABLE `traceper_user_was_here`
+  ADD CONSTRAINT `traceper_user_was_here_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
