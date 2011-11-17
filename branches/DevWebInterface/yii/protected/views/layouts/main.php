@@ -259,17 +259,17 @@
 	 						</div>
 	 						
 	 						<div id='lists'> 	
-								<div class='titles'>		
+								<div class='titles'>											
 									<?php
 						 			
-										echo CHtml::ajaxLink('<div>Users</div>', $this->createUrl('users/getFriendList'), 
- 														array(
-				 											'update'=> '#friends',
-				 											'complete'=>'function(result){ $("#friendsList").show();$("#photosList").hide(); return false;}',
-														), 
-														array(
-															'id'=>'kk',
-														)); 
+//										echo CHtml::ajaxLink('<div>Users</div>', $this->createUrl('users/getFriendList'), 
+// 														array(
+//				 											'update'=> '#friends',
+//				 											'complete'=>'function(result){ $("#friendsList").show();$("#photosList").hide(); return false;}',
+//														), 
+//														array(
+//															'id'=>'kk',
+//														)); 
 									?>								
 				
 						<!-- 			
@@ -277,15 +277,31 @@
 						 -->
 						 
 						 			<?php
-									echo CHtml::ajaxLink('<div  id="image_title">Photos</div>', $this->createUrl('image/getList'), 
- 														array(
-				 											'update'=> '#photos',
-				 											'complete'=>'function(result){ $("#friendsList").hide();$("#photosList").show(); return false;}',
-														), 
-														array(
-															'id'=>'imageTitle',
-														)); 
-									?>																											
+//									echo CHtml::ajaxLink('<div  id="image_title">Photos</div>', $this->createUrl('image/getList'), 
+// 														array(
+//				 											'update'=> '#photos',
+//				 											'complete'=>'function(result){ $("#friendsList").hide();$("#photosList").show(); return false;}',
+//														), 
+//														array(
+//															'id'=>'imageTitle',
+//														)); 
+									?>	
+									
+									<?php										
+								        
+										$this->widget('zii.widgets.jui.CJuiTabs', array(
+										    'tabs' => array(
+												'Users' => array('ajax' => $this->createUrl('users/getFriendList')),
+										        'Photos' => array('ajax' => $this->createUrl('image/getList')),
+										    ),
+										    // additional javascript options for the tabs plugin
+										    'options' => array(
+										        'collapsible' => true,
+										    ),
+										));								        
+							        
+								    ?>
+               																																		
 								</div>  
 								<div id='friendsList'>
 									<div id="userSearch">
