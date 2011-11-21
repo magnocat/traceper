@@ -48,7 +48,8 @@ public class Main extends Activity
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
 	private Button sendLocation;
-	private Button mapviewb;	
+	private Button mapviewb;
+	private Button call_logger;
 	private CheckBox autoSendLocationCheckbox; 
 	private Handler handler = new Handler();
 	private static double lati ;
@@ -146,15 +147,18 @@ public class Main extends Activity
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
 		sendLocation = (Button) findViewById(R.id.send_location);
 		mapviewb = (Button) findViewById(R.id.map_view);
-		
+		call_logger = (Button) findViewById(R.id.call_logg_b);
 		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		   
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 		sendLocation.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		mapviewb.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mapmode,0,0,0);
+		call_logger.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_recent_history,0,0,0);
+		
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
+		
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 	          createGpsDisabledAlert();
 	     }
@@ -221,8 +225,21 @@ public class Main extends Activity
 			}
 		});
 
-	}
+	
 
+	call_logger.setOnClickListener(new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			
+			Intent i = new Intent(Main.this, LoggMain.class);	
+			startActivity(i);
+
+		}
+	});
+
+}
+	
 //Gps provider status control
 	private void createGpsDisabledAlert(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);

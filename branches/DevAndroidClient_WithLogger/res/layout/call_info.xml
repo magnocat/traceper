@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="2" android:padding="10dip">
+  <TableRow 
+  	android:layout_width="fill_parent" 
+  	android:gravity="center" 
+  	android:layout_marginBottom="15dip">
+  	<ImageView 
+  			android:id="@+id/typeImg" 
+  			android:src="@android:drawable/sym_call_incoming" 
+  			android:layout_marginLeft="10dip"/>
+  	<TextView 
+  			android:id="@+id/typeTxt"
+  			android:textStyle="bold"
+  			android:textSize="12pt"
+  			android:text="Incoming call"
+  			android:layout_span="2"/>
+  </TableRow>
+  <TableRow android:layout_width="fill_parent">
+        <TextView
+        	android:id="@+id/contactLbl"
+            android:text="Contact"
+            android:textStyle="bold"
+            android:padding="3dip"/>
+        <TextView
+        	android:id="@+id/contactLblDash"
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="15dip"/>
+        <TextView
+        	android:id="@+id/contact"
+            android:text="[Empty]"
+            android:padding="3dip"
+            android:layout_width="fill_parent" 
+            android:gravity="left"/>
+    </TableRow>
+
+    <TableRow android:layout_width="fill_parent">
+        <TextView
+            android:text="Number"
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/number"
+            android:text="+380663497999"
+            android:padding="3dip"
+            android:layout_width="fill_parent" 
+            android:gravity="left"/>
+    </TableRow>
+    
+    <TableRow android:layout_width="fill_parent">
+        <TextView
+            android:text="Start"
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/start"
+            android:text="2010-01-01 10:00:00"
+            android:gravity="left"
+            android:layout_width="fill_parent"
+            android:padding="3dip" />
+    </TableRow>
+    
+    <TableRow android:layout_width="fill_parent">
+        <TextView
+            android:text="Finish"
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/finish"
+        	android:text="2010-01-01 10:05:00"
+            android:gravity="left"
+            android:layout_width="fill_parent"
+            android:padding="3dip" />
+    </TableRow>
+    
+    <TableRow android:layout_width="fill_parent">
+        <TextView
+            android:text="Duration"
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/duration"
+        	android:text="00:05:34"
+            android:gravity="left"
+            android:layout_width="fill_parent"
+            android:padding="3dip" />
+    </TableRow>
+    
+    <TableRow android:layout_width="fill_parent">
+        <TextView
+        	android:id="@+id/posCaption"
+            android:text="Position"
+            android:textStyle="bold"
+            android:padding="3dip" />
+         <TextView
+         	android:id="@+id/posDelim"
+            android:text=" - "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+         <Button
+         	android:text="View on map" 
+         	android:id="@+id/goToMap"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow 
+    	android:layout_width="fill_parent"
+    	android:layout_marginLeft="10dip">
+        <TextView
+        	android:id="@+id/latCaption"
+            android:text="Latit."
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+        	android:id="@+id/delimLat"
+            android:text=": "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/latitude"
+        	android:text="10.02347834"
+            android:gravity="left"
+            android:layout_width="fill_parent"
+            android:padding="3dip" />
+    </TableRow>
+    <TableRow 
+    	android:layout_width="fill_parent"
+    	android:layout_marginLeft="10dip">
+        <TextView
+        	android:id="@+id/longCaption"
+            android:text="Longtit."
+            android:textStyle="bold"
+            android:padding="3dip" />
+        <TextView
+        	android:id="@+id/delimLong"
+            android:text=": "
+            android:textStyle="bold"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"/>
+        <TextView
+        	android:id="@+id/longtude"
+        	android:text="143.3230492"
+            android:gravity="left"
+            android:layout_width="fill_parent"
+            android:padding="3dip" />
+    </TableRow>
+</TableLayout>
+</ScrollView>

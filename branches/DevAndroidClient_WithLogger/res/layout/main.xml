@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
     android:orientation="vertical"
-    android:padding="10dip"
+   
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:gravity="center"
+  
 
     >
+    
     <ImageView 
     	android:src="@drawable/logo"
     	android:adjustViewBounds="true"
@@ -15,45 +16,73 @@
     		/>
     <LinearLayout
     	  android:orientation="vertical"
-    	  android:layout_width="wrap_content"
+    	  android:layout_width="fill_parent"
+    	  android:layout_height="wrap_content"
+    	  android:gravity="center">
+    	  
+    	<LinearLayout
+    	  android:orientation="vertical"
+    	  android:layout_width="fill_parent"
     	  android:layout_height="wrap_content"
     	  android:gravity="center">
 		<TextView  
   		  	android:layout_width="wrap_content" 
   		  	android:padding="10px"
     		android:layout_height="wrap_content" 
-    		android:text="@string/lastLocationDataSentAt"
-    		android:textSize="15px"    	
-    	/>
+    		android:text="@string/lastLocationDataSentAt" android:textSize="11sp"/>
     	<TextView  
 			android:id="@+id/lastLocationDataSentAtTime"
 			android:padding="10px"
   		  	android:layout_width="wrap_content" 
     		android:layout_height="wrap_content" 
-    		android:textSize="18px" 
     		android:text="calculating gps location..."   	
-    	/>
-    	<Button android:layout_width="wrap_content"
+    	android:textSize="11sp"/>
+    		</LinearLayout>
+    	
+    	  
+    	<LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center">
+         	<Button android:layout_width="wrap_content"
     	 android:layout_height="wrap_content" 
     	 android:id="@+id/send_location" 
     	 android:text="Send Location" 
-    	 android:textSize="15px" 
-    	 android:width="200px"></Button>
+    	 android:width="150sp" android:textSize="11sp" android:height="100sp"></Button>
     	<Button 
     		android:id="@+id/take_upload_photo_button" 
     		android:text="Take and upload photo"
-    		android:textSize="15px"
     		android:layout_width="wrap_content" 
-    		android:layout_height="wrap_content" 
-    		
-    	android:width="200px"/>
-    	<Button android:layout_width="wrap_content" 
+    		android:layout_height="wrap_content" android:width="150sp" android:textSize="11sp" android:height="100sp"/>
+    </LinearLayout>
+    	
+   <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center">
+      <Button android:layout_width="wrap_content" 
     	android:layout_height="wrap_content" 
     	android:id="@+id/map_view"
-    	 android:textSize="15px" 
-    	 android:width="200px" 
-    	 android:text="Location On Map"></Button>
+    	 android:text="Location On Map" android:width="150sp" android:textSize="11sp" android:height="100sp"></Button>
+    	<Button android:layout_width="wrap_content" 
+    	android:layout_height="wrap_content"
+    	 android:textSize="11sp" 
+    	 android:width="150sp" 
+    	 android:text="Call Logg"
+    	  android:id="@+id/call_logg_b" android:height="100sp"></Button>
     </LinearLayout>
-    <CheckBox android:layout_width="wrap_content" 
-     android:layout_height="wrap_content" android:text="Auto Send" android:id="@+id/auto_check"></CheckBox>
+   
+   <CheckBox android:layout_width="wrap_content" 
+     android:layout_height="wrap_content"
+     android:text="Auto Send"
+     android:id="@+id/auto_check"
+     android:textSize="11sp"></CheckBox>
+    	
+    	
+    </LinearLayout>
+    
 </LinearLayout>

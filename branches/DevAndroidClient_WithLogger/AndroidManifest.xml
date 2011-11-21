@@ -44,8 +44,34 @@
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
+		 <activity android:name=".android.LoggMain"
+                 >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.NORMAL" />
+            </intent-filter>
+        </activity>
+		<activity android:name=".android.CallDetails" android:label="Call info"/>
+        <activity android:name=".android.CallLoggerPreferencesActivity" android:label="Preferences"
+         android:theme="@android:style/Theme.Dialog"/>
+        <activity android:name=".android.CallOnMapActivity" android:label="Google maps" />
+		<service android:name=".android.services.CallLoggerService" android:process="com.traceper.android.services"/>
+		<provider android:name=".android.dao.CallLoggContentProvider" android:authorities="com.traceper.android.LogContentProvider"/>
 		
 </application>
+
+<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" /> 
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<uses-permission android:name="android.permission.CALL_PHONE"/>
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+	<uses-permission android:name="android.permission.ACCESS_GPS" /> 
+    <uses-permission android:name="android.permission.ACCESS_LOCATION" /> 
+    <uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" /> 
+    <uses-permission android:name="android.permission.ACCESS_CELL_ID" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
+	<uses-permission android:name="android.permission.GET_ACCOUNTS"></uses-permission>
 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>
