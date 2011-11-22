@@ -9,19 +9,7 @@
 		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
 		<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon"/>
-   	 <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/css/mbContainer.css" title="style"  media="screen"/>
-<!-- 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
--->  
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/jquery.cookie.js"></script>
-<!-- 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
--->
-     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/inc/jquery.metadata.js"></script> 
-  	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/mb.containerPlus/inc/mbContainer.js"></script>
-  	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/rating/jquery.raty.min.js"></script> 
-	
-  	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/superfish/js/superfish.js"></script>
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/DataOperations.js"></script>
 
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/MapStructs.js"></script>	
@@ -44,27 +32,14 @@
 				//TODO: queryIntervalForChangedUsers 
    				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
 				trackerOp.setLangOperator(langOp);
-				//TODO: setUserId should be a real id
-//				trackerOp.setUserId(0);
 		  		trackerOp.getFriendList(1);	
 		  		trackerOp.getImageList();   				
 			}
    			catch (e) {
 				
 			}
-/*			    			
-			    $('.containerPlus').buildContainers({
-			        containment:'document',
-			        elementsPath:'js/jquery/plugins/mb.containerPlus/elements/',
-			        onClose:function(o){},
-			        onIconize:function(o){},
-			        effectDuration:10,
-			        zIndexContext:'auto' 
-      			});
- */
-  //    			setLanguage(langOp);
-  //    			bindElements(langOp, trackerOp);			    
-  //    			$('#user_title').click();",
+
+  		",
 		CClientScript::POS_READY);
 		
 		 if (Yii::app()->user->isGuest == false){
@@ -119,25 +94,6 @@
 	echo '<div id="inviteUsersWindow"></div>';
 ///////////////////////////// Friend Request Window ///////////////////////////	
 	echo '<div id="friendRequestsWindow"></div>';
-/*	
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'friendRequestsWindow',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Friend Requests'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false,
-			'width'=> '400px',
-			'height'=> '550'    
-	    ),
-	));
-	
-	echo '<div id="friendRequestsList" class="">  
-	</div>';	
-			
-	$this->endWidget('zii.widgets.jui.CJuiDialog');	
-*/
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
@@ -176,7 +132,6 @@
 							?>		
 							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
 		 						<div id="loginBlock">
-		 								
 		 								<?php 				
 												echo CHtml::ajaxLink(Yii::t('general', 'Login'), $this->createUrl('site/login'), 
 	 												array(
@@ -227,13 +182,6 @@
 										),
 										array(
 											'id'=>'showInviteUsersWindow'));										
-																			
-
-// 									echo CHtml::link('<div class="userOperations" id="inviteUser">
-//	 													<img src="images/invite.png"  /><div></div>
-//	 												 </div>', '#', array(
-//    												'onclick'=>'$("#inviteUserWindow").dialog("open"); return false;',
-//									));	
 									
 									echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
 	 													<img src="images/friends.png"  /><div></div>
@@ -245,13 +193,6 @@
 										array(
 											'id'=>'showFriendRequestsWindow'));
 									
-									
-// 									echo CHtml::link('<div class="userOperations" id="friendRequests">	
-//	 													<img src="images/friends.png"  /><div></div>
-//	 												 </div>', '#', array(
-//   												'onclick'=>'$("#friendRequestsWindow").dialog("open"); return false;',
-//									));	
-
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
 	 												 </div>', $this->createUrl('site/logout'), array()); 																			
@@ -260,33 +201,6 @@
 	 						
 	 						<div id='lists'> 	
 								<div class='titles'>											
-									<?php
-						 			
-//										echo CHtml::ajaxLink('<div>Users</div>', $this->createUrl('users/getFriendList'), 
-// 														array(
-//				 											'update'=> '#friends',
-//				 											'complete'=>'function(result){ $("#friendsList").show();$("#photosList").hide(); return false;}',
-//														), 
-//														array(
-//															'id'=>'kk',
-//														)); 
-									?>								
-				
-						<!-- 			
-									<div class="title" id="photo_title"><div class="arrowImage"></div></div>
-						 -->
-						 
-						 			<?php
-//									echo CHtml::ajaxLink('<div  id="image_title">Photos</div>', $this->createUrl('image/getList'), 
-// 														array(
-//				 											'update'=> '#photos',
-//				 											'complete'=>'function(result){ $("#friendsList").hide();$("#photosList").show(); return false;}',
-//														), 
-//														array(
-//															'id'=>'imageTitle',
-//														)); 
-									?>	
-									
 									<?php										
 								        
 										$this->widget('zii.widgets.jui.CJuiTabs', array(
@@ -307,37 +221,14 @@
 									<div id="userSearch">
 											<?php $this->renderPartial('//users/searchUser', array('model'=>new SearchForm())); ?>
 									</div>
-							<!-- 												
-									<div class='search'>						
-										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
-									</div>
-							 -->
-									<div id="friends"></div>
-							<!--  
-									<div class='searchResults'>
-										<a href='#returnToUserList'></a>	
-										<div id='results'></div>								
-									</div>
-							-->				
+									<div id="friends"></div>		
 								</div> 
 								<div id="photosList">	
 									<div id="imageSearch">
 											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
 									</div>		
-							<!-- 															
-									<div class='search'>
-										<input type='text' id='searchBox' value='' /><img src='images/search.png' id='searchButton'  />
-									</div>
-							
-									<input type='checkbox' id='showPhotosOnMap'> Show photos on map
-							 -->		<div id="photos">
+										<div id="photos">
 										</div>
-							<!--  			
-									<div class='searchResults'>
-										<a href='#returnToPhotoList' id="returnToPhotoList"></a>	
-										<div id='results'></div>								
-									</div>
-							-->
 								</div>		
 							</div> 													
 					</div>
@@ -352,13 +243,7 @@
 	<div id="forgotPasswordForm" class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
 		<div id="emailLabel"></div>
 		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
-	</div>
-		
-	<div id='message_warning' class="containerPlus draggable {buttons:'c', skin:'default', icon:'alert.png',width:'400', closed:'true' }">
-	</div>
-	<div id='message_info' class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'400', closed:'true' }">
-	</div>
-	
+	</div>	
 	</body>
 </html>
 
