@@ -217,20 +217,20 @@
 								    ?>
                																																		
 								</div>  
+								
 								<div id='friendsList'>
 									<div id="userSearch">
 											<?php $this->renderPartial('//users/searchUser', array('model'=>new SearchForm())); ?>
 									</div>
-									<div id="friends"></div>		
 								</div> 
+								
 								<div id="photosList">	
 									<div id="imageSearch">
 											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
 									</div>		
-										<div id="photos">
-										</div>
-								</div>		
-							</div> 													
+								</div>
+							</div>		
+						</div> 													
 					</div>
 																																									
 				</div>
