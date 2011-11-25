@@ -39,7 +39,7 @@ public interface IAppService {
 	
 	public int registerUser(String password, String email, String realname);
 	
-	public int authenticateUser(String username, String password);
+	public String authenticateUser(String username, String password);
 	
 	public void setAuthenticationServerAddress(String address);
 	
