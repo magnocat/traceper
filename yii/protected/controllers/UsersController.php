@@ -28,6 +28,81 @@ class UsersController extends Controller
 			$this->render('error', $error);
 		}
 	}
+	
+	/*
+	 * this action is used by mobile clients
+	 */
+	public function actionTakeMyLocation()
+	{
+		/*if (Yii::app()->user->isGuest) {
+			echo CJSON::encode(array(
+			"result"=>"Unauthorized access",
+			));
+			}
+			*/
+		if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
+		&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
+		&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
+		&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
+		&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
+		&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
+		&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL
+		)
+		{
+			$latitude = (float) $_REQUEST['latitude'];
+			$longitude = (float) $_REQUEST['longitude'];
+			$altitude = (float) $_REQUEST['altitude'];
+			$deviceId = $_REQUEST['deviceId'];
+			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
+			$email = $_REQUEST['email'];
+			$password = $_REQUEST['password'];
+				
+			$sql = sprintf('SELECT Id
+								FROM '.  Users::model()->tableName() .' 
+							WHERE email = "%s" 
+						  		  AND 
+						  		  password = "%s"
+							LIMIT 1', $email, md5($password));
+			$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+			$result = "Email or password not correct";	
+			if ($userId != false) 
+			{
+				$sql = sprintf('UPDATE '
+				. Users::model()->tableName() .'
+								SET
+								  	latitude = %f , '
+								  	.'	longitude = %f , '
+								  	.'	altitude = %f ,	'
+								  	.'	dataArrivedTime = NOW(), '
+								  	.'	deviceId = "%s"	,'
+								  	.'    dataCalculatedTime = "%s" '
+								  	.' WHERE '
+								  	.' Id = %d '
+								  	 .' LIMIT 1;',
+				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
+				$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+				$result = "Unknown Error";
+				if ($effectedRows == 1)
+				{
+					$sqlWasHere = sprintf('INSERT INTO '
+									. UserWasHere::model()->tableName() . '
+									(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
+		    						VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s") 
+									',
+								  	$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
+					Yii::app()->db->createCommand($sqlWasHere)->execute();
+					$result = "1";
+				}
+			}
+			echo CJSON::encode(array(
+                 		"result"=>$result,
+						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+			));
+		}
+
+		Yii::app()->end();
+	}
 
 	public function actionGetFriendList()
 	{
@@ -153,17 +228,17 @@ class UsersController extends Controller
 					ORDER BY 
 						Id DESC
 					LIMIT '. $offset . ','
-						 . Yii::app()->params->itemCountInDataListPage;
-			
-						 // subtract 1 to not get the last location into consideration
-			$sqlPageCount = 'SELECT
+					. Yii::app()->params->itemCountInDataListPage;
+						
+					// subtract 1 to not get the last location into consideration
+					$sqlPageCount = 'SELECT
 									ceil((count(Id)-1)/ '. Yii::app()->params->itemCountInDataListPage .')
 							 FROM '. UserWasHere::model()->tableName() .'
 							 WHERE 
 								 	userId = '. $userId;				
-			$pageCount = Yii::app()->db->createCommand($sqlPageCount)->queryScalar();
-			
-			$out = $this->prepareXML($sql, $pageNo, $pageCount, "userPastLocations", $userId);
+					$pageCount = Yii::app()->db->createCommand($sqlPageCount)->queryScalar();
+						
+					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userPastLocations", $userId);
 		}
 		echo $out;
 	}
