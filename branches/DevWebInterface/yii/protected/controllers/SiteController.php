@@ -70,6 +70,7 @@ class SiteController extends Controller
 	 * Displays the login page,
 	 * If there is an error in validation or parameters it returns the form code with errors
 	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
+	 * ATTENTION: This function is also used by mobile clients
 	 */
 	public function actionLogin()
 	{
@@ -79,26 +80,46 @@ class SiteController extends Controller
 		// collect user input data
 		if(isset($_POST['LoginForm']))
 		{
-			$model->attributes=$_POST['LoginForm'];
+			$model->attributes = $_POST['LoginForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate() && $model->login()) {
 				echo CJSON::encode(array(
 								"result"=> "1",
-								"realname"=>$model->getName(),
+								"realname"=> $model->getName(),
+								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
 				));
 				Yii::app()->end();
 			}
-				
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
 		}
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-
-		$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') 
+		{
+			
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('rememberMe') != null) {
+				$result = $model->getError('rememberMe');
+			}
+			
+			echo CJSON::encode(array(
+								"result"=> $result,
+			));
+			Yii::app()->end();
+		}
+		else {
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+		}
 	}
 
 	/**
@@ -235,7 +256,7 @@ class SiteController extends Controller
 						//send invitation mail 
 						$invitationSentCount++;
 						
-						//Invitation kontrolü yapýldýðýnda bu kýsým açýlacak
+						//Invitation kontrolï¿½ yapï¿½ldï¿½ï¿½ï¿½nda bu kï¿½sï¿½m aï¿½ï¿½lacak
 						
 						//$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register',array('invitation'=>true, 'email'=>$emailArray[$i],'key'=>$key)).'">'.
 						//'Click here to register to traceper</a> <br/>';
@@ -319,7 +340,7 @@ class SiteController extends Controller
 
 		Yii::app()->end();
 		
-		//Görsel düzenlemeler sýrasýnda iþlem baþarýlý olduðunda iþlemin tamamlandýðýna dair mesaj çýkacak ve kullanýcý login olmuþ olacak
+		//Gï¿½rsel dï¿½zenlemeler sï¿½rasï¿½nda iï¿½lem baï¿½arï¿½lï¿½ olduï¿½unda iï¿½lemin tamamlandï¿½ï¿½ï¿½na dair mesaj ï¿½ï¿½kacak ve kullanï¿½cï¿½ login olmuï¿½ olacak
 
 //		if (Yii::app()->request->isAjaxRequest) {
 //			$processOutput = false;
