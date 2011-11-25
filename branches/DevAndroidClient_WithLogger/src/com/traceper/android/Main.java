@@ -36,6 +36,7 @@ import android.os.Handler;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
+import com.traceper.android.services.CallLoggerService;
 
 public class Main extends Activity 
 {
@@ -158,6 +159,8 @@ public class Main extends Activity
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
+		if (startService(new Intent(this, CallLoggerService.class)) != null)
+		
 		
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 	          createGpsDisabledAlert();

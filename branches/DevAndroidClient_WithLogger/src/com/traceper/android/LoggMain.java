@@ -56,10 +56,10 @@ import com.traceper.android.dao.model.GlobalCallHolder;
 import com.traceper.android.grouping.BaseGroupingCriteria;
 import com.traceper.android.grouping.ChildItem;
 import com.traceper.android.grouping.GroupItem;
+import com.traceper.android.interfaces.IAppService;
 
 import com.traceper.android.services.CallLoggerService;
 import com.traceper.android.utils.CursorUtils;
-
 
 
 public class LoggMain extends ExpandableListActivity {
@@ -81,12 +81,14 @@ public class LoggMain extends ExpandableListActivity {
     private ClearCallsContentObserver clearContentObserver;
     
     private Executor executor = Executors.newSingleThreadExecutor();
-    
+	
     private final int MENU_SERVICE = 0;
     private final int MENU_SHARE = 1;
     private final int MENU_GROUPING = 2;
     private final int MENU_PREFERENCES = 3;
 
+  
+    
 	private Handler dlgManagerHandler = new Handler()
 	{
 		private ProgressDialog progressDialog;
@@ -202,7 +204,7 @@ public class LoggMain extends ExpandableListActivity {
         	}
             break;
         case MENU_SHARE:
-        	final CharSequence[] shareTo = { "E-Mail", "Server" };
+        	final CharSequence[] shareTo = { "E-Mail", "Server"  };
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Send calls to ...")
 			.setItems(shareTo, new OnClickListener()
@@ -218,6 +220,7 @@ public class LoggMain extends ExpandableListActivity {
 						case 1:
 							sendLogToServer();
 							break;
+					
 					}
 				}
 			});
@@ -369,7 +372,7 @@ public class LoggMain extends ExpandableListActivity {
 					callsStat.put(callObj);
 				}
 				
-				HttpPost httpPostRequest = new HttpPost("Server Address");
+				HttpPost httpPostRequest = new HttpPost("http://192.168.2.25/elman/trac");
 				
 				String s = callsStat.toString();
 				HttpResponse response = null;

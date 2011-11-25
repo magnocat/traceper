@@ -22,6 +22,7 @@ public final class CursorUtils
     	if (c.moveToFirst())
 	    	do
 			{
+	    		String action = null;
 	    		String callNumber;
 	    		String callName;
 	    		int callType;
@@ -36,6 +37,7 @@ public final class CursorUtils
 	    		}
 	    		index++;
 	    		
+	    		
 	    		callNumber = c.getString(c.getColumnIndex(CallInfoTable.KEY_NUMBER));
 	    		callName = c.getString(c.getColumnIndex(CallInfoTable.KEY_CONTACT_NAME));
 	    		callType = c.getInt(c.getColumnIndex(CallInfoTable.KEY_TYPE));
@@ -44,6 +46,7 @@ public final class CursorUtils
 	    		
 	    		callLat = c.getInt(c.getColumnIndex(CallInfoTable.KEY_LAT));
 	    		callLon = c.getInt(c.getColumnIndex(CallInfoTable.KEY_LONG));
+	    		
 	    		
 	    		CallInfo ci = new CallInfo(callNumber, callName);
 	    		ci.setLatitude(callLat);

@@ -25,6 +25,7 @@ public class GlobalCallHolder implements List<CallInfo>
 	private static List<CallInfo> storage = null;
 	private static ContentResolver contentResolver = null;
 	
+	
 	public static List<CallInfo> getEntireCallList()
 	{
 		if (storage == null)
@@ -47,8 +48,8 @@ public class GlobalCallHolder implements List<CallInfo>
 			{
 				contentResolver = cr;
 			}
-			storage = CursorUtils.getAllCalls(contentResolver.query(CallLoggContentProvider.CALLS_URI, null, null, null,
-					CallInfoTable.KEY_START + " DESC"));
+			storage  = CursorUtils.getAllCalls(contentResolver.query(CallLoggContentProvider.CALLS_URI, null, null, null,
+					CallInfoTable.KEY_START + " DESC")) ;
 		}
 		return storage;
 	}

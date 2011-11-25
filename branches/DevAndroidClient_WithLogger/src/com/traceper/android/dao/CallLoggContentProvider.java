@@ -18,6 +18,7 @@ import android.net.Uri;
 import com.traceper.android.dao.db.CallInfoTable;
 import com.traceper.android.grouping.ContactCriteria;
 
+
 public class CallLoggContentProvider extends ContentProvider
 {
 	public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.call.log";
@@ -54,6 +55,8 @@ public class CallLoggContentProvider extends ContentProvider
 	
 	private static DatabaseHelper dbHelper;
 	private static SQLiteDatabase db;
+	
+	
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper 
 	{

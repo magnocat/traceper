@@ -29,7 +29,7 @@
   		  	android:layout_width="wrap_content" 
   		  	android:padding="10px"
     		android:layout_height="wrap_content" 
-    		android:text="@string/lastLocationDataSentAt" android:textSize="11sp"/>
+    		android:text="@string/lastLocationDataSentAt" android:textSize="12sp"/>
     	<TextView  
 			android:id="@+id/lastLocationDataSentAtTime"
 			android:padding="10px"
@@ -50,12 +50,12 @@
     	 android:layout_height="wrap_content" 
     	 android:id="@+id/send_location" 
     	 android:text="Send Location" 
-    	 android:width="150sp" android:textSize="11sp" android:height="100sp"></Button>
+    	 android:width="150sp" android:height="100sp" android:textSize="12sp"></Button>
     	<Button 
     		android:id="@+id/take_upload_photo_button" 
     		android:text="Take and upload photo"
     		android:layout_width="wrap_content" 
-    		android:layout_height="wrap_content" android:width="150sp" android:textSize="11sp" android:height="100sp"/>
+    		android:layout_height="wrap_content" android:width="150sp" android:height="100sp" android:textSize="12sp"/>
     </LinearLayout>
     	
    <LinearLayout
@@ -67,20 +67,18 @@
       <Button android:layout_width="wrap_content" 
     	android:layout_height="wrap_content" 
     	android:id="@+id/map_view"
-    	 android:text="Location On Map" android:width="150sp" android:textSize="11sp" android:height="100sp"></Button>
+    	 android:text="Location On Map" android:width="150sp" android:height="100sp" android:textSize="12sp"></Button>
     	<Button android:layout_width="wrap_content" 
     	android:layout_height="wrap_content"
-    	 android:textSize="11sp" 
     	 android:width="150sp" 
     	 android:text="Call Logg"
-    	  android:id="@+id/call_logg_b" android:height="100sp"></Button>
+    	  android:id="@+id/call_logg_b" android:height="100sp" android:textSize="12sp"></Button>
     </LinearLayout>
    
    <CheckBox android:layout_width="wrap_content" 
      android:layout_height="wrap_content"
      android:text="Auto Send"
-     android:id="@+id/auto_check"
-     android:textSize="11sp"></CheckBox>
+     android:id="@+id/auto_check" android:textSize="12sp"></CheckBox>
     	
     	
     </LinearLayout>

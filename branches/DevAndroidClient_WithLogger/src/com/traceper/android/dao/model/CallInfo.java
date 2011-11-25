@@ -23,6 +23,8 @@ public class CallInfo
 	
 	private String number;
 	private String contact;
+
+	
 	private int microLatitude;
 	private int microLongitude;
 	private long begin;
@@ -142,6 +144,8 @@ public class CallInfo
 			throw new NumberFormatException("Method parameter value isn't in range");
 		this.callType = type;
 	}
+	
+	
 
 }
 

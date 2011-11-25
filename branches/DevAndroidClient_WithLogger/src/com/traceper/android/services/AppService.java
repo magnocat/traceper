@@ -22,12 +22,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import android.app.Notification;
@@ -35,9 +49,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -54,6 +70,9 @@ import android.widget.Toast;
 import com.traceper.R;
 import com.traceper.android.CameraController;
 import com.traceper.android.Configuration;
+import com.traceper.android.dao.CallLoggContentProvider;
+import com.traceper.android.dao.model.CallInfo;
+import com.traceper.android.dao.model.GlobalCallHolder;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.tools.XMLHandler;
 
@@ -95,7 +114,9 @@ public class AppService extends Service implements IAppService{
 	private boolean gps_enabled = false;
 	private boolean network_enabled = false;
 	
-  
+	private Executor executor = Executors.newSingleThreadExecutor();
+	private ContentResolver contentResolver;
+		
 	public class IMBinder extends Binder {
 		public IAppService getService() {
 			return AppService.this;
@@ -374,11 +395,72 @@ public void sendLocationNow(boolean enable){
 		return result;		
 	}
 
+	   public void sendLogTServer(boolean enable)
+		{
+		   if (enable = true){
+	    	executor.execute(new Runnable()
+			{
+				public void run()
+				{
+
+					HttpParams httpParams = new BasicHttpParams();
+
+					HttpConnectionParams.setConnectionTimeout(httpParams, 3000);
+					HttpConnectionParams.setSoTimeout(httpParams, 5000);
+					
+					final HttpClient client = new DefaultHttpClient();
+					
+					JSONArray callsStat = new JSONArray();
+					
+					for (CallInfo call : GlobalCallHolder.getEntireCallList(getContentResolver()))
+					{
+						JSONObject callObj = new JSONObject(call.getMap());
+						callsStat.put(callObj);
+					}
+					
+					HttpPost httpPostRequest = new HttpPost(authenticationServerAddress);
+					
+					String s = callsStat.toString();
+					HttpResponse response = null;
+					try
+					{
+						httpPostRequest.setEntity(new StringEntity(s));
+						
+						response = client.execute(httpPostRequest);
+						if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+							getContentResolver().delete(CallLoggContentProvider.CLEAR_CALLS_URI, null, null);
+			        	   	GlobalCallHolder.getEntireCallList().clear();
+						
+					}
+					catch (ClientProtocolException e)
+					{
+						e.printStackTrace();
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+				
+				}
+			});
+		}
+		}
+	
+	
 	public boolean isNetworkConnected() {
 		boolean connected = false;
 		NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
 		if (networkInfo != null) {
 			connected = networkInfo.isConnected();
+			
+			Cursor c = getContentResolver().query(CallLoggContentProvider.CALLS_URI, null, null, null, null);
+						
+			if (c.getCount() >0  ){
+			
+			sendLogTServer(true);
+			}
+		
+		
 		}		
 		return connected; 
 	}
@@ -590,6 +672,8 @@ public void sendLocationNow(boolean enable){
 	public Long getLastLocationSentTime() {
 		return lastLocationSentTime;
 	}
+	
+
 	
 	private int sendLocationDataAndParseResult(Location loc) {
 		int result = AppService.this.sendLocationData(AppService.this.email, AppService.this.password, loc);	
