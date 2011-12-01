@@ -22,7 +22,6 @@
 		Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 			try 
 			{
-				
 				var mapStruct = new MapStruct();
 			    var initialLoc = new MapStruct.Location({latitude:39.504041,
 			    								  longitude:35.024414}); 

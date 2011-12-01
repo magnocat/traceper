@@ -97,9 +97,9 @@ class SiteController extends Controller
 			}
 		}
 
-		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') 
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-			
+				
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -109,7 +109,7 @@ class SiteController extends Controller
 			else if ($model->getError('rememberMe') != null) {
 				$result = $model->getError('rememberMe');
 			}
-			
+				
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -130,10 +130,10 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
 	}
-	
+
 	/**
 	 * Changes the user's current password with the new one
-	 */	
+	 */
 	public function actionChangePassword()
 	{
 		$model = new ChangePasswordForm;
@@ -147,29 +147,29 @@ class SiteController extends Controller
 			if($model->validate()) {
 				//$users=Users::model()->findByPk(Yii::app()->user->id);
 				//$users->password=md5($model->newPassword);
-				
+
 				//if($users->save()) // save the change to database
 				if(Users::model()->updateByPk(Yii::app()->user->id, array("password"=>md5($model->newPassword)))) // save the change to database
 				{
-					echo CJSON::encode(array("result"=> "1"));				
-				} 
-				else 
+					echo CJSON::encode(array("result"=> "1"));
+				}
+				else
 				{
-					echo CJSON::encode(array("result"=> "0"));				
+					echo CJSON::encode(array("result"=> "0"));
 				}
 				Yii::app()->end();
 			}
-				
+
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
-		}	
+		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);			
+		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);
 	}
 
 	public function actionRegister()
@@ -180,51 +180,77 @@ class SiteController extends Controller
 		// collect user input data
 		if(isset($_POST['RegisterForm']))
 		{
+			$isMobileClient = false;
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') {
+				$isMobileClient = true;
+			}
 			$model->attributes = $_POST['RegisterForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
 
 				$time = date('Y-m-d h:i:s');
-				
-				$userCandidates = new UserCandidates;				
+
+				$userCandidates = new UserCandidates;
 				$userCandidates->email = $model->email;
 				$userCandidates->realname = $model->name;
 				$userCandidates->password = md5($model->password);
-				$userCandidates->time = $time;				
-				$userCandidates->save();				
-				
+				$userCandidates->time = $time;
+				$userCandidates->save();
+
 				if($userCandidates->save()) // save the change to database
 				{
-					$key = md5($model->email.$time);					
+					$key = md5($model->email.$time);
 					$message = 'Hi '.$model->name.',<br/> <a href="'.$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
 					'Click here to register to traceper</a> <br/>';										
 					$message .= '<br/> Your Password is :'.$model->password;
 					$message .= '<br/> The Traceper Team';
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers  .= 'From: contact@traceper.com' . "\r\n";
+					$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
 					//echo $message;
-					mail($model->email, "Traceper Activation", $message, $headers);					
-					
-					echo CJSON::encode(array("result"=> "1"));				
-				} 
-				else 
+					mail($model->email, "Traceper Activation", $message, $headers);
+					echo CJSON::encode(array("result"=> "1"));
+				}
+				else
 				{
-					echo CJSON::encode(array("result"=> "0"));				
+					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
 				Yii::app()->end();
 			}
-				
+
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
-		}	
+		}
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if ($isMobileClient == true)
+		{
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+				
+			echo CJSON::encode(array(
+								"result"=> $result,
+			));
+			Yii::app()->end();
+		}
+		else {
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-		$this->renderPartial('register',array('model'=>$model), false, $processOutput);		
+			$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+		}
+
 	}
 
 	public function actionInviteUsers()
@@ -243,95 +269,95 @@ class SiteController extends Controller
 				$arrayLength = count($emailArray);
 				$invitationSentCount = 0;
 				for ($i = 0; $i < $arrayLength; $i++)
-				{		
+				{
 					$dt = date("Y-m-d H:m:s");
-					
+						
 					$invitedUsers = new InvitedUsers;
 					$invitedUsers->email = $emailArray[$i];
-					$invitedUsers->dt = $dt;						
-					
+					$invitedUsers->dt = $dt;
+						
 					if ($invitedUsers->save())
-					{							
+					{
 						$key = md5($emailArray[$i].$dt);
-						//send invitation mail 
+						//send invitation mail
 						$invitationSentCount++;
-						
+
 						//Invitation kontrol� yap�ld���nda bu k�s�m a��lacak
-						
+
 						//$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register',array('invitation'=>true, 'email'=>$emailArray[$i],'key'=>$key)).'">'.
 						//'Click here to register to traceper</a> <br/>';
-						
-						$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register').'">'.						
+
+						$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register').'">'.
 						'Click here to register to traceper</a> <br/>';
-						$message .= '<br/> ' . $model->message;	
+						$message .= '<br/> ' . $model->message;
 						$message .= '<br/> The Traceper Team';
 						$headers  = 'MIME-Version: 1.0' . "\r\n";
 						$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-						$headers  .= 'From: contact@traceper.com' . "\r\n";					
-						//echo $message;	
-						mail($emailArray[$i], "Traceper Invitation", $message, $headers);							
+						$headers  .= 'From: contact@traceper.com' . "\r\n";
+						//echo $message;
+						mail($emailArray[$i], "Traceper Invitation", $message, $headers);
 					}
-				}					
-				
+				}
+
 				if ($arrayLength == $invitationSentCount) // save the change to database
 				{
-					echo CJSON::encode(array("result"=> "1"));				
-				} 
-				else 
+					echo CJSON::encode(array("result"=> "1"));
+				}
+				else
 				{
-					echo CJSON::encode(array("result"=> "0"));				
+					echo CJSON::encode(array("result"=> "0"));
 				}
 				Yii::app()->end();
 			}
-				
+
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
-		}	
+		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-		$this->renderPartial('inviteUsers',array('model'=>$model), false, $processOutput);		
-	}	
-	
+		$this->renderPartial('inviteUsers',array('model'=>$model), false, $processOutput);
+	}
+
 	private function splitEmails($emails)
 	{
 		$emails = str_replace(array(" ",",","\r","\n"),array(";",";",";",";"),$emails);
-		$emails = str_replace(";;", ";",$emails);		
-		$emails = explode(";", $emails);					
+		$emails = str_replace(";;", ";",$emails);
+		$emails = explode(";", $emails);
 		return $emails;
-	}	
-	
+	}
+
 	public function actionActivate()
 	{
 		$email = $_GET['email'];
 		$key = $_GET['key'];
-		
+
 		$processOutput = true;
 		// collect user input data
-		
+
 		$criteria=new CDbCriteria;
-		$criteria->select='Id,email,realname,password,time';  
+		$criteria->select='Id,email,realname,password,time';
 		$criteria->condition='email=:email';
 		$criteria->params=array(':email'=>$email);
-		$userCandidate = UserCandidates::model()->find($criteria); // $params is not needed		
+		$userCandidate = UserCandidates::model()->find($criteria); // $params is not needed
 
 		$generatedKey =  md5($email.$userCandidate->time);
-		
+
 		if ($generatedKey == $key)
 		{
-			$users = new Users;				
+			$users = new Users;
 			$users->email = $userCandidate->email;
 			$users->realname = $userCandidate->realname;
-			$users->password = $userCandidate->password;	
-						
+			$users->password = $userCandidate->password;
+
 			if($users->save())
 			{
 				$userCandidate->delete();
 				echo CJSON::encode(array("result"=> "1"));
-			}		
+			}
 		}
 		else
 		{
@@ -339,20 +365,19 @@ class SiteController extends Controller
 		}
 
 		Yii::app()->end();
-		
+
 		//G�rsel d�zenlemeler s�ras�nda i�lem ba�ar�l� oldu�unda i�lemin tamamland���na dair mesaj ��kacak ve kullan�c� login olmu� olacak
 
-//		if (Yii::app()->request->isAjaxRequest) {
-//			$processOutput = false;
-//		}
-//
-//		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-//		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-//
-//		$this->renderPartial('activate',array('model'=>$model), false, $processOutput);		
-	}	
+		//		if (Yii::app()->request->isAjaxRequest) {
+		//			$processOutput = false;
+		//		}
+		//
+		//		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		//		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		//
+		//		$this->renderPartial('activate',array('model'=>$model), false, $processOutput);
+	}
 }
 
 
 
-	
