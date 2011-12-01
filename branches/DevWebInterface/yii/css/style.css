@@ -361,3 +361,11 @@ cursor:pointer;
 .commentForPhotos{
 	padding-left:15px;
 }
+
+.ui-tabs .ui-tabs-panel {
+    background: none repeat scroll 0 0 transparent;
+    border-width: 0;
+    display: block;
+    height: 500px;
+    padding: 1em 1.4em;
+}
