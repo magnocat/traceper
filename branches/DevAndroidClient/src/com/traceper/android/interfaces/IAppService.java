@@ -37,13 +37,13 @@ public interface IAppService {
 	
 	public void exit();
 	
-	public int registerUser(String password, String email, String realname);
+	public String registerUser(String password, String email, String realname);
 	
 	public String authenticateUser(String username, String password);
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public int sendImage(byte[] image, boolean publicData);
+	public String sendImage(byte[] image, boolean publicData);
 	
 
 	

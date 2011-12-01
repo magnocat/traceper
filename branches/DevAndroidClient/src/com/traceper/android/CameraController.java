@@ -284,13 +284,13 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
 				bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
 
-				final int result = appService.sendImage(byteArrayOutputStream.toByteArray(), publicImage);
+				final String result = appService.sendImage(byteArrayOutputStream.toByteArray(), publicImage);
 				{
 					handler.post(new Runnable() {							
 						@Override
 						public void run() {
 							String str;
-							if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
+							if (result.equals("1")) {
 								str = getString(R.string.upload_succesfull);
 							}
 							else {

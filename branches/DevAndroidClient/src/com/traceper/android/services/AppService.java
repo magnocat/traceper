@@ -354,7 +354,8 @@ public class AppService extends Service implements IAppService{
 		return result;	
 	}
 
-	public int sendImage(byte[] image, boolean publicData){
+	public String sendImage(byte[] image, boolean publicData)
+	{
 		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		double latitude = 0;
 		double longitude = 0;
@@ -368,7 +369,7 @@ public class AppService extends Service implements IAppService{
 		//		try {
 		String[] name = new String[7];
 		String[] value = new String[7];
-		name[0] = "action";
+		name[0] = "r";
 		name[1] = "email";
 		name[2] = "password";
 		name[3] = "latitude";
@@ -376,7 +377,7 @@ public class AppService extends Service implements IAppService{
 		name[5] = "altitude";
 		name[6] = "publicData";
 
-		value[0] = HTTP_ACTION_GET_IMAGE;
+		value[0] = "image/upload";
 		value[1] = this.email;
 		value[2] = this.password;
 		value[3] = String.valueOf(latitude);
@@ -392,7 +393,16 @@ public class AppService extends Service implements IAppService{
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
 		Log.i("img length: ", String.valueOf(img.length()) );
-		int result = this.evaluateResult(httpRes);
+		String result = getString(R.string.unknown_error_occured);
+
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		int result = this.evaluateResult(httpRes);
 
 		return result;		
 	}
@@ -445,7 +455,6 @@ public class AppService extends Service implements IAppService{
 				ds.writeBytes("Content-Disposition: form-data; name=\"image\";filename=\"" + filename +"\"" + end + end);
 				ds.write(file);
 				ds.writeBytes(end);
-
 			}			
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			ds.flush();
@@ -496,23 +505,37 @@ public class AppService extends Service implements IAppService{
 		return this.isUserAuthenticated;
 	}
 
-	public int registerUser(String password, String email, String realname) 
+	public String registerUser(String password, String email, String realname) 
 	{
-		String[] name = new String[4];
-		String[] value = new String[4];
-		name[0] = "action";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "realname";
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "RegisterForm[email]";
+		name[2] = "RegisterForm[password]";
+		name[3] = "RegisterForm[passwordAgain]";
+		name[4] = "RegisterForm[name]";
+		name[5] = "client";
 
-		value[0] = HTTP_ACTION_REGISTER_ME;
+		value[0] = "site/register";
 		value[1] = email;
 		value[2] = password;
-		value[3] = realname;
+		value[3] = password;
+		value[4] = realname;
+		value[5] = "mobile";
 
-		String result = this.sendHttpRequest(name, value, null, null);		
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		
+		String result = getString(R.string.unknown_error_occured);
 
-		return this.evaluateResult(result);
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+		
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 
