@@ -140,7 +140,7 @@ class UsersController extends Controller
 		));
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('userList',array('dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 
 	}
 
@@ -298,7 +298,7 @@ class UsersController extends Controller
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('searchUser',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
 	public function actionCreateGeofence() {
