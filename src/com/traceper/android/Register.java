@@ -35,6 +35,7 @@ public class Register extends Activity {
 	private static final int SIGN_UP_SUCCESSFULL = 4;
 	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
 	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
+	protected static final int CUSTOM_MESSAGE_DIALOG = 7;
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
@@ -68,6 +69,7 @@ public class Register extends Activity {
                     Toast.LENGTH_SHORT).show();
         }
     };
+	protected String dialogMessage;
 
 	public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);    
@@ -104,7 +106,7 @@ public class Register extends Activity {
 									progressDialog = ProgressDialog.show(Register.this, "", getString(R.string.saving));
 								
 									Thread thread = new Thread(){
-										int result;
+										String result;
 										public void run() {
 											String password = null;
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
@@ -116,12 +118,17 @@ public class Register extends Activity {
 											
 		
 											handler.post(new Runnable(){
-		
+
 												public void run() {
 													progressDialog.dismiss();
-													if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
+													if (result.equals("1") == true) {
 														showDialog(SIGN_UP_SUCCESSFULL);
 													}
+													else {
+														Register.this.dialogMessage = result;
+														showDialog(CUSTOM_MESSAGE_DIALOG);
+													}
+													/*
 													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_EXISTS){
 														showDialog(SIGN_UP_EMAIL_CRASHED);
 													}
@@ -131,7 +138,8 @@ public class Register extends Activity {
 													else  //if (result.equals(SERVER_RES_SIGN_UP_FAILED)) 
 													{
 														showDialog(SIGN_UP_FAILED);
-													}			
+													}
+													*/			
 												}
 		
 											});
@@ -234,6 +242,15 @@ public class Register extends Activity {
 					}
 				})        
 				.create();
+			case CUSTOM_MESSAGE_DIALOG:
+    			return new AlertDialog.Builder(Register.this)       
+        		.setMessage(this.dialogMessage)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 
 			default:
 				return null;
 				
