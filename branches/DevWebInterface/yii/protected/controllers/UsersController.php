@@ -40,6 +40,7 @@ class UsersController extends Controller
 			));
 			}
 			*/
+		$result = "Missing parameter";
 		if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 		&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 		&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
@@ -94,12 +95,18 @@ class UsersController extends Controller
 					$result = "1";
 				}
 			}
-			echo CJSON::encode(array(
-                 		"result"=>$result,
-						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
-						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-			));
+			
 		}
+		$resultArray = array("result"=>$result);
+		if ($result == "1") {
+			$resultArray = array_merge($resultArray, array(                 			
+									"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+									"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+							));
+		}
+		echo CJSON::encode(array(
+                 		$resultArray
+		));
 
 		Yii::app()->end();
 	}

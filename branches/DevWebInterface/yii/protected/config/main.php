@@ -90,7 +90,8 @@ return array(
 	// using Yii::app()->params['paramName']
 	'params'=>array(
 		// this is used in contact page
-		'adminEmail'=>'webmaster@example.com',
+		'adminEmail'=>'contact@traceper.com',
+		'contactEmail'=>'contact@traceper.com',
 		'itemCountInOnePage'=> 5,  // this is the number of users that are shown in a page
 		'imageCountInOnePage'=> 5, // this is the number of images that are shown in a page	
 		'itemCountInDataListPage'=> 20,

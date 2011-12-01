@@ -145,6 +145,72 @@ class ImageController extends Controller
 		Yii::app()->end();
 	}
 
+	/**
+	 * this action is used by mobile clients
+	 */
+	public function actionUpload()
+	{
+		$result = "Missing parameter";
+		if (isset($_FILES["image"])
+			&& isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
+			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
+			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
+			&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
+			&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL)
+		{
+			if ($_FILES["image"]["error"] == UPLOAD_ERR_OK )
+			{
+				$latitude = (float) $_REQUEST['latitude'];
+				$longitude = (float) $_REQUEST['longitude'];
+				$altitude = (float) $_REQUEST['altitude'];
+				$email = $_REQUEST['email'];
+				$password = $_REQUEST['password'];
+
+				$publicData = 0;
+				if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
+					$tmp = (int) $_REQUEST['publicData'];
+					if ($tmp == 1) {
+						$publicData = 1;
+					}
+				}
+
+				$sql = sprintf('SELECT Id
+								FROM '.  Users::model()->tableName() .' 
+							WHERE email = "%s" 
+						  		  AND 
+						  		  password = "%s"
+							LIMIT 1', $email, md5($password));
+				$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+				$result = "Email or password not correct";
+		
+				if ($userId != false) 
+				{
+					
+					$sql = sprintf('INSERT INTO '
+									. Upload::model()->tableName() .'
+									(userId, latitude, longitude, altitude, uploadtime, publicData)
+									VALUES(%d, %s, %s, %s, NOW(), %d)', 
+									$userId, $latitude, $longitude, $altitude, $publicData);
+					$result = "Unknown Error";
+					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+					if ($effectedRows == 1)
+					{
+						$result = "Error in moving uploading file";
+						if (move_uploaded_file($_FILES["image"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . '.jpg'))
+						{
+							$result = "1";
+						}
+					}
+				}
+		
+			}
+
+		}
+		echo CJSON::encode(array("result"=> $result));
+		Yii::app()->end();
+
+	}
+
 	private function getFileName($imageId, $thumb = false)
 	{
 		$fileName = Yii::app()->params->uploadPath. '/' . $imageId . '.jpg';
@@ -198,22 +264,22 @@ class ImageController extends Controller
 				$time = Yii::app()->session[$dataFetchedTimeKey];
 				if ($time !== false)
 				{
-						$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-						$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 								 FROM '. Upload::model()->tableName() . ' u 
 								 WHERE (userId in ('. $friendList .') 
 								        OR userId = '. Yii::app()->user->id .')
 								        AND unix_timestamp(u.uploadTime) >= '. $time;
-			
-						$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-			
-						$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
+						
+					$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+						
+					$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
 								 FROM '. Upload::model()->tableName() . ' u 
 								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 								 WHERE (userId in ('. $friendList .') 
 								 		OR userId = '. Yii::app()->user->id .')
 								 		AND unix_timestamp(u.uploadTime) >= '. $time;
-					
+						
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
 				}
 
@@ -234,7 +300,7 @@ class ImageController extends Controller
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 					 WHERE userId in ('. $friendList .') OR 
 					 	   userId = '. Yii::app()->user->id .'';
-				
+
 
 			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
 		}
@@ -278,6 +344,8 @@ class ImageController extends Controller
 
 		return $out;
 	}
+
+
 
 
 	private function getImageXMLItem($row)
