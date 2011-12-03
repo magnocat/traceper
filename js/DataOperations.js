@@ -127,7 +127,7 @@ function processXML(MAP, xml, isFriendList)
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
-				var userMarker = MAP.putMarker(location, "../images/person.png", visible);
+				var userMarker = MAP.putMarker(location, "images/person.png", visible);
 				var iWindow = MAP.initializeInfoWindow();
 				var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
 				
