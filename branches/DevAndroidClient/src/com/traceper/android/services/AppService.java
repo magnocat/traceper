@@ -74,13 +74,6 @@ public class AppService extends Service implements IAppService{
 	 */
 	private ArrayList<Location> pendingLocations = new ArrayList<Location>();
 
-	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
-	private final static String HTTP_ACTION_AUTHENTICATE_ME = "DeviceAuthenticateMe";
-	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
-	private static final String LOCATION_CHANGED = "location changed";
-	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
-
-
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -92,10 +85,10 @@ public class AppService extends Service implements IAppService{
 	private LocationHandler locationHandler;
 	private int minDataSentInterval = Configuration.MIN_GPS_DATA_SEND_INTERVAL;
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
-	private XMLHandler xmlHandler;
+	//	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-	private boolean gps_enabled = false;
-	private boolean network_enabled = false;
+//	private boolean gps_enabled = false;
+//	private boolean network_enabled = false;
 	private String cookie = null;
 	private boolean configurationChanged = false;
 
@@ -109,15 +102,10 @@ public class AppService extends Service implements IAppService{
 	public void onCreate() 
 	{   	
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
-
-		xmlHandler = new XMLHandler();
+		//		xmlHandler = new XMLHandler();
 		locationHandler = new LocationHandler();
-
-
 
 		networkStateReceiver = new BroadcastReceiver() {
 			@Override
@@ -134,68 +122,15 @@ public class AppService extends Service implements IAppService{
 	}
 
 	public void setAutoCheckin(boolean enable){
-
-		if (enable == true) {
-
-			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-			final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-
-			notification.setLatestEventInfo(AppService.this,
-					getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
-
-			mManager.notify(NOTIFICATION_ID , notification);
-
-			try {
-				gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-			} catch (Exception ex) {
-			}
-			try {
-				network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-			} catch (Exception ex) {
-			}
-
-
-			if (gps_enabled) {
-				Thread locationUpdates = new Thread() {
-					public void run() {
-						Looper.prepare();
-
-						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-								locationHandler);				       
-
-						Looper.loop();
-					}
-				};
-				locationUpdates.start();
-
-			}else{
-				locationManager.removeUpdates(locationHandler);
-			}
-			if (network_enabled) {
-				Thread locationUpdates = new Thread() {
-					public void run() {
-						Looper.prepare();
-
-						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minDataSentInterval, minDistanceInterval, 
-								locationHandler);				       
-
-						Looper.loop();
-					}
-				};
-				locationUpdates.start();
-
-			}else{
-				locationManager.removeUpdates(locationHandler);
-			}
-
-		}
-
+		sendLocation(enable, locationHandler, minDataSentInterval, minDistanceInterval);
 	}
 
 	public void sendLocationNow(boolean enable){
+		sendLocation(enable, locationOneTime, 0, 0);
+		
+	}
+	
+	public void sendLocation(boolean enable, final LocationListener locationListener, final int datasentInterval, final int distanceInterval) {
 
 		if (enable == true) {
 
@@ -210,49 +145,54 @@ public class AppService extends Service implements IAppService{
 
 			mManager.notify(NOTIFICATION_ID , notification);
 
+			locationManager.removeUpdates(locationListener);
+			boolean gps_enabled = false;
 			try {
 				gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+				if (gps_enabled == true) {
+					Thread locationUpdates = new Thread() {
+						public void run() {
+							Looper.prepare();
+
+							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, datasentInterval, distanceInterval, 
+									locationListener);				       
+
+							Looper.loop();
+						}
+					};
+					locationUpdates.start();
+
+				}
 			} catch (Exception ex) {
+				
 			}
+			
+			boolean network_enabled = false;
 			try {
 				network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-			} catch (Exception ex) {
+				if (gps_enabled == false && network_enabled == true) {
+					Thread locationUpdates = new Thread() {
+						public void run() {
+							Looper.prepare();
+
+							locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, datasentInterval, distanceInterval, 
+									locationListener);				       
+
+							Looper.loop();
+						}
+					};
+					locationUpdates.start();
+				}				
+				
+			} catch (Exception e) {
+				
 			}
+			if (network_enabled == false && gps_enabled == false){
+				notification.setLatestEventInfo(AppService.this,
+						getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
 
-
-			if (gps_enabled) {
-				Thread locationUpdates = new Thread() {
-					public void run() {
-						Looper.prepare();
-
-						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-								locationOneTime);				       
-
-						Looper.loop();
-					}
-				};
-				locationUpdates.start();
-
-			}else{
-				locationManager.removeUpdates(locationOneTime);
+				mManager.notify(NOTIFICATION_ID , notification);
 			}
-			if (network_enabled) {
-				Thread locationUpdates = new Thread() {
-					public void run() {
-						Looper.prepare();
-
-						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minDataSentInterval, minDistanceInterval, 
-								locationOneTime);				       
-
-						Looper.loop();
-					}
-				};
-				locationUpdates.start();
-
-			}else{
-				locationManager.removeUpdates(locationOneTime);
-			}
-
 		}
 
 	}
@@ -327,21 +267,9 @@ public class AppService extends Service implements IAppService{
 				Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 				i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 				i.putExtra(IAppService.LAST_LOCATION_DATA_SENT_TIME, lastLocationSentTime);
+				i.putExtra(IAppService.LAST_LOCATION, loc);
 				sendBroadcast(i);
 				Log.i("broadcast sent", "sendLocationData broadcast sent");		
-
-
-				Intent aa = new Intent(IAppService.L_LATITUDE);
-				aa.setAction(IAppService.L_LATITUDE);
-				aa.putExtra(IAppService.L_LATITUDE,latitude);
-				sendBroadcast(aa);
-				Log.i("broadcast sent", "sendLocationData broadcast sent");	
-
-				Intent aaa = new Intent(IAppService.L_LONGITUDE);
-				aaa.setAction(IAppService.L_LONGITUDE);
-				aaa.putExtra(IAppService.L_LONGITUDE, longitude);
-				sendBroadcast(aaa);
-				Log.i("broadcast sent", "sendLocationData broadcast sent");	
 
 			}
 
@@ -356,10 +284,26 @@ public class AppService extends Service implements IAppService{
 
 	public String sendImage(byte[] image, boolean publicData)
 	{
-		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		Location loc = null;
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
+		if (locationGPS == null && locationNetwork != null) {
+			loc = locationNetwork;
+		}
+		else if (locationGPS != null && locationNetwork == null) {
+			loc = locationGPS;
+		}
+		else if (locationGPS != null && locationNetwork != null) {
+			if (locationGPS.getTime() > locationNetwork.getTime()) {
+				loc = locationGPS;
+			}
+			else {
+				loc = locationNetwork;
+			}
+		}
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
@@ -402,7 +346,7 @@ public class AppService extends Service implements IAppService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		int result = this.evaluateResult(httpRes);
+		//		int result = this.evaluateResult(httpRes);
 
 		return result;		
 	}
@@ -524,13 +468,13 @@ public class AppService extends Service implements IAppService{
 		value[5] = "mobile";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
-		
+
 		String result = getString(R.string.unknown_error_occured);
 
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
-		
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -686,13 +630,13 @@ public class AppService extends Service implements IAppService{
 	private String sendLocationDataAndParseResult(Location loc) {
 		String result = AppService.this.sendLocationData(AppService.this.email, AppService.this.password, loc);	
 
-//		int dataSentInterval = AppService.this.xmlHandler.getGpsMinDataSentInterval();
-//		int distanceInterval = AppService.this.xmlHandler.getGpsMinDistanceInterval();
+		//		int dataSentInterval = AppService.this.xmlHandler.getGpsMinDataSentInterval();
+		//		int distanceInterval = AppService.this.xmlHandler.getGpsMinDistanceInterval();
 
 		// if configuration is changed in server, then arrange itself below by
 		// adding using new params in locationManager. requestLocationUpdates
-//		if (dataSentInterval != AppService.this.minDataSentInterval ||
-//				distanceInterval != AppService.this.minDistanceInterval)
+		//		if (dataSentInterval != AppService.this.minDataSentInterval ||
+		//				distanceInterval != AppService.this.minDistanceInterval)
 		if (configurationChanged == true)
 		{
 			configurationChanged = false;
@@ -724,21 +668,24 @@ public class AppService extends Service implements IAppService{
 				boolean connected = isNetworkConnected();
 				String result = null;
 				if (connected == true) {
+					mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+					Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+					PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+					notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sending_location_data), contentIntent);
+					mManager.notify(NOTIFICATION_ID, notification);
 					// send pending locations if any...
 					sendPendingLocations();
 					// send last location data
 					result = sendLocationDataAndParseResult(loc);	
-
-					mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-					final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-					final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-
-
-					notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sent_succes), contentIntent);
+					String processResult = getString(R.string.sending_location_data_failed);
+					if (result.equals("1")) {
+						processResult = getString(R.string.sending_location_data_successfull);
+					}
+					notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
 					mManager.notify(NOTIFICATION_ID, notification);
-
 				}
 				if (connected == false || result.equals("1") == false){
 					pendingLocations.add(loc);
@@ -758,6 +705,16 @@ public class AppService extends Service implements IAppService{
 
 	}
 
+	LocationListener locationOneTime = new LocationHandler(){
+
+		public void onLocationChanged(Location loc) {
+			super.onLocationChanged(loc);
+			locationManager.removeUpdates(locationOneTime);	
+
+		};
+
+	};
+	/*
 	LocationListener locationOneTime = new LocationListener() {
 		public void onLocationChanged(Location location) {
 
@@ -773,7 +730,7 @@ public class AppService extends Service implements IAppService{
 					result = sendLocationDataAndParseResult(location);	
 					// remove location update
 
-					locationManager.removeUpdates(locationOneTime);			
+
 
 					mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -798,13 +755,5 @@ public class AppService extends Service implements IAppService{
 		public void onProviderEnabled(String provider) {}
 		public void onStatusChanged(String provider, int status, Bundle extras) {}
 	};
-
-	public String updateLocation(String status){
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, locationHandler);
-		String retval = sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-		//this.status = status;
-		locationManager.removeUpdates(locationHandler);
-		return retval;
-	}
-
+	 */
 }

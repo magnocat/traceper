@@ -66,7 +66,11 @@ public class Login extends Activity {
             appManager = ((AppService.IMBinder)service).getService();  
             appManager.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
            
-            if (appManager.isUserAuthenticated() == true)
+            if (appManager.isNetworkConnected() == false)
+    		{
+    			showDialog(NOT_CONNECTED_TO_NETWORK);					
+    		}
+            else if (appManager.isUserAuthenticated() == true)
             {
             	Intent i = new Intent(Login.this, Main.class);																
 				startActivity(i);
@@ -107,6 +111,7 @@ public class Login extends Activity {
         emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
         passwordText.setText(preferences.getString(Configuration.PREFERENCES_PASSWORD, ""));
         rememberMeCheckBox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, false));
+        
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
@@ -204,7 +209,8 @@ public class Login extends Activity {
 				appManager.exit();
 				finish();				
 			}        	
-        });       
+        }); 
+        
         
          
         
@@ -258,7 +264,7 @@ public class Login extends Activity {
         		.setMessage(R.string.not_connected_to_network)
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
-        				/* User clicked OK so do some stuff */
+        				finish();
         			}
         		})        
         		.create(); 

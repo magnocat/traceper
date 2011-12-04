@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,10 +29,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Handler;
-
-
-
 
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
@@ -39,20 +36,15 @@ import com.traceper.android.services.AppService;
 
 public class Main extends Activity 
 {
-
-
-
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
-	private Button sendLocation;
+	private Button checkInNow;
 	private Button mapviewb;	
 	private CheckBox autoSendLocationCheckbox; 
-	private Handler handler = new Handler();
-	private static double lati ;
-	private static double longi;
+	private Location lastLocation = null;
 
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
@@ -66,39 +58,10 @@ public class Main extends Activity
 				{
 					Long time = (Long) extra.getLong(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 					lastDataSentTimeText.setText(getFormattedDate(time));
-										
+					lastLocation = (Location)extra.getParcelable(IAppService.LAST_LOCATION);										
 				}
-				
-				
 			}
-			
-			Bundle latiextra = intent.getExtras();
-			if (latiextra != null)
-			{
-				String action = intent.getAction();
-				if (action.equals(IAppService.L_LATITUDE))
-				{
-					lati= (double) latiextra.getDouble(IAppService.L_LATITUDE);
-					
-										
-				}
-				
-				
-			}
-			Bundle longiextra = intent.getExtras();
-			if (longiextra != null)
-			{
-				String action = intent.getAction();
-				if (action.equals(IAppService.L_LONGITUDE))
-				{
-					longi = (double) longiextra.getDouble(IAppService.L_LONGITUDE);
-					
-										
-				}
-				
-				
-			}
-			
+
 		}
 
 	};
@@ -117,9 +80,8 @@ public class Main extends Activity
 				}
 				if (autoSendLocationCheckbox.isChecked()==true){
 					appService.setAutoCheckin(true);
-					sendLocation.setEnabled(false);
+					//			checkInNow.setEnabled(false);
 					Toast.makeText(getBaseContext(), "Auto sending is ready!", Toast.LENGTH_SHORT).show();
-					
 				};
 			}
 			else {
@@ -144,21 +106,21 @@ public class Main extends Activity
 		setContentView(R.layout.main);
 		autoSendLocationCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
-		sendLocation = (Button) findViewById(R.id.send_location);
+		checkInNow = (Button) findViewById(R.id.send_location);
 		mapviewb = (Button) findViewById(R.id.map_view);
-		
+
 		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		   
+
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
-		sendLocation.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
+		checkInNow.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		mapviewb.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mapmode,0,0,0);
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-	          createGpsDisabledAlert();
-	     }
-		
+			createGpsDisabledAlert();
+		}
+
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				Intent i = new Intent(Main.this, CameraController.class);
@@ -176,79 +138,72 @@ public class Main extends Activity
 				editor.commit();
 				if (isChecked) { 
 					appService.setAutoCheckin(true);
-					//sendLocation.setEnabled(false);
 					Toast.makeText(getBaseContext(), "Auto sending is ready!", Toast.LENGTH_SHORT).show(); 
 				} 
 				else 
 				{ 
 					appService.setAutoCheckin(false);
-					//sendLocation.setEnabled(true);
-					Toast.makeText(getBaseContext(), "Auto sending is disable!", Toast.LENGTH_SHORT).show(); 
+					Toast.makeText(getBaseContext(), "Auto sending is disabled!", Toast.LENGTH_SHORT).show(); 
 				} 
 
 			} 
 		}); 
-		
-		sendLocation.setOnClickListener(new OnClickListener() {
+
+		checkInNow.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				         if (autoSendLocationCheckbox.isChecked()) {
-				        	autoSendLocationCheckbox.setChecked(false);
-		         }
-				appService.sendLocationNow(true);
-				
+				appService.sendLocationNow(true);				
 			}
-	
+
 		});
 
 		mapviewb.setOnClickListener(new OnClickListener() {
-		
+
 			@Override
 			public void onClick(View v) {
-				
-				if (lati != 0.0 & longi != 0.0){
-				
-				MapViewController.putLatLong(lati, longi);
-				Intent i = new Intent(Main.this, MapViewController.class);	
-				startActivity(i);
-			
-				}else{
-				Toast.makeText(getBaseContext(), "Please take location!", Toast.LENGTH_SHORT).show(); 
+
+				if (lastLocation != null){
+					Intent i = new Intent(Main.this, MapViewController.class);
+					i.putExtra(IAppService.LAST_LOCATION, lastLocation);
+					startActivity(i);
 				}
-					
-				
+				else{
+					Toast.makeText(getBaseContext(), getString(R.string.location_hasnt_received), Toast.LENGTH_SHORT).show(); 
+				}
+
+
 			}
 		});
 
 	}
 
-//Gps provider status control
+	//Gps provider status control
 	private void createGpsDisabledAlert(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Your GPS is disabled! Would you like to enable it?")
-		     .setCancelable(false)
-		     .setPositiveButton("Enable GPS",
-		          new DialogInterface.OnClickListener(){
-		          public void onClick(DialogInterface dialog, int id){
-		               showGpsOptions();
-		          }
-		     });
-		     builder.setNegativeButton("Do nothing",
-		          new DialogInterface.OnClickListener(){
-		          public void onClick(DialogInterface dialog, int id){
-		               dialog.cancel();
-		          }
-		     });
+		builder.setMessage(getString(R.string.gps_disabled_message))
+		.setCancelable(false)
+		.setPositiveButton(R.string.enable_gps,
+				new DialogInterface.OnClickListener(){
+			public void onClick(DialogInterface dialog, int id){
+				showGpsOptions();
+			}
+		});
+		builder.setNegativeButton(R.string.cancel,
+				new DialogInterface.OnClickListener(){
+			public void onClick(DialogInterface dialog, int id){
+				dialog.cancel();
+			}
+		});
 		AlertDialog alert = builder.create();
 		alert.show();
-		}
+	}
 
-		private void showGpsOptions(){
-				Intent gpsOptionsIntent = new Intent(
-						android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-				startActivity(gpsOptionsIntent);
-		}
+	private void showGpsOptions(){
+		Intent gpsOptionsIntent = new Intent(
+				android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		startActivity(gpsOptionsIntent);
+	}
 
 	@Override
 	protected void onPause() 
@@ -265,14 +220,8 @@ public class Main extends Activity
 		bindService(new Intent(Main.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
 		IntentFilter i = new IntentFilter();
 		i.addAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-		i.addAction(IAppService.L_LATITUDE);	
-		i.addAction(IAppService.L_LONGITUDE);
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
-
-
-
-
 	}
 
 	@Override
