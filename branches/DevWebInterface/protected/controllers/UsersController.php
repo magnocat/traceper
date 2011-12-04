@@ -104,9 +104,9 @@ class UsersController extends Controller
 									"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
 							));
 		}
-		echo CJSON::encode(array(
+		echo CJSON::encode(
                  		$resultArray
-		));
+		);
 
 		Yii::app()->end();
 	}
