@@ -19,9 +19,7 @@ public interface IAppService {
 		
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
-	
-	public static final String L_LONGITUDE = "FASULYA";
-	public static final String L_LATITUDE = "BAMYA";
+	public static final String LAST_LOCATION = "LOCATION";
 	
 	public String getUsername();
 	

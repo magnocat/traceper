@@ -36,6 +36,7 @@ public class Register extends Activity {
 	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
 	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
 	protected static final int CUSTOM_MESSAGE_DIALOG = 7;
+	private static final int NOT_CONNECTED_TO_NETWORK = 8;
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
@@ -56,6 +57,11 @@ public class Register extends Activity {
 			
             appService = ((AppService.IMBinder)service).getService(); 
             appService.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
+            
+            if (appService.isNetworkConnected() == false)
+    		{
+    			showDialog(NOT_CONNECTED_TO_NETWORK);					
+    		}
             
         }
 
@@ -248,6 +254,16 @@ public class Register extends Activity {
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
         				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 
+			case NOT_CONNECTED_TO_NETWORK:
+
+    			return new AlertDialog.Builder(Register.this)       
+        		.setMessage(R.string.not_connected_to_network)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				finish();
         			}
         		})        
         		.create(); 
