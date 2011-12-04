@@ -304,6 +304,54 @@ class SiteController extends Controller
 		return $emails;
 	}	
 	
+	
+	public function actiontakeCallInfo()
+	{
+		
+	
+	//$string=file_get_contents(filepath); 
+	
+	
+	// örnek olarak gelen veri tipi
+	//$string='[{"ylocation":0,"number":"552255555","xlocation":0,"type":0,"contact":0,"end":1322324987381,"begin":1322324984079},
+	//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324994078,"begin":1322324990438},
+	//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324999737,"begin":1322324996553}]';
+
+	  
+		
+	$json_o=json_decode($string);
+	//print_r($json_o);
+	$i = 0;
+
+	
+	foreach ($json_o as $v) {
+		
+		
+	// çözümleme  ,veri tabanýna kayýt iþlemi
+    $number = $json_o[$i]->number;
+   	$type = $json_o[$i]->type;
+    $contact =  $json_o[$i]->contact;
+    $end = $json_o[$i]->end;
+    $begin =  $json_o[$i]->begin;
+    $lati =  $json_o[$i]->xlocation;
+    $longi = $json_o[$i]->ylocation;
+    
+   		
+    $sqlWasHere = sprintf('INSERT INTO traceper_call_logg								
+									(contact, number, latitude, longitude, begin, end,type)
+		    						VALUES(%s, %s, %f, %f, "%s", "%s", "%s") 
+									',
+								  	$contact, $number, $lati, $longi, $begin, $end ,$type);
+					Yii::app()->db->createCommand($sqlWasHere)->execute();
+    
+	// veri tabanýna kayýt iþlemi
+    
+    $i++;
+	}
+		
+
+	}
+	
 	public function actionActivate()
 	{
 		$email = $_GET['email'];
