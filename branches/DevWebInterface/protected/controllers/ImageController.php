@@ -70,7 +70,7 @@ class ImageController extends Controller
 		));
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('getList',array('dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('imagesInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
 
 	public function actionSearch() {
@@ -111,7 +111,7 @@ class ImageController extends Controller
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('search', array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('searchImageResults', array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
 	public function actionGet()
