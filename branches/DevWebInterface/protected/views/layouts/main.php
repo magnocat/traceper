@@ -223,11 +223,12 @@
 									</div>
 								</div> 
 								
-								--><div id="photosList">	
+								<div id="photosList">	
 									<div id="imageSearch">
 											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
 									</div>		
 								</div>
+								-->
 							</div>		
 						</div> 													
 					</div>
