@@ -17,13 +17,10 @@
 
 	));
 	 ?>
-	 
-	 
-
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'keyword'); ?>
-		<?php echo $form->textField($model,'keyword'); ?>
+		<?php echo $form->textField($model,'keyword', array('size'=>15)); ?>
 		<?php echo CHtml::ajaxSubmitButton('Submit', $this->createUrl('image/search'), 
 											array(
 												'complete'=> 'function() { $("#imageSearchResults").dialog("open"); return false;}',
