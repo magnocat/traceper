@@ -41,11 +41,12 @@ public class Login extends Activity {
 	private static final int SETTINGS_DIALOG = 5;
 	private static final int HTTP_REQUEST_FAILED = 6;
 	private static final int HTTP_MISSING_PARAMETER = 7;
+	private static final int CUSTOM_MESSAGE_DIALOG = 8;
 	private EditText emailText;
     private EditText passwordText;
     private Button cancelButton;
     private CheckBox rememberMeCheckBox;
-
+    private String dialogMessage;
     private IAppService appManager;
     private ProgressDialog progressDialog;
     public static final int SIGN_UP_ID = Menu.FIRST;
@@ -65,7 +66,11 @@ public class Login extends Activity {
             appManager = ((AppService.IMBinder)service).getService();  
             appManager.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
            
-            if (appManager.isUserAuthenticated() == true)
+            if (appManager.isNetworkConnected() == false)
+    		{
+    			showDialog(NOT_CONNECTED_TO_NETWORK);					
+    		}
+            else if (appManager.isUserAuthenticated() == true)
             {
             	Intent i = new Intent(Login.this, Main.class);																
 				startActivity(i);
@@ -83,6 +88,7 @@ public class Login extends Activity {
                     Toast.LENGTH_SHORT).show();
         }
     };
+	
 	
 	
     
@@ -105,6 +111,7 @@ public class Login extends Activity {
         emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
         passwordText.setText(preferences.getString(Configuration.PREFERENCES_PASSWORD, ""));
         rememberMeCheckBox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, false));
+        
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
@@ -130,25 +137,17 @@ public class Login extends Activity {
 					
 					Thread loginThread = new Thread(){
 						private Handler handler = new Handler();
-						int result;
+						String result;
 						@Override
 						public void run() {
-							
-							String password = null;
-							try {
-								password = AeSimpleMD5.MD5(passwordText.getText().toString());
-							} catch (NoSuchAlgorithmException e) {
-								e.printStackTrace();
-							} catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							result = appManager.authenticateUser(emailText.getText().toString(), password);
+							result = appManager.authenticateUser(emailText.getText().toString(), passwordText.getText().toString());
 							
 							handler.post(new Runnable(){
 								public void run() {										
 									progressDialog.dismiss();
 									
-									if (result == IAppService.HTTP_RESPONSE_SUCCESS){
+									if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
+									{
 										SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 										
 										if (rememberMeCheckBox.isChecked() == true) {									
@@ -166,6 +165,11 @@ public class Login extends Activity {
 										startActivity(i);	
 										Login.this.finish();										
 									}
+									else{
+										Login.this.dialogMessage = result;
+										showDialog(CUSTOM_MESSAGE_DIALOG);
+									}
+						/*			
 									else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
 									{
 										// Authentication failed, inform the user								 
@@ -181,6 +185,7 @@ public class Login extends Activity {
 									else {							
 										showDialog(UNKNOWN_ERROR_OCCURED);
 									}
+						*/
 								}									
 							});
 														
@@ -204,7 +209,8 @@ public class Login extends Activity {
 				appManager.exit();
 				finish();				
 			}        	
-        });       
+        }); 
+        
         
          
         
@@ -258,7 +264,7 @@ public class Login extends Activity {
         		.setMessage(R.string.not_connected_to_network)
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
-        				/* User clicked OK so do some stuff */
+        				finish();
         			}
         		})        
         		.create(); 
@@ -316,6 +322,15 @@ public class Login extends Activity {
     		case HTTP_MISSING_PARAMETER:
     			return new AlertDialog.Builder(Login.this)       
         		.setMessage(R.string.http_missing_parameter)
+        		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+        			public void onClick(DialogInterface dialog, int whichButton) {
+        				/* User clicked OK so do some stuff */
+        			}
+        		})        
+        		.create(); 
+    		case CUSTOM_MESSAGE_DIALOG:
+    			return new AlertDialog.Builder(Login.this)       
+        		.setMessage(this.dialogMessage)
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
         				/* User clicked OK so do some stuff */

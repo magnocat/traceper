@@ -19,9 +19,8 @@ public interface IAppService {
 		
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
+	public static final String LAST_LOCATION = "LOCATION";
 	
-	public static final String L_LONGITUDE = "";
-	public static final String L_LATITUDE = "";
 	
 	public String getUsername();
 	
@@ -41,13 +40,13 @@ public interface IAppService {
 	
 	public void exit();
 	
-	public int registerUser(String password, String email, String realname);
+	public String registerUser(String password, String email, String realname);
 	
-	public int authenticateUser(String username, String password);
+	public String authenticateUser(String username, String password);
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public int sendImage(byte[] image, boolean publicData);
+	public String sendImage(byte[] image, boolean publicData);
 	
 
 	
