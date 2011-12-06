@@ -99,7 +99,7 @@ class SiteController extends Controller
 
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-				
+
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -109,7 +109,7 @@ class SiteController extends Controller
 			else if ($model->getError('rememberMe') != null) {
 				$result = $model->getError('rememberMe');
 			}
-				
+
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -238,7 +238,7 @@ class SiteController extends Controller
 			else if ($model->getError('passwordAgain') != null) {
 				$result = $model->getError('passwordAgain');
 			}
-				
+
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -271,11 +271,11 @@ class SiteController extends Controller
 				for ($i = 0; $i < $arrayLength; $i++)
 				{
 					$dt = date("Y-m-d H:m:s");
-						
+
 					$invitedUsers = new InvitedUsers;
 					$invitedUsers->email = $emailArray[$i];
 					$invitedUsers->dt = $dt;
-						
+
 					if ($invitedUsers->save())
 					{
 						$key = md5($emailArray[$i].$dt);
@@ -376,6 +376,53 @@ class SiteController extends Controller
 		//		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 		//
 		//		$this->renderPartial('activate',array('model'=>$model), false, $processOutput);
+	}
+
+	public function actionTakeCallInfo()
+	{
+		echo "takeCallInfo";
+
+		//$string=file_get_contents(filepath);
+
+
+		// �rnek olarak gelen veri tipi
+		//$string='[{"ylocation":0,"number":"552255555","xlocation":0,"type":0,"contact":0,"end":1322324987381,"begin":1322324984079},
+		//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324994078,"begin":1322324990438},
+		//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324999737,"begin":1322324996553}]';
+
+		 
+
+		$json_o=json_decode($string);
+		//print_r($json_o);
+		$i = 0;
+
+
+		foreach ($json_o as $v) {
+
+
+			// ��z�mleme  ,veri taban�na kay�t i�lemi
+			$number = $json_o[$i]->number;
+			$type = $json_o[$i]->type;
+			$contact =  $json_o[$i]->contact;
+			$end = $json_o[$i]->end;
+			$begin =  $json_o[$i]->begin;
+			$lati =  $json_o[$i]->xlocation;
+			$longi = $json_o[$i]->ylocation;
+
+			 
+			$sqlWasHere = sprintf('INSERT INTO traceper_call_logg
+									(contact, number, latitude, longitude, begin, end,type)
+		    						VALUES(%s, %s, %f, %f, "%s", "%s", "%s") 
+									',
+			$contact, $number, $lati, $longi, $begin, $end ,$type);
+			Yii::app()->db->createCommand($sqlWasHere)->execute();
+
+			// veri taban�na kay�t i�lemi
+
+			$i++;
+		}
+
+
 	}
 }
 
