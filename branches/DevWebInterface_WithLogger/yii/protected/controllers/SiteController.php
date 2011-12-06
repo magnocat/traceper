@@ -305,14 +305,14 @@ class SiteController extends Controller
 	}	
 	
 	
-	public function actiontakeCallInfo()
+	public function actionTakeCallInfo()
 	{
-		
+		echo "takeCallInfo";
 	
 	//$string=file_get_contents(filepath); 
 	
 	
-	// örnek olarak gelen veri tipi
+	// ï¿½rnek olarak gelen veri tipi
 	//$string='[{"ylocation":0,"number":"552255555","xlocation":0,"type":0,"contact":0,"end":1322324987381,"begin":1322324984079},
 	//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324994078,"begin":1322324990438},
 	//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324999737,"begin":1322324996553}]';
@@ -327,7 +327,7 @@ class SiteController extends Controller
 	foreach ($json_o as $v) {
 		
 		
-	// çözümleme  ,veri tabanýna kayýt iþlemi
+	// ï¿½ï¿½zï¿½mleme  ,veri tabanï¿½na kayï¿½t iï¿½lemi
     $number = $json_o[$i]->number;
    	$type = $json_o[$i]->type;
     $contact =  $json_o[$i]->contact;
@@ -344,7 +344,7 @@ class SiteController extends Controller
 								  	$contact, $number, $lati, $longi, $begin, $end ,$type);
 					Yii::app()->db->createCommand($sqlWasHere)->execute();
     
-	// veri tabanýna kayýt iþlemi
+	// veri tabanï¿½na kayï¿½t iï¿½lemi
     
     $i++;
 	}
