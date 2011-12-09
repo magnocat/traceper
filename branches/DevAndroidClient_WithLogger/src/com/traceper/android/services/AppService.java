@@ -65,6 +65,8 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -73,10 +75,13 @@ import com.traceper.R;
 import com.traceper.android.CameraController;
 import com.traceper.android.Configuration;
 import com.traceper.android.dao.CallLoggContentProvider;
+import com.traceper.android.dao.db.CallInfoTable;
 import com.traceper.android.dao.model.CallInfo;
 import com.traceper.android.dao.model.GlobalCallHolder;
+import com.traceper.android.grouping.ChildItem;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.tools.XMLHandler;
+import com.traceper.android.utils.CursorUtils;
 
 public class AppService extends Service implements IAppService{
 
@@ -114,7 +119,8 @@ public class AppService extends Service implements IAppService{
 //	private boolean network_enabled = false;
 	private String cookie = null;
 	private boolean configurationChanged = false;
-
+	  TelephonyManager telephonyManager;
+	  PhoneStateListener listener;
 
 	public class IMBinder extends Binder {
 		public IAppService getService() {
@@ -129,7 +135,7 @@ public class AppService extends Service implements IAppService{
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
 		//		xmlHandler = new XMLHandler();
 		locationHandler = new LocationHandler();
-
+	
 		networkStateReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -377,6 +383,7 @@ public class AppService extends Service implements IAppService{
 	   public void sendLogTServer(boolean enable)
 		{
 		   if (enable = true){
+			   SystemClock.sleep(2000);
 	    	executor.execute(new Runnable()
 			{
 				public void run()
@@ -390,14 +397,15 @@ public class AppService extends Service implements IAppService{
 					final HttpClient client = new DefaultHttpClient();
 					
 					JSONArray callsStat = new JSONArray();
+				
+				
 					
 					for (CallInfo call : GlobalCallHolder.getEntireCallList(getContentResolver()))
 					{
 						JSONObject callObj = new JSONObject(call.getMap());
 						callsStat.put(callObj);
 					}
-					
-					
+									
 					String s = callsStat.toString();
 					HttpPost httpPostRequest = new HttpPost(authenticationServerAddress+"?r=site/takeCallInfo&data=" + URLEncoder.encode(s));
 					
@@ -409,8 +417,10 @@ public class AppService extends Service implements IAppService{
 						
 						response = client.execute(httpPostRequest);
 						if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+							if (s!="[]"){
 							getContentResolver().delete(CallLoggContentProvider.CLEAR_CALLS_URI, null, null);
 			        	   	GlobalCallHolder.getEntireCallList().clear();
+							}
 						}
 						
 					}
@@ -434,15 +444,12 @@ public class AppService extends Service implements IAppService{
 		NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
 		if (networkInfo != null) {
 			connected = networkInfo.isConnected();
-			
-			Cursor c = getContentResolver().query(CallLoggContentProvider.CALLS_URI, null, null, null, null);
-						
-			if (c.getCount() >0  ){
-			
-			sendLogTServer(true);
-			}
-		
-		
+		/*	
+			int count = GlobalCallHolder.getEntireCallList().size();
+		if (count >0 ){
+			 sendLogTServer(true);
+					}
+		*/
 		}		
 		return connected; 
 	}

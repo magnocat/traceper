@@ -3,9 +3,15 @@ package com.traceper.android;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,7 +23,9 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,12 +39,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.traceper.R;
+import com.traceper.android.dao.CallLoggContentProvider;
+
+import com.traceper.android.dao.ClearCallsContentObserver;
+import com.traceper.android.dao.NewCallsContentObserver;
+import com.traceper.android.dao.model.GlobalCallHolder;
+import com.traceper.android.grouping.BaseGroupingCriteria;
+import com.traceper.android.grouping.ChildItem;
+import com.traceper.android.grouping.GroupItem;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
 import com.traceper.android.services.CallLoggerService;
 
 public class Main extends Activity 
 {
+	
+	private static final int POST_SUCCES = 5;
+	private static final int POST_FAILED = 4;
+    private static final int START_SEND_MAIL = 3;
+	private static final int UPDATE_EXPANDABLE_LIST = 2;
+	private static final int WAIT_SCREEN_OFF = 1;
+	private static final int WAIT_SCREEN_ON = 0;
+	
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
@@ -47,7 +71,88 @@ public class Main extends Activity
 	private Button call_logger;
 	private CheckBox autoSendLocationCheckbox; 
 	private Location lastLocation = null;
+	
+	private CallExpandableListAdapter callListAdapter;
+	  
+    private BaseGroupingCriteria activeGrouping;
+    
+    private SharedPreferences sharedPrefs;
+	
+    private NewCallsContentObserver callContentObserver;
+    private ClearCallsContentObserver clearContentObserver;
+	
+    
+	private Handler dlgManagerHandler = new Handler()
+	{
+		private ProgressDialog progressDialog;
 
+		public void handleMessage(android.os.Message msg)
+		{
+			if (msg.what == WAIT_SCREEN_ON && progressDialog == null)
+			{
+				progressDialog = ProgressDialog.show(Main.this, "Please wait", "Loading data...", true);
+			}
+			if (msg.what == WAIT_SCREEN_OFF && progressDialog != null)
+			{
+				progressDialog.dismiss();
+				progressDialog = null;
+			}
+			if (msg.what == UPDATE_EXPANDABLE_LIST)
+			{
+		
+			}
+			if (msg.what == START_SEND_MAIL)
+			{
+				startActivity(Intent.createChooser((Intent) msg.obj, "Send mail..."));
+			}
+			if (msg.what == POST_FAILED)
+			{
+				Toast.makeText(Main.this, "Posting failed!", Toast.LENGTH_LONG);
+			}
+			if (msg.what == POST_SUCCES)
+			{
+				Toast.makeText(Main.this, "Posting successed!", Toast.LENGTH_LONG);
+			}
+		};
+	};
+	 private Handler newCallHandler = new Handler()
+	    {
+	    	public void handleMessage(android.os.Message msg)
+	    	{
+	    		if (msg.what == NewCallsContentObserver.CALL_LOG_DB_CHANGED)
+	    		{    			
+	    			handleAddNewCall();
+	    		}
+	    	};
+	    };
+	    
+	    private Handler cearCallsHandler = new Handler()
+	    {
+	    	public void handleMessage(android.os.Message msg)
+	    	{
+	    		if (msg.what == ClearCallsContentObserver.CALL_LOG_DB_CHANGED)
+	    		{    			
+	    			handleClearCalls();
+	    		}
+	    	};
+	    };
+	    
+	    private void handleAddNewCall()
+		{
+			ChildItem child = GlobalCallHolder.loadDBScopeIdentity();
+			GroupItem grIt = activeGrouping.getTargetGroup(child);
+			activeGrouping.putToTargetGroup(grIt, child);
+			callListAdapter.add(grIt);
+			appService.sendLogTServer(true);
+		
+		}
+		
+		private void handleClearCalls()
+		{
+			GlobalCallHolder.getEntireCallList().clear();
+			callListAdapter.clear();
+		
+		}
 	public class MessageReceiver extends  BroadcastReceiver  {
 		public void onReceive(Context context, Intent intent) {
 
@@ -99,8 +204,57 @@ public class Main extends Activity
 		}
 	};
 
-
-
+	private void regroupList(int which)
+	{
+		int prevGrouping = sharedPrefs.getInt(CallLoggerPreferencesActivity.defaultGrouping, BaseGroupingCriteria.GROUPING_BY_TIME);
+		if (which == prevGrouping) return;
+		activeGrouping = BaseGroupingCriteria.createGroupingByCriteria(which, getContentResolver());
+		sharedPrefs.edit().
+			putInt(CallLoggerPreferencesActivity.defaultGrouping, which).
+			commit();
+		activeGrouping.fillCallExpList(callListAdapter, GlobalCallHolder.getEntireCallList());
+		dlgManagerHandler.sendEmptyMessage(UPDATE_EXPANDABLE_LIST);
+		dlgManagerHandler.sendEmptyMessage(WAIT_SCREEN_OFF);
+	}
+        
+    private void registerObservers(boolean notifyForDescendents)
+    {
+    	if (callContentObserver == null)
+    	{
+    		getContentResolver().registerContentObserver
+    			(CallLoggContentProvider.CALLS_URI, notifyForDescendents, 
+    					callContentObserver = new NewCallsContentObserver(newCallHandler));
+    		getContentResolver().registerContentObserver
+			(CallLoggContentProvider.CLEAR_CALLS_URI, notifyForDescendents, 
+					clearContentObserver = new ClearCallsContentObserver(cearCallsHandler));
+    	}
+    }
+    
+    private void unregisterObservers()
+    {
+    	if (callContentObserver != null)
+    		getContentResolver().unregisterContentObserver(callContentObserver);
+    	if (clearContentObserver != null)
+    		getContentResolver().unregisterContentObserver(clearContentObserver);
+    }
+    
+	private boolean isCallServiceRun()
+	{
+		ActivityManager activMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		List<ActivityManager.RunningServiceInfo> servList = activMan.getRunningServices(Integer.MAX_VALUE);
+		
+		if (servList != null && servList.size()>0)
+		{
+			for (RunningServiceInfo runningServiceInfo : servList)
+			{
+				if (runningServiceInfo.service.getClassName().equalsIgnoreCase(CallLoggerService.class.getName()))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	protected void onCreate(Bundle savedInstanceState) 
 	{		
@@ -121,6 +275,23 @@ public class Main extends Activity
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
+		
+	        
+		 sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+	        
+	        registerObservers(true);
+	        
+	        callListAdapter = new CallExpandableListAdapter(Main.this);
+
+	        activeGrouping = BaseGroupingCriteria.createGroupingByCriteria(
+	        		sharedPrefs.getInt(	CallLoggerPreferencesActivity.defaultGrouping, 
+	        							CallLoggerPreferencesActivity.defaultGroupingVal),
+	        							getContentResolver());
+	        
+	        activeGrouping.fillCallExpList(callListAdapter, GlobalCallHolder.getEntireCallList(getContentResolver()));
+	       
+		
+		
 		if (startService(new Intent(this, CallLoggerService.class)) != null)
 		{}
 		
@@ -242,7 +413,12 @@ public class Main extends Activity
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
 	}
-
+	@Override
+	public void onDestroy()
+	{
+	    	super.onDestroy();
+	    	unregisterObservers();
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {		
 		boolean result = super.onCreateOptionsMenu(menu);		

@@ -372,7 +372,7 @@ public class LoggMain extends ExpandableListActivity {
 					callsStat.put(callObj);
 				}
 				
-				HttpPost httpPostRequest = new HttpPost("http://192.168.2.25/elman/trac");
+				HttpPost httpPostRequest = new HttpPost("http://localhost/traceper");
 				
 				String s = callsStat.toString();
 				HttpResponse response = null;
@@ -416,6 +416,7 @@ public class LoggMain extends ExpandableListActivity {
 		activeGrouping.putToTargetGroup(grIt, child);
 		callListAdapter.add(grIt);
 		setListAdapter(callListAdapter);
+		
 	}
 	
 	private void handleClearCalls()
