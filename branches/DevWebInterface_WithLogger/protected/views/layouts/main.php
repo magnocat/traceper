@@ -93,6 +93,21 @@
 	echo '<div id="inviteUsersWindow"></div>';
 ///////////////////////////// Friend Request Window ///////////////////////////	
 	echo '<div id="friendRequestsWindow"></div>';
+///////////////////////////////// Call log window //////////////////////////////
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'callLogWindow',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'About'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'width'=> '800px'      
+	    ),
+	));
+
+	echo "call log window";		
+	$this->endWidget('zii.widgets.jui.CJuiDialog');		
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',

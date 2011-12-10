@@ -84,6 +84,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		TRACKER.langOperator = langOperator;		
 	}
 
+	this.showCallLog = function(userId) {
+		
+		$("#callLogWindow").dialog("open");
+		var params = "r=users/getCallLog&userId=" + userId;
+		TRACKER.ajaxReq(params, function(result){
+			$('#callLogWindow').html(result);
+		});
+		
+	}
 	/**
 	 * 
 	 */

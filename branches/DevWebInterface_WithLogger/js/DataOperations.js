@@ -148,10 +148,10 @@ function processXML(MAP, xml, isFriendList)
 					+ '<br/>' + TRACKER.users[userId].realname  
 					+ '<br/>' + TRACKER.users[userId].locationCalculatedTime
 					+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-
 					+'</div>'
 					+'<div>'
 					+ '<ul class="sf-menu"> '
+					+ '<li><a href="javascript:TRACKER.showCallLog('+userId+')">See call log</a></li>' 
 					+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
 					+ TRACKER.langOperator.previousPoint 
 					+'</a>'+ '</li>'

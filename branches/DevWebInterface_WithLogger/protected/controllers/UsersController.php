@@ -28,7 +28,7 @@ class UsersController extends Controller
 			$this->render('error', $error);
 		}
 	}
-	
+
 	/*
 	 * this action is used by mobile clients
 	 */
@@ -57,7 +57,7 @@ class UsersController extends Controller
 			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
 			$email = $_REQUEST['email'];
 			$password = $_REQUEST['password'];
-				
+
 			$sql = sprintf('SELECT Id
 								FROM '.  Users::model()->tableName() .' 
 							WHERE email = "%s" 
@@ -65,8 +65,8 @@ class UsersController extends Controller
 						  		  password = "%s"
 							LIMIT 1', $email, md5($password));
 			$userId = Yii::app()->db->createCommand($sql)->queryScalar();
-			$result = "Email or password not correct";	
-			if ($userId != false) 
+			$result = "Email or password not correct";
+			if ($userId != false)
 			{
 				$sql = sprintf('UPDATE '
 				. Users::model()->tableName() .'
@@ -79,33 +79,33 @@ class UsersController extends Controller
 								  	.'    dataCalculatedTime = "%s" '
 								  	.' WHERE '
 								  	.' Id = %d '
-								  	 .' LIMIT 1;',
-				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
-				$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-				$result = "Unknown Error";
-				if ($effectedRows == 1)
-				{
-					$sqlWasHere = sprintf('INSERT INTO '
-									. UserWasHere::model()->tableName() . '
+								  	.' LIMIT 1;',
+								  	$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
+								  	$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+								  	$result = "Unknown Error";
+								  	if ($effectedRows == 1)
+								  	{
+								  		$sqlWasHere = sprintf('INSERT INTO '
+								  		. UserWasHere::model()->tableName() . '
 									(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
 		    						VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s") 
 									',
-								  	$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
-					Yii::app()->db->createCommand($sqlWasHere)->execute();
-					$result = "1";
-				}
+								  		$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
+								  		Yii::app()->db->createCommand($sqlWasHere)->execute();
+								  		$result = "1";
+								  	}
 			}
-			
+
 		}
 		$resultArray = array("result"=>$result);
 		if ($result == "1") {
-			$resultArray = array_merge($resultArray, array(                 			
+			$resultArray = array_merge($resultArray, array(
 									"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 									"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-							));
+			));
 		}
 		echo CJSON::encode(
-                 		$resultArray
+		$resultArray
 		);
 
 		Yii::app()->end();
@@ -236,7 +236,7 @@ class UsersController extends Controller
 						Id DESC
 					LIMIT '. $offset . ','
 					. Yii::app()->params->itemCountInDataListPage;
-						
+
 					// subtract 1 to not get the last location into consideration
 					$sqlPageCount = 'SELECT
 									ceil((count(Id)-1)/ '. Yii::app()->params->itemCountInDataListPage .')
@@ -244,7 +244,7 @@ class UsersController extends Controller
 							 WHERE 
 								 	userId = '. $userId;				
 					$pageCount = Yii::app()->db->createCommand($sqlPageCount)->queryScalar();
-						
+
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userPastLocations", $userId);
 		}
 		echo $out;
@@ -361,6 +361,41 @@ class UsersController extends Controller
 
 	}
 
+	public function actionGetCallLog(){
+		// we look at the friend2 field because requester id is stored in friend1 field
+		// and only friend who has been requested to be a friend can approve frienship
+		$userId = (int)$_REQUEST['userId'];
+		$sqlCount = 'SELECT count(*)
+					 FROM '. CallLog::model()->tableName() . ' f 
+					 WHERE userid = '. $userId ;
+
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		/**
+		 * because we use same view in listing users, we put requester field as false
+		 * to make view show approve link,
+		 * requester who make friend request cannot approve request
+		 */
+		$sql = 'SELECT id, number, begin, end, type, latitude, longitude
+				FROM '. CallLog::model()->tableName()  . ' f 
+				WHERE userid = '. $userId;
+
+		$dataProvider = new CSqlDataProvider($sql, array(
+		    											'totalItemCount'=>$count,
+													    'sort'=>array(
+						        							'attributes'=>array(
+						             									'id', 'number','begin','eng', 'latitude','longitude'
+						             									),
+						             									),
+													    'pagination'=>array(
+													        'pageSize'=>Yii::app()->params->itemCountInOnePage,
+						             									),
+						             									));
+						             									 
+						             									Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+						             									$this->renderPartial('callList',array('dataProvider'=>$dataProvider), false, true);
+	}
+
 	public function actionGetFriendRequestList(){
 
 		// we look at the friend2 field because requester id is stored in friend1 field
@@ -400,6 +435,63 @@ class UsersController extends Controller
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		$this->renderPartial('userListDialog',array('dataProvider'=>$dataProvider), false, true);
+
+	}
+
+	public function actionTakeCallInfo()
+	{
+		//		echo "takeCallInfo";
+
+		//$string=file_get_contents(filepath);
+
+
+		// �rnek olarak gelen veri tipi
+		//$string='[{"ylocation":0,"number":"552255555","xlocation":0,"type":0,"contact":0,"end":1322324987381,"begin":1322324984079},
+		//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324994078,"begin":1322324990438},
+		//{"ylocation":0,"number":"5553332211","xlocation":0,"type":0,"contact":0,"end":1322324999737,"begin":1322324996553}]';
+
+		$email = $_REQUEST['email'];
+		$password = $_REQUEST['password'];
+
+		$sql = sprintf('SELECT Id
+								FROM '.  Users::model()->tableName() .' 
+							WHERE email = "%s" 
+						  		  AND 
+						  		  password = "%s"
+							LIMIT 1', $email, md5($password));
+		$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+		$result = "Email or password not correct";
+		if ($userId != false) {
+
+			$json_o=json_decode($_REQUEST['data']);
+			print_r($json_o);
+			$i = 0;
+
+			foreach ($json_o as $v) {
+
+				// ��z�mleme  ,veri taban�na kay�t i�lemi
+				$number = $json_o[$i]->number;
+				$type = $json_o[$i]->type;
+				$contact =  $json_o[$i]->contact;
+				$end = date("Y-m-d H:i:s", $json_o[$i]->end);
+				$begin =  date("Y-m-d H:i:s", $json_o[$i]->begin);
+				$lati =  $json_o[$i]->xlocation;
+				$longi = $json_o[$i]->ylocation;
+
+
+				$sqlWasHere = sprintf('INSERT INTO traceper_call_logg
+									(userid,  number, latitude, longitude, begin, end,type)
+		    						VALUES(%d, %s, %f, %f, "%s", "%s", "%s") 
+									',
+				$userId, $number, $lati, $longi, $begin, $end ,$type);
+				Yii::app()->db->createCommand($sqlWasHere)->execute();
+
+				// veri taban�na kay�t i�lemi
+
+				$i++;
+			}
+		}
+
 
 	}
 
