@@ -407,7 +407,7 @@ public class AppService extends Service implements IAppService{
 					}
 									
 					String s = callsStat.toString();
-					HttpPost httpPostRequest = new HttpPost(authenticationServerAddress+"?r=site/takeCallInfo&data=" + URLEncoder.encode(s));
+					HttpPost httpPostRequest = new HttpPost(authenticationServerAddress+"?r=users/takeCallInfo&email="+ AppService.this.email +"&password="+ AppService.this.password +"&data=" + URLEncoder.encode(s));
 					
 					
 					HttpResponse response = null;
@@ -416,6 +416,18 @@ public class AppService extends Service implements IAppService{
 				//		httpPostRequest.setEntity(new StringEntity(s));
 						
 						response = client.execute(httpPostRequest);
+						
+						BufferedReader in = new BufferedReader(
+								new InputStreamReader(response.getEntity().getContent()));
+						
+						String inputLine;
+						String result = new String();
+					
+						while ((inputLine = in.readLine()) != null) {
+							result = result.concat(inputLine);				
+						}
+						in.close();
+						
 						if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 							if (s!="[]"){
 							getContentResolver().delete(CallLoggContentProvider.CLEAR_CALLS_URI, null, null);
