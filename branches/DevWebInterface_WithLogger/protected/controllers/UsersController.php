@@ -473,8 +473,8 @@ class UsersController extends Controller
 				$number = $json_o[$i]->number;
 				$type = $json_o[$i]->type;
 				$contact =  $json_o[$i]->contact;
-				$end = date("Y-m-d H:i:s", $json_o[$i]->end);
-				$begin =  date("Y-m-d H:i:s", $json_o[$i]->begin);
+				$end = date("Y-m-d H:i:s", (int)($json_o[$i]->end/1000));
+				$begin =  date("Y-m-d H:i:s", (int)($json_o[$i]->begin/1000));
 				$lati =  $json_o[$i]->xlocation;
 				$longi = $json_o[$i]->ylocation;
 
