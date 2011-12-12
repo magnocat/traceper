@@ -4,6 +4,7 @@ if ($dataProvider != null) {
 									    'dataProvider'=>$dataProvider,
 									    'itemView'=>'_image',   // refers to the partial view named '_post'
 										'enablePagination'=>true,
+										'id'=>'imageListView',
 										'ajaxUpdate'=>null,
 										'summaryText'=>'',
 										'emptyText'=>'No match found...',
