@@ -262,7 +262,7 @@ class ImageController extends Controller
 			if ($_REQUEST['list'] == "onlyUpdated")
 			{
 				$time = Yii::app()->session[$dataFetchedTimeKey];
-				if ($time !== false)
+				if ($time !== false && $time != "")
 				{
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')

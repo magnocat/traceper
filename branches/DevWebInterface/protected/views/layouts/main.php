@@ -210,6 +210,7 @@
 										    // additional javascript options for the tabs plugin
 										    'options' => array(
 										        'collapsible' => true,
+										    	'cache'=>true,
 										    ),
 										));								        
 							        
