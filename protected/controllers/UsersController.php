@@ -120,7 +120,7 @@ class UsersController extends Controller
 
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId
+		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
@@ -140,7 +140,8 @@ class UsersController extends Controller
 		));
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()));
 
 	}
 
@@ -174,7 +175,7 @@ class UsersController extends Controller
 
 					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId,
+					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
 								1 isFriend
 							FROM '. Users::model()->tableName() . ' u 
 							LEFT JOIN ' . Friends::model()->tableName() . ' f
@@ -198,7 +199,7 @@ class UsersController extends Controller
 
 			$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId,
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
@@ -228,7 +229,7 @@ class UsersController extends Controller
 			$offset++;  // to not get the last location
 			$sql = 'SELECT
 							longitude, latitude, deviceId, 
-							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+							date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 					FROM ' . UserWasHere::model()->tableName() .'
 					WHERE 
 						userId = '. $userId . '
@@ -378,9 +379,7 @@ class UsersController extends Controller
 		 * requester who make friend request cannot approve request
 		 */
 		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, f.status,
-					   false as requester
-	
-					   
+					   false as requester	   
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = f.friend1
@@ -478,8 +477,10 @@ class UsersController extends Controller
 					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
 					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
 					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-
-					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" >'
+					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
+	
+					
+					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" calculatedTime="' . $row['dataCalculatedTime'] . '" >'
 					.'<time>'. $row['dataArrivedTime'] .'</time>'
 					.'<deviceId>'. $row['deviceId'] .'</deviceId>'
 					.'</location>';

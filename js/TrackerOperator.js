@@ -40,7 +40,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.allImagesFetched = false;
 	this.images = [];
-//	this.imageIds = [];
+	this.imageIds = [];
 	this.imageThumbSuffix;
 	this.imageOrigSuffix;
 	

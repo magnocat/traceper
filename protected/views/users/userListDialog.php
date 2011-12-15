@@ -10,7 +10,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    ),
 	));
 
-$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'viewId'=>'userListDialog')); 	
+$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'viewId'=>'userListDialog', 'friendRequestList'=>true)); 	
 
 $this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>
