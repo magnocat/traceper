@@ -143,10 +143,9 @@ function processXML(MAP, xml, isFriendList)
 					mapMarker:new Array(markerInfoWindow),
 					locationCalculatedTime:locationCalculatedTime
 				});
-
 				var content =  '<div>'														   
 					+ '<br/>' + TRACKER.users[userId].realname  
-					+ '<br/>' + TRACKER.users[userId].locationCalculatedTime
+					+ '<br/>' + TRACKER.users[userId].time
 					+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
 
 					+'</div>'
@@ -265,6 +264,7 @@ function processImageXML(MAP, xml){
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	$(xml).find("page").find("image").each(function(){
+		
 		var image = $(this);
 		var imageId = $(image).attr('id');
 		var imageURL =  decodeURIComponent($(image).attr('url'));
@@ -274,13 +274,14 @@ function processImageXML(MAP, xml){
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
-
+		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
-
+		
 		if ($.inArray(imageId, TRACKER.imageIds) == -1)
 		{
 			TRACKER.imageIds.push(imageId);
 		}
+		
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
 				

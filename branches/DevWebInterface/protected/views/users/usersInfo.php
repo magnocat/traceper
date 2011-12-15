@@ -1,6 +1,6 @@
 <?php 
 	if (isset($dataProvider)) {
-		$this->renderPartial('userList', array('dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true), false, true);
 	}
 	
 	echo '<div id="userSearchResults"></div>';
@@ -29,11 +29,5 @@
 											null);?>
 		<?php echo $form->error($model,'keyword'); 	?>
 	</div>
-
-	<div class="row buttons">
-		<?php  ?>
-												
-	</div>
-
 <?php $this->endWidget(); ?>
 </div>

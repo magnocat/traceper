@@ -70,7 +70,9 @@ class ImageController extends Controller
 		));
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('imagesInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+		//TODO: added below line because gridview.js is loaded before.
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('imagesInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()));
 	}
 
 	public function actionSearch() {
@@ -111,7 +113,8 @@ class ImageController extends Controller
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('searchImageResults', array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
+//		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('searchImageResults', array('model'=>$model, 'dataProvider'=>$dataProvider));
 	}
 
 	public function actionGet()

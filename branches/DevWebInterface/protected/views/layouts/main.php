@@ -204,8 +204,10 @@
 								        
 										$this->widget('zii.widgets.jui.CJuiTabs', array(
 										    'tabs' => array(
-												'Users' => array('ajax' => $this->createUrl('users/getFriendList')),
-										        'Photos' => array('ajax' => $this->createUrl('image/getList')),
+												'Users' => array('ajax' => $this->createUrl('users/getFriendList'), 
+																 'id'=>'users_tab'),
+										        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
+										        				  'id'=>'photos_tab'),
 										    ),
 										    // additional javascript options for the tabs plugin
 										    'options' => array(
@@ -213,23 +215,8 @@
 										    	'cache'=>true,
 										    ),
 										));								        
-							        
 								    ?>
-               																																		
-								</div><!--  
-								
-								<div id='friendsList'>
-									<div id="userSearch">
-											<?php $this->renderPartial('//users/searchUser', array('model'=>new SearchForm())); ?>
-									</div>
-								</div> 
-								
-								<div id="photosList">	
-									<div id="imageSearch">
-											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
-									</div>		
 								</div>
-								-->
 							</div>		
 						</div> 													
 					</div>
