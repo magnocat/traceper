@@ -398,8 +398,8 @@ public class Main extends Activity
 	@Override
 	protected void onPause() 
 	{
-		unregisterReceiver(messageReceiver);		
-		unbindService(mConnection);
+	//	unregisterReceiver(messageReceiver);		
+	//	unbindService(mConnection);
 		super.onPause();
 	}
 
@@ -417,7 +417,7 @@ public class Main extends Activity
 	public void onDestroy()
 	{
 	    	super.onDestroy();
-	    	unregisterObservers();
+	//    	unregisterObservers();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {		
