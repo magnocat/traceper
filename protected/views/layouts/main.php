@@ -201,20 +201,22 @@
 	 						<div id='lists'> 	
 								<div class='titles'>											
 									<?php										
-								        
-										$this->widget('zii.widgets.jui.CJuiTabs', array(
-										    'tabs' => array(
-												'Users' => array('ajax' => $this->createUrl('users/getFriendList'), 
-																 'id'=>'users_tab'),
-										        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
-										        				  'id'=>'photos_tab'),
-										    ),
-										    // additional javascript options for the tabs plugin
-										    'options' => array(
-										        'collapsible' => true,
-										    	'cache'=>true,
-										    ),
-										));								        
+								    	if (Yii::app()->user->isGuest == false)
+								    	{
+											$this->widget('zii.widgets.jui.CJuiTabs', array(
+											    'tabs' => array(
+													'Users' => array('ajax' => $this->createUrl('users/getFriendList'), 
+																	 'id'=>'users_tab'),
+											        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
+											        				  'id'=>'photos_tab'),
+											    ),
+											    // additional javascript options for the tabs plugin
+											    'options' => array(
+											        'collapsible' => true,
+											    	'cache'=>true,							   
+											    ),
+											));									    										    		
+								    	}    													        
 								    ?>
 								</div>
 							</div>		
