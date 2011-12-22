@@ -201,7 +201,7 @@
 	 						<div id='lists'> 	
 								<div class='titles'>											
 									<?php										
-								    	if (Yii::app()->user->isGuest == false)
+								    	//if (Yii::app()->user->isGuest == false)
 								    	{
 											$this->widget('zii.widgets.jui.CJuiTabs', array(
 											    'tabs' => array(
