@@ -2,6 +2,10 @@
 	if (isset($dataProvider)) {
 		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true), false, true);
 	}
+	else
+	{
+		echo 'No users to show... <br/> <br/>';				
+	}
 	
 	echo '<div id="userSearchResults"></div>';
 ?>
