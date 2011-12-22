@@ -113,36 +113,42 @@ class UsersController extends Controller
 
 	public function actionGetFriendList()
 	{
-		$sqlCount = 'SELECT count(*)
-					 FROM '. Friends::model()->tableName() . ' f 
-					 WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2 ='.Yii::app()->user->id.') AND status= 1';
-
-		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
-				FROM '. Friends::model()->tableName() . ' f 
-				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-				WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
-
-		$dataProvider = new CSqlDataProvider($sql, array(
-		    											'totalItemCount'=>$count,
-													    'sort'=>array(
-						        							'attributes'=>array(
-						             									'id', 'realname',
-		),
-		),
-													    'pagination'=>array(
-													        'pageSize'=>Yii::app()->params->itemCountInOnePage,
-		),
-		));
+		if(Yii::app()->user->id != null)
+		{
+			$sqlCount = 'SELECT count(*)
+						 FROM '. Friends::model()->tableName() . ' f 
+						 WHERE (friend1 = '.Yii::app()->user->id.' 
+							OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+	
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	
+			$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+					FROM '. Friends::model()->tableName() . ' f 
+					LEFT JOIN ' . Users::model()->tableName() . ' u
+						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+					WHERE (friend1 = '.Yii::app()->user->id.' 
+							OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
 			
+			$dataProvider = new CSqlDataProvider($sql, array(
+			    											'totalItemCount'=>$count,
+														    'sort'=>array(
+							        							'attributes'=>array(
+							             									'id', 'realname',
+			),
+			),
+														    'pagination'=>array(
+														        'pageSize'=>Yii::app()->params->itemCountInOnePage,
+			),
+			));		
+		}
+		else
+		{
+			$dataProvider = null;
+		}
+
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()));
-
 	}
 
 	/**
