@@ -43,32 +43,41 @@ class ImageController extends Controller
 
 	public function actionGetList()
 	{
-		$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-		$sqlCount = 'SELECT count(*)
-					 FROM '. Upload::model()->tableName() . ' u 
-					 WHERE userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .'';
 
-		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-		$sql = 'SELECT u.Id as id, s.realname, s.Id as userId
-					 FROM '. Upload::model()->tableName() . ' u 
-					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-					 WHERE userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .'';
-
-		$dataProvider = new CSqlDataProvider($sql, array(
-		    											'totalItemCount'=>$count,
-													    'sort'=>array(
-						        							'attributes'=>array(
-						             									'id',
-		),
-		),
-													    'pagination'=>array(
-													        'pageSize'=>Yii::app()->params->imageCountInOnePage,
-		),
-		));
+		if(Yii::app()->user->id != null)
+		{
+			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 			
+			$sqlCount = 'SELECT count(*)
+						 FROM '. Upload::model()->tableName() . ' u 
+						 WHERE userId in ('. $friendList .') OR 
+						 	   userId = '. Yii::app()->user->id .'';
+	
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	
+			$sql = 'SELECT u.Id as id, s.realname, s.Id as userId
+						 FROM '. Upload::model()->tableName() . ' u 
+						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+						 WHERE userId in ('. $friendList .') OR 
+						 	   userId = '. Yii::app()->user->id .'';
+	
+			$dataProvider = new CSqlDataProvider($sql, array(
+			    											'totalItemCount'=>$count,
+														    'sort'=>array(
+							        							'attributes'=>array(
+							             									'id',
+			),
+			),
+														    'pagination'=>array(
+														        'pageSize'=>Yii::app()->params->imageCountInOnePage,
+			),
+			));		
+		}
+		else
+		{
+			$dataProvider = null;
+		}
+	
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
