@@ -63,35 +63,10 @@ if ($dataProvider != null) {
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isSearchResult,
 				),
-				
-/*			
-			array(            // display 'author.username' using an expression
-		            'name'=>'authorName',
-		            'value'=>'$data->author->username',
-			),
-			array(            // display a column with "view", "update" and "delete" buttons
-		            'class'=>'CButtonColumn',
-			),
-*/
 			),
 	));
 
 
-	/*
-	 $this->widget('zii.widgets.CListView', array(
-	 'dataProvider'=>$dataProvider,
-	 'itemView'=>'_user',   // refers to the partial view named '_post'
-	 'enablePagination'=>true,
-	 'id'=>isset($viewId) ? $viewId : 'userListView',
-	 'ajaxUpdate'=>null,
-	 'summaryText'=>'',
-	 'emptyText'=>'No match found...',
-	 'pager'=>array( 'header'=>'',
-	 'firstPageLabel'=>'',
-	 'lastPageLabel'=>'',
 
-	 ),
-	 ));
-	 */
 }
 ?>
