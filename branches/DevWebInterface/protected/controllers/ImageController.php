@@ -18,14 +18,15 @@ class ImageController extends Controller
 				$result = "not authorized to delete";
 				if ($image->user->Id == Yii::app()->user->id )
 				{
-					$result = "An error occured";
+					$result = "An error occured 1";
 					if ($image->delete()) {
+						$result = 1;
 						if (file_exists($this->getFileName($imageId))) {
-							$result = "An error occured";
+							$result = "An error occured 2";
 							if (unlink($this->getFileName($imageId))) {
 								$result = 1;
 								if (file_exists($this->getFileName($imageId))) {
-									$result = "An error occured";
+									$result = "An error occured 3";
 									if (unlink($this->getFileName($imageId))) {
 										$result = 1;
 									}
