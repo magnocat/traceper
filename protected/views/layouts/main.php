@@ -115,7 +115,26 @@
 	</div>';
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');		
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// this is a generic message dialog
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'messageDialog',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Message'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+	      
+	    ),
+	));
+
+	echo '<div id="messageDialogText"></div>';	
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+	
+	
 ?>
 	
 	
@@ -234,6 +253,7 @@
 		<div id="emailLabel"></div>
 		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 	</div>	
+	
 	</body>
 </html>
 
