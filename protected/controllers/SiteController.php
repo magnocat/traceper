@@ -177,6 +177,7 @@ class SiteController extends Controller
 		$model = new RegisterForm;
 
 		$processOutput = true;
+		$isMobileClient = false;
 		// collect user input data
 		if(isset($_POST['RegisterForm']))
 		{

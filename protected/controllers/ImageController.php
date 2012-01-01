@@ -56,7 +56,7 @@ class ImageController extends Controller
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
-			$sql = 'SELECT u.Id as id, s.realname, s.Id as userId
+			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId
 						 FROM '. Upload::model()->tableName() . ' u 
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 						 WHERE userId in ('. $friendList .') OR 
@@ -67,12 +67,12 @@ class ImageController extends Controller
 														    'sort'=>array(
 							        							'attributes'=>array(
 							             									'id',
-			),
-			),
+																			),
+															),
 														    'pagination'=>array(
 														        'pageSize'=>Yii::app()->params->imageCountInOnePage,
-			),
-			));		
+															),
+													));		
 		}
 		else
 		{
@@ -82,7 +82,7 @@ class ImageController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('imagesInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()));
+		$this->renderPartial('imagesInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'imageList'=>true), false, true);
 	}
 
 	public function actionSearch() {
@@ -97,14 +97,18 @@ class ImageController extends Controller
 				$sqlCount = 'SELECT count(*)
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE s.realname like "%'. $model->keyword .'%"';
+					 WHERE s.realname like "%'. $model->keyword .'%"
+						   OR
+						   u.description like "%'. $model->keyword.'%"';
 
 				$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-				$sql ='SELECT u.Id as id, s.realname, s.Id as userId
+				$sql ='SELECT u.Id as id, u.description, s.realname, s.Id as userId
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE s.realname like "%'. $model->keyword .'%"';
+					 WHERE s.realname like "%'. $model->keyword .'%"
+					 		OR
+					 	   u.description like "%'. $model->keyword.'%"';
 
 
 				$dataProvider = new CSqlDataProvider($sql, array(
@@ -112,19 +116,20 @@ class ImageController extends Controller
 													    'sort'=>array(
 						        							'attributes'=>array(
 						             									'id', 'realname',
-				),
-				),
+															),
+														),
 													    'pagination'=>array(
 													        'pageSize'=>Yii::app()->params->imageCountInOnePage,
 															'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
-				),
-				));
+														),
+								));
 					
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-//		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('searchImageResults', array('model'=>$model, 'dataProvider'=>$dataProvider));
+		//TODO: added below line because gridview.js is loaded before.
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('searchImageResults', array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
 	public function actionGet()
@@ -169,7 +174,8 @@ class ImageController extends Controller
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 			&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
-			&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL)
+			&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL
+			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL)
 		{
 			if ($_FILES["image"]["error"] == UPLOAD_ERR_OK )
 			{
@@ -178,6 +184,7 @@ class ImageController extends Controller
 				$altitude = (float) $_REQUEST['altitude'];
 				$email = $_REQUEST['email'];
 				$password = $_REQUEST['password'];
+				$description = $_REQUEST['description'];
 
 				$publicData = 0;
 				if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
@@ -201,9 +208,9 @@ class ImageController extends Controller
 					
 					$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
-									(userId, latitude, longitude, altitude, uploadtime, publicData)
-									VALUES(%d, %s, %s, %s, NOW(), %d)', 
-									$userId, $latitude, $longitude, $altitude, $publicData);
+									(userId, latitude, longitude, altitude, uploadtime, publicData, description)
+									VALUES(%d, %s, %s, %s, NOW(), %d, "%s")', 
+									$userId, $latitude, $longitude, $altitude, $publicData, $description);
 					$result = "Unknown Error";
 					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 					if ($effectedRows == 1)
@@ -286,7 +293,7 @@ class ImageController extends Controller
 						
 					$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 						
-					$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
+					$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
 								 FROM '. Upload::model()->tableName() . ' u 
 								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 								 WHERE (userId in ('. $friendList .') 
@@ -308,7 +315,7 @@ class ImageController extends Controller
 
 			$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-			$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, u.altitude, u.latitude, u.longitude
+			$sql = 'SELECT u.Id as id, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
 					 FROM '. Upload::model()->tableName() . ' u 
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 					 WHERE userId in ('. $friendList .') OR 

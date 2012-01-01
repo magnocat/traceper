@@ -148,7 +148,7 @@ class UsersController extends Controller
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()));
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
 
 	/**
@@ -181,7 +181,9 @@ class UsersController extends Controller
 
 					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
+					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+								date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+								date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 								1 isFriend
 							FROM '. Users::model()->tableName() . ' u 
 							LEFT JOIN ' . Friends::model()->tableName() . ' f
@@ -205,7 +207,9 @@ class UsersController extends Controller
 
 			$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
@@ -221,7 +225,7 @@ class UsersController extends Controller
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
-public function actionGetUserListJson()
+	public function actionGetUserListJson()
 	{
 		if (Yii::app()->user->isGuest) {
 			return;
@@ -247,6 +251,7 @@ public function actionGetUserListJson()
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
+	
 	public function actionGetUserPastPointsXML(){
 
 		if (isset($_REQUEST['userId']))
@@ -330,6 +335,7 @@ public function actionGetUserListJson()
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
