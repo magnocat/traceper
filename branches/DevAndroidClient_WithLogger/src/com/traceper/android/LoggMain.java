@@ -2,7 +2,6 @@ package com.traceper.android;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -19,46 +18,34 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
-import com.traceper.android.CallDetails; 
-import com.traceper.android.CallExpandableListAdapter ; 
-import com.traceper.android.CallLoggerPreferencesActivity;
-
 import com.traceper.R;
 import com.traceper.android.dao.CallLoggContentProvider;
 import com.traceper.android.dao.ClearCallsContentObserver;
 import com.traceper.android.dao.NewCallsContentObserver;
-
 import com.traceper.android.dao.model.CallInfo;
 import com.traceper.android.dao.model.GlobalCallHolder;
-
 import com.traceper.android.grouping.BaseGroupingCriteria;
 import com.traceper.android.grouping.ChildItem;
 import com.traceper.android.grouping.GroupItem;
-import com.traceper.android.interfaces.IAppService;
-
-import com.traceper.android.services.CallLoggerService;
 import com.traceper.android.utils.CursorUtils;
 
 
@@ -168,15 +155,15 @@ public class LoggMain extends ExpandableListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
     {
-    	MenuItem srvControl = menu.add(0, MENU_SERVICE, 1, R.string.start_service); 
-    	if (isCallServiceRun())
-    	{
-    		srvControl.setTitle(getString(R.string.stop_service));
-    	}
-    	else
-    	{
-    		srvControl.setTitle(getString(R.string.start_service));
-    	}
+//    	MenuItem srvControl = menu.add(0, MENU_SERVICE, 1, R.string.start_service); 
+//    	if (isCallServiceRun())
+//    	{
+//    		srvControl.setTitle(getString(R.string.stop_service));
+//    	}
+//    	else
+//    	{
+//    		srvControl.setTitle(getString(R.string.start_service));
+//    	}
     	menu.add(0, MENU_GROUPING, 1, R.string.grouping);
         menu.add(0, MENU_SHARE, 1, R.string.sharing);
         menu.add(0, MENU_PREFERENCES, 1, R.string.preferences);
@@ -185,6 +172,7 @@ public class LoggMain extends ExpandableListActivity {
     
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+/*        
         case MENU_SERVICE:
         	if (!isCallServiceRun())
         	{
@@ -203,6 +191,7 @@ public class LoggMain extends ExpandableListActivity {
         		}
         	}
             break;
+*/            
         case MENU_SHARE:
         	final CharSequence[] shareTo = { "E-Mail", "Server"  };
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -254,7 +243,7 @@ public class LoggMain extends ExpandableListActivity {
     	super.onDestroy();
     	unregisterObservers();
     }
-    
+/*    
 	private boolean isCallServiceRun()
 	{
 		ActivityManager activMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -272,7 +261,7 @@ public class LoggMain extends ExpandableListActivity {
 		}
 		return false;
 	}
-    
+*/    
 	private void showGroupingDlg()
 	{
 		new AlertDialog.Builder(LoggMain.this).setTitle("Grouping").

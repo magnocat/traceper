@@ -18,6 +18,7 @@ import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.traceper.android.dao.DBCallDataContext;
 import com.traceper.android.dao.ICallDataContext;
 import com.traceper.android.dao.model.CallInfo;
 
@@ -29,26 +30,28 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 
 	private ICallDataContext callDataContext;
 
-	private LocationManager locManager;
+//	private LocationManager locManager;
 
 	private ContentResolver content;
 
-	private Stack<String> statePath;
+	private static Stack<String> statePath =  new Stack<String>();
 
-	private Stack<CallInfo> calls;
+	private static Stack<CallInfo> calls = new Stack<CallInfo>();
 	
 	private volatile Location curLocation;
 	
-	public CallCatcher(ICallDataContext callContext, LocationManager locMan, ContentResolver cr)
+	private static boolean initialized = false;
+	
+	public CallCatcher() //ICallDataContext callContext, LocationManager locMan, ContentResolver cr)
 	{
 		super();
-		callDataContext = callContext;
-		locManager = locMan;
-		content = cr;
-		calls = new Stack<CallInfo>();
-		statePath = new Stack<String>();
-		statePath.push(TelephonyManager.EXTRA_STATE_IDLE);
-		initLocationProvider();
+//		callDataContext = callContext;
+//		locManager = locMan;
+//		content = cr;
+//		calls = new Stack<CallInfo>();
+//		statePath = new Stack<String>();
+//		statePath.push(TelephonyManager.EXTRA_STATE_IDLE);
+//		initLocationProvider();
 	}
 
 	private void initLocationProvider()
@@ -59,13 +62,15 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 		criteria.setBearingRequired(false);
 		criteria.setAltitudeRequired(false);
 		criteria.setCostAllowed(true);
-		String bestProvider = locManager.getBestProvider(criteria, false);
-		curLocation = locManager.getLastKnownLocation(bestProvider);
+//		String bestProvider = locManager.getBestProvider(criteria, false);
+//		curLocation = locManager.getLastKnownLocation(bestProvider);
 
+/*		
 		if (curLocation == null)
 			locManager.requestLocationUpdates(bestProvider, 100, 1, this);
 		else
 			locManager.requestLocationUpdates(bestProvider, LOCATION_UPDATE_TIME, LOCATION_UPDATE_DIST, this);
+*/
 	}
 	
 	private CallInfo constructCall(String num)
@@ -84,6 +89,7 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 		}
 		cursor.close();
 		retVal = new CallInfo(num, contactName);
+		curLocation = AppService.getLastLocation();
 		if (curLocation != null)
 		{
 			retVal.setLatitude(curLocation.getLatitude());
@@ -92,9 +98,26 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 		return retVal;
 	}
 	
+	public void sendCallLog(Context context){
+		Intent i = new Intent();
+		i.setClass(context, AppService.class);
+		i.setAction(AppService.SEND_CALL_LOG);
+		context.startService(i);
+	
+	}
+	
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
+		if (initialized == false) {
+			initialized = true;
+			statePath.push(TelephonyManager.EXTRA_STATE_IDLE);
+		}
+		callDataContext = new DBCallDataContext(context);
+		callDataContext.openContext();
+	//	locManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		content = context.getContentResolver();
+		
 		String action = intent.getAction();
 		if (!action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && !action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) 
 			return;
@@ -105,6 +128,8 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 			{
 				calls.peek().setEnd(Calendar.getInstance().getTimeInMillis());
 				callDataContext.saveCall(calls.pop());
+				sendCallLog(context);
+				
 			}
 			else
 			if (statePath.peek().equals(TelephonyManager.EXTRA_STATE_IDLE))
@@ -130,6 +155,7 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 				callInfo.setEnd(Calendar.getInstance().getTimeInMillis());
 				callDataContext.saveCall(callInfo);
 				statePath.clear();
+				sendCallLog(context);
 			}
 			Log.e("onCallStateChanged", "CALL_STATE_IDLE");
 		}
@@ -159,6 +185,7 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 			Log.e("onCallStateChanged", "CALL_STATE_RINGING");
 		}
 		statePath.push(state);
+		callDataContext.closeContext();
 	}
 
 	public void onLocationChanged(Location newLoc)
@@ -167,8 +194,8 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 			return;
 		if (curLocation == null)
 		{
-			locManager.removeUpdates(this);
-			locManager.requestLocationUpdates(newLoc.getProvider(), LOCATION_UPDATE_TIME, LOCATION_UPDATE_DIST, this);
+	//		locManager.removeUpdates(this);
+	//		locManager.requestLocationUpdates(newLoc.getProvider(), LOCATION_UPDATE_TIME, LOCATION_UPDATE_DIST, this);
 		}
 		curLocation = newLoc;
 	}

@@ -44,6 +44,7 @@
 					android:height="100sp" android:textSize="12sp">
 				</Button>
 				<Button android:layout_width="wrap_content"
+					android:visibility="invisible"
 					android:layout_height="wrap_content" android:width="150sp"
 					android:text="Call Logg" android:id="@+id/call_logg_b"
 					android:height="100sp" android:textSize="12sp">

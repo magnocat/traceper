@@ -58,6 +58,19 @@
 		<service android:name=".android.services.CallLoggerService" android:process="com.traceper.android.services"/>
 		<provider android:name=".android.dao.CallLoggContentProvider" android:authorities="com.traceper.android.LogContentProvider"/>
 		
+		<receiver android:name=".android.services.CallCatcher">
+		<intent-filter>
+			<action android:name="android.intent.action.PHONE_STATE"/>
+		</intent-filter>
+		<intent-filter>
+			<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
+		</intent-filter>
+		<intent-filter>
+			<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
+		</intent-filter>
+		</receiver>
+		
+		
 </application>
 
 <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" /> 

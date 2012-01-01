@@ -28,7 +28,7 @@ public class GlobalCallHolder implements List<CallInfo>
 	
 	public static List<CallInfo> getEntireCallList()
 	{
-		if (storage == null)
+	//	if (storage == null)
 		{
 			if (contentResolver == null) 
 			{
@@ -42,7 +42,7 @@ public class GlobalCallHolder implements List<CallInfo>
 	
 	public static List<CallInfo> getEntireCallList(ContentResolver cr)
 	{
-		if (storage == null)
+	//	if (storage == null)
 		{
 			if (contentResolver == null) 
 			{

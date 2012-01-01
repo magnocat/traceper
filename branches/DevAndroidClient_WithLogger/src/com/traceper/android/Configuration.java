@@ -10,7 +10,7 @@ public class Configuration {
 	public static final String PREFERENCES_USEREMAIL = "PREFERENCES_USEREMAIL";
 	public static final String PREFERENCES_PASSWORD = "PREFERENCES_PASSWORD";
 	public static final String PREFRENCES_REMEMBER_ME_CHECKBOX = "PREFRENCES_REMEMBER_ME_CHECKBOX";
-	public static final String DEFAULT_SERVER_ADRESS = "http://localhost/traceper";
+	public static final String DEFAULT_SERVER_ADRESS = "http://www.mekya.com/labs/traceper_logger/";
 	public static final String PREFRENCES_AUTO_SEND_CHECKBOX = "PREFRENCES_AUTO_SEND_CHECKBOX";
 	
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
