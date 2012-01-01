@@ -12,15 +12,15 @@ if ($dataProvider != null) {
 		echo "<div id='friendShipId' style='display:none'></div>";
 		echo "<div id='gridViewId' style='display:none'></div>";
 		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'confirmation',
-		// additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Delete friendship'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false,
-			'buttons' =>array (
-				"OK"=>"js:function(){
+		    'id'=>'confirmation',
+			// additional javascript options for the dialog plugin
+		    'options'=>array(
+		        'title'=>Yii::t('general', 'Delete friendship'),
+		        'autoOpen'=>false,
+		        'modal'=>true, 
+				'resizable'=>false,
+				'buttons' =>array (
+					"OK"=>"js:function(){
 								". CHtml::ajax(
 										array(
 												'url'=>Yii::app()->createUrl('users/deleteFriendShip'),
@@ -59,16 +59,21 @@ if ($dataProvider != null) {
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
 			'summaryText'=>'',
+			'pager'=>array( 
+				 'header'=>'',
+		         'firstPageLabel'=>'',
+		         'lastPageLabel'=>'',
+			       ),
 		    'columns'=>array(
 
-	array(            // display 'create_time' using an expression
+		array(            // display 'create_time' using an expression
 				    'name'=>'Name',
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["realname"], "#", array(
     										"onclick"=>"TRACKER.trackUser(".$data["id"].");",
 										))',	
-	),
-	array(            // display 'create_time' using an expression
+		),
+		array(            // display 'create_time' using an expression
 	//    'name'=>'realname',
 					'type' => 'raw',
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
@@ -79,8 +84,8 @@ if ($dataProvider != null) {
 					  				  )',
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isFriendList || $isFriendRequestList,
-	),
-	array(            // display 'create_time' using an expression
+		),
+		array(            // display 'create_time' using an expression
 	//    'name'=>'realname',
 					'type' => 'raw',
 		            'value'=>'(isset($data[\'status\']) && $data[\'status\'] == 0 
@@ -96,12 +101,6 @@ if ($dataProvider != null) {
 														if (obj.result && obj.result == "1") 
 														{
 															$.fn.yiiGridView.update("'.$viewId.'", {
-																									"complete":function(jqXHR, textStatus) { 
-																												//$.fn.yiiGridView.update("userListView"); 
-																											}
-																									});
-															
-														
 														}
 														else 
 														{
@@ -120,8 +119,8 @@ if ($dataProvider != null) {
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isFriendRequestList,
-	),
-	array(            // display 'create_time' using an expression
+		),
+		array(            // display 'create_time' using an expression
 	/*  This field can only be seen in search results
 	* if status == -1 it means there is no relation between these users*/
 					'type' => 'raw',
@@ -137,7 +136,7 @@ if ($dataProvider != null) {
 					 			: "";',
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isSearchResult,
-	),
+		),
 	),
 	));
 

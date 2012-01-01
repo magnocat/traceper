@@ -285,8 +285,7 @@ function processImageXML(MAP, xml){
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
 				
-			image = imageURL + TRACKER.imageThumbSuffix;
-
+			image = imageURL + "&"+ TRACKER.imageThumbSuffix;
 			var userMarker = MAP.putMarker(location, image, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});

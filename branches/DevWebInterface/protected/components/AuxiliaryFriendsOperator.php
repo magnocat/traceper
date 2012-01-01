@@ -2,6 +2,12 @@
 
 class AuxiliaryFriendsOperator {
 	
+	
+	/**
+	 * 
+	 * returns the comma separated id of user friends
+	 * if no friend exists it returns -1;
+	 */
 	public static function getFriendIdList() 
 	{
 		$sql = 'SELECT IF (friend1!=' .Yii::app()->user->id. ', friend1, friend2) as friend
@@ -17,8 +23,11 @@ class AuxiliaryFriendsOperator {
 		for ($i = 0; $i < $length; $i++) {
 			array_push($friends, $friendsResult[$i]['friend']);			
 		}
-				
-		return implode(',', $friends);
+		$result = -1;
+		if (count($friends) > 0) {		
+			$result = implode(',', $friends);
+		}
+		return $result;
 	}
 	
 	
