@@ -59,6 +59,7 @@ INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend2`, `status`) VALUES
 CREATE TABLE IF NOT EXISTS `traceper_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
+  `owner` int(10) unsigned NOT NULL,
   `description` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
