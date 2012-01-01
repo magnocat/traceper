@@ -52,7 +52,6 @@
 <string name="http_missing_parameter">Missing parameter, please consult the developer</string>
 <string name="upload_succesfull">Upload is successfull</string>
 <string name="upload_failed">Upload is failed. Please try again later...</string>
-<string name="ask_to_make_image_public">Do you want to make your image public so that every one can see?</string>
 <string name="make_it_public">Yes, make it public</string>
 <string name="make_it_private">No, make it private to my friends</string>
 <string name="cancel_upload">Cancel Upload</string>
@@ -71,4 +70,8 @@
 <string name="sending_location_data">Sending location data to server...</string>
 <string name="sending_location_data_failed">Sending location data failed, it will be tried again...</string>
 <string name="no_location_provider">Please enable GPS or Network provider to get location</string>
+<string name="description">Description</string>
+<string name="makeItPublic">Make it public</string>
+<string name="upload_photo">Upload photo</string>
+<string name="please_enter_description">Please enter description</string>
 </resources>

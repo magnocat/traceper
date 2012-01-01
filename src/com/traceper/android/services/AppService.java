@@ -95,6 +95,7 @@ public class AppService extends Service implements IAppService{
 
 	public void onCreate() 
 	{   	
+		startForeground(0, null);
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
@@ -146,9 +147,10 @@ public class AppService extends Service implements IAppService{
 							getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
 
 					mManager.notify(NOTIFICATION_ID , notification);
+					locationManager.removeUpdates(gpsLocationIntent);
+					locationManager.removeUpdates(networkLocationIntent);
 					
 					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
-					
 					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationIntent);
 				
 					Intent sendLocationIntent = new Intent(AppService.this, AppService.class);
@@ -209,15 +211,13 @@ public class AppService extends Service implements IAppService{
 		boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 		try {
-
 			if (datasentInterval > 0) {
+				am.cancel(getLocationIntent);
 				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, AppService.this.minDataSentInterval, getLocationIntent);
-
 			}
 			else {
 				am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, getLocationIntent);
 			}
-			
 
 		} catch (Exception ex) {
 
@@ -321,7 +321,7 @@ public class AppService extends Service implements IAppService{
 		return result;	
 	}
 
-	public String sendImage(byte[] image, boolean publicData)
+	public String sendImage(byte[] image, boolean publicData, String description)
 	{
 		Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -350,8 +350,8 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[7];
-		String[] value = new String[7];
+		String[] name = new String[8];
+		String[] value = new String[8];
 		name[0] = "r";
 		name[1] = "email";
 		name[2] = "password";
@@ -359,6 +359,7 @@ public class AppService extends Service implements IAppService{
 		name[4] = "longitude";
 		name[5] = "altitude";
 		name[6] = "publicData";
+		name[7] = "description";
 
 		value[0] = "image/upload";
 		value[1] = this.email;
@@ -371,7 +372,7 @@ public class AppService extends Service implements IAppService{
 			publicDataInt = 1; 
 		} 
 		value[6] = String.valueOf(publicDataInt);
-
+		value[7] = description;
 
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
@@ -401,6 +402,7 @@ public class AppService extends Service implements IAppService{
 
 	public void onDestroy() {
 		Log.i("Traceper-AppService is being destroyed", "...");
+		am.cancel(getLocationIntent);
 		unregisterReceiver(networkStateReceiver);
 		super.onDestroy();
 	}
@@ -622,6 +624,8 @@ public class AppService extends Service implements IAppService{
 	private void sendLocation(Location loc) {
 		locationManager.removeUpdates(networkLocationIntent);
 		locationManager.removeUpdates(gpsLocationIntent);
+		networkLocation = null;
+		gpsLocation = null;
 		boolean connected = isNetworkConnected();
 		String result = null;
 		if (connected == true) {
