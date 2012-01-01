@@ -7,8 +7,8 @@
  */
 class UpdateGroupForm extends CFormModel
 {
-	public $email;
-	public $groupName;
+	public $userId;
+	public $groupId;
 
 	/**
 	 * Declares the validation rules.
@@ -19,7 +19,7 @@ class UpdateGroupForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('email, groupName', 'required','message'=>'Field cannot be blank!'),
+			array('userId, groupId', 'required','message'=>'Field cannot be blank!'),
 		);
 	}
 
@@ -29,8 +29,8 @@ class UpdateGroupForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'email'=>Yii::t('general', 'E-Mail'),
-			'groupName'=>Yii::t('general', 'Group Name'),
+			'userId'=>Yii::t('general', 'User ID'),
+			'groupId'=>Yii::t('general', 'Group ID'),
 		);
 	}
 }
