@@ -65,6 +65,7 @@ class GroupsController extends Controller
 
 				$groups = new Groups;
 				$groups->name = $model->name;
+				$groups->owner = Yii::app()->user->id;
 				$groups->description = $model->description;
 				$groups->save();
 
@@ -98,26 +99,37 @@ class GroupsController extends Controller
 			$model->attributes = $_POST['UpdateGroupForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-
-				$userGroupRelation = new UserGroupRelation;
-				$user=Users::model()->find('email=:email', array(':email'=>$model->email));				
-				$userGroupRelation->userId = $user->Id;
-				$group=Groups::model()->find('groupName=:groupName', array(':groupName'=>$model->groupName));				
-				$userGroupRelation->groupId = $group->Id;
-				$userGroupRelation->save();
-
-				if($groups->save()) // save the change to database
+				$group = Groups::model()->findByPk($model->groupId);
+				
+				//Add user to the group, if the adder is the user owner
+				if($group->owner == Yii::app()->user->id)
 				{
-					echo CJSON::encode(array("result"=> "1"));
+					$userGroupRelation = new UserGroupRelation;
+					//$user=Users::model()->find('email=:email', array(':email'=>$model->email));				
+					$userGroupRelation->userId = $model->userId;
+					//$group=Groups::model()->find('groupName=:groupName', array(':groupName'=>$model->groupName));				
+					$userGroupRelation->groupId = $model->groupId;
+					$userGroupRelation->save();
+	
+					if($groups->save()) // save the change to database
+					{
+						echo CJSON::encode(array("result"=> "1"));
+					}
+					else
+					{
+						echo CJSON::encode(array("result"=> "Unknown error"));
+					}					
 				}
 				else
 				{
 					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
-				Yii::app()->end();
 			}
-			
-			//$this->renderPartial('groupInfo',array('model'=>$model), false, $processOutput);
+				
+			Yii::app()->end();
+		}
+		
+		//$this->renderPartial('groupInfo',array('model'=>$model), false, $processOutput);
 	}	
 }
 
