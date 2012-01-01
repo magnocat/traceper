@@ -364,7 +364,13 @@ class UsersController extends Controller
 	public function actionGetCallLog(){
 		// we look at the friend2 field because requester id is stored in friend1 field
 		// and only friend who has been requested to be a friend can approve frienship
-		$userId = (int)$_REQUEST['userId'];
+		if (isset($_REQUEST['userId'])) {
+			$userId = (int)$_REQUEST['userId'];
+			Yii::app()->session["calllogUserId"] = $userId;
+		}
+		else if (isset(Yii::app()->session["calllogUserId"])) {
+			$userId = Yii::app()->session["calllogUserId"];
+		}
 		$sqlCount = 'SELECT count(*)
 					 FROM '. CallLog::model()->tableName() . ' f 
 					 WHERE userid = '. $userId ;
@@ -378,7 +384,8 @@ class UsersController extends Controller
 		 */
 		$sql = 'SELECT id, number, begin, end, type, latitude, longitude
 				FROM '. CallLog::model()->tableName()  . ' f 
-				WHERE userid = '. $userId;
+				WHERE userid = '. $userId . '
+				ORDER BY id DESC';
 
 		$dataProvider = new CSqlDataProvider($sql, array(
 		    											'totalItemCount'=>$count,
@@ -392,8 +399,8 @@ class UsersController extends Controller
 						             									),
 						             									));
 						             									 
-						             									Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-						             									$this->renderPartial('callList',array('dataProvider'=>$dataProvider), false, true);
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		$this->renderPartial('callList',array('dataProvider'=>$dataProvider), false, true);
 	}
 
 	public function actionGetFriendRequestList(){
