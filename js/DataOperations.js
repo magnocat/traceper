@@ -274,6 +274,7 @@ function processImageXML(MAP, xml){
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
+		var description = $(image).attr('description');
 		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		
@@ -300,6 +301,7 @@ function processImageXML(MAP, xml){
 				time:time,
 				rating:rating,
 				mapMarker:markerInfoWindow,
+				description:description,
 			});
 			
 			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
@@ -317,9 +319,10 @@ function processImageXML(MAP, xml){
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
 						+ "</div>"
 						+ "<div>"
-						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ TRACKER.images[imageId].description + "<br/>"
+						+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
 						+ "<br/>"
-						+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.images[imageId].time + "<br/>"
 						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
 						+ "</div>"
 						+ '<ul class="sf-menu"> '

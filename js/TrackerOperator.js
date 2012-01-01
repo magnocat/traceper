@@ -74,6 +74,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var rating;
 		var mapMarker;
 		var infoWindowIsOpened = false;
+		var description;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
