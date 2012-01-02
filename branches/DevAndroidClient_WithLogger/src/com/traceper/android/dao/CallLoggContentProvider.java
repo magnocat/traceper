@@ -13,10 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-
-
 import com.traceper.android.dao.db.CallInfoTable;
-import com.traceper.android.grouping.ContactCriteria;
 
 
 public class CallLoggContentProvider extends ContentProvider
@@ -110,6 +107,7 @@ public class CallLoggContentProvider extends ContentProvider
 		case CALLS:
 			queryBuilder.setProjectionMap(logProjectionMap);
 			break;
+/*			
 		case LAST_CALL:
 		{
 			String query =  "SELECT *, MAX([" + CallInfoTable.KEY_ID + "]) AS MID " +
@@ -151,9 +149,11 @@ public class CallLoggContentProvider extends ContentProvider
 			" FROM " + CallInfoTable.TABLE;
 			return db.rawQuery(query, null);
 		}
+*/
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
+
 		Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
 		cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		return cursor;

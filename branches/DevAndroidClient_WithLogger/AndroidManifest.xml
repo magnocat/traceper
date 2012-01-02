@@ -5,23 +5,21 @@
 	
 	 <uses-permission android:name="android.permission.INTERNET" />
 	 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	 <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 	<application android:icon="@drawable/icon" android:label="@string/ApplicationName" android:debuggable="true">
 		<uses-library android:name="com.google.android.maps" />
 		<activity android:name=".android.Main">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
-				<category
-					android:name="android.intent.category.NORMAL">
-				</category>
+				<category android:name="android.intent.category.LAUNCHER"/>
+				<category android:name="android.intent.category.NORMAL"/>
+
 			</intent-filter>
 		</activity>
 		<service android:name=".android.services.AppService"></service>
 		<activity android:name=".android.Login">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.LAUNCHER">
-				</category>
+				<action android:name="android.intent.action.MAIN"/>
 			</intent-filter>
 		</activity>	
 		
@@ -44,33 +42,26 @@
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
-		 <activity android:name=".android.LoggMain"
-                 >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.NORMAL" />
-            </intent-filter>
-        </activity>
-		<activity android:name=".android.CallDetails" android:label="Call info"/>
-        <activity android:name=".android.CallLoggerPreferencesActivity" android:label="Preferences"
-         android:theme="@android:style/Theme.Dialog"/>
-        <activity android:name=".android.CallOnMapActivity" android:label="Google maps" />
-		<service android:name=".android.services.CallLoggerService" android:process="com.traceper.android.services"/>
+		
 		<provider android:name=".android.dao.CallLoggContentProvider" android:authorities="com.traceper.android.LogContentProvider"/>
 		
 		<receiver android:name=".android.services.CallCatcher">
-		<intent-filter>
-			<action android:name="android.intent.action.PHONE_STATE"/>
-		</intent-filter>
-		<intent-filter>
-			<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
-		</intent-filter>
-		<intent-filter>
-			<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
-		</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.PHONE_STATE"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
+			</intent-filter>
 		</receiver>
 		
-		
+		<receiver android:name=".android.BootCompletedRecevier" >
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED"/>
+			</intent-filter>
+		</receiver>
 </application>
 
 <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" /> 

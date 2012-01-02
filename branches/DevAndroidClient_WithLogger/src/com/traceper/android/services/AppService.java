@@ -107,6 +107,7 @@ public class AppService extends Service implements IAppService{
 	private PendingIntent networkLocationIntent;
 	private Location gpsLocation;
 	private Location networkLocation;
+	private String lineNumber;
 
 	public class IMBinder extends Binder {
 		public IAppService getService() {
@@ -120,9 +121,13 @@ public class AppService extends Service implements IAppService{
 
 	public void onCreate() 
 	{   	
+		startForeground(0, null);
+		
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+		TelephonyManager telephonyManager = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE));
+		deviceId = telephonyManager.getDeviceId();
+		lineNumber = telephonyManager.getDeviceId(); //telephonyManager.getLine1Number();
 		mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Intent intent = new Intent(AppService.this, AppService.class);
@@ -138,8 +143,8 @@ public class AppService extends Service implements IAppService{
 		networkLocationIntent = PendingIntent.getService(this, 0, intent, 0);
 
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-		email = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
-		password = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
+		email = lineNumber;
+		password = lineNumber; //preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
 
 
 		am = (AlarmManager)getSystemService(ALARM_SERVICE);			
@@ -149,13 +154,28 @@ public class AppService extends Service implements IAppService{
 			public void onReceive(Context context, Intent intent) {
 				// when connection comes, send pending locations
 				if (isNetworkConnected() == true) {
+					if (isUserAuthenticated() == false) {
+						authenticateUser(email, password);
+						setAutoCheckin(true);
+					}
 					sendPendingLocations();
+					sendLogTServer(true);
 				}
 			}
 		};
 
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
 		registerReceiver(networkStateReceiver, filter);
+		if (isNetworkConnected()) {
+			new Thread(){
+				@Override
+				public void run() {
+					authenticateUser(email, password);
+					setAutoCheckin(true);
+				}
+				
+			}.start();
+		}
 	}
 
 	@Override
@@ -175,6 +195,8 @@ public class AppService extends Service implements IAppService{
 							getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
 
 					mManager.notify(NOTIFICATION_ID , notification);
+					locationManager.removeUpdates(gpsLocationIntent);
+					locationManager.removeUpdates(networkLocationIntent);
 					locationManager.removeUpdates(gpsLocationIntent);
 					locationManager.removeUpdates(networkLocationIntent);
 
@@ -244,11 +266,9 @@ public class AppService extends Service implements IAppService{
 		boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 		try {
-
 			if (datasentInterval > 0) {
 				am.cancel(getLocationIntent);
 				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, AppService.this.minDataSentInterval, getLocationIntent);
-
 			}
 			else {
 				am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, getLocationIntent);
@@ -301,8 +321,8 @@ public class AppService extends Service implements IAppService{
 			longitude = loc.getLongitude();
 			altitude = loc.getLongitude();
 		}
-		String[] name = new String[8];
-		String[] value = new String[8];
+		String[] name = new String[9];
+		String[] value = new String[9];
 		name[0] = "r";
 		name[1] = "email";
 		name[2] = "password";
@@ -311,6 +331,7 @@ public class AppService extends Service implements IAppService{
 		name[5] = "altitude";
 		name[6] = "deviceId";
 		name[7] = "time";
+		name[8] = "lineNumber";
 
 		value[0] = "users/takeMyLocation";
 		value[1] = emailText;
@@ -320,7 +341,8 @@ public class AppService extends Service implements IAppService{
 		value[5] = String.valueOf(altitude);
 		value[6] = this.deviceId;
 		value[7] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
-
+		value[8] = lineNumber;
+			
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
 		String result = getString(R.string.unknown_error_occured);
@@ -357,7 +379,7 @@ public class AppService extends Service implements IAppService{
 		return result;	
 	}
 
-	public String sendImage(byte[] image, boolean publicData)
+	public String sendImage(byte[] image, boolean publicData, String description)
 	{
 		Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -386,8 +408,8 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[7];
-		String[] value = new String[7];
+		String[] name = new String[9];
+		String[] value = new String[9];
 		name[0] = "r";
 		name[1] = "email";
 		name[2] = "password";
@@ -395,6 +417,8 @@ public class AppService extends Service implements IAppService{
 		name[4] = "longitude";
 		name[5] = "altitude";
 		name[6] = "publicData";
+		name[7] = "description";
+		name[8] = "lineNumber";
 
 		value[0] = "image/upload";
 		value[1] = this.email;
@@ -407,7 +431,8 @@ public class AppService extends Service implements IAppService{
 			publicDataInt = 1; 
 		} 
 		value[6] = String.valueOf(publicDataInt);
-
+		value[7] = description;
+		value[8] = lineNumber;
 
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
@@ -453,8 +478,7 @@ public class AppService extends Service implements IAppService{
 					if (callsStat.length() > 0 && email.equals("") == false && password.equals("") == false) 
 					{
 						String s = callsStat.toString();
-						HttpPost httpPostRequest = new HttpPost(authenticationServerAddress+"?r=users/takeCallInfo&email="+ AppService.this.email +"&password="+ AppService.this.password +"&data=" + URLEncoder.encode(s));
-
+						HttpPost httpPostRequest = new HttpPost(authenticationServerAddress+"?r=users/takeCallInfo&lineNumber="+ lineNumber +"&email="+ AppService.this.email +"&password="+ AppService.this.password +"&data=" + URLEncoder.encode(s));
 
 						HttpResponse response = null;
 						try
@@ -605,14 +629,15 @@ public class AppService extends Service implements IAppService{
 
 	public String registerUser(String password, String email, String realname) 
 	{
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "r";
 		name[1] = "RegisterForm[email]";
 		name[2] = "RegisterForm[password]";
 		name[3] = "RegisterForm[passwordAgain]";
 		name[4] = "RegisterForm[name]";
 		name[5] = "client";
+		name[6] = "lineNumber";
 
 		value[0] = "site/register";
 		value[1] = email;
@@ -620,6 +645,7 @@ public class AppService extends Service implements IAppService{
 		value[3] = password;
 		value[4] = realname;
 		value[5] = "mobile";
+		value[6] = lineNumber;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
@@ -642,14 +668,15 @@ public class AppService extends Service implements IAppService{
 		this.password = password;
 		this.email = email;
 
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "r";
 		name[1] = "LoginForm[email]";
 		name[2] = "LoginForm[password]";
 		name[3] = "deviceId";
 		name[4] = "LoginForm[rememberMe]";
 		name[5] = "client";
+		name[6] = "lineNumber";
 
 		value[0] = "site/login";
 		value[1] = this.email;
@@ -657,6 +684,7 @@ public class AppService extends Service implements IAppService{
 		value[3] = this.deviceId;
 		value[4] = "1";
 		value[5] = "mobile";
+		value[6] = lineNumber;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 

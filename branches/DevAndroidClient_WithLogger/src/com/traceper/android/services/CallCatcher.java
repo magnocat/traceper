@@ -22,7 +22,7 @@ import com.traceper.android.dao.DBCallDataContext;
 import com.traceper.android.dao.ICallDataContext;
 import com.traceper.android.dao.model.CallInfo;
 
-public class CallCatcher extends BroadcastReceiver implements LocationListener
+public class CallCatcher extends BroadcastReceiver
 {
 	private static final int LOCATION_UPDATE_DIST = 10;
 
@@ -54,24 +54,6 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 //		initLocationProvider();
 	}
 
-	private void initLocationProvider()
-	{
-		Criteria criteria = new Criteria();
-		criteria.setPowerRequirement(Criteria.POWER_LOW);
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		criteria.setBearingRequired(false);
-		criteria.setAltitudeRequired(false);
-		criteria.setCostAllowed(true);
-//		String bestProvider = locManager.getBestProvider(criteria, false);
-//		curLocation = locManager.getLastKnownLocation(bestProvider);
-
-/*		
-		if (curLocation == null)
-			locManager.requestLocationUpdates(bestProvider, 100, 1, this);
-		else
-			locManager.requestLocationUpdates(bestProvider, LOCATION_UPDATE_TIME, LOCATION_UPDATE_DIST, this);
-*/
-	}
 	
 	private CallInfo constructCall(String num)
 	{
@@ -188,25 +170,7 @@ public class CallCatcher extends BroadcastReceiver implements LocationListener
 		callDataContext.closeContext();
 	}
 
-	public void onLocationChanged(Location newLoc)
-	{
-		if (newLoc == null)
-			return;
-		if (curLocation == null)
-		{
-	//		locManager.removeUpdates(this);
-	//		locManager.requestLocationUpdates(newLoc.getProvider(), LOCATION_UPDATE_TIME, LOCATION_UPDATE_DIST, this);
-		}
-		curLocation = newLoc;
-	}
 	
-	public void onProviderDisabled(String arg0)
-	{}
 
-	public void onProviderEnabled(String arg0)
-	{}
-
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2)
-	{}
 
 }

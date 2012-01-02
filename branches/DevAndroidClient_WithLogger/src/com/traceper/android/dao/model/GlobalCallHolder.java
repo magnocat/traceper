@@ -1,23 +1,15 @@
 package com.traceper.android.dao.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import android.content.ContentResolver;
-import android.database.Cursor;
 
 import com.traceper.android.dao.CallLoggContentProvider;
 import com.traceper.android.dao.db.CallInfoTable;
-import com.traceper.android.dao.model.CallInfo;
-
-import com.traceper.android.grouping.ChildItem;
 import com.traceper.android.utils.CursorUtils;
-import com.traceper.android.utils.GeoUtils;
 
 public class GlobalCallHolder implements List<CallInfo>
 {
@@ -54,25 +46,25 @@ public class GlobalCallHolder implements List<CallInfo>
 		return storage;
 	}
 	
-	public static ChildItem loadDBScopeIdentity()
-	{
-		if (contentResolver == null) 
-		{
-			throw new NullPointerException("Content resolver is not been initialized!");
-		}
-		Cursor c = contentResolver.query(CallLoggContentProvider.LAST_ADDED_CALL_URI, 
-				null, null, null, null);
-		List<CallInfo> newCall = CursorUtils.getLimitCalls(c, 1);
-		c.close();
-
-		CallInfo callInfo = newCall.get(0);
-		GlobalCallHolder.getEntireCallList().add(0, callInfo);
-		
-		String caption = callInfo.getContactOrNumber();
-
-		return new ChildItem(caption, callInfo);
-	}
-	
+//	public static ChildItem loadDBScopeIdentity()
+//	{
+//		if (contentResolver == null) 
+//		{
+//			throw new NullPointerException("Content resolver is not been initialized!");
+//		}
+//		Cursor c = contentResolver.query(CallLoggContentProvider.LAST_ADDED_CALL_URI, 
+//				null, null, null, null);
+//		List<CallInfo> newCall = CursorUtils.getLimitCalls(c, 1);
+//		c.close();
+//
+//		CallInfo callInfo = newCall.get(0);
+//		GlobalCallHolder.getEntireCallList().add(0, callInfo);
+//		
+//		String caption = callInfo.getContactOrNumber();
+//
+//		return new ChildItem(caption, callInfo);
+//	}
+/*	
 	public static Collection<List<CallInfo>> getCallsGroupedByLocation()
 	{
 		Map<Integer, List<CallInfo>> table = new HashMap<Integer, List<CallInfo>>();
@@ -90,7 +82,7 @@ public class GlobalCallHolder implements List<CallInfo>
 		}
 		return table.values();
 	}
-	
+*/	
 	public boolean add(CallInfo call)
 	{
 		storage.add(call);
