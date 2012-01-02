@@ -3,7 +3,7 @@
 <?php 
 echo CHtml::link($data['realname'], "#", 
 				 array('onclick'=>'TRACKER.trackUser('. $data['id'] .');')); 
-echo "&nbsp;&nbsp;&nbsp;&nbsp;";
+
 ?>
 </div>
 
@@ -30,7 +30,7 @@ if (isset($data['status']) && $data['status'] == 0
 {
 	/*
 	 * if status is zero, it means friend ship request is made and not yet confirmed.
-	 * requester is about who made first friend request if one is requester he cannot approve friendship
+	 * requester who made first friend request. if one is requester he cannot approve friendship
 	 */
 ?>
 <div style='float: left;'>

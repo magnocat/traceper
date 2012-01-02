@@ -9,8 +9,7 @@
 		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 		<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
 		<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon"/>
-	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery/plugins/jquery.cookie.js"></script>
-	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/DataOperations.js"></script>
+ 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/DataOperations.js"></script>
 
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/MapStructs.js"></script>	
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/GMapOperator.js"></script>
@@ -130,7 +129,26 @@
 	</div>';
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');		
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// this is a generic message dialog
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'messageDialog',
+	    // additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Message'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+	      
+	    ),
+	));
+
+	echo '<div id="messageDialogText"></div>';	
+			
+	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+	
+	
 ?>
 	
 	
@@ -146,24 +164,34 @@
 							?>		
 							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
 		 						<div id="loginBlock">
-		 								<?php 				
-												echo CHtml::ajaxLink(Yii::t('general', 'Login'), $this->createUrl('site/login'), 
-	 												array(
-	    												'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
-	 													'update'=> '#userLoginWindow',
-													),
-													array(
-														'id'=>'showLoginWindow')); 
-												
-												echo ' '; //To separate Login and Register
-												
-												echo CHtml::ajaxLink(Yii::t('general', 'Register'), $this->createUrl('site/register'), 
-	 												array(
-	    												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
-	 													'update'=> '#registerWindow',
-													),
-													array(
-														'id'=>'showRegisterWindow'));																							
+		 								<?php 	
+											$this->widget('zii.widgets.jui.CJuiButton', array(
+															'name'=>'login',
+															'caption'=>'Login',
+															'id'=>'showLoginWindow',											
+														    'onclick'=>'function(){ '.
+																			CHtml::ajax(
+																						array(
+																						'url'=>$this->createUrl('site/login'),
+	    																				'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
+	 																					'update'=> '#userLoginWindow',
+																				)).
+																		' }',
+											));
+		 								
+											$this->widget('zii.widgets.jui.CJuiButton', array(
+															'name'=>'register',
+															'caption'=>'Register',
+															'id'=>'showRegisterWindow',											
+														    'onclick'=>'function(){ '.
+																			CHtml::ajax(
+																						array(
+																						'url'=>$this->createUrl('site/register'),
+																						'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
+		 																				'update'=> '#registerWindow',
+																			)).
+																		' }',
+													));
 									?>		
 		 						</div>
 	 						<?php }?>
@@ -216,41 +244,32 @@
 	 						<div id='lists'> 	
 								<div class='titles'>											
 									<?php										
-								        
-										$this->widget('zii.widgets.jui.CJuiTabs', array(
-										    'tabs' => array(
-												'Users' => array('ajax' => $this->createUrl('users/getFriendList')),
-										        'Photos' => array('ajax' => $this->createUrl('image/getList')),
-										    ),
-										    // additional javascript options for the tabs plugin
-										    'options' => array(
-										        'collapsible' => true,
-										    ),
-										));								        
-							        
+								    	//if (Yii::app()->user->isGuest == false)
+								    	{
+											$this->widget('zii.widgets.jui.CJuiTabs', array(
+											    'tabs' => array(
+													'Users' => array('ajax' => $this->createUrl('users/getFriendList'), 
+																	 'id'=>'users_tab'),
+											        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
+											        				  'id'=>'photos_tab'),
+											    ),
+											    'id'=>"tab_view",
+											    // additional javascript options for the tabs plugin
+											    'options' => array(
+											    	
+											        'collapsible' => true,
+											    	'cache'=>true,							   
+											    ),
+											));									    										    		
+								    	}    													        
 								    ?>
-               																																		
-								</div><!--  
-								
-								<div id='friendsList'>
-									<div id="userSearch">
-											<?php $this->renderPartial('//users/searchUser', array('model'=>new SearchForm())); ?>
-									</div>
-								</div> 
-								
-								<div id="photosList">	
-									<div id="imageSearch">
-											<?php $this->renderPartial('//image/search', array('model'=>new SearchForm())); ?>
-									</div>		
 								</div>
-								-->
 							</div>		
 						</div> 													
 					</div>
 																																									
 				</div>
-	
-				<div id="map"></div>					
+				<div id="map" ></div>					
 				<div id='infoBottomBar'></div>
 				<div id='loading'></div>											
 	</div>
@@ -259,6 +278,7 @@
 		<div id="emailLabel"></div>
 		<div><input type="text" name="email" id="email" /><input type="button" id="sendNewPassword"/></div>
 	</div>	
+	
 	</body>
 </html>
 

@@ -168,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `altitude` decimal(15,6) NOT NULL,
   `uploadTime` datetime NOT NULL,
   `publicData` tinyint(4) NOT NULL DEFAULT '0',
+  `description` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`) USING BTREE,
   KEY `index2` (`uploadTime`),
   KEY `publicData` (`publicData`),
@@ -190,6 +191,21 @@ INSERT INTO `traceper_upload` (`Id`, `userId`, `latitude`, `longitude`, `altitud
 (10, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1),
 (11, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1),
 (12, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1);
+  KEY `userId` (`userId`),
+  KEY `descriptioon` (`description`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+
+--
+-- Dumping data for table `traceper_upload`
+--
+
+INSERT INTO `traceper_upload` (`Id`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`) VALUES
+(7, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, ''),
+(10, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, ''),
+(11, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, ''),
+(12, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, ''),
+(13, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, ''),
+(14, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj');
 
 -- --------------------------------------------------------
 

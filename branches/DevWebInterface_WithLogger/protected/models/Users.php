@@ -18,10 +18,14 @@
  * @property integer $status_source
  * @property string $status_message_time
  * @property string $dataCalculatedTime
+ * @property string $lineNumber
  *
  * The followings are the available model relations:
+ * @property TraceperCallLogg[] $traceperCallLoggs
  * @property TraceperFriends[] $traceperFriends
  * @property TraceperFriends[] $traceperFriends1
+ * @property TraceperUpload[] $traceperUploads
+ * @property TraceperUserWasHere[] $traceperUserWasHeres
  */
 class Users extends CActiveRecord
 {
@@ -50,7 +54,7 @@ class Users extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('password, realname, email', 'required'),
+			array('password, realname, email, lineNumber', 'required'),
 			array('status_source', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group', 'length', 'max'=>10),
@@ -61,10 +65,11 @@ class Users extends CActiveRecord
 			array('email', 'length', 'max'=>100),
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
+			array('lineNumber', 'length', 'max'=>20),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, lineNumber', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -75,12 +80,13 @@ class Users extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array();
-		
-//		return array(
-//			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
-//			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
-//		);
+		return array(
+			'traceperCallLoggs' => array(self::HAS_MANY, 'TraceperCallLogg', 'userid'),
+			'traceperFriends' => array(self::HAS_MANY, 'TraceperFriends', 'friend1'),
+			'traceperFriends1' => array(self::HAS_MANY, 'TraceperFriends', 'friend2'),
+			'traceperUploads' => array(self::HAS_MANY, 'TraceperUpload', 'userId'),
+			'traceperUserWasHeres' => array(self::HAS_MANY, 'TraceperUserWasHere', 'userId'),
+		);
 	}
 
 	/**
@@ -103,6 +109,7 @@ class Users extends CActiveRecord
 			'status_source' => 'Status Source',
 			'status_message_time' => 'Status Message Time',
 			'dataCalculatedTime' => 'Data Calculated Time',
+			'lineNumber' => 'Line Number',
 		);
 	}
 
@@ -131,6 +138,7 @@ class Users extends CActiveRecord
 		$criteria->compare('status_source',$this->status_source);
 		$criteria->compare('status_message_time',$this->status_message_time,true);
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
+		$criteria->compare('lineNumber',$this->lineNumber,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

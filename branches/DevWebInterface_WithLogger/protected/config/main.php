@@ -29,6 +29,7 @@ return array(
 		),
 		
 	),
+	
 
 	// application components
 	'components'=>array(
@@ -36,6 +37,30 @@ return array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
 		),
+		'widgetFactory' => array(
+            'widgets' => array(
+                'CJuiAutoComplete' => array(
+                    'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
+                'CJuiDialog' => array(
+                    'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
+                'CJuiDatePicker' => array(
+                    'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
+                'CJuiTabs' =>array(
+                	'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
+                'CJuiButton' =>array(
+                	'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
+            ),
+       ),
 		// uncomment the following to enable URLs in path-format
 		/*
 		'urlManager'=>array(
@@ -54,7 +79,7 @@ return array(
 		// uncomment the following to use a MySQL database
 		*/
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=php',
+			'connectionString' => 'mysql:host=localhost;dbname=traceper_logger',
 			'emulatePrepare' => true,
 			'username' => 'root',
 			'password' => '',

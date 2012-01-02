@@ -88,30 +88,6 @@ a {
 	padding-left:22px;
 	background: url("../images/account.png") no-repeat 3px;
 }
-#signout{
-	/*
-	background: url("images/signout.png") no-repeat 0px;
-	background-position: top left;
-	*/
-}
-#changePassword{ 
-		/*
-		background: url("images/changePassword.png") no-repeat 0px;
-		background-position: top left;
-		*/
-}
-#inviteUser { 
-	/*
-	background: url("images/invite.png") no-repeat 0px; 
-	background-position: top left;
-	*/
-}
-#friendRequests{ 
-	/*
-	background: url("images/friends.png") no-repeat 0px;
-	background-position: top left;
-	*/
-}
 
 #bar:hover{ background-color:#6261d8;}
 #infoBottomBar {
@@ -149,9 +125,6 @@ a {
 
 }
 #userLoginForm, #forgotPasswordForm, #registerForm, #activateAccountInfo {
-/*	position:absolute;
-	text-align:center;	
-*/
 	line-height: 25px;
 }
 
@@ -279,7 +252,7 @@ a {
 .search{
 	margin-top:10px;
 }
-#searchBox{
+.searchBox{
 	width:85%;
 	color:#666;	
 }

@@ -48,6 +48,7 @@ class UsersController extends Controller
 		&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
 		&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
 		&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL
+		&& isset($_REQUEST['lineNumber']) && $_REQUEST['lineNumber'] != NULL 
 		)
 		{
 			$latitude = (float) $_REQUEST['latitude'];
@@ -57,13 +58,12 @@ class UsersController extends Controller
 			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
 			$email = $_REQUEST['email'];
 			$password = $_REQUEST['password'];
-
+			$lineNumber = $_REQUEST['lineNumber'];
+			
 			$sql = sprintf('SELECT Id
 								FROM '.  Users::model()->tableName() .' 
-							WHERE email = "%s" 
-						  		  AND 
-						  		  password = "%s"
-							LIMIT 1', $email, md5($password));
+							WHERE lineNumber="%s"
+							LIMIT 1', $lineNumber);
 			$userId = Yii::app()->db->createCommand($sql)->queryScalar();
 			$result = "Email or password not correct";
 			if ($userId != false)
@@ -113,35 +113,42 @@ class UsersController extends Controller
 
 	public function actionGetFriendList()
 	{
-		$sqlCount = 'SELECT count(*)
-					 FROM '. Friends::model()->tableName() . ' f 
-					 WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2 ='.Yii::app()->user->id.') AND status= 1';
-
-		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId
-				FROM '. Friends::model()->tableName() . ' f 
-				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-				WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
-
-		$dataProvider = new CSqlDataProvider($sql, array(
-		    											'totalItemCount'=>$count,
-													    'sort'=>array(
-						        							'attributes'=>array(
-						             									'id', 'realname',
-		),
-		),
-													    'pagination'=>array(
-													        'pageSize'=>Yii::app()->params->itemCountInOnePage,
-		),
-		));
+		if(Yii::app()->user->id != null)
+		{
+			$sqlCount = 'SELECT count(*)
+						 FROM '. Friends::model()->tableName() . ' f 
+						 WHERE (friend1 = '.Yii::app()->user->id.' 
+							OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+	
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	
+			$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+					FROM '. Friends::model()->tableName() . ' f 
+					LEFT JOIN ' . Users::model()->tableName() . ' u
+						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+					WHERE (friend1 = '.Yii::app()->user->id.' 
+							OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
 			
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+			$dataProvider = new CSqlDataProvider($sql, array(
+			    											'totalItemCount'=>$count,
+														    'sort'=>array(
+							        							'attributes'=>array(
+							             									'id', 'realname',
+			),
+			),
+														    'pagination'=>array(
+														        'pageSize'=>Yii::app()->params->itemCountInOnePage,
+			),
+			));		
+		}
+		else
+		{
+			$dataProvider = null;
+		}
 
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
 
 	/**
@@ -166,15 +173,18 @@ class UsersController extends Controller
 				if ($time !== null && $time !== false)
 				{
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
-					 		FROM ' . Users::model()->tableName() . ' u
-					 		LEFT JOIN ' . Friends::model()->tableName() . ' f  
-					 			ON (f.friend1 = '. Yii::app()->user->id .' 
+					 		FROM '. Users::model()->tableName() . ' u 
+							LEFT JOIN ' . Friends::model()->tableName() . ' f
+								ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+							WHERE (f.friend1 = '. Yii::app()->user->id .' 
 									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1
-							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time;
+									AND unix_timestamp(u.dataArrivedTime) >= '. $time ;
 
 					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId,
+					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+								date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+								date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 								1 isFriend
 							FROM '. Users::model()->tableName() . ' u 
 							LEFT JOIN ' . Friends::model()->tableName() . ' f
@@ -198,7 +208,9 @@ class UsersController extends Controller
 
 			$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId,
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
@@ -208,13 +220,39 @@ class UsersController extends Controller
 				LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
 
 
-			$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
+		$out = $this-> prepareXML($sql, $pageNo, $pageCount, "userList");
 		}
 		echo $out;
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
+	public function actionGetUserListJson()
+	{
+		if (Yii::app()->user->isGuest) {
+			return;
+		}
+	
+		$out = '';
+		$dataFetchedTimeKey = "UsersController.dataFetchedTime";
+		
+	
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
+						1 isFriend
+				FROM '. Friends::model()->tableName() . ' f 
+				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+				WHERE (friend1 = '.Yii::app()->user->id.' 
+						OR friend2 ='.Yii::app()->user->id.') AND status= 1
+				 ' ;
 
+
+		$out = $this-> prepareJson($sql, "userList");
+		
+		echo $out;
+		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->end();
+	}
+	
 	public function actionGetUserPastPointsXML(){
 
 		if (isset($_REQUEST['userId']))
@@ -228,7 +266,7 @@ class UsersController extends Controller
 			$offset++;  // to not get the last location
 			$sql = 'SELECT
 							longitude, latitude, deviceId, 
-							date_format(dataArrivedTime,"%d %b %Y %T") as dataArrivedTime
+							date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 					FROM ' . UserWasHere::model()->tableName() .'
 					WHERE 
 						userId = '. $userId . '
@@ -298,6 +336,7 @@ class UsersController extends Controller
 			}
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
@@ -420,9 +459,7 @@ class UsersController extends Controller
 		 * requester who make friend request cannot approve request
 		 */
 		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, f.status,
-					   false as requester
-	
-					   
+					   false as requester	   
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = f.friend1
@@ -459,13 +496,13 @@ class UsersController extends Controller
 
 		$email = $_REQUEST['email'];
 		$password = $_REQUEST['password'];
+		$lineNumber = $_REQUEST['lineNumber'];
 
 		$sql = sprintf('SELECT Id
 								FROM '.  Users::model()->tableName() .' 
-							WHERE email = "%s" 
-						  		  AND 
-						  		  password = "%s"
-							LIMIT 1', $email, md5($password));
+							WHERE lineNumber = "%s"
+							LIMIT 1', $lineNumber);
+		
 		$userId = Yii::app()->db->createCommand($sql)->queryScalar();
 		$result = "Email or password not correct";
 		if ($userId != false) {
@@ -577,8 +614,10 @@ class UsersController extends Controller
 					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
 					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
 					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-
-					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" >'
+					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
+	
+					
+					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" calculatedTime="' . $row['dataCalculatedTime'] . '" >'
 					.'<time>'. $row['dataArrivedTime'] .'</time>'
 					.'<deviceId>'. $row['deviceId'] .'</deviceId>'
 					.'</location>';
@@ -600,6 +639,55 @@ class UsersController extends Controller
 		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
 	}
 
+	public function PrepareJson($sql, $type="userList", $userId=NULL)
+	{
+	
+
+			$dataReader = Yii::app()->db->createCommand($sql)->query();
+		
+
+
+		$str = NULL;
+		if ($dataReader != NULL )
+		{
+			if ($type == "userList")
+			{
+				while ( $row = $dataReader->read() )
+				{
+					$str .= $this->getUserJsonItem($row);
+				}
+			}
+			else if ($type == "userPastLocations")
+			{
+				while ( $row = $dataReader->read() )
+				{
+					$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
+					$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
+					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
+					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
+					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
+					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
+	
+					
+					$str = CJSON::encode(array(
+							'latitude'=>$row['latitude'],
+							'longitude'=>$row['longitude'],
+                    		'altitude'=>$row['altitude'],
+							'calculatedTime'=>$row['dataCalculatedTime'],
+							'time'=>$row['dataArrivedTime'],
+							'deviceId'=>$row['deviceId'],		
+                            ));
+					
+				}
+			}
+		}
+
+
+	$out =$str;
+	return $out;
+		
+	}
+	
 	private function addXMLEnvelope($pageNo, $pageCount, $str, $extra = ""){
 			
 		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
@@ -613,6 +701,39 @@ class UsersController extends Controller
 		return $out;
 	}
 
+	private function getUserJsonItem($row){
+		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		//		$row->username = isset($row->username) ? $row->username : null;
+		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
+		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
+		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
+		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
+		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
+		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
+		$row['message'] = isset($row['message']) ? $row['message'] : null;
+		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
+		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
+		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
+			
+		
+		$str = CJSON::encode(array(
+                            'user'=>$row['id'],
+                            'isFriend'=>$row['isFriend'],
+                    		'realname'=>$row['realname'],
+							'latitude'=>$row['latitude'],
+							'longitude'=>$row['longitude'],
+                    		'altitude'=>$row['altitude'],
+							'calculatedTime'=>$row['dataCalculatedTime'],
+							'time'=>$row['dataArrivedTime'],
+							'message'=>$row['message'],
+                    		'status_message'=>$row['status_message'],
+							'deviceId'=>$row['deviceId'],		
+                            ));
+                            
+                            
+		return $str;
+	}
+	
 	private function getUserXMLItem($row)
 	{
 		$row['id'] = isset($row['id']) ? $row['id'] : null;
@@ -628,6 +749,7 @@ class UsersController extends Controller
 		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
 			
+	
 		$str = '<user>'
 		. '<Id isFriend="'.$row['isFriend'].'">'. $row['id'] .'</Id>'
 		//		. '<username>' . $row->username . '</username>'

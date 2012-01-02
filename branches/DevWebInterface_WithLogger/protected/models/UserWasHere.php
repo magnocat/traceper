@@ -5,13 +5,17 @@
  *
  * The followings are the available columns in table 'traceper_user_was_here':
  * @property integer $Id
- * @property integer $userId
+ * @property string $userId
  * @property string $dataArrivedTime
  * @property string $latitude
  * @property string $altitude
  * @property string $longitude
  * @property string $deviceId
  * @property string $dataCalculatedTime
+ * @property integer $lineNumber
+ *
+ * The followings are the available model relations:
+ * @property TraceperUsers $user
  */
 class UserWasHere extends CActiveRecord
 {
@@ -40,8 +44,9 @@ class UserWasHere extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('userId, dataArrivedTime', 'required'),
-			array('userId', 'numerical', 'integerOnly'=>true),
+			array('userId, dataArrivedTime, lineNumber', 'required'),
+			array('lineNumber', 'numerical', 'integerOnly'=>true),
+			array('userId', 'length', 'max'=>11),
 			array('latitude', 'length', 'max'=>8),
 			array('altitude', 'length', 'max'=>15),
 			array('longitude', 'length', 'max'=>9),
@@ -49,7 +54,7 @@ class UserWasHere extends CActiveRecord
 			array('dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, deviceId, dataCalculatedTime', 'safe', 'on'=>'search'),
+			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, deviceId, dataCalculatedTime, lineNumber', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -61,6 +66,7 @@ class UserWasHere extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'user' => array(self::BELONGS_TO, 'TraceperUsers', 'userId'),
 		);
 	}
 
@@ -78,6 +84,7 @@ class UserWasHere extends CActiveRecord
 			'longitude' => 'Longitude',
 			'deviceId' => 'Device',
 			'dataCalculatedTime' => 'Data Calculated Time',
+			'lineNumber' => 'Line Number',
 		);
 	}
 
@@ -93,13 +100,14 @@ class UserWasHere extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('Id',$this->Id);
-		$criteria->compare('userId',$this->userId);
+		$criteria->compare('userId',$this->userId,true);
 		$criteria->compare('dataArrivedTime',$this->dataArrivedTime,true);
 		$criteria->compare('latitude',$this->latitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
 		$criteria->compare('longitude',$this->longitude,true);
 		$criteria->compare('deviceId',$this->deviceId,true);
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
+		$criteria->compare('lineNumber',$this->lineNumber);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

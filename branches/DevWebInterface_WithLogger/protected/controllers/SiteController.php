@@ -78,7 +78,39 @@ class SiteController extends Controller
 
 		$processOutput = true;
 		// collect user input data
-		if(isset($_POST['LoginForm']))
+		
+		
+		if (isset($_POST['lineNumber'])) {
+		
+			$lineNumber = $_POST['lineNumber'];
+			$sql = 'SELECT 
+						Id FROM ' . Users::model()->tableName() .'
+					WHERE lineNumber = "' . $lineNumber . '"
+					LIMIT 1';
+			$Id = Yii::app()->db->createCommand($sql)->queryScalar();
+			$result = 1;
+			if ($Id == false) {
+				$users = new Users;
+				$users->email = $lineNumber;
+				$users->realname = $lineNumber;
+				$users->password = $lineNumber;
+				$users->lineNumber = $lineNumber;
+				
+				if ($users->save() == false){
+					$result = 0;
+				}
+				
+			}
+			echo CJSON::encode(array(
+								"result"=> "1",
+								"realname"=> $lineNumber,
+								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+			));
+			Yii::app()->end();
+			
+		}
+		else if(isset($_POST['LoginForm']))
 		{
 			$model->attributes = $_POST['LoginForm'];
 			// validate user input and if ok return json data and end application.
@@ -177,6 +209,7 @@ class SiteController extends Controller
 		$model = new RegisterForm;
 
 		$processOutput = true;
+		$isMobileClient = false;
 		// collect user input data
 		if(isset($_POST['RegisterForm']))
 		{

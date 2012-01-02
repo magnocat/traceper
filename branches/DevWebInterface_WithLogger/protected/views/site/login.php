@@ -52,17 +52,22 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		{
 																			$("#username").html(obj.realname);
 																			//TRACKER.getFriendList(1);
+																			$("#lists").show();
+																			$("#tab_view").tabs("select",0);
 																		'.
+
 																		CHtml::ajax(
 																			array(
 																			'url'=>$this->createUrl('users/getFriendList'),
-																			'update'=>'#friends',
+																			'update'=>'#users_tab',
 																			)
-																		)
+																		)																			
+																		
 																		 .'	
 																			$("#loginBlock").hide();
 																			$("#userBlock").show();
 																			$("#userLoginWindow").dialog("close");
+																		 
 																		}
 																	}
 																	catch (error){
