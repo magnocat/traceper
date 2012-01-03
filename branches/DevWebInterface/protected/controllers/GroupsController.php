@@ -47,9 +47,7 @@ class GroupsController extends Controller
 	}
 
 	/**
-	 * Displays the create group page,
-	 * If there is an error in validation or parameters it returns the form code with errors
-	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
+	 * Creates new group
 	 */
 	public function actionCreateGroup()
 	{
@@ -79,8 +77,12 @@ class GroupsController extends Controller
 				}
 				Yii::app()->end();
 			}
+		}	
 			
-			//$this->renderPartial('newGroup',array('model'=>$model), false, $processOutput);
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+		
+		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);
 	}
 	
 		/**
