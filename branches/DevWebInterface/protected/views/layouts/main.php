@@ -92,6 +92,8 @@
 	echo '<div id="inviteUsersWindow"></div>';
 ///////////////////////////// Friend Request Window ///////////////////////////	
 	echo '<div id="friendRequestsWindow"></div>';
+///////////////////////////// Create Group Window ///////////////////////////	
+	echo '<div id="createGroupWindow"></div>';	
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
@@ -219,6 +221,16 @@
 										),
 										array(
 											'id'=>'showFriendRequestsWindow'));
+										
+									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+	 													<img src="images/createGroup.png"  /><div></div>
+	 												 </div>', $this->createUrl('groups/createGroup'), 
+ 										array(
+    										'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
+ 											'update'=> '#createGroupWindow',
+										),
+										array(
+											'id'=>'showCreateGroupWindow'));										
 									
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
