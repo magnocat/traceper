@@ -65,6 +65,14 @@ if ($dataProvider != null) {
 		         'lastPageLabel'=>'',
 			       ),
 		    'columns'=>array(
+		array(            // display 'create_time' using an expression
+	//    'name'=>'realname',
+					'name'=>'Add Group',
+					'type' => 'raw',
+		            'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
+					'htmlOptions'=>array('width'=>'10px'),
+					'visible'=>$isFriendList
+		),			       
 
 		array(            // display 'create_time' using an expression
 				    'name'=>'Name',
