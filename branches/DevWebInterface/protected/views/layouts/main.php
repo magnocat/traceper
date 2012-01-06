@@ -86,6 +86,8 @@
 	echo '<div id="userLoginWindow"></div>';
 ///////////////////////////// Register Window ///////////////////////////
 	echo '<div id="registerWindow"></div>';
+///////////////////////////// Register GPS Tracker Window ///////////////////////////
+	echo '<div id="registerGPSTrackerWindow"></div>';
 ///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
 ///////////////////////////// Invite User Window ///////////////////////////
@@ -232,6 +234,17 @@
 										array(
 											'id'=>'showCreateGroupWindow'));										
 									
+										
+									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+	 													<img src="images/registerGPSTracker.png"  /><div></div>
+	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
+ 										array(
+    										'complete'=> 'function() { $("#registerGPSTrackerWindow").dialog("open"); return false;}',
+ 											'update'=> '#registerGPSTrackerWindow',
+										),
+										array(
+											'id'=>'showRegisterGPSTrackerWindow'));
+											
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
 	 												 </div>', $this->createUrl('site/logout'), array()); 																			
