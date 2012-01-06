@@ -173,11 +173,13 @@ class UsersController extends Controller
 				if ($time !== null && $time !== false)
 				{
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
-					 		FROM ' . Users::model()->tableName() . ' u
-					 		LEFT JOIN ' . Friends::model()->tableName() . ' f  
-					 			ON (f.friend1 = '. Yii::app()->user->id .' 
-									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1
-							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time;
+					 		FROM ' . Friends::model()->tableName() . ' f
+					 		LEFT JOIN  '. Users::model()->tableName() . ' u 
+					 			ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time . '
+								 AND
+								 ((f.friend1 = '. Yii::app()->user->id .' 
+									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1)';
 
 					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 

@@ -4,7 +4,7 @@
 	'enableClientValidation'=>true,
 	'clientOptions'=> array(
 						'validateOnSubmit'=> true,
-						'validateOnChange'=>true,
+						'validateOnChange'=>false,
 					 ),
 
 	));
