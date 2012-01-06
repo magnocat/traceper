@@ -1,4 +1,6 @@
 <?php 
+
+// default width 300, we made text fields 250 px
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'userLoginWindow',
 	    // additional javascript options for the dialog plugin
@@ -6,7 +8,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'title'=>Yii::t('general', 'Login'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
-			'resizable'=>false      
+			'resizable'=>false,			      
 	    ),
 	));
 ?>
@@ -18,7 +20,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 		<div class="row">
 			<?php echo $form->labelEx($model,'email'); ?>
-			<?php echo $form->textField($model,'email'); ?>
+			<?php echo $form->textField($model,'email', array('style'=>'width:250px')); ?>
 			<?php $errorMessage = $form->error($model,'email'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
@@ -27,7 +29,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 		<div class="row">
 			<?php echo $form->labelEx($model,'password'); ?>
-			<?php echo $form->passwordField($model,'password'); ?>
+			<?php echo $form->passwordField($model,'password', array('style'=>'width:250px')); ?>
 			<?php $errorMessage = $form->error($model,'password'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
