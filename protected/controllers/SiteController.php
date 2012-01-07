@@ -291,7 +291,7 @@ class SiteController extends Controller
 				
 				$friend = new Friends();
 				$friend->friend1 = Yii::app()->user->id;
-				$friend->friend2 = 2;
+				$friend->friend2 = $users->getPrimaryKey();
 				$friend->status = 1;
 				
 				if ($friend->save()) 
