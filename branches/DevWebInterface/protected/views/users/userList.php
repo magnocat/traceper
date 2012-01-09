@@ -1,4 +1,5 @@
 <?php
+
 if ($dataProvider != null) {
 	$isFriendRequestList = isset($friendRequestList) ? true : false;
 	$isSearchResult = isset($searchResult) ? true : false;
@@ -55,6 +56,105 @@ if ($dataProvider != null) {
 		echo "Do you want to delete this user from your friend list?";
 		$this->endWidget('zii.widgets.jui.CJuiDialog');
 	}
+	
+	
+//$this->widget('application.extensions.menu.SMenu',
+//	array(
+//		  "menu"=>array(
+//					    array("url"=>array("route"=>"/product/create"),
+//					          "label"=>"Sspiner",
+//					          array("url"=>array("route"=>"/product/create"),
+//					                "label"=>"Create product",
+//					                ),
+//					          array("url"=>array("route"=>"/product/list"),
+//					                "label"=>"Product List",
+//					                ),
+//					          array("url"=>"",
+//					                "label"=>"View Products",
+//					                array("url"=>array("route"=>"/product/show",
+//					                       			   "params"=>array("id"=>3),
+//					                                   "htmlOptions"=>array("title"=>"title")),
+//					                      "label"=>"Product 3"
+//					          		      ),
+//					                array("url"=>array("route"=>"/product/show",
+//					                                   "params"=>array("id"=>4)),
+//					                      "label"=>"Product 4",
+//							              array("url"=>array("route"=>"/product/show",
+//							                                 "params"=>array("id"=>5)),
+//							                    "label"=>"Product 5"
+//							                    )
+//					                      )
+//					                )
+//					          ),
+//					        
+//				        array("url"=>array("route"=>"/event/create"),
+//				              "label"=>"Scalendar"
+//				              ),
+//				              
+//				        array("url"=>array(),
+//				              "label"=>"Admin",
+//				              array("url"=>array("route"=>"/event/admin"),
+//				                    "label"=>"Scalendar Admin"
+//				                    ),
+//				              array("url"=>array("route"=>"/product/admin"),
+//				                    "label"=>"Sspinner Admin"
+//				                    ),
+//				              array("url"=>array("route"=>"/product/admin"),
+//				                    "label"=>"Disabled Link",
+//				                    "disabled"=>true
+//				                    )
+//				              ),
+//				              
+//				        array("url"=>array(),
+//				              "label"=>"Documentation",
+//				              array("url"=>array("link"=>"http://www.yiiframework.com",
+//				                                 "htmlOptions"=>array("target"=>"_BLANK")
+//				                                 ),
+//				                    "label"=>"Yii Framework"
+//				                    ),
+//				              array("url"=>array("route"=>"site/spinnerDoc"),
+//				                    "label"=>"Sspinner"
+//				                    ),
+//				              array("url"=>array("route"=>"site/calendarDoc"),
+//				                    "label"=>"Scalendar"
+//				                    ),
+//				              array("url"=>array("route"=>"site/menuDoc"),
+//				                    "label"=>"Smenu"
+//				                    ),
+//				              )
+//	         			),
+//		  "stylesheet"=>"menu_white.css",
+//		  "menuID"=>"myMenu",
+//		  "delay"=>3
+//		  )
+//);
+
+
+
+//$this->widget('application.extensions.menu.SMenu',
+//	array(
+//		  'menu'=>array(				              
+//				        array('url'=>array(),
+//				              'label'=>'Admin',
+//				        	  'icon'=>'images/addGroup.png',
+//				              array('url'=>array('route'=>'/event/admin'),
+//				                    'label'=>'Scalendar Admin',
+//				                    ),
+//				              array('url'=>array('route'=>'/product/admin'),
+//				                    'label'=>'Sspinner Admin'
+//				                    ),
+//				              array('url'=>array('route'=>'/product/admin'),
+//				                    'label'=>'Disabled Link',
+//				                    'disabled'=>true
+//				                    )
+//				              ),
+//	         			),
+//		  'stylesheet'=>'menu_white.css',
+//		  'menuID'=>'myMenu',
+//		  'delay'=>3
+//		  )
+//);
+
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
@@ -69,10 +169,35 @@ if ($dataProvider != null) {
 	//    'name'=>'realname',
 					'name'=>'Add Group',
 					'type' => 'raw',
+//					'value'=>
+//					'$this->widget(\'application.extensions.menu.SMenu\',
+//						array(
+//							  "menu"=>array(				              
+//									        array("url"=>array(),
+//									              "label"=>"Admin",  
+//									              array("url"=>array("route"=>"/event/admin"),
+//									                    "label"=>"Scalendar Admin"
+//									                    ),
+//									              array("url"=>array("route"=>"/product/admin"),
+//									                    "label"=>"Sspinner Admin"
+//									                    ),
+//									              array("url"=>array("route"=>"/product/admin"),
+//									                    "label"=>"Disabled Link",
+//									                    "disabled"=>true
+//									                    )
+//									              ),
+//						         			),
+//							  "stylesheet"=>"menu_white.css",
+//							  "menuID"=>"myMenu",
+//							  "delay"=>3
+//							  )
+//					)',
+					//'value'=>'CHtml::dropDownList("listname", "M", array("M" => "Male", "F" => "Female"))',		
 		            'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
 					'htmlOptions'=>array('width'=>'10px'),
 					'visible'=>$isFriendList
-		),			       
+		),
+		       
 
 		array(            // display 'create_time' using an expression
 				    'name'=>'Name',
