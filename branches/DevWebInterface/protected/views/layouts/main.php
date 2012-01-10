@@ -202,7 +202,7 @@
  											'update'=> '#changePasswordWindow',
 										),
 										array(
-											'id'=>'showChangePasswordWindow')); 
+											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>'Change Password')); 
 
  									echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
 	 													<img src="images/invite.png"  /><div></div>
@@ -212,7 +212,7 @@
  											'update'=> '#inviteUsersWindow',
 										),
 										array(
-											'id'=>'showInviteUsersWindow'));										
+											'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>'Invite Friends'));										
 									
 									echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
 	 													<img src="images/friends.png"  /><div></div>
@@ -222,7 +222,7 @@
  											'update'=> '#friendRequestsWindow',
 										),
 										array(
-											'id'=>'showFriendRequestsWindow'));
+											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>'Friend Requests'));
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
 	 													<img src="images/createGroup.png"  /><div></div>
@@ -232,7 +232,7 @@
  											'update'=> '#createGroupWindow',
 										),
 										array(
-											'id'=>'showCreateGroupWindow'));										
+											'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>'Create New Group'));										
 									
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
@@ -243,11 +243,11 @@
  											'update'=> '#registerGPSTrackerWindow',
 										),
 										array(
-											'id'=>'showRegisterGPSTrackerWindow'));
+											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Register GPS Tracker'));
 											
  									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
-	 												 </div>', $this->createUrl('site/logout'), array()); 																			
+	 												 </div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>'Sign Out')); 																			
 	 							?>
 	 						</div>
 	 						
