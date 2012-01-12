@@ -35,12 +35,12 @@ class Groups extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, description', 'required'),
+			array('name, owner, description', 'required'),
 			array('name', 'length', 'max'=>20),
 			array('description', 'length', 'max'=>200),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, name, description', 'safe', 'on'=>'search'),
+			array('id, name, owner, description', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,8 +60,9 @@ class Groups extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'Id' => 'ID',
+			'id' => 'ID',
 			'name' => 'Name',
+			'owner' => 'Owner',
 			'description' => 'Description',
 		);
 	}
@@ -77,8 +78,9 @@ class Groups extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('Id',$this->Id,true);
+		$criteria->compare('id',$this->id,true);
 		$criteria->compare('name',$this->name,true);
+		$criteria->compare('owner',$this->owner,true);
 		$criteria->compare('description',$this->description,true);
 
 		return new CActiveDataProvider($this, array(

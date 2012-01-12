@@ -155,28 +155,15 @@ if ($dataProvider != null) {
 //		  )
 //);
 
-	$this->widget('zii.widgets.grid.CGridView', array(
-		    'dataProvider'=>$dataProvider,
-	 		'id'=>$viewId,
-			'summaryText'=>'',
-			'pager'=>array( 
-				 'header'=>'',
-		         'firstPageLabel'=>'',
-		         'lastPageLabel'=>'',
-			       ),
-		    'columns'=>array(
-		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
-					'name'=>'Add Group',
-					'type' => 'raw',
-//					'value'=>
-//					'$this->widget(\'application.extensions.menu.SMenu\',
+//	$string = 	
+//						'Yii::app()->controller->widget(\'application.extensions.menu.SMenu\',
 //						array(
 //							  "menu"=>array(				              
 //									        array("url"=>array(),
-//									              "label"=>"Admin",  
+//									              "label"=>"Admin",
+//									        	  "icon"=>"images/addGroup.png",
 //									              array("url"=>array("route"=>"/event/admin"),
-//									                    "label"=>"Scalendar Admin"
+//									                    "label"=>"Scalendar Admin",
 //									                    ),
 //									              array("url"=>array("route"=>"/product/admin"),
 //									                    "label"=>"Sspinner Admin"
@@ -191,10 +178,37 @@ if ($dataProvider != null) {
 //							  "menuID"=>"myMenu",
 //							  "delay"=>3
 //							  )
-//					)',
+//					);';
+
+	$this->widget('zii.widgets.grid.CGridView', array(
+		    'dataProvider'=>$dataProvider,
+	 		'id'=>$viewId,
+			'summaryText'=>'',
+			'pager'=>array( 
+				 'header'=>'',
+		         'firstPageLabel'=>'',
+		         'lastPageLabel'=>'',
+			       ),
+		    'columns'=>array(
+		array(            // display 'create_time' using an expression
+	//    'name'=>'realname',
+					'name'=>'Group Settings',
+					'type' => 'raw',
+  
 					//'value'=>'CHtml::dropDownList("listname", "M", array("M" => "Male", "F" => "Female"))',		
-		            'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
-					'htmlOptions'=>array('width'=>'10px'),
+		            //'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
+
+					'value'=>'CHtml::ajaxLink("<div class=\"userOperations\" id=\"groupSettings\">
+ 										<img src=\"images/GroupSettings.png\"/><div></div>
+ 									 </div>", Yii::app()->createUrl("groups/updateGroup"), 
+	 						array(
+	    						"complete"=> "function() { $(\"#groupSettingsWindow\").dialog(\"open\"); return false;}",
+	 							"update"=> "#groupSettingsWindow",
+							),
+							array(
+								"id"=>"showGroupSettingsWindowWindow","class"=>"vtip", "title"=>"Edit Settings"))',		
+		
+					'htmlOptions'=>array('width'=>'80px'),
 					'visible'=>$isFriendList
 		),
 		       
@@ -212,8 +226,8 @@ if ($dataProvider != null) {
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
 										array("onclick"=>"$(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
-														 $(\"#confirmation\").dialog(\"open\");"
-											)
+														 $(\"#confirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>'.($isFriendRequestList?'"Reject"':'"Delete Friend"').
+											')
 					  				  )',
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isFriendList || $isFriendRequestList,
@@ -247,7 +261,7 @@ if ($dataProvider != null) {
 													}
 													
 												}\',
-											)))
+											)),\'class\'=>\'vtip\', \'title\'=>\'Approve\')
 					  				 )
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),
@@ -272,6 +286,8 @@ if ($dataProvider != null) {
 		),
 	),
 	));
+	
+
 
 
 

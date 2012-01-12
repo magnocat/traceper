@@ -85,6 +85,39 @@ class GroupsController extends Controller
 		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);
 	}
 	
+	/**
+	 * Updates new group
+	 */
+	public function actionUpdateGroup()
+	{
+		$model = new GroupSettingsForm;
+
+		$processOutput = true;
+		// collect user input data
+//		if(isset($_POST['GroupSettingsForm']))
+//		{
+//			$model->attributes = $_POST['GroupSettingsForm'];
+//			// validate user input and if ok return json data and end application.
+//			if($model->validate()) {
+//
+//			$message = "You selected: ";  
+//			$loopCount = 0;
+//			foreach($model->groupStatusArray as $selectedItem)
+//			{
+//			     $message .= strval($selectedItem);
+//			     //if(++$loopCount < count($_POST['myCheckBoxList']))   
+//			          $message .=  " & ";
+//            }				
+//
+//			}
+//		}	
+			
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+		
+		$this->renderPartial('groupSettings',array('model'=>$model), false, $processOutput);
+	}	
+	
 		/**
 	 * Displays the create group page,
 	 * If there is an error in validation or parameters it returns the form code with errors
