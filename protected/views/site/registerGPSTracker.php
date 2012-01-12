@@ -50,11 +50,15 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		{
 																			$("#registerGPSTrackerWindow").dialog("close");
 																			
-																			$("#messageWindow").dialog("open");
+																			$("#registerMessage").dialog("open");
 																		}
 																	}
 																	catch (error){
 																		$("#registerGPSTrackerWindow").html(result);
+																		var confirmMessage = document.getElementById("registerMessage");
+																		if(confirmMessage.style.display != "block") {																		
+																			confirmMessage.style.display = "none";
+																		}
 																	}
 																 }',
 													 ),
@@ -73,10 +77,9 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>
 
-
-<?php 
+<?php
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'messageWindow',
+	    'id'=>'registerMessage',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
 	        'title'=>Yii::t('general', 'Info Message'),
@@ -85,14 +88,12 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			'resizable'=>false,
 			'width'=>'520px',
 			'rows'=>1,
-			'htmlOptions'=>array('style'=>'text-align: center'),
+			'htmlOptions'=>array('style'=>'text-align: center'),			
 	    ),
 	));
-?>	
-	
+?>
 	<div align="center" class="row"> <?php echo '<br/> GPS Tracker is added to your list <br/><br/>'; ?> </div>
-	<div align="center" class="row buttons"> <?php echo CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#messageWindow").dialog("close"); return false;','width'=>'200px'), null); ?> </div>
-		 		
+	<div align="center" class="row buttons"> <?php echo CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#registerMessage").dialog("close"); return false;','width'=>'200px'), null); ?> </div>
 <?php	
-$this->endWidget('zii.widgets.jui.CJuiDialog');
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>
