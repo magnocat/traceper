@@ -72,6 +72,10 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																	}
 																	catch (error){
 																		$("#registerWindow").html(result);
+																		var confirmMessage = document.getElementById("messageWindow");
+																		if(confirmMessage.style.display != "block") {																		
+																			confirmMessage.style.display = "none";
+																		}
 																	}
 																 }',
 													 ),
