@@ -96,6 +96,8 @@
 	echo '<div id="friendRequestsWindow"></div>';
 ///////////////////////////// Create Group Window ///////////////////////////	
 	echo '<div id="createGroupWindow"></div>';	
+	///////////////////////////// Create Group Window ///////////////////////////	
+	echo '<div id="groupSettingsWindow"></div>';
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
