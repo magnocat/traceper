@@ -276,41 +276,42 @@ class SiteController extends Controller
 				$users->deviceId = $model->deviceId;
 				
 				//For database recording, because of email and password are required fields
-				$users->email = $model->name;
+				$users->email = $model->deviceId;
 				$users->password = md5($model->name);
 				$users->save();
 
 				if($users->save()) // save the change to database
 				{
-					echo CJSON::encode(array("result"=> "1"));
+					$friend = new Friends();
+					$friend->friend1 = Yii::app()->user->id;
+					$friend->friend2 = $users->getPrimaryKey();
+					$friend->status = 1;
+					
+					if ($friend->save()) 
+					{
+						echo CJSON::encode(array("result"=> "1"));
+					}
+					else
+					{
+						echo CJSON::encode(array("result"=> "Unknown error"));
+					}
 				}
 				else
 				{
 					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
 				
-				$friend = new Friends();
-				$friend->friend1 = Yii::app()->user->id;
-				$friend->friend2 = $users->getPrimaryKey();
-				$friend->status = 1;
 				
-				if ($friend->save()) 
-				{
-					echo CJSON::encode(array("result"=> "1"));
-				}
-				else
-				{
-					echo CJSON::encode(array("result"=> "Unknown error"));
-				}
 				
 				Yii::app()->end();
 			}
-
+			
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
 		}
+		
 		if ($isMobileClient == true)
 		{
 			if ($model->getError('password') != null) {
