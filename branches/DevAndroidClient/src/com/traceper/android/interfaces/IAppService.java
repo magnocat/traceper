@@ -29,7 +29,7 @@ public interface IAppService {
 	
 	public void setAutoCheckin(boolean enable);
 	
-	public void sendLocationNow(boolean enable);
+	public void sendLocationNow();
 	
 	public Long getLastLocationSentTime();
 	
@@ -41,7 +41,7 @@ public interface IAppService {
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public String sendImage(byte[] image, boolean publicData, String description);
+	public boolean uploadImage(byte[] image, boolean publicData, String description);
 	
 
 	

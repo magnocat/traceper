@@ -2,6 +2,7 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,9 +27,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
@@ -39,6 +44,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.traceper.R;
+import com.traceper.android.CameraController;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
 
@@ -52,15 +58,26 @@ public class AppService extends Service implements IAppService{
 	private LocationManager locationManager = null;
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
-
 	private NotificationManager mManager;
 	private static int NOTIFICATION_ID = 0;
-
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
 	private ArrayList<Location> pendingLocations = new ArrayList<Location>();
+	
+	private class Image {
+		public byte[] image;
+		public boolean isPublic;
+		public String description;
+		public Image(byte[] image, boolean isPublic, String description) {
+			super();
+			this.image = image;
+			this.isPublic = isPublic;
+			this.description = description;
+		}
+	}
 
+	private Image pendingImage = null;
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -81,10 +98,12 @@ public class AppService extends Service implements IAppService{
 	private boolean autoCheckinEnabled;
 	private PendingIntent getLocationIntent;
 	private AlarmManager am;
+	private PendingIntent sendLocation;
 	private PendingIntent gpsLocationIntent;
 	private PendingIntent networkLocationIntent;
 	private Location gpsLocation;
 	private Location networkLocation;
+	private Location lastSentLocation;
 
 
 	public class IMBinder extends Binder {
@@ -113,6 +132,9 @@ public class AppService extends Service implements IAppService{
 		intent.setAction(GET_NETWORK_LOCATION);
 		networkLocationIntent = PendingIntent.getService(this, 0, intent, 0);
 		
+		Intent sendLocationIntent = new Intent(AppService.this, AppService.class);
+		sendLocationIntent.setAction(SEND_LOCATION);
+		sendLocation = PendingIntent.getService(AppService.this, 0, sendLocationIntent, 0);
 		
 		am = (AlarmManager)getSystemService(ALARM_SERVICE);			
 
@@ -136,27 +158,36 @@ public class AppService extends Service implements IAppService{
 			String action = intent.getAction();
 			if (action != null) {
 				if (action.equals(REQUEST_LOCATION)) {
-					gpsLocation = null;
+					boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
+					boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 					networkLocation = null;
+					gpsLocation = null;
+					boolean requestStarted = false;
+					if (network_enabled == true) {
+						locationManager.removeUpdates(networkLocationIntent);
+						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationIntent);
+						requestStarted = true;
+					}
+					else if (gps_enabled == true) {
+						locationManager.removeUpdates(gpsLocationIntent);
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+						requestStarted = true;
+					}
 
-					Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-					PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-
-					notification.setLatestEventInfo(AppService.this,
-							getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
-
-					mManager.notify(NOTIFICATION_ID , notification);
-					locationManager.removeUpdates(gpsLocationIntent);
-					locationManager.removeUpdates(networkLocationIntent);
 					
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
-					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationIntent);
-				
-					Intent sendLocationIntent = new Intent(AppService.this, AppService.class);
-					sendLocationIntent.setAction(SEND_LOCATION);
-					PendingIntent sendLocation = PendingIntent.getService(AppService.this, 0, sendLocationIntent, 0);
-					am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, sendLocation);
+					if (requestStarted == true) 
+					{
+						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+						notification.setLatestEventInfo(AppService.this,
+								getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
+						mManager.notify(NOTIFICATION_ID , notification);
+						am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, sendLocation);
+					}
+					else {
+						notifyNoProviderEnabled();
+					}
 				}
 				else if (action.equals(SEND_LOCATION)) {
 					locationManager.removeUpdates(gpsLocationIntent);
@@ -167,24 +198,80 @@ public class AppService extends Service implements IAppService{
 					else if(gpsLocation != null){
 						sendLocation(gpsLocation);
 					}
+					else {
+						networkLocation = null;
+						gpsLocation = null;
+						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+						notification.setLatestEventInfo(AppService.this,
+								getString(R.string.ApplicationName), getString(R.string.location_fix_problem), contentIntent);	
+
+						mManager.notify(NOTIFICATION_ID , notification);
+					}
 				}
 				else if(action.equals(GET_GPS_LOCATION)) {
-					gpsLocation = (Location)intent.getExtras().getParcelable(LocationManager.KEY_LOCATION_CHANGED);
-					if (gpsLocation != null) {
+					Bundle extras = intent.getExtras();
+					if (extras.containsKey(LocationManager.KEY_LOCATION_CHANGED)) {
+						gpsLocation = (Location)intent.getExtras().getParcelable(LocationManager.KEY_LOCATION_CHANGED);
 						locationManager.removeUpdates(gpsLocationIntent);
+						sendBestLocation();
 					}
-					sendBestLocation();
 				}
 				else if(action.equals(GET_NETWORK_LOCATION)) {
-					networkLocation = (Location)intent.getExtras().getParcelable(LocationManager.KEY_LOCATION_CHANGED);
-					if (networkLocation != null) {
-						locationManager.removeUpdates(networkLocationIntent);
+					Bundle extras = intent.getExtras();
+					boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
+					
+					if (extras.containsKey(LocationManager.KEY_PROVIDER_ENABLED)) {
+						boolean network_enabled = intent.getExtras().getBoolean(LocationManager.KEY_PROVIDER_ENABLED);
+						if (network_enabled == false) {
+							locationManager.removeUpdates(networkLocationIntent);
+							if (gps_enabled == true) {
+								locationManager.removeUpdates(gpsLocationIntent);
+								locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+							}
+							else {
+								notifyNoProviderEnabled();
+							}
+						}
 					}
-					sendBestLocation();
+					
+					if (extras.containsKey(LocationManager.KEY_STATUS_CHANGED)) 
+					{
+						int status = extras.getInt(LocationManager.KEY_STATUS_CHANGED);
+						if (status == LocationProvider.OUT_OF_SERVICE ||
+							status == LocationProvider.TEMPORARILY_UNAVAILABLE) 
+						{
+							locationManager.removeUpdates(networkLocationIntent);
+							if (gps_enabled == true) {
+								locationManager.removeUpdates(gpsLocationIntent);
+								locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+							} 
+							else {
+								notifyNoProviderEnabled();
+							}
+						}
+					}
+					
+					if (extras.containsKey(LocationManager.KEY_LOCATION_CHANGED)) 
+					{
+						networkLocation = (Location)extras.getParcelable(LocationManager.KEY_LOCATION_CHANGED);
+						locationManager.removeUpdates(networkLocationIntent);
+						float accuracy =  networkLocation.getAccuracy();
+						Log.i("network location accuracy", " " + accuracy);
+						if (gps_enabled == false) {
+							sendLocation(networkLocation);
+						}
+						else 
+						{
+							locationManager.removeUpdates(gpsLocationIntent);
+							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+						}
+					}
 				}
 			}
 		}
-
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -199,10 +286,56 @@ public class AppService extends Service implements IAppService{
 		autoCheckinEnabled = enable;
 	}
 
-	public void sendLocationNow(boolean enable){
-		if (enable == true) {
-			sendLocation(0, 0);
+	public void sendLocationNow(){
+		sendLocation(0, 0);
+	}
+	
+	@Override
+	public boolean uploadImage(byte[] picture, boolean publicData, String description) {
+		
+		if (lastSentLocation == null || 
+			lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+			sendLocationNow();
+			pendingImage = new Image(picture, publicData, description);
+			return false;
+		}		
+		
+		
+		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+		notification.setLatestEventInfo(this,
+				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
+
+		mManager.notify(NOTIFICATION_ID , notification);
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		int inSampleSize = 2;
+		int quality = 75;
+		if (picture.length > 1000000) {
+			inSampleSize = 6;
+			quality = 50;
+		}					
+		options.inSampleSize = inSampleSize;
+		Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+		int byteCount = bitmap.getRowBytes();
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
+		bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
+		
+				
+		String result = sendImage(byteArrayOutputStream.toByteArray(), publicData, description, null);
+		String notificationText = getString(R.string.upload_failed);
+		boolean operationResult = false;
+		if (result.equals("1")) {
+			notificationText = getString(R.string.upload_succesfull);
+			operationResult = true;
 		}
+
+		notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
+		mManager.notify(NOTIFICATION_ID, notification);
+		
+		return operationResult;
 	}
 
 	public void sendLocation(final int datasentInterval, final int distanceInterval) {
@@ -263,7 +396,7 @@ public class AppService extends Service implements IAppService{
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
-			altitude = loc.getLongitude();
+			altitude = loc.getAltitude();
 		}
 		String[] name = new String[8];
 		String[] value = new String[8];
@@ -320,15 +453,23 @@ public class AppService extends Service implements IAppService{
 
 		return result;	
 	}
+	
+	public void notifyNoProviderEnabled(){
+		Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+		notification.setLatestEventInfo(AppService.this,
+				getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
 
-	public String sendImage(byte[] image, boolean publicData, String description)
+		mManager.notify(NOTIFICATION_ID , notification);
+	}
+
+	public String sendImage(byte[] image, boolean publicData, String description, Location loc)
 	{
+		/*
 		Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		Location loc = null;
-		double latitude = 0;
-		double longitude = 0;
-		double altitude = 0;
+		
 		if (locationGPS == null && locationNetwork != null) {
 			loc = locationNetwork;
 		}
@@ -343,10 +484,14 @@ public class AppService extends Service implements IAppService{
 				loc = locationNetwork;
 			}
 		}
+		*/
+		double latitude = 0;
+		double longitude = 0;
+		double altitude = 0;
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
-			altitude = loc.getLongitude();
+			altitude = loc.getAltitude();
 		}
 		String params;
 		//		try {
@@ -626,6 +771,7 @@ public class AppService extends Service implements IAppService{
 		locationManager.removeUpdates(gpsLocationIntent);
 		networkLocation = null;
 		gpsLocation = null;
+		lastSentLocation = loc;
 		boolean connected = isNetworkConnected();
 		String result = null;
 		if (connected == true) {
@@ -647,6 +793,12 @@ public class AppService extends Service implements IAppService{
 			}
 			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
 			mManager.notify(NOTIFICATION_ID, notification);
+			
+			// upload pending image if any...
+			if (pendingImage != null) {
+				uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
+				pendingImage = null;
+			}
 		}
 		if (connected == false || result.equals("1") == false){
 			pendingLocations.add(loc);

@@ -153,7 +153,7 @@ public class Main extends Activity
 
 			@Override
 			public void onClick(View v) {
-				appService.sendLocationNow(true);				
+				appService.sendLocationNow();				
 			}
 
 		});
