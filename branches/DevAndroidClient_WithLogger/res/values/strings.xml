@@ -21,7 +21,7 @@
 	your username and password correct</string>
 	<string name="user_offline">This user is offline</string>
 	<string name="register">Register</string>
-	<string name="exit_application">Exit</string>	
+	<string name="restart_application">Restart</string>	
 	<string name="password_again">Password(again):</string>
 	<string name="signup_fill_all_fields">Please fill all fields</string>
 	<string name="signup_type_same_password_in_password_fields">Type same password in password fields</string>
@@ -61,6 +61,7 @@
 <string name="traceper_register">Traceper-Register</string>
 <string name="saving">Saving, please wait...</string>
 <string name="waiting_location">Waiting for location</string>
+<string name="location_fix_problem">Location fix hasn\'t been received.</string>
 <string name="sending_location_data_successfull">Location sent successfully</string>
 <string name="check_in_automatically">Check in automatically in background</string>
 <string name="check_in_manually">Check in manually now</string>

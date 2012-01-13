@@ -3,7 +3,8 @@
 	android:id="@+id/scrollview" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	<LinearLayout android:orientation="vertical"
-		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:padding="10dp">
 		<ImageView android:src="@drawable/logo"
 			android:adjustViewBounds="true" android:layout_height="wrap_content" android:layout_width="fill_parent"/>
 		<LinearLayout android:orientation="vertical"
@@ -26,9 +27,6 @@
 			<LinearLayout android:orientation="vertical"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:layout_weight="1" android:gravity="center">
-				<Button android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:id="@+id/send_location"
-					android:textSize="12sp" android:width="150sp" android:height="100sp" android:text="Check in manually"/>
 				<Button android:id="@+id/take_upload_photo_button"
 					android:text="Take and upload photo" android:layout_width="wrap_content"
 					android:layout_height="wrap_content" android:width="150sp"

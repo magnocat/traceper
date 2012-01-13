@@ -206,7 +206,7 @@ public class Login extends Activity {
         cancelButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
 			{					
-				appManager.exit();
+				//appManager.exit();
 				finish();				
 			}        	
         }); 
@@ -371,7 +371,7 @@ public class Login extends Activity {
 		 }
 		 menu.add(0, SETTINGS_ID, 0, R.string.settings).setIcon(R.drawable.settings);
 		 
-		 menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);
+		 menu.add(0, EXIT_APP_ID, 0, R.string.restart_application).setIcon(R.drawable.exit);
 		 
 		return result;
 	}

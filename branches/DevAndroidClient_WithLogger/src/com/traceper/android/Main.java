@@ -44,11 +44,11 @@ public class Main extends Activity
 	private static final int WAIT_SCREEN_ON = 0;
 
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
-	private static final int EXIT_APP_ID = Menu.FIRST + 1;
+	private static final int RESTART_APP_ID = Menu.FIRST + 1;
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
-	private Button checkInNow;
+//	private Button checkInNow;
 	private Button mapviewb;
 	private Button call_logger;
 	private CheckBox autoSendLocationCheckbox; 
@@ -138,12 +138,12 @@ public class Main extends Activity
 		setContentView(R.layout.main);
 //		autoSendLocationCheckbox = (CheckBox) findViewById(R.id.auto_check);
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
-		checkInNow = (Button) findViewById(R.id.send_location);
+//		checkInNow = (Button) findViewById(R.id.send_location);
 
 		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
-		checkInNow.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
+//		checkInNow.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -178,14 +178,14 @@ public class Main extends Activity
 //			} 
 //		}); 
 
-		checkInNow.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				appService.sendLocationNow(true);				
-			}
-
-		});
+//		checkInNow.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				appService.sendLocationNow(true);				
+//			}
+//
+//		});
 
 	
 
@@ -217,8 +217,7 @@ public class Main extends Activity
 
 		//		menu.add(0, TAKE_PICTURE_ID, 0, R.string.take_photo).setIcon(android.R.drawable.ic_menu_camera);
 
-
-		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);	
+		menu.add(0, RESTART_APP_ID, 0, R.string.restart_application); //.setIcon(R.drawable.exit);	
 
 		return result;
 	}
@@ -238,10 +237,12 @@ public class Main extends Activity
 			startActivity(i);
 			return true;
 		}		
-		case EXIT_APP_ID:
+		case RESTART_APP_ID:
 		{
-			appService.exit();
-			finish();
+			appService.restart();
+			
+			//startService(i);
+			//finish();
 			return true;
 		}			
 		}

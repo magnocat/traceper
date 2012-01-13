@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.sax.StartElementListener;
 
-public class BootCompletedReceiver extends BroadcastReceiver {
+public class TraceperBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		context.startService(new Intent(context, AppService.class));
+		Intent i = new Intent(context, AppService.class);
+		i.setAction(intent.getAction());
+		context.startService(i);
 
 	}
 

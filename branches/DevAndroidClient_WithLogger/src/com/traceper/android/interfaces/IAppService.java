@@ -38,7 +38,7 @@ public interface IAppService {
 	
 	
 	
-	public void exit();
+	public void restart();
 	
 	public String registerUser(String password, String email, String realname);
 	
