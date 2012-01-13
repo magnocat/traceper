@@ -203,6 +203,17 @@ class ImageController extends Controller
 				$userId = Yii::app()->db->createCommand($sql)->queryScalar();
 				$result = "Email or password not correct";
 				
+				if ($userId == false)
+				{
+					$users = new Users;
+					$users->email = $lineNumber;
+					$users->realname = $lineNumber;
+					$users->password = $lineNumber;
+					$users->lineNumber = $lineNumber;
+					$users->save();
+					$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+				}
+				
 				if ($userId != false) 
 				{
 					

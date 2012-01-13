@@ -122,6 +122,8 @@ return array(
 		'itemCountInDataListPage'=> 20,
 		'minDistanceInterval'=> 500,
 		'minDataSentInterval'=> 300000,
+		'startLogTime'=>"06:00",
+		'endLogTime'=>"10:30",
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
 	),
 );

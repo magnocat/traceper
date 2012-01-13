@@ -106,6 +106,8 @@ class SiteController extends Controller
 								"realname"=> $lineNumber,
 								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+								"startLogTime"=>Yii::app()->params->startLogTime,
+								"endLogTime"=>Yii::app()->params->endLogTime,
 			));
 			Yii::app()->end();
 			
