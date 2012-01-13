@@ -27,6 +27,7 @@ class RegisterForm extends CFormModel
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
 			'message'=>'Passwords not same!'),
+			array('email', 'isExists')
 		);
 	}
 
@@ -39,5 +40,23 @@ class RegisterForm extends CFormModel
 			'email'=>Yii::t('general', 'E-mail'),
 			'passwordAgain'=>Yii::t('general', 'Password (Again)'),
 		);
-	}	
+	}
+
+	public function isExists($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			$criteria=new CDbCriteria;
+			$criteria->select='email';
+			$criteria->condition='email=:email';
+			$criteria->params=array(':email'=>$this->email);
+			$data = Users::model()->find($criteria);
+			if ($data == null) {
+				$data = UserCandidates::model()->find($criteria);
+			}
+			if ($data != null) {
+				$this->addError('email','E-mail is already registered!');
+			}							
+		}
+	}
 }

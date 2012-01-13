@@ -86,10 +86,13 @@ if ($dataProvider != null) {
 				array(           
 		        //    'name'=>'realname',
 					'type' =>'raw',
-		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
+		            'value'=>' ($data["userId"] == Yii::app()->user->id) 
+		            			?
+		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
 		            						"onclick"=>"$(\"#imageId\").html(". $data["id"] .");
 		            									$(\"#imageDeleteConfirmation\").dialog(\"open\");",
-		            						))',
+		            						))
+		            			: ""; ',
 					'htmlOptions'=>array('width'=>'16px'),
 				),
 

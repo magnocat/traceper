@@ -135,14 +135,14 @@
 	    ),
 	));
 
-	echo '<div id="messageDialogText"></div>';	
+	echo '<div align="center" id="messageDialogText"></div>';	
+	echo '<div align="center" class="row buttons"><br/>'. CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#messageDialog").dialog("close"); return false;','width'=>'200px'), null) .'</div>';
+	
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 	
 	
 ?>
-	
-	
 	<div id='wrap'>
 				<div class='logo_inFullMap'></div>										
 				<div id='bar'></div>
@@ -268,7 +268,6 @@
 											    'id'=>"tab_view",
 											    // additional javascript options for the tabs plugin
 											    'options' => array(
-											    	
 											        'collapsible' => true,
 											    	'cache'=>true,							   
 											    ),

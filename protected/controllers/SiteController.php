@@ -196,7 +196,6 @@ class SiteController extends Controller
 				$userCandidates->realname = $model->name;
 				$userCandidates->password = md5($model->password);
 				$userCandidates->time = $time;
-				$userCandidates->save();
 
 				if($userCandidates->save()) // save the change to database
 				{
@@ -335,7 +334,6 @@ class SiteController extends Controller
 		else {
 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-
 			$this->renderPartial('registerGPSTracker',array('model'=>$model), false, $processOutput);
 		}
 

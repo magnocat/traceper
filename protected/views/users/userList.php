@@ -9,8 +9,11 @@ if ($dataProvider != null) {
 
 	
 	if ($isFriendList == true) {
+		
+		//TODO: Refactor make common confirmation dialog 	
 		/** This is the friend ship id holder, when user clicks delete, its content is filled***/
 		echo "<div id='friendShipId' style='display:none'></div>";
+		echo "<div id='friendId' style='display:none'></div>";
 		echo "<div id='gridViewId' style='display:none'></div>";
 		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		    'id'=>'confirmation',
@@ -55,130 +58,52 @@ if ($dataProvider != null) {
 			));
 		echo "Do you want to delete this user from your friend list?";
 		$this->endWidget('zii.widgets.jui.CJuiDialog');
+		
+		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+		    'id'=>'addAsFriendConfirmation',
+			// additional javascript options for the dialog plugin
+		    'options'=>array(
+		        'title'=>Yii::t('general', 'Add as friend'),
+		        'autoOpen'=>false,
+		        'modal'=>true, 
+				'resizable'=>false,
+				'buttons' =>array (
+					"OK"=>"js:function(){
+								". CHtml::ajax(
+					  						array("url"=>Yii::app()->createUrl("users/addAsFriend"),
+					  							  'data'=> array('friendId'=>"js:$('#friendId').html()"),
+					  							  "success"=>'function(result) {
+					  							  		$("#addAsFriendConfirmation").dialog("close"); 
+					  							  		try {
+														var obj = jQuery.parseJSON(result);
+														if (obj.result && obj.result == "1") 
+														{
+															$.fn.yiiGridView.update($("#gridViewId").text());
+														}
+														else 
+														{
+															$("#messageDialogText").html("Sorry,an error occured in operation");
+															$("#messageDialog").dialog("open");
+														}
+													}
+													catch(ex) {
+														$("#messageDialogText").html("Sorry,an error occured in operation");
+														$("#messageDialog").dialog("open");
+													}
+					  							  		
+													}'
+					  						))
+									.
+							"}",
+				"Cancel"=>"js:function() {
+					$( this ).dialog( \"close\" );
+				}" 
+				)),
+			));
+		echo "Do you want to add this user as a friend?";
+		$this->endWidget('zii.widgets.jui.CJuiDialog');
 	}
 	
-	
-//$this->widget('application.extensions.menu.SMenu',
-//	array(
-//		  "menu"=>array(
-//					    array("url"=>array("route"=>"/product/create"),
-//					          "label"=>"Sspiner",
-//					          array("url"=>array("route"=>"/product/create"),
-//					                "label"=>"Create product",
-//					                ),
-//					          array("url"=>array("route"=>"/product/list"),
-//					                "label"=>"Product List",
-//					                ),
-//					          array("url"=>"",
-//					                "label"=>"View Products",
-//					                array("url"=>array("route"=>"/product/show",
-//					                       			   "params"=>array("id"=>3),
-//					                                   "htmlOptions"=>array("title"=>"title")),
-//					                      "label"=>"Product 3"
-//					          		      ),
-//					                array("url"=>array("route"=>"/product/show",
-//					                                   "params"=>array("id"=>4)),
-//					                      "label"=>"Product 4",
-//							              array("url"=>array("route"=>"/product/show",
-//							                                 "params"=>array("id"=>5)),
-//							                    "label"=>"Product 5"
-//							                    )
-//					                      )
-//					                )
-//					          ),
-//					        
-//				        array("url"=>array("route"=>"/event/create"),
-//				              "label"=>"Scalendar"
-//				              ),
-//				              
-//				        array("url"=>array(),
-//				              "label"=>"Admin",
-//				              array("url"=>array("route"=>"/event/admin"),
-//				                    "label"=>"Scalendar Admin"
-//				                    ),
-//				              array("url"=>array("route"=>"/product/admin"),
-//				                    "label"=>"Sspinner Admin"
-//				                    ),
-//				              array("url"=>array("route"=>"/product/admin"),
-//				                    "label"=>"Disabled Link",
-//				                    "disabled"=>true
-//				                    )
-//				              ),
-//				              
-//				        array("url"=>array(),
-//				              "label"=>"Documentation",
-//				              array("url"=>array("link"=>"http://www.yiiframework.com",
-//				                                 "htmlOptions"=>array("target"=>"_BLANK")
-//				                                 ),
-//				                    "label"=>"Yii Framework"
-//				                    ),
-//				              array("url"=>array("route"=>"site/spinnerDoc"),
-//				                    "label"=>"Sspinner"
-//				                    ),
-//				              array("url"=>array("route"=>"site/calendarDoc"),
-//				                    "label"=>"Scalendar"
-//				                    ),
-//				              array("url"=>array("route"=>"site/menuDoc"),
-//				                    "label"=>"Smenu"
-//				                    ),
-//				              )
-//	         			),
-//		  "stylesheet"=>"menu_white.css",
-//		  "menuID"=>"myMenu",
-//		  "delay"=>3
-//		  )
-//);
-
-
-
-//$this->widget('application.extensions.menu.SMenu',
-//	array(
-//		  'menu'=>array(				              
-//				        array('url'=>array(),
-//				              'label'=>'Admin',
-//				        	  'icon'=>'images/addGroup.png',
-//				              array('url'=>array('route'=>'/event/admin'),
-//				                    'label'=>'Scalendar Admin',
-//				                    ),
-//				              array('url'=>array('route'=>'/product/admin'),
-//				                    'label'=>'Sspinner Admin'
-//				                    ),
-//				              array('url'=>array('route'=>'/product/admin'),
-//				                    'label'=>'Disabled Link',
-//				                    'disabled'=>true
-//				                    )
-//				              ),
-//	         			),
-//		  'stylesheet'=>'menu_white.css',
-//		  'menuID'=>'myMenu',
-//		  'delay'=>3
-//		  )
-//);
-
-//	$string = 	
-//						'Yii::app()->controller->widget(\'application.extensions.menu.SMenu\',
-//						array(
-//							  "menu"=>array(				              
-//									        array("url"=>array(),
-//									              "label"=>"Admin",
-//									        	  "icon"=>"images/addGroup.png",
-//									              array("url"=>array("route"=>"/event/admin"),
-//									                    "label"=>"Scalendar Admin",
-//									                    ),
-//									              array("url"=>array("route"=>"/product/admin"),
-//									                    "label"=>"Sspinner Admin"
-//									                    ),
-//									              array("url"=>array("route"=>"/product/admin"),
-//									                    "label"=>"Disabled Link",
-//									                    "disabled"=>true
-//									                    )
-//									              ),
-//						         			),
-//							  "stylesheet"=>"menu_white.css",
-//							  "menuID"=>"myMenu",
-//							  "delay"=>3
-//							  )
-//					);';
 
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
@@ -226,7 +151,9 @@ if ($dataProvider != null) {
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
 										array("onclick"=>"$(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
-														 $(\"#confirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>'.($isFriendRequestList?'"Reject"':'"Delete Friend"').
+														 $(\"#confirmation\").dialog(\"open\");", 
+												"class"=>"vtip", 
+												"title"=>'.($isFriendRequestList?'"Reject"':'"Delete Friend"').
 											')
 					  				  )',
 					'htmlOptions'=>array('width'=>'16px'),
@@ -247,7 +174,7 @@ if ($dataProvider != null) {
 														var obj = jQuery.parseJSON(result);
 														if (obj.result && obj.result == "1") 
 														{
-															$.fn.yiiGridView.update("'.$viewId.'", {
+															$.fn.yiiGridView.update("'.$viewId.'");
 														}
 														else 
 														{
@@ -271,13 +198,11 @@ if ($dataProvider != null) {
 	/*  This field can only be seen in search results
 	* if status == -1 it means there is no relation between these users*/
 					'type' => 'raw',
-		            'value'=>' (isset($data[\'status\']) && $data[\'status\'] == -1) ?  
-		            				 CHtml::link(\'<img src="images/user_add_friend.png"  />\', \'#\',
-					  				array(\'onclick\'=>CHtml::ajax(
-					  						array(\'url\'=>Yii::app()->createUrl(\'users/addAsFriend\', array(\'friendId\'=>$data[\'id\'])),
-					  							  \'success\'=>\'function(result) { alert(result); }\',
-												 )
-					  						)
+		            'value'=>' (isset($data[\'status\']) && $data[\'status\'] == -1 && $data["id"] != Yii::app()->user->id) ?  
+		            				 CHtml::link("<img src=\"images/user_add_friend.png\"  />", "#",
+					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
+					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
+					  								 $(\"#addAsFriendConfirmation\").dialog(\"open\");"
 					  					)
 					 				)
 					 			: "";',

@@ -437,6 +437,7 @@ class UsersController extends Controller
 		));
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('userListDialog',array('dataProvider'=>$dataProvider), false, true);
 
 	}

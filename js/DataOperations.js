@@ -264,7 +264,6 @@ function processImageXML(MAP, xml){
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	$(xml).find("page").find("image").each(function(){
-		
 		var image = $(this);
 		var imageId = $(image).attr('id');
 		var imageURL =  decodeURIComponent($(image).attr('url'));
@@ -274,7 +273,7 @@ function processImageXML(MAP, xml){
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
-		var description = $(image).attr('description');
+		var description = ""; //$(image).attr('description');
 		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		
@@ -290,7 +289,6 @@ function processImageXML(MAP, xml){
 			var userMarker = MAP.putMarker(location, image, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
-			
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -399,36 +397,4 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+"</ul>";
 
 	return content;
-}
-
-function processCommentXML(xml){
-		
-	var list = "";
-	$(xml).find("page").find("comment").each(function(){
-	
-		var comment = $(this);
-		var commentText = $(comment).text();
-		var commentId = $(comment).attr("Id");
-		var commentTime =  $(comment).attr("time");
-		var userId = $(comment).attr("userId");
-		var userName = $(comment).attr("userName");
-	
-		list += "<li>"
-		// add delete image button if logged in user and image uploader are same
-		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+","+userId+")' src='images/delete.png' />"
-		+ "<div>"
-		/*+ TRACKER.langOperator.uploader + ": " */ + userName 
-		+ "<br/>"
-		/* + TRACKER.langOperator.time + ": " */ +  commentTime
-		+ "</a>"
-		+ "<br/>"
-		+ "<div class='comment' id='viewComment"+ commentId +"' commentId='" + commentId +"'>" 
-		+ commentText
-		+ "</div>"
-		+ "<br/>"
-		+ "<hr>"
-		+ "</li>";
-	});
-	
-	return list;
 }
