@@ -324,7 +324,7 @@ public class AppService extends Service implements IAppService{
 		bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
 		
 				
-		String result = sendImage(byteArrayOutputStream.toByteArray(), publicData, description, null);
+		String result = sendImage(byteArrayOutputStream.toByteArray(), publicData, description, lastSentLocation);
 		String notificationText = getString(R.string.upload_failed);
 		boolean operationResult = false;
 		if (result.equals("1")) {
