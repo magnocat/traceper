@@ -61,12 +61,21 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			'url'=>$this->createUrl('users/getFriendList'),
 																			'update'=>'#users_tab',
 																			)
+																		)
+																		. '  '.
+																		CHtml::ajax(
+																			array(
+																			'url'=> $this->createUrl('image/getList'),
+																			'update'=>'#photos_tab',
+																			)
 																		)																			
 																		
 																		 .'	
 																			$("#loginBlock").hide();
 																			$("#userBlock").show();
 																			$("#userLoginWindow").dialog("close");
+																			TRACKER.getFriendList(1);	
+		  																	TRACKER.getImageList();
 																		 
 																		}
 																	}

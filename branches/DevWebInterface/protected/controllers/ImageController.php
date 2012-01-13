@@ -51,8 +51,9 @@ class ImageController extends Controller
 			
 			$sqlCount = 'SELECT count(*)
 						 FROM '. Upload::model()->tableName() . ' u 
-						 WHERE userId in ('. $friendList .') OR 
-						 	   userId = '. Yii::app()->user->id .'';
+						 WHERE userId in ('. $friendList .') 
+						 		OR userId = '. Yii::app()->user->id .' OR 
+						 		publicData = 1';
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
@@ -60,7 +61,8 @@ class ImageController extends Controller
 						 FROM '. Upload::model()->tableName() . ' u 
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 						 WHERE userId in ('. $friendList .') OR 
-						 	   userId = '. Yii::app()->user->id .'';
+						 	   userId = '. Yii::app()->user->id .' OR 
+						 	   publicData = 1';
 	
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,
@@ -94,22 +96,35 @@ class ImageController extends Controller
 			$model->attributes = $_REQUEST['SearchForm'];
 			if ($model->validate()) {
 
+				$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+				
 				$sqlCount = 'SELECT count(*)
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE s.realname like "%'. $model->keyword .'%"
-						   OR
-						   u.description like "%'. $model->keyword.'%"';
+					 WHERE (u.userId in ('. $friendList .') 
+					 			OR 
+						 		u.userId = '. Yii::app()->user->id .'
+						 		OR
+						 		u.publicData = 1 )
+					 	   AND	
+					 	   (s.realname like "%'. $model->keyword .'%"
+						   		OR
+						   		u.description like "%'. $model->keyword.'%")';
 
 				$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
 				$sql ='SELECT u.Id as id, u.description, s.realname, s.Id as userId
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE s.realname like "%'. $model->keyword .'%"
-					 		OR
-					 	   u.description like "%'. $model->keyword.'%"';
-
+					 WHERE (u.userId in ('. $friendList .') 
+					 			OR 
+						 		u.userId = '. Yii::app()->user->id .' 
+						 		OR
+						 		u.publicData = 1)
+					 	   AND
+					 	   (s.realname like "%'. $model->keyword .'%"
+					 			OR
+					 	   		u.description like "%'. $model->keyword.'%")';
 
 				$dataProvider = new CSqlDataProvider($sql, array(
 		    											'totalItemCount'=>$count,
@@ -288,7 +303,8 @@ class ImageController extends Controller
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 								 FROM '. Upload::model()->tableName() . ' u 
 								 WHERE (userId in ('. $friendList .') 
-								        OR userId = '. Yii::app()->user->id .')
+								        OR userId = '. Yii::app()->user->id .'
+								        OR publicData = 1)
 								        AND unix_timestamp(u.uploadTime) >= '. $time;
 						
 					$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
@@ -297,7 +313,8 @@ class ImageController extends Controller
 								 FROM '. Upload::model()->tableName() . ' u 
 								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 								 WHERE (userId in ('. $friendList .') 
-								 		OR userId = '. Yii::app()->user->id .')
+								 		OR userId = '. Yii::app()->user->id .'
+								 		OR publicData = 1)
 								 		AND unix_timestamp(u.uploadTime) >= '. $time;
 						
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
@@ -311,7 +328,8 @@ class ImageController extends Controller
 			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 					 FROM '. Upload::model()->tableName() . ' u 
 					 WHERE userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .'';
+					 	   userId = '. Yii::app()->user->id .' OR
+					 	   publicData = 1';
 
 			$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
@@ -319,7 +337,8 @@ class ImageController extends Controller
 					 FROM '. Upload::model()->tableName() . ' u 
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 					 WHERE userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .'';
+					 	   userId = '. Yii::app()->user->id .' OR
+					 	   publicData = 1';
 
 
 			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");
