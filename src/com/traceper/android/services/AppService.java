@@ -769,6 +769,7 @@ public class AppService extends Service implements IAppService{
 	private void sendLocation(Location loc) {
 		locationManager.removeUpdates(networkLocationIntent);
 		locationManager.removeUpdates(gpsLocationIntent);
+		am.cancel(sendLocation);
 		networkLocation = null;
 		gpsLocation = null;
 		lastSentLocation = loc;
