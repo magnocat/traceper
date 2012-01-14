@@ -90,7 +90,7 @@ if ($dataProvider != null) {
 		            			?
 		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
 		            						"onclick"=>"$(\"#imageId\").html(". $data["id"] .");
-		            									$(\"#imageDeleteConfirmation\").dialog(\"open\");",
+		            									$(\"#imageDeleteConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>"Delete Photo"
 		            						))
 		            			: ""; ',
 					'htmlOptions'=>array('width'=>'16px'),
