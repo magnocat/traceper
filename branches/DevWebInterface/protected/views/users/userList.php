@@ -202,7 +202,7 @@ if ($dataProvider != null) {
 		            				 CHtml::link("<img src=\"images/user_add_friend.png\"  />", "#",
 					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
 					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
-					  								 $(\"#addAsFriendConfirmation\").dialog(\"open\");"
+					  								 $(\"#addAsFriendConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>"Add as Friend"
 					  					)
 					 				)
 					 			: "";',
