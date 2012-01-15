@@ -22,7 +22,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-
 		<div class="row">
 			<?php echo $form->labelEx($model,'name'); ?>
 			<?php echo $form->textField($model,'name'); ?>
