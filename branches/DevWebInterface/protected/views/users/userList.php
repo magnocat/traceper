@@ -55,7 +55,7 @@ if ($dataProvider != null) {
 					$( this ).dialog( \"close\" );
 				}" 
 				)),
-			));
+			));	
 		echo "Do you want to delete this user from your friend list?";
 		$this->endWidget('zii.widgets.jui.CJuiDialog');
 		
@@ -123,9 +123,11 @@ if ($dataProvider != null) {
 					//'value'=>'CHtml::dropDownList("listname", "M", array("M" => "Male", "F" => "Female"))',		
 		            //'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
 
+					//ADNAN: friendId olarak seçilen arkadaþýn alýnmasý saðlanacak
+					
 					'value'=>'CHtml::ajaxLink("<div class=\"userOperations\" id=\"groupSettings\">
  										<img src=\"images/GroupSettings.png\"/><div></div>
- 									 </div>", Yii::app()->createUrl("groups/updateGroup"), 
+ 									 </div>", Yii::app()->createUrl("groups/updateGroup", array("friendId"=>$data["id"])), 
 	 						array(
 	    						"complete"=> "function() { $(\"#groupSettingsWindow\").dialog(\"open\"); return false;}",
 	 							"update"=> "#groupSettingsWindow",
@@ -133,7 +135,7 @@ if ($dataProvider != null) {
 							array(
 								"id"=>"showGroupSettingsWindowWindow","class"=>"vtip", "title"=>"Edit Settings"))',		
 		
-					'htmlOptions'=>array('width'=>'80px'),
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList
 		),
 		       

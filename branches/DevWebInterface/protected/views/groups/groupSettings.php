@@ -7,7 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '320px'      
+			'width'=> '350px'      
 	    ),
 	));
 ?>
@@ -23,41 +23,79 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 	
 
-		<div class="row">
+		<div class="row" style="text-align:center">
 			<?php			
-				echo CHtml::activeCheckboxList(
-				  $model, 'groupStatusArray', 
-				  CHtml::listData(Groups::model()->findAll(), 'id', 'name'),
-				  array()
-				);
+				if(empty($groupsOfUser))
+				{
+					echo '</br></br> There is no group to show... </br></br>';
+					echo 'First create some group(s) please';	
+				}
+				else
+				{
+//					echo CHtml::activeCheckboxList(
+//					  $model, 'groupStatusArray', 
+//					  CHtml::listData($groupsOfUser, 'id', 'name'),
+//					  array('separator'=>'')
+//					);	
+
+					//echo $friendId;
+
+					echo CHtml::checkboxList(
+					  'Groups', CHtml::listData($relationRowsSelectedFriendBelongsTo, 'groupId', 'groupId'), 
+					  CHtml::listData($groupsOfUser, 'id', 'name'),
+					  array('separator'=>'')
+					);					
+				}				
+				
+				
 			?>				
 		</div>
 		
 		<br/>
 		
-		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/updateGroup'), 
-												array(
-													'success'=> 'function(result){ 
-																	try {
-																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{
-																			$("#groupSettingsWindow").dialog("close");
-																		}
-																	}
-																	catch (error){
-																		$("#groupSettingsWindow").html(result);
-																	}
-																 }',
-													 ),
-												null); ?>
+		<div class="row buttons" style="text-align:center">
+			<?php 
+				if(!empty($groupsOfUser))
+				{
+					echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/updateGroup'), 
+														array(
+															'success'=> 'function(result){ 
+																			try {
+																				var obj = jQuery.parseJSON(result);
+																				if (obj.result && obj.result == "1") 
+																				{
+																					$("#groupSettingsWindow").dialog("close");
+																				}
+																			}
+																			catch (error){
+																				$("#groupSettingsWindow").html(result);
+																			}
+																		 }',
+															 ),
+														null);					
+				}
+				else
+				{
+					
+					echo CHtml::htmlButton('OK',  
+														array(
+															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
+															'style'=>'text-align:center'
+															 ),
+														null); 					
+				} 
+			?>
 												
-			<?php echo CHtml::htmlButton('Cancel',  
-												array(
-													'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
-													 ),
-												null); ?>												
+			<?php 
+				if(!empty($groupsOfUser))
+				{
+					echo CHtml::htmlButton('Cancel',  
+														array(
+															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
+															 ),
+														null);					
+				} 
+			?>												
 		</div>		
 	
 	<?php $this->endWidget(); ?>
