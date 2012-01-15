@@ -7,7 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '320px'      
+			'width'=> '340px'      
 	    ),
 	));
 ?>
@@ -34,7 +34,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 		<div class="row">
 			<?php echo $form->labelEx($model,'description'); ?>
-			<?php echo $form->textarea($model,'description', array('rows'=>5, 'cols'=>36,'resizable'=>false)); ?>	
+			<?php echo $form->textarea($model,'description', array('rows'=>5, 'cols'=>32,'resizable'=>false)); ?>	
 			<?php $errorMessage = $form->error($model,'description'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
