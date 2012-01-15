@@ -73,7 +73,7 @@
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '600px'      
+			'width'=> '600px'     
 	    ),
 	));
 
@@ -150,7 +150,7 @@
 					<div id='content'>	
  							<?php 
  										echo CHtml::link('<div id="logo"></div>', '#', array(
-    										'onclick'=>'$("#Logo").dialog("open"); return false;',
+    										'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>'Click to learn about Traceper',
 										));									
 							?>		
 							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
