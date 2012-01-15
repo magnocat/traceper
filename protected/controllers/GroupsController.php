@@ -93,6 +93,18 @@ class GroupsController extends Controller
 		$model = new GroupSettingsForm;
 
 		$processOutput = true;
+		$groupsOfUser = Groups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
+		
+		if (isset($_REQUEST['friendId']))
+		{
+
+			$friendId = (int) $_REQUEST['friendId'];
+			
+			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
+		}
+	
+		
+		
 		// collect user input data
 //		if(isset($_POST['GroupSettingsForm']))
 //		{
@@ -115,7 +127,7 @@ class GroupsController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 		
-		$this->renderPartial('groupSettings',array('model'=>$model), false, $processOutput);
+		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
 	}	
 	
 		/**
