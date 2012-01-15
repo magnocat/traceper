@@ -150,7 +150,7 @@
 					<div id='content'>	
  							<?php 
  										echo CHtml::link('<div id="logo"></div>', '#', array(
-    										'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>'Click to learn about Traceper',
+    										'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>'Click here to learn about Traceper',
 										));									
 							?>		
 							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
