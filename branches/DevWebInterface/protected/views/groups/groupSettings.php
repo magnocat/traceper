@@ -11,7 +11,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    ),
 	));
 ?>
-	<div class="form">
+
+<div>
 	<?php $form=$this->beginWidget('CActiveForm', array(
 		'id'=>'groupSettings-form',
 		'enableClientValidation'=>true,
@@ -22,8 +23,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-
-		<div class="row" style="text-align:center">
+		<div class="row">
 			<?php			
 				if(empty($groupsOfUser))
 				{
@@ -32,19 +32,19 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				}
 				else
 				{
-//					echo CHtml::activeCheckboxList(
-//					  $model, 'groupStatusArray', 
-//					  CHtml::listData($groupsOfUser, 'id', 'name'),
-//					  array('separator'=>'')
-//					);	
-
-					//echo $friendId;
-
-					echo CHtml::checkboxList(
-					  'Groups', CHtml::listData($relationRowsSelectedFriendBelongsTo, 'groupId', 'groupId'), 
+					echo CHtml::activeCheckboxList(
+					  $model, 'groupStatusArray', 
 					  CHtml::listData($groupsOfUser, 'id', 'name'),
-					  array('separator'=>'')
-					);					
+					  array()
+					);	
+
+					echo $friendId;
+
+//					echo CHtml::checkboxList(
+//					  'Groups', CHtml::listData($relationRowsSelectedFriendBelongsTo, 'groupId', 'groupId'), 
+//					  CHtml::listData($groupsOfUser, 'id', 'name'),
+//					  array()
+//					);					
 				}				
 				
 				
@@ -57,7 +57,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/updateGroup'), 
+					echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/updateGroup', array('friendId'=>$friendId)), 
 														array(
 															'success'=> 'function(result){ 
 																			try {
@@ -96,10 +96,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														null);					
 				} 
 			?>												
-		</div>		
-	
+		</div>	
+		
 	<?php $this->endWidget(); ?>
-</div>
+</div>				
+
 <?php 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>
