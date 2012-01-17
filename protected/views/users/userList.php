@@ -133,7 +133,7 @@ if ($dataProvider != null) {
 	 							"update"=> "#groupSettingsWindow",
 							),
 							array(
-								"id"=>"showGroupSettingsWindowWindow","class"=>"vtip", "title"=>"Edit Settings"))',		
+								"id"=>"showGroupSettingsWindow","class"=>"vtip", "title"=>"Edit Settings"))',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList

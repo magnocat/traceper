@@ -17,7 +17,6 @@ class GroupSettingsForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('groupStatusArray', 'boolean')
 		);
 	}
 
@@ -27,6 +26,7 @@ class GroupSettingsForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
+			'groupStatusArray'=>'Group Status',
 		);
 	}
 }

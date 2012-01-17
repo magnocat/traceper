@@ -92,7 +92,7 @@ class GroupsController extends Controller
 	{
 		$model = new GroupSettingsForm;
 
-		$processOutput = true;
+		$processOutput = true;		
 		$groupsOfUser = Groups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
 		
 		if (isset($_REQUEST['friendId']))
@@ -100,8 +100,43 @@ class GroupsController extends Controller
 
 			$friendId = (int) $_REQUEST['friendId'];
 			
-			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
+			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));			
+		}		
+		
+		if(isset($_POST['GroupSettingsForm']))
+		{
+			echo 'SET';
+			
+			$model->attributes=$_POST['GroupSettingsForm'];
+			
+			if($model->validate()) 
+			{
+				echo CJSON::encode(array("result"=> "1"));
+
+				Yii::app()->end();
+			}
+			
+			if(Yii::app()->request->isAjaxRequest) 
+			{
+				$processOutput = false;	
+				echo ' Ajax';
+			}			
 		}
+		else
+		{
+			echo 'ELSE';
+			
+			$selected_groups=array();
+	
+			$selected_groups[]=8;
+			$selected_groups[]=9;
+			$selected_groups[]=10;
+			$model->groupStatusArray=$selected_groups;			
+		}	
+
+		
+		
+
 	
 		
 		
@@ -122,12 +157,13 @@ class GroupsController extends Controller
 //            }				
 //
 //			}
-//		}	
+//		}
 			
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 		
-		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
+		//$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
+		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'friendId'=>$friendId), false, $processOutput);
 	}	
 	
 		/**
