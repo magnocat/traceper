@@ -121,19 +121,17 @@ if ($dataProvider != null) {
 					'type' => 'raw',
   
 					//'value'=>'CHtml::dropDownList("listname", "M", array("M" => "Male", "F" => "Female"))',		
-		            //'value'=>'CHtml::link("<img src=\"images/addGroup.png\"  />", "#")',
-
-					//ADNAN: friendId olarak seçilen arkadaþýn alýnmasý saðlanacak
 					
-					'value'=>'CHtml::ajaxLink("<div class=\"userOperations\" id=\"groupSettings\">
- 										<img src=\"images/GroupSettings.png\"/><div></div>
- 									 </div>", Yii::app()->createUrl("groups/updateGroup", array("friendId"=>$data["id"])), 
-	 						array(
-	    						"complete"=> "function() { $(\"#groupSettingsWindow\").dialog(\"open\"); return false;}",
-	 							"update"=> "#groupSettingsWindow",
-							),
-							array(
-								"id"=>"showGroupSettingsWindow","class"=>"vtip", "title"=>"Edit Settings"))',		
+		            'value'=>'CHtml::link(\'<img src="images/GroupSettings.png"  />\', \'#\',
+										array(\'onclick\'=>CHtml::ajax(
+											array(
+												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'])),
+												
+					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
+					 							\'update\'=> \'#groupSettingsWindow\',	
+					 							
+											)),\'class\'=>\'vtip\', \'title\'=>\'Edit Settings\')
+					  				 )',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList
