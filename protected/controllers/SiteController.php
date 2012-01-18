@@ -29,7 +29,7 @@ class SiteController extends Controller
 	{
 		// renders the view file 'protected/views/site/index.php'
 		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');
+		$this->render('index');		
 	}
 
 	/**
@@ -200,7 +200,7 @@ class SiteController extends Controller
 				if($userCandidates->save()) // save the change to database
 				{
 					$key = md5($model->email.$time);
-					$message = 'Hi '.$model->name.',<br/> <a href="'.$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
+					$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
 					'Click here to register to traceper</a> <br/>';										
 					$message .= '<br/> Your Password is :'.$model->password;
 					$message .= '<br/> The Traceper Team';
