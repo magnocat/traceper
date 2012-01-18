@@ -97,10 +97,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{
 			params += "list=onlyUpdated";
 		}
-		
-		
-		// set time out again
-		TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
 
 		TRACKER.ajaxReq(params, function(result){
 			if (result != "") {
@@ -119,11 +115,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					TRACKER.updateFriendListPageNo++;
 					TRACKER.updateInterval = TRACKER.getUserListInterval;
 				}
-
-				if (updateInt != TRACKER.updateInterval) {
-					clearTimeout(TRACKER.timer);
-					TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
-				}
+			
+				TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
 			}
 
 		}, true);
@@ -146,7 +139,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
 					setTimeout(TRACKER.getImageList, TRACKER.getUserListInterval);
 				}	
-				else if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount){
+				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+				{
 					TRACKER.bgImageListPageNo = 1;
 					TRACKER.allImagesFetched = true;
 					setTimeout(TRACKER.getImageList, TRACKER.queryUpdatedUserInterval);

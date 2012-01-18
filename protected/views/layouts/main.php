@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title></title>
+		<title><?php echo Yii::app()->name; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="keywords"  content="" />
 		<meta name="description" content="open source GPS tracking system" />
@@ -29,9 +29,7 @@
 				//TODO: updateUserListInterval 
 				//TODO: queryIntervalForChangedUsers 
    				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
-				trackerOp.setLangOperator(langOp);
-		  		trackerOp.getFriendList(1);	
-		  		trackerOp.getImageList();   				
+				trackerOp.setLangOperator(langOp);	  				
 			}
    			catch (e) {
 				
@@ -45,7 +43,9 @@
 		 												CHtml::ajax(array(
 																			'url'=>$this->createUrl('users/getFriendList'),
 																			'update'=>'#friends',
-																	)),
+																	)).
+														'trackerOp.getFriendList(1);	
+		  												 trackerOp.getImageList(); ',
 		 												CClientScript::POS_READY); 				
 		 }
 	
@@ -268,7 +268,7 @@
 											    'id'=>"tab_view",
 											    // additional javascript options for the tabs plugin
 											    'options' => array(
-											        'collapsible' => true,
+											        'collapsible' => false,
 											    	'cache'=>true,							   
 											    ),
 											));									    										    		

@@ -29,6 +29,28 @@ class UsersController extends Controller
 		}
 	}
 	
+ 	public function filters()
+    {
+        return array(
+            'accessControl',
+        );
+    }
+	
+ 	public function accessRules()
+    {
+    	//TODO: takeMyLocation, getUserlistJSON can be added but they are used by mobile app,
+    	// after mobile app is able to login the framework, these actions can be added to list below
+        return array(
+        	array('deny',
+                'actions'=>array('addAsFriend', 'approveFriendShip', 'createGeoFence', 
+                				 'deleteFriendShip','getFriendRequestList',
+        						 'getUserPastPointsXML', 'getUserListXML', 'search'),
+        		'users'=>array('?'),
+            )
+        );
+    }
+    
+	
 	/*
 	 * this action is used by mobile clients
 	 */
@@ -227,6 +249,11 @@ class UsersController extends Controller
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
+	
+	/**
+	 * this is intented to be used by mobile app
+	 * Enter description here ...
+	 */
 	public function actionGetUserListJson()
 	{
 		if (Yii::app()->user->isGuest) {

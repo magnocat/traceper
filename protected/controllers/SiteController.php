@@ -20,7 +20,25 @@ class SiteController extends Controller
 		),
 		);
 	}
-
+	
+ 	public function filters()
+    {
+        return array(
+            'accessControl',
+        );
+    }
+	
+ 	public function accessRules()
+    {
+        return array(
+        	array('deny',
+                'actions'=>array('changePassword','inviteUser', 'registerGPSTracker'),
+        		'users'=>array('?'),
+            )
+        );
+    }
+    
+    
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -31,6 +49,8 @@ class SiteController extends Controller
 		// using the default layout 'protected/views/layouts/main.php'
 		$this->render('index');		
 	}
+	
+	
 
 	/**
 	 * This is the action to handle external exceptions.
