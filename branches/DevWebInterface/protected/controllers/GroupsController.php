@@ -20,17 +20,24 @@ class GroupsController extends Controller
 		),
 		);
 	}
-
-	/**
-	 * This is the default 'index' action that is invoked
-	 * when an action is not explicitly requested by users.
-	 */
-	public function actionIndex()
-	{
-		// renders the view file 'protected/views/site/index.php'
-		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');
-	}
+	
+ 	public function filters()
+    {
+        return array(
+            'accessControl',
+        );
+    }
+	
+	public function accessRules()
+    {
+    	//TODO: actionUpload can be added list below after mobile app is able to login the framework
+        return array(
+        	array('deny',
+                'actions'=>array('createGroup', 'updateGroup', 'addUserToGroup'),
+        		'users'=>array('?'),
+            )
+        );
+    }
 
 	/**
 	 * This is the action to handle external exceptions.

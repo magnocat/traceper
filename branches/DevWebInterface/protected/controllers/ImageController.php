@@ -3,8 +3,28 @@
 class ImageController extends Controller
 {
 	const thumbSuffix = '_thumb';
+	
+ 	public function filters()
+    {
+        return array(
+            'accessControl',
+        );
+    }
+    
+	public function accessRules()
+    {
+    	//TODO: actionUpload can be added list below after mobile app is able to login the framework
+        return array(
+        	array('deny',
+                'actions'=>array('delete', 'search', 
+                				 'get','getImageListXML'),
+        		'users'=>array('?'),
+            )
+        );
+    }
 
 
+    
 	public function actionDelete()
 	{
 		$result = "id field missing";
