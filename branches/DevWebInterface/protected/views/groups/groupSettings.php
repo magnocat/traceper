@@ -37,9 +37,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					  CHtml::listData($groupsOfUser, 'id', 'name'),
 					  array()
 					);	
-
-					echo $friendId;
-
+					
 //					echo CHtml::checkboxList(
 //					  'Groups', CHtml::listData($relationRowsSelectedFriendBelongsTo, 'groupId', 'groupId'), 
 //					  CHtml::listData($groupsOfUser, 'id', 'name'),

@@ -17,6 +17,7 @@ class GroupSettingsForm extends CFormModel
 	public function rules()
 	{
 		return array(
+			array('groupStatusArray', 'safe') //marks the associated attributes to be safe for massive assignments			
 		);
 	}
 

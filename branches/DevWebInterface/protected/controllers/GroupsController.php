@@ -102,22 +102,86 @@ class GroupsController extends Controller
 		$processOutput = true;		
 		$groupsOfUser = Groups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
 		
+		$selected_groups=array();
+		
 		if (isset($_REQUEST['friendId']))
 		{
-
-			$friendId = (int) $_REQUEST['friendId'];
+			$friendId = (int) $_REQUEST['friendId'];			
+			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
 			
-			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));			
+			foreach($relationRowsSelectedFriendBelongsTo as $relationRow)
+			{
+			    $selected_groups[] = $relationRow->groupId;
+			}
 		}		
 		
 		if(isset($_POST['GroupSettingsForm']))
 		{
 			echo 'SET';
 			
-			$model->attributes=$_POST['GroupSettingsForm'];
+			$model->attributes = $_POST['GroupSettingsForm'];
+			//$model->groupStatusArray = $_POST['GroupSettingsForm']['groupStatusArray'];
 			
 			if($model->validate()) 
 			{
+				if(!empty($model->groupStatusArray))
+				{
+					foreach($model->groupStatusArray as $selectedItem)
+					{
+						echo $selectedItem.' ';
+					}			
+				}	
+
+				foreach($groupsOfUser as $selectedOwnerGroup)
+				{
+					$found = false;
+					
+					foreach($model->groupStatusArray as $selectedFriendGroup)
+					{
+						if($selectedOwnerGroup->id == $selectedFriendGroup)
+						{
+							$found = true;
+							break;
+						}					
+					}
+
+					if($found) //Check whether the friend belongs to the selected group or not. If he does not, add his relation to the traceper_user_group_relation table 
+					{					
+						$relationQueryResult = UserGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+						                                                     'params'=>array(':userId'=>$friendId, 
+						                                                                     ':groupId'=>$selectedOwnerGroup->id
+						                                                                     )
+						                                                     )
+						                                               );
+
+					    if($relationQueryResult != null) 
+					    {
+					    	//traceper_user_group_relation table already has the desired relation, so do nothing
+					    }
+					    else
+					    {
+							$userGroupRelation = new UserGroupRelation;
+							$userGroupRelation->userId = $friendId;
+							$userGroupRelation->groupId = $selectedOwnerGroup->id;
+
+							if($userCandidates->save()) // save the change to database
+							{
+								//Relation added to the traceper_user_group_relation table
+							}
+							else
+							{
+								echo CJSON::encode(array("result"=> "Unknown error"));
+							}
+					    } 
+						
+					}
+					else //Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
+					{
+					
+					}
+				}
+				
+				
 				echo CJSON::encode(array("result"=> "1"));
 
 				Yii::app()->end();
@@ -132,12 +196,8 @@ class GroupsController extends Controller
 		else
 		{
 			echo 'ELSE';
-			
-			$selected_groups=array();
-	
-			$selected_groups[]=8;
-			$selected_groups[]=9;
-			$selected_groups[]=10;
+
+			//If the form is opened, check the checkboxes according to traceper_user_group_relation table
 			$model->groupStatusArray=$selected_groups;			
 		}	
 
