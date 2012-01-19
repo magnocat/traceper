@@ -4,8 +4,9 @@
  * This is the model class for table "traceper_groups".
  *
  * The followings are the available columns in table 'traceper_groups':
- * @property string $Id
+ * @property string $id
  * @property string $name
+ * @property string $owner
  * @property string $description
  */
 class Groups extends CActiveRecord
@@ -36,8 +37,9 @@ class Groups extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('name, owner, description', 'required'),
-			array('name', 'length', 'max'=>20),
-			array('description', 'length', 'max'=>200),
+			array('name', 'length', 'max'=>45),
+			array('owner', 'length', 'max'=>10),
+			array('description', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, name, owner, description', 'safe', 'on'=>'search'),
@@ -51,7 +53,8 @@ class Groups extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array();
+		return array(
+		);
 	}
 
 	/**

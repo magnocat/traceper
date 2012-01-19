@@ -67,11 +67,12 @@ class GroupsController extends Controller
 			$model->attributes = $_POST['NewGroupForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-
+				
 				$groups = new Groups;
 				$groups->name = $model->name;
 				$groups->owner = Yii::app()->user->id;
 				$groups->description = $model->description;
+								
 
 				if($groups->save()) // save the change to database
 				{
@@ -86,8 +87,7 @@ class GroupsController extends Controller
 			
 			if(Yii::app()->request->isAjaxRequest) 
 			{
-				$processOutput = false;	
-				//echo ' Ajax';
+				$processOutput = false;
 			}			
 		}	
 			
