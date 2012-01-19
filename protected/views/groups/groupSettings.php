@@ -23,7 +23,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-		<div class="row">
+		<div class="row" style="padding-left:100px">
 			<?php			
 				if(empty($groupsOfUser))
 				{
@@ -63,12 +63,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#groupSettingsWindow").dialog("close");
+																					$("#messageDialogText").html("Your settings have been saved");
+																					$("#messageDialog").dialog("open");																					
 																				}
 																			}
 																			catch (error){
 																				$("#groupSettingsWindow").html(result);
 																			}
-																		 }',
+																		 }',														
 															 ),
 														null);					
 				}
