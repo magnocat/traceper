@@ -131,10 +131,13 @@
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
+            'width'=>'auto',
+            'height'=>'auto',	
 	      
 	    ),
 	));
 
+	echo '</br>';
 	echo '<div align="center" id="messageDialogText"></div>';	
 	echo '<div align="center" class="row buttons"><br/>'. CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#messageDialog").dialog("close"); return false;','width'=>'200px'), null) .'</div>';
 	
