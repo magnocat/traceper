@@ -28,7 +28,7 @@
 				//TODO: ../index.php should be changed 
 				//TODO: updateUserListInterval 
 				//TODO: queryIntervalForChangedUsers 
-   				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
+   				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 1200000)	   	
 				trackerOp.setLangOperator(langOp);	  				
 			}
    			catch (e) {
@@ -39,11 +39,7 @@
 		CClientScript::POS_READY);
 		
 		 if (Yii::app()->user->isGuest == false){
-		 		Yii::app()->clientScript->registerScript('getFirstFriendListPage',
-		 												CHtml::ajax(array(
-																			'url'=>$this->createUrl('users/getFriendList'),
-																			'update'=>'#friends',
-																	)).
+		 		Yii::app()->clientScript->registerScript('getDataInBackground',
 														'trackerOp.getFriendList(1);	
 		  												 trackerOp.getImageList(); ',
 		 												CClientScript::POS_READY); 				

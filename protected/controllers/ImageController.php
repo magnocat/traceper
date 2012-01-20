@@ -13,10 +13,9 @@ class ImageController extends Controller
     
 	public function accessRules()
     {
-    	//TODO: actionUpload can be added list below after mobile app is able to login the framework
         return array(
         	array('deny',
-                'actions'=>array('delete', 'search', 
+                'actions'=>array('delete', 'search', 'upload', 
                 				 'get','getImageListXML'),
         		'users'=>array('?'),
             )
@@ -82,7 +81,9 @@ class ImageController extends Controller
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 						 WHERE userId in ('. $friendList .') OR 
 						 	   userId = '. Yii::app()->user->id .' OR 
-						 	   publicData = 1';
+						 	   publicData = 1
+						  ORDER BY u.Id DESC';
+
 	
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,
@@ -208,8 +209,6 @@ class ImageController extends Controller
 			&& isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
-			&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
-			&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL
 			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL)
 		{
 			if ($_FILES["image"]["error"] == UPLOAD_ERR_OK )
@@ -217,8 +216,6 @@ class ImageController extends Controller
 				$latitude = (float) $_REQUEST['latitude'];
 				$longitude = (float) $_REQUEST['longitude'];
 				$altitude = (float) $_REQUEST['altitude'];
-				$email = $_REQUEST['email'];
-				$password = $_REQUEST['password'];
 				$description = $_REQUEST['description'];
 
 				$publicData = 0;
@@ -229,23 +226,14 @@ class ImageController extends Controller
 					}
 				}
 
-				$sql = sprintf('SELECT Id
-								FROM '.  Users::model()->tableName() .' 
-							WHERE email = "%s" 
-						  		  AND 
-						  		  password = "%s"
-							LIMIT 1', $email, md5($password));
-				$userId = Yii::app()->db->createCommand($sql)->queryScalar();
-				$result = "Email or password not correct";
-		
-				if ($userId != false) 
+				if (Yii::app()->user->id != null) 
 				{
 					
 					$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
 									(userId, latitude, longitude, altitude, uploadtime, publicData, description)
 									VALUES(%d, %s, %s, %s, NOW(), %d, "%s")', 
-									$userId, $latitude, $longitude, $altitude, $publicData, $description);
+									Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
 					$result = "Unknown Error";
 					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 					if ($effectedRows == 1)
@@ -335,7 +323,9 @@ class ImageController extends Controller
 								 WHERE (userId in ('. $friendList .') 
 								 		OR userId = '. Yii::app()->user->id .'
 								 		OR publicData = 1)
-								 		AND unix_timestamp(u.uploadTime) >= '. $time;
+								 		AND unix_timestamp(u.uploadTime) >= '. $time . '
+								 ORDER BY u.Id DESC
+								 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
 						
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
 				}
@@ -358,7 +348,9 @@ class ImageController extends Controller
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 					 WHERE userId in ('. $friendList .') OR 
 					 	   userId = '. Yii::app()->user->id .' OR
-					 	   publicData = 1';
+					 	   publicData = 1
+					 ORDER BY u.Id DESC
+					 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
 
 
 			$out = $this->prepareXML($sql, $pageNo, $pageCount, "imageList");

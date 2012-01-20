@@ -122,7 +122,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}, true);
 	};
 
-	this.getImageList = function(){
+	this.getImageList = function(callback){
 		var params = "r=image/getImageListXML&pageNo="+ TRACKER.bgImageListPageNo +"&"; 
 
 		if (TRACKER.allImagesFetched == true) {
@@ -145,14 +145,32 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					TRACKER.allImagesFetched = true;
 					setTimeout(TRACKER.getImageList, TRACKER.queryUpdatedUserInterval);
 				}
+				if (typeof callback == 'function'){
+					callback();
+				}
 			}
 		}, true);	
 	}
 
 	this.trackUser = function(userId){
 		
-		if (TRACKER.users[userId].friendshipStatus == "1" &&  TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
+		if (typeof TRACKER.users[userId] === "undefined") {
+			var params = "r=users/getUserInfo&userId="+ userId +"&"; 
+			TRACKER.ajaxReq(params, function(result){
+				processXML(MAP, result);
+				if (typeof TRACKER.users[userId]  !== "undefined") {
+					TRACKER.trackUser(userId);
+				}
+				else {
+					TRACKER.users[userId] = null;
+				}
+			});
+		}
+		else if (TRACKER.users[userId] !== null &&
+				 TRACKER.users[userId].friendshipStatus == "1" &&  
+				 TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
 		{
+			
 			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 			MAP.panMapTo(location);
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
@@ -241,7 +259,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 
 	this.showImageWindow = function(imageId){
-		MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
+		if (typeof TRACKER.images[imageId] == "undefined") {
+			TRACKER.getImageList(function(){
+				MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
+			});
+		}
+		else {		
+			MAP.trigger(TRACKER.images[imageId].mapMarker.marker, 'click');	
+		}
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
