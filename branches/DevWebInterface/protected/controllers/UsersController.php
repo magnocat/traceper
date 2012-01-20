@@ -38,13 +38,12 @@ class UsersController extends Controller
 	
  	public function accessRules()
     {
-    	//TODO: takeMyLocation, getUserlistJSON can be added but they are used by mobile app,
-    	// after mobile app is able to login the framework, these actions can be added to list below
         return array(
         	array('deny',
                 'actions'=>array('addAsFriend', 'approveFriendShip', 'createGeoFence', 
                 				 'deleteFriendShip','getFriendRequestList',
-        						 'getUserPastPointsXML', 'getUserListXML', 'search'),
+        						 'getUserPastPointsXML', 'getUserListXML', 'search',
+        						 'takeMyLocation', 'getUserInfo'),
         		'users'=>array('?'),
             )
         );
@@ -56,20 +55,12 @@ class UsersController extends Controller
 	 */
 	public function actionTakeMyLocation()
 	{
-		/*if (Yii::app()->user->isGuest) {
-			echo CJSON::encode(array(
-			"result"=>"Unauthorized access",
-			));
-			}
-			*/
 		$result = "Missing parameter";
 		if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 		&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 		&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 		&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
 		&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
-		&& isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
-		&& isset($_REQUEST['password']) && $_REQUEST['password'] != NULL
 		)
 		{
 			$latitude = (float) $_REQUEST['latitude'];
@@ -77,18 +68,9 @@ class UsersController extends Controller
 			$altitude = (float) $_REQUEST['altitude'];
 			$deviceId = $_REQUEST['deviceId'];
 			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
-			$email = $_REQUEST['email'];
-			$password = $_REQUEST['password'];
-				
-			$sql = sprintf('SELECT Id
-								FROM '.  Users::model()->tableName() .' 
-							WHERE email = "%s" 
-						  		  AND 
-						  		  password = "%s"
-							LIMIT 1', $email, md5($password));
-			$userId = Yii::app()->db->createCommand($sql)->queryScalar();
-			$result = "Email or password not correct";	
-			if ($userId != false) 
+
+			$result = "No valid user id";	
+			if (Yii::app()->user->id != false) 
 			{
 				$sql = sprintf('UPDATE '
 				. Users::model()->tableName() .'
@@ -102,7 +84,7 @@ class UsersController extends Controller
 								  	.' WHERE '
 								  	.' Id = %d '
 								  	 .' LIMIT 1;',
-				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
+				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, Yii::app()->user->id);
 				$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 				$result = "Unknown Error";
 				if ($effectedRows == 1)
@@ -112,7 +94,7 @@ class UsersController extends Controller
 									(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
 		    						VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s") 
 									',
-								  	$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
+								  	Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
 					Yii::app()->db->createCommand($sqlWasHere)->execute();
 					$result = "1";
 				}
@@ -247,6 +229,35 @@ class UsersController extends Controller
 		}
 		echo $out;
 		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->end();
+	}
+	
+	public function actionGetUserInfo()
+	{
+		$out = "Missing parameter";
+		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
+			
+			$userId = (int) $_REQUEST['userId'];
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+						1 isFriend
+				FROM '. Friends::model()->tableName() . ' f 
+				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = '. $userId .'
+				WHERE  ((friend1 = '. Yii::app()->user->id .' 
+						 	AND friend2 ='. $userId .')
+						 OR
+						 (friend2 = '. Yii::app()->user->id .' 
+						 	AND friend1 ='. $userId .')) 
+						AND 
+							status= 1
+				LIMIT 1' ;
+
+			$out = $this-> prepareXML($sql, 1, 1, "userList");
+		}
+		
+		echo $out;
 		Yii::app()->end();
 	}
 	
