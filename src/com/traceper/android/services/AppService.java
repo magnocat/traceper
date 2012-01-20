@@ -9,11 +9,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +28,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.ConnectivityManager;
@@ -38,13 +35,11 @@ import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.traceper.R;
-import com.traceper.android.CameraController;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
 
@@ -64,7 +59,7 @@ public class AppService extends Service implements IAppService{
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
 	private ArrayList<Location> pendingLocations = new ArrayList<Location>();
-	
+
 	private class Image {
 		public byte[] image;
 		public boolean isPublic;
@@ -89,11 +84,9 @@ public class AppService extends Service implements IAppService{
 
 	private int minDataSentInterval = Configuration.MIN_GPS_DATA_SEND_INTERVAL;
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
-	//	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-	//	private boolean gps_enabled = false;
-	//	private boolean network_enabled = false;
-	private String cookie = null;
+	private String cookieName = null;
+	private String cookieValue = null;
 	private boolean configurationChanged = false;
 	private boolean autoCheckinEnabled;
 	private PendingIntent getLocationIntent;
@@ -119,23 +112,23 @@ public class AppService extends Service implements IAppService{
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
 		mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		
+
 		Intent intent = new Intent(AppService.this, AppService.class);
 		intent.setAction(REQUEST_LOCATION);
 		getLocationIntent = PendingIntent.getService(AppService.this, 0, intent, 0);
-		
+
 		intent = new Intent(AppService.this, AppService.class);
 		intent.setAction(GET_GPS_LOCATION);
 		gpsLocationIntent = PendingIntent.getService(this, 0, intent, 0);
-		
+
 		intent = new Intent(AppService.this, AppService.class);
 		intent.setAction(GET_NETWORK_LOCATION);
 		networkLocationIntent = PendingIntent.getService(this, 0, intent, 0);
-		
+
 		Intent sendLocationIntent = new Intent(AppService.this, AppService.class);
 		sendLocationIntent.setAction(SEND_LOCATION);
 		sendLocation = PendingIntent.getService(AppService.this, 0, sendLocationIntent, 0);
-		
+
 		am = (AlarmManager)getSystemService(ALARM_SERVICE);			
 
 		networkStateReceiver = new BroadcastReceiver() {
@@ -174,7 +167,7 @@ public class AppService extends Service implements IAppService{
 						requestStarted = true;
 					}
 
-					
+
 					if (requestStarted == true) 
 					{
 						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
@@ -222,7 +215,7 @@ public class AppService extends Service implements IAppService{
 				else if(action.equals(GET_NETWORK_LOCATION)) {
 					Bundle extras = intent.getExtras();
 					boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
-					
+
 					if (extras.containsKey(LocationManager.KEY_PROVIDER_ENABLED)) {
 						boolean network_enabled = intent.getExtras().getBoolean(LocationManager.KEY_PROVIDER_ENABLED);
 						if (network_enabled == false) {
@@ -236,12 +229,12 @@ public class AppService extends Service implements IAppService{
 							}
 						}
 					}
-					
+
 					if (extras.containsKey(LocationManager.KEY_STATUS_CHANGED)) 
 					{
 						int status = extras.getInt(LocationManager.KEY_STATUS_CHANGED);
 						if (status == LocationProvider.OUT_OF_SERVICE ||
-							status == LocationProvider.TEMPORARILY_UNAVAILABLE) 
+								status == LocationProvider.TEMPORARILY_UNAVAILABLE) 
 						{
 							locationManager.removeUpdates(networkLocationIntent);
 							if (gps_enabled == true) {
@@ -253,7 +246,7 @@ public class AppService extends Service implements IAppService{
 							}
 						}
 					}
-					
+
 					if (extras.containsKey(LocationManager.KEY_LOCATION_CHANGED)) 
 					{
 						networkLocation = (Location)extras.getParcelable(LocationManager.KEY_LOCATION_CHANGED);
@@ -276,7 +269,7 @@ public class AppService extends Service implements IAppService{
 	}
 
 	public void setAutoCheckin(boolean enable){
-		
+
 		if (enable == true && autoCheckinEnabled == false) {			
 			sendLocation(minDataSentInterval, minDistanceInterval);
 		}
@@ -289,18 +282,18 @@ public class AppService extends Service implements IAppService{
 	public void sendLocationNow(){
 		sendLocation(0, 0);
 	}
-	
+
 	@Override
 	public boolean uploadImage(byte[] picture, boolean publicData, String description) {
-		
+
 		if (lastSentLocation == null || 
-			lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
 			sendLocationNow();
 			pendingImage = new Image(picture, publicData, description);
 			return false;
 		}		
-		
-		
+
+
 		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
 		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
@@ -309,7 +302,7 @@ public class AppService extends Service implements IAppService{
 				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
 
 		mManager.notify(NOTIFICATION_ID , notification);
-		
+
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		int inSampleSize = 2;
 		int quality = 75;
@@ -322,8 +315,8 @@ public class AppService extends Service implements IAppService{
 		int byteCount = bitmap.getRowBytes();
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
 		bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
-		
-				
+
+
 		String result = sendImage(byteArrayOutputStream.toByteArray(), publicData, description, lastSentLocation);
 		String notificationText = getString(R.string.upload_failed);
 		boolean operationResult = false;
@@ -334,7 +327,7 @@ public class AppService extends Service implements IAppService{
 
 		notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
 		mManager.notify(NOTIFICATION_ID, notification);
-		
+
 		return operationResult;
 	}
 
@@ -387,8 +380,7 @@ public class AppService extends Service implements IAppService{
 		return mBinder;
 	}
 
-	//TODO: edit the traceper protocol file
-	private String sendLocationData(String emailText, String passwordText, Location loc) 
+	private String sendLocationData(Location loc) 
 	{		
 		double latitude = 0;
 		double longitude = 0;
@@ -398,25 +390,21 @@ public class AppService extends Service implements IAppService{
 			longitude = loc.getLongitude();
 			altitude = loc.getAltitude();
 		}
-		String[] name = new String[8];
-		String[] value = new String[8];
+		String[] name = new String[6];
+		String[] value = new String[6];
 		name[0] = "r";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "latitude";
-		name[4] = "longitude";
-		name[5] = "altitude";
-		name[6] = "deviceId";
-		name[7] = "time";
+		name[1] = "latitude";
+		name[2] = "longitude";
+		name[3] = "altitude";
+		name[4] = "deviceId";
+		name[5] = "time";
 
 		value[0] = "users/takeMyLocation";
-		value[1] = emailText;
-		value[2] = passwordText;
-		value[3] = String.valueOf(latitude);
-		value[4] = String.valueOf(longitude);
-		value[5] = String.valueOf(altitude);
-		value[6] = this.deviceId;
-		value[7] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
+		value[1] = String.valueOf(latitude);
+		value[2] = String.valueOf(longitude);
+		value[3] = String.valueOf(altitude);
+		value[4] = this.deviceId;
+		value[5] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
@@ -446,14 +434,13 @@ public class AppService extends Service implements IAppService{
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 
 		return result;	
 	}
-	
+
 	public void notifyNoProviderEnabled(){
 		Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
@@ -465,26 +452,6 @@ public class AppService extends Service implements IAppService{
 
 	public String sendImage(byte[] image, boolean publicData, String description, Location loc)
 	{
-		/*
-		Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		Location locationNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		Location loc = null;
-		
-		if (locationGPS == null && locationNetwork != null) {
-			loc = locationNetwork;
-		}
-		else if (locationGPS != null && locationNetwork == null) {
-			loc = locationGPS;
-		}
-		else if (locationGPS != null && locationNetwork != null) {
-			if (locationGPS.getTime() > locationNetwork.getTime()) {
-				loc = locationGPS;
-			}
-			else {
-				loc = locationNetwork;
-			}
-		}
-		*/
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
@@ -495,29 +462,25 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[8];
-		String[] value = new String[8];
+		String[] name = new String[6];
+		String[] value = new String[6];
 		name[0] = "r";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "latitude";
-		name[4] = "longitude";
-		name[5] = "altitude";
-		name[6] = "publicData";
-		name[7] = "description";
+		name[1] = "latitude";
+		name[2] = "longitude";
+		name[3] = "altitude";
+		name[4] = "publicData";
+		name[5] = "description";
 
 		value[0] = "image/upload";
-		value[1] = this.email;
-		value[2] = this.password;
-		value[3] = String.valueOf(latitude);
-		value[4] = String.valueOf(longitude);
-		value[5] = String.valueOf(altitude);
+		value[1] = String.valueOf(latitude);
+		value[2] = String.valueOf(longitude);
+		value[3] = String.valueOf(altitude);
 		int publicDataInt = 0;
 		if (publicData == true) {
 			publicDataInt = 1; 
 		} 
-		value[6] = String.valueOf(publicDataInt);
-		value[7] = description;
+		value[4] = String.valueOf(publicDataInt);
+		value[5] = description;
 
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
@@ -528,7 +491,6 @@ public class AppService extends Service implements IAppService{
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//		int result = this.evaluateResult(httpRes);
@@ -569,10 +531,10 @@ public class AppService extends Service implements IAppService{
 			conn.setRequestProperty("Connection", "Keep-Alive");
 			conn.setRequestProperty("Charset", "UTF-8");
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
-			if (cookie != null) {
-				conn.setRequestProperty("Cookie", cookie);
+			if (cookieName != null && cookieValue != null) {
+				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
 			}
-
+			//conn.connect();
 			DataOutputStream ds = new DataOutputStream(conn.getOutputStream());
 
 			for (int i = 0; i < value.length; i++) {
@@ -589,7 +551,8 @@ public class AppService extends Service implements IAppService{
 			ds.flush();
 			ds.close();
 
-			cookie  = conn.getHeaderField("set-cookie");
+			getCookie(conn);
+
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
 					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
 			{
@@ -622,7 +585,64 @@ public class AppService extends Service implements IAppService{
 		return null;		
 	}
 
+	private void getCookie(URLConnection conn) {
+		for (int i=0; ; i++) {
+			String headerName = conn.getHeaderFieldKey(i);
+			String headerValue = conn.getHeaderField(i);
+
+			if (headerName == null && headerValue == null) {
+				// No more headers
+				break;
+			}
+			if ("Set-Cookie".equalsIgnoreCase(headerName)) {
+				// Parse cookie
+				String[] fields = headerValue.split(";\\s*");
+
+				String cookie = fields[0];
+				cookieName = cookie.substring(0, cookie.indexOf("="));
+				cookieValue = cookie.substring(cookie.indexOf("=")+1);
+				Log.i("cookie name", cookieName);
+				Log.i("cookie value", cookieValue);
+				String expires = null;
+				String path = null;
+				String domain = null;
+				boolean secure = false;
+
+				// Parse each field
+				for (int j=1; j<fields.length; j++) {
+					if ("secure".equalsIgnoreCase(fields[j])) {
+						secure = true;
+					} else if (fields[j].indexOf('=') > 0) {
+						String[] f = fields[j].split("=");
+						if ("expires".equalsIgnoreCase(f[0])) {
+							expires = f[1];
+						} else if ("domain".equalsIgnoreCase(f[0])) {
+							domain = f[1];
+						} else if ("path".equalsIgnoreCase(f[0])) {
+							path = f[1];
+						}
+					}
+				}
+
+				// Save the cookie...
+			}
+		}
+
+
+	}
+
 	public void exit() {
+
+		if (isUserAuthenticated() == true) {
+			String[] name = new String[2];
+			String[] value = new String[2];
+			name[0] = "r";
+			name[1] = "client";
+			value[0] = "site/logout";
+			value[1] = "mobile";
+
+			String httpRes = sendHttpRequest(name, value, null, null);
+		}
 		this.stopSelf();	
 	}
 
@@ -723,7 +743,7 @@ public class AppService extends Service implements IAppService{
 	}
 
 	private String sendLocationDataAndParseResult(Location loc) {
-		String result = AppService.this.sendLocationData(AppService.this.email, AppService.this.password, loc);	
+		String result = AppService.this.sendLocationData(loc);	
 
 		if (configurationChanged == true)
 		{
@@ -735,10 +755,10 @@ public class AppService extends Service implements IAppService{
 		}
 		return result;
 	}
-	
+
 	private void sendBestLocation() {
 		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false ||
-			locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == false)
+				locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == false)
 		{
 			if (gpsLocation != null) {
 				sendLocation(gpsLocation);
@@ -764,8 +784,8 @@ public class AppService extends Service implements IAppService{
 			}	
 		}	
 	}
-	
-	
+
+
 	private void sendLocation(Location loc) {
 		locationManager.removeUpdates(networkLocationIntent);
 		locationManager.removeUpdates(gpsLocationIntent);
@@ -794,7 +814,7 @@ public class AppService extends Service implements IAppService{
 			}
 			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
 			mManager.notify(NOTIFICATION_ID, notification);
-			
+
 			// upload pending image if any...
 			if (pendingImage != null) {
 				uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
@@ -804,7 +824,7 @@ public class AppService extends Service implements IAppService{
 		if (connected == false || result.equals("1") == false){
 			pendingLocations.add(loc);
 		}
-		
+
 	}
 
 }
