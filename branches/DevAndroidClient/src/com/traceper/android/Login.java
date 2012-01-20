@@ -1,8 +1,5 @@
 package com.traceper.android;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,7 +26,6 @@ import android.widget.Toast;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
-import com.traceper.android.tools.AeSimpleMD5;
 
 public class Login extends Activity {	
 
@@ -169,23 +165,6 @@ public class Login extends Activity {
 										Login.this.dialogMessage = result;
 										showDialog(CUSTOM_MESSAGE_DIALOG);
 									}
-						/*			
-									else if (result == IAppService.HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS) 
-									{
-										// Authentication failed, inform the user								 
-										showDialog(MAKE_SURE_USERNAME_AND_PASSWORD_CORRECT);
-													
-									}
-									else if (result == IAppService.HTTP_REQUEST_FAILED){
-										showDialog(HTTP_REQUEST_FAILED);
-									}
-									else if (result == IAppService.HTTP_RESPONSE_ERROR_MISSING_PARAMETER) {
-										showDialog(HTTP_MISSING_PARAMETER);
-									}
-									else {							
-										showDialog(UNKNOWN_ERROR_OCCURED);
-									}
-						*/
 								}									
 							});
 														
@@ -210,14 +189,7 @@ public class Login extends Activity {
 				finish();				
 			}        	
         }); 
-        
-        
-         
-        
     }
-    
-    
-    
     
     @Override
     protected Dialog onCreateDialog(int id) 
@@ -341,8 +313,6 @@ public class Login extends Activity {
     		default:
     			return null;
     	}
-    	
-    	
     }
 
 	@Override
@@ -356,7 +326,6 @@ public class Login extends Activity {
 	protected void onResume() 
 	{		
 		bindService(new Intent(Login.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
-	    		
 		super.onResume();
 	}
 

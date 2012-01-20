@@ -75,4 +75,5 @@
 <string name="upload_photo">Upload photo</string>
 <string name="please_enter_description">Please enter description</string>
 <string name="location_fix_problem">Location fix hasn\'t been received.</string>
+<string name="signingout">Signing out...</string>
 </resources>

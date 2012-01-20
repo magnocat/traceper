@@ -6,6 +6,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -96,6 +98,7 @@ public class Main extends Activity
 					Toast.LENGTH_SHORT).show();
 		}
 	};
+	private ProgressDialog progressDialog;
 
 
 
@@ -201,9 +204,6 @@ public class Main extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) {		
 		boolean result = super.onCreateOptionsMenu(menu);		
 
-		//		menu.add(0, TAKE_PICTURE_ID, 0, R.string.take_photo).setIcon(android.R.drawable.ic_menu_camera);
-
-
 		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);	
 
 		return result;
@@ -226,8 +226,25 @@ public class Main extends Activity
 		}		
 		case EXIT_APP_ID:
 		{
-			appService.exit();
-			finish();
+			progressDialog = ProgressDialog.show(Main.this, "", getString(R.string.signingout), true, false);	
+			
+			Thread exitThread = new Thread(){
+				private Handler handler = new Handler();
+				@Override
+				public void run() {
+					appService.exit();
+					
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							progressDialog.dismiss();
+							finish();
+						}
+					});
+				}
+			};
+			exitThread.start();
+			
 			return true;
 		}			
 		}
