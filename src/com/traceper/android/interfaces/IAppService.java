@@ -1,5 +1,8 @@
 package com.traceper.android.interfaces;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 
 public interface IAppService {
@@ -42,7 +45,10 @@ public interface IAppService {
 	public void setAuthenticationServerAddress(String address);
 	
 	public boolean uploadImage(byte[] image, boolean publicData, String description);
-	
+
+	public JSONObject getUserList();
+
+
 
 	
 }

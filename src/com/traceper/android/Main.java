@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -44,7 +46,8 @@ public class Main extends Activity
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
 	private Button checkInNow;
-	private Button mapviewb;	
+	private Button mapviewb;
+	private Button friends_list;
 	private CheckBox autoSendLocationCheckbox; 
 	private Location lastLocation = null;
 
@@ -77,6 +80,7 @@ public class Main extends Activity
 			if (appService.isUserAuthenticated()) {				
 				setTitle(appService.getUsername() + " - " + Configuration.APPLICATION_NAME);	
 				Long dt = appService.getLastLocationSentTime();
+			
 				if (dt != null) {
 					lastDataSentTimeText.setText(getFormattedDate(dt));
 				}
@@ -111,12 +115,14 @@ public class Main extends Activity
 		takePhoto = (Button) findViewById(R.id.take_upload_photo_button);
 		checkInNow = (Button) findViewById(R.id.send_location);
 		mapviewb = (Button) findViewById(R.id.map_view);
+		friends_list = (Button)findViewById(R.id.friends_list);
 
 		LocationManager locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		takePhoto.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 		checkInNow.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mylocation,0,0,0);
 		mapviewb.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_mapmode,0,0,0);
+		friends_list.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_myplaces,0,0,0);
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
@@ -179,6 +185,16 @@ public class Main extends Activity
 			}
 		});
 
+		friends_list.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				Intent i = new Intent(Main.this, friends.class);
+				startActivity(i);
+
+			}
+		});
 	}
 
 	@Override
