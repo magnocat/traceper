@@ -267,9 +267,21 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListJson()
 	{
-		if (Yii::app()->user->isGuest) {
+		$email = $_REQUEST['email'];
+		$password = $_REQUEST['password'];
+
+		$sql = sprintf('SELECT Id
+								FROM '.  Users::model()->tableName() .' 
+							WHERE email = "%s" 
+						  		  AND 
+						  		  password = "%s"
+							LIMIT 1', $email, md5($password));
+		$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+		$result = "Email or password not correct";
+		if ($userId == false) {
 			return;
 		}
+		
 	
 		$out = '';
 		$dataFetchedTimeKey = "UsersController.dataFetchedTime";
@@ -279,11 +291,22 @@ class UsersController extends Controller
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = IF(f.friend1 != '.$userId .', f.friend1, f.friend2)
+				WHERE (friend1 = '.$userId .' 
+						OR friend2 ='.$userId .') AND status= 1
+				 ' ;
+
+			/* 
+			 	$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
+						1 isFriend
+				FROM '. Friends::model()->tableName() . ' f 
+				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 				WHERE (friend1 = '.Yii::app()->user->id.' 
 						OR friend2 ='.Yii::app()->user->id.') AND status= 1
 				 ' ;
-
+			 */
+			
 
 		$out = $this-> prepareJson($sql, "userList");
 		
@@ -595,8 +618,17 @@ class UsersController extends Controller
 			{
 				while ( $row = $dataReader->read() )
 				{
-					$str .= $this->getUserJsonItem($row);
+					$row = $dataReader->read();
+					$str .= $this->getUserJsonItem($row).',';
 				}
+				$str='{"userlist":['.$str.']}';
+				/*
+				$JSON["userlist"]=array();
+
+				array_push($JSON["userlist"],$str);
+
+				$str= json_encode($JSON);
+				*/
 			}
 			else if ($type == "userPastLocations")
 			{
@@ -657,7 +689,7 @@ class UsersController extends Controller
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
 			
 		
-		$str = CJSON::encode(array(
+		                   $str=   CJSON::encode( array(
                             'user'=>$row['id'],
                             'isFriend'=>$row['isFriend'],
                     		'realname'=>$row['realname'],
@@ -671,7 +703,12 @@ class UsersController extends Controller
 							'deviceId'=>$row['deviceId'],		
                             ));
                             
+
                             
+                           // '{"userlist":[{"user":"18","isFriend":"g","realname":"17","latitude":"17.000000","longitude":"0.000000","altitude":"0.000000","calculatedTime":"0000-00-00 00:00:00","time":"0000-00-00 00:00:00","message":null,"status_message":null,"deviceId":null}]}';
+                            
+		
+                                        
 		return $str;
 	}
 	
