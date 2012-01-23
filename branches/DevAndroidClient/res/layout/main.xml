@@ -58,6 +58,15 @@
     	 android:textSize="15px" 
     	 android:width="200px" 
     	 android:text="Location On Map"></Button>
+
+    	<Button
+    	    android:id="@+id/friends_list"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:textSize="15px" 
+    		android:width="200px" 
+    	    android:text="Friends List" />
+    	
     </LinearLayout>
     <CheckBox android:layout_width="wrap_content" 
      android:layout_height="wrap_content" 
