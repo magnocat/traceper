@@ -23,12 +23,12 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-		<div class="row" style="padding-left:100px">
+		<div class="row" style="padding-left:10px">
 			<?php			
 				if(empty($groupsOfUser))
 				{
 					echo '</br></br> There is no group to show... </br></br>';
-					echo 'First create some group(s) please';	
+					echo 'First create some group(s) please';
 				}
 				else
 				{
