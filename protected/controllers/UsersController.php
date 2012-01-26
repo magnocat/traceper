@@ -194,8 +194,8 @@ class UsersController extends Controller
 							FROM '. Users::model()->tableName() . ' u 
 							LEFT JOIN ' . Friends::model()->tableName() . ' f
 								ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-							WHERE (f.friend1 = '. Yii::app()->user->id .' 
-									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1
+							WHERE ((f.friend1 = '. Yii::app()->user->id .' AND f.friend2Visibility = 1) 
+									OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1
 									AND unix_timestamp(u.dataArrivedTime) >= '. $time . '
 							LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
 
@@ -219,9 +219,10 @@ class UsersController extends Controller
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-				WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2 ='.Yii::app()->user->id.') AND status= 1
+					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)		
+				WHERE ((f.friend1 = '. Yii::app()->user->id .' AND f.friend2Visibility = 1) 
+						OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1						
+						
 				LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
 
 
@@ -537,7 +538,9 @@ class UsersController extends Controller
 
 			$friend = new Friends();
 			$friend->friend1 = Yii::app()->user->id;
+			$friend->friend1Visibility = 1; //default visibility setting is visible
 			$friend->friend2 = $friendId;
+			$friend->friend2Visibility = 1; //default visibility setting is visible
 			$friend->status = 0;
 			$result = 'Error occured';
 			if ($friend->save()) {
