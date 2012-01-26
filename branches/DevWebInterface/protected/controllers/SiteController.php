@@ -311,7 +311,9 @@ class SiteController extends Controller
 				{
 					$friend = new Friends();
 					$friend->friend1 = Yii::app()->user->id;
+					$friend->friend1Visibility = 1; //default visibility setting is visible
 					$friend->friend2 = $users->getPrimaryKey();
+					$friend->friend2Visibility = 1; //default visibility setting is visible
 					$friend->status = 1;
 					
 					if ($friend->save()) 

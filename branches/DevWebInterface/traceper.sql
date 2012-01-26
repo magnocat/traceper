@@ -29,26 +29,28 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `traceper_friends` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `friend1` int(11) unsigned NOT NULL,
+  `friend1Visibility` tinyint(1) NOT NULL,
   `friend2` int(11) unsigned NOT NULL,
+  `friend2Visibility` tinyint(1) NOT NULL,
   `status` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `friend1_2` (`friend1`,`friend2`),
   KEY `friend1` (`friend1`),
   KEY `friend2` (`friend2`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=45 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=63 ;
 
 --
 -- Dumping data for table `traceper_friends`
 --
 
-INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend2`, `status`) VALUES
-(38, 1, 2, 1),
-(39, 1, 3, 1),
-(40, 1, 4, 1),
-(41, 1, 5, 1),
-(42, 1, 6, 1),
-(43, 1, 8, 1),
-(44, 1, 9, 1);
+INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend1Visibility`, `friend2`, `friend2Visibility`, `status`) VALUES
+(38, 1, 1, 2, 1, 1),
+(39, 1, 1, 3, 1, 1),
+(40, 1, 1, 4, 1, 1),
+(41, 1, 1, 5, 0, 1),
+(42, 1, 0, 6, 1, 1),
+(43, 1, 0, 8, 0, 1),
+(44, 1, 1, 9, 0, 1);
 
 -- --------------------------------------------------------
 
