@@ -190,10 +190,18 @@ private function parseRequests($input)
 			case "#SA": //Login message
 				//echo "Login Message i=$icounter";
 				$imei_no=implode('',$data_array);
-				$output = $input;
-				$output[2]='B';
-				$output[8]=1;
-				$output[13]=((int) $output[13])+1;
+				$sql = sprintf("SELECT Id from traceper_users WHERE deviceId = '%s' LIMIT 1;",
+								  	$imei_no);
+				
+				$result = Yii::app()->db->createCommand($sql)->queryScalar();
+				
+				if ($result != false)
+				{
+					$output = $input;
+					$output[2]='B';
+					$output[8]=1;
+					$output[13]=((int) $output[13])+1;
+				}
 				/*
 				socket_write($spawn, $output, strlen ($output)) or die("Could not write
 		output\n");
