@@ -84,6 +84,8 @@
 	echo '<div id="registerWindow"></div>';
 ///////////////////////////// Register GPS Tracker Window ///////////////////////////
 	echo '<div id="registerGPSTrackerWindow"></div>';
+///////////////////////////// GeoFence Window ///////////////////////////
+	echo '<div id="geoFenceWindow"></div>';	
 ///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
 ///////////////////////////// Invite User Window ///////////////////////////
@@ -246,7 +248,32 @@
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Register GPS Tracker'));
 											
- 									echo CHtml::link('<div  class="userOperations" id="signout">	 			
+ 									echo CHtml::ajaxLink('<div  class="userOperations" id="geoFence">	 			
+	 													<img src="images/geoFence.png"  /><div></div>		
+	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
+ 										array(
+    										'complete'=> 'function() {var mapStruct = new MapStruct();
+    										var polygon = mapOperator.initializePolygon();    										
+    										var initialLoc1 = new MapStruct.Location({latitude:40.504041,
+			    								  longitude:34.024414});
+			    							var initialLoc2 = new MapStruct.Location({latitude:41.504041,
+			    								  longitude:35.024414});
+			    							var initialLoc3 = new MapStruct.Location({latitude:39.504041,
+			    								  longitude:34.024414});
+			    								  
+    										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
+    										mapOperator.addPointToGeoFence(geoFence_,initialLoc1);
+    										mapOperator.addPointToGeoFence(geoFence_,initialLoc2);
+    										mapOperator.addPointToGeoFence(geoFence_,initialLoc3);
+    										mapOperator.setGeoFenceVisibility(geoFence_,true);    									
+    										//mapOperator.initializeGeoFenceControl(geoFence_);
+    										return false;}',
+ 											'update'=> '#registerGPSTrackerWindow',
+										),
+										array(
+											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Geo-Fence'));
+										
+									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
 	 												 </div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>'Sign Out')); 																			
 	 							?>
