@@ -11,7 +11,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	));
 
 	if (isset($dataProvider)) {
-		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'viewId'=>'searchResultList', 'searchResult'=>true), false, true);
+		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'model'=>$model, 'viewId'=>'searchResultList', 'searchResult'=>true), false, true);
 	}
 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');

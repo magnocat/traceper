@@ -7,6 +7,21 @@ if ($dataProvider != null) {
 
 	$viewId = isset($viewId) ? $viewId : 'userListView';
 
+	$emptyText = "No users found";
+	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
+	// keyword parameter
+	$ajaxUrl = null;
+	$deleteFrienshipQuestion = "Do you want to delete this user from your friend list?";
+	$addAsFriendQuestion = "Do you want to add this user as a friend?";
+	if ($isFriendRequestList == true) {
+		$deleteFrienshipQuestion = "Do you want to reject this user's friend request?";
+		$emptyText = "There is no friend requests found";
+	}
+	else if ($isSearchResult == true){
+		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
+	}
+	
+	
 	
 	if ($isFriendList == true) {
 		
@@ -15,23 +30,15 @@ if ($dataProvider != null) {
 		echo "<div id='friendShipId' style='display:none'></div>";
 		echo "<div id='friendId' style='display:none'></div>";
 		echo "<div id='gridViewId' style='display:none'></div>";
-		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-		    'id'=>'confirmation',
-			// additional javascript options for the dialog plugin
-		    'options'=>array(
-		        'title'=>Yii::t('general', 'Delete friendship'),
-		        'autoOpen'=>false,
-		        'modal'=>true, 
-				'resizable'=>false,
-				'buttons' =>array (
-					"OK"=>"js:function(){
-								". CHtml::ajax(
-										array(
+				
+		$deleteFriendshipJSFunction = "function deleteFriendship() { "
+										.CHtml::ajax(
+											array(
 												'url'=>Yii::app()->createUrl('users/deleteFriendShip'),
 												'data'=> array('friendShipId'=>"js:$('#friendShipId').html()"),
 												'success'=> 'function(result) { 	
 															 	try {
-															 		$("#confirmation").dialog("close");
+															 		TRACKER.closeConfirmationDialog();
 																	var obj = jQuery.parseJSON(result);
 																	if (obj.result && obj.result == "1") 
 																	{
@@ -39,76 +46,57 @@ if ($dataProvider != null) {
 																	}
 																	else 
 																	{
-																		$("#messageDialogText").html("Sorry,an error occured in operation");
-																		$("#messageDialog").dialog("open");
+																		TRACKER.showMessageDialog("Sorry,an error occured in operation");
 																	}
-
 																}
 																catch(ex) {
-																	$("#messageDialogText").html("Sorry,an error occured in operation");
-																	$("#messageDialog").dialog("open");
+																	TRACKER.showMessageDialog("Sorry,an error occured in operation");
 																}
 															}',
-											)) .
-							"}",
-				"Cancel"=>"js:function() {
-					$( this ).dialog( \"close\" );
-				}" 
-				)),
-			));	
-		echo "Do you want to delete this user from your friend list?";
-		$this->endWidget('zii.widgets.jui.CJuiDialog');
+											)).
+										"}";	
+
 		
-		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-		    'id'=>'addAsFriendConfirmation',
-			// additional javascript options for the dialog plugin
-		    'options'=>array(
-		        'title'=>Yii::t('general', 'Add as friend'),
-		        'autoOpen'=>false,
-		        'modal'=>true, 
-				'resizable'=>false,
-				'buttons' =>array (
-					"OK"=>"js:function(){
-								". CHtml::ajax(
+		 												
+		$addAsFriendJSFunction = "function addasFriend(){
+									". CHtml::ajax(
 					  						array("url"=>Yii::app()->createUrl("users/addAsFriend"),
 					  							  'data'=> array('friendId'=>"js:$('#friendId').html()"),
 					  							  "success"=>'function(result) {
-					  							  		$("#addAsFriendConfirmation").dialog("close"); 
-					  							  		try {
-														var obj = jQuery.parseJSON(result);
-														if (obj.result && obj.result == "1") 
-														{
-															$.fn.yiiGridView.update($("#gridViewId").text());
+					  							  		TRACKER.closeConfirmationDialog();
+														try {
+															var obj = jQuery.parseJSON(result);
+															if (obj.result && obj.result == "1") 
+															{
+																$.fn.yiiGridView.update($("#gridViewId").text());
+															}
+															else 
+															{
+																TRACKER.showMessageDialog("Sorry,an error occured in operation");
+															}
 														}
-														else 
-														{
-															$("#messageDialogText").html("Sorry,an error occured in operation");
-															$("#messageDialog").dialog("open");
+														catch(ex) {
+															TRACKER.showMessageDialog("Sorry,an error occured in operation");
 														}
-													}
-													catch(ex) {
-														$("#messageDialogText").html("Sorry,an error occured in operation");
-														$("#messageDialog").dialog("open");
-													}
 					  							  		
 													}'
 					  						))
 									.
-							"}",
-				"Cancel"=>"js:function() {
-					$( this ).dialog( \"close\" );
-				}" 
-				)),
-			));
-		echo "Do you want to add this user as a friend?";
-		$this->endWidget('zii.widgets.jui.CJuiDialog');
+									"}"; 
+
+		Yii::app()->clientScript->registerScript('frienshipFunctions',
+														$deleteFriendshipJSFunction
+														.$addAsFriendJSFunction,
+		 												CClientScript::POS_READY);									
 	}
 	
 
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
+			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
+			'emptyText'=>$emptyText,
 			'pager'=>array( 
 				 'header'=>'',
 		         'firstPageLabel'=>'',
@@ -116,13 +104,10 @@ if ($dataProvider != null) {
 			       ),
 		    'columns'=>array(
 		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
 					'name'=>'Group Settings',
 					'type' => 'raw',
-  
-					//'value'=>'CHtml::dropDownList("listname", "M", array("M" => "Male", "F" => "Female"))',		
 					
-		            'value'=>'CHtml::link(\'<img src="images/GroupSettings.png"  />\', \'#\',
+		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
 										array(\'onclick\'=>CHtml::ajax(
 											array(
 												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'])),
@@ -141,17 +126,18 @@ if ($dataProvider != null) {
 		array(            // display 'create_time' using an expression
 				    'name'=>'Name',
 					'type' => 'raw',
-		            'value'=>'CHtml::link($data["realname"], "#", array(
+					'sortable'=>$isFriendList ? true : false,
+		            'value'=>'CHtml::link($data["Name"], "#", array(
     										"onclick"=>"TRACKER.trackUser(".$data["id"].");",
 										))',	
 		),
 		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
 					'type' => 'raw',
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
 										array("onclick"=>"$(\"#friendShipId\").text(".$data[\'friendShipId\'].");
-														 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
-														 $(\"#confirmation\").dialog(\"open\");", 
+														 $(\"#gridViewId\").text(\"'.$viewId.'\");
+														 TRACKER.showConfirmationDialog(\"'.$deleteFrienshipQuestion.'\", deleteFriendship);
+														 ", 									
 												"class"=>"vtip", 
 												"title"=>'.($isFriendRequestList?'"Reject"':'"Delete Friend"').
 											')
@@ -160,7 +146,6 @@ if ($dataProvider != null) {
 					'visible'=>$isFriendList || $isFriendRequestList,
 		),
 		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
 					'type' => 'raw',
 		            'value'=>'(isset($data[\'status\']) && $data[\'status\'] == 0 
 								&& isset($data[\'requester\']) && $data[\'requester\'] == false) ?
@@ -202,7 +187,8 @@ if ($dataProvider != null) {
 		            				 CHtml::link("<img src=\"images/user_add_friend.png\"  />", "#",
 					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
 					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
-					  								 $(\"#addAsFriendConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>"Add as Friend"
+													 TRACKER.showConfirmationDialog(\"'.$addAsFriendQuestion.'\", addasFriend); 
+													 "									
 					  					)
 					 				)
 					 			: "";',

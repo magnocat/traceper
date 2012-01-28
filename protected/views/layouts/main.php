@@ -28,7 +28,7 @@
 				//TODO: ../index.php should be changed 
 				//TODO: updateUserListInterval 
 				//TODO: queryIntervalForChangedUsers 
-   				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 1200000)	   	
+   				var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)	   	
 				trackerOp.setLangOperator(langOp);	  				
 			}
    			catch (e) {
@@ -130,18 +130,39 @@
 	        'modal'=>true, 
 			'resizable'=>false,
             'width'=>'auto',
-            'height'=>'auto',	
+            'height'=>'auto',
+			'buttons'=>array(
+					"OK"=>"js:function(){
+						$(this).dialog('close');
+					}"
+				),	
 	      
 	    ),
 	));
-
 	echo '</br>';
 	echo '<div align="center" id="messageDialogText"></div>';	
-	echo '<div align="center" class="row buttons"><br/>'. CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#messageDialog").dialog("close"); return false;','width'=>'200px'), null) .'</div>';
-	
-			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
-	
+/////////////////////////////////////////////////////////////////////////////////////////////
+/*
+ * this is a generic confirmation dialog
+ */	
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+	    'id'=>'confirmationDialog',
+		// additional javascript options for the dialog plugin
+	    'options'=>array(
+	        'title'=>Yii::t('general', 'Confirmation'),
+	        'autoOpen'=>false,
+	        'modal'=>true, 
+			'resizable'=>false,
+			'buttons' =>array (
+				"OK"=>'js:function(){}',
+				"Cancel"=>"js:function() {
+					$(this).dialog( 'close' );
+				}" 
+			)),
+	));	
+	echo '<div id="question"></div>';
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	
 ?>
 	<div id='wrap'>
@@ -188,13 +209,22 @@
 		 						</div>
 	 						<?php }?>
 	 						
-	 						<div id="userBlock" <?php if (Yii::app()->user->isGuest == true) {	echo "style='display:none'"; }  ?>>
+	 						<div id="userBlock" <?php
+	 											$userId = "$('#userId').html()"; 
+	 											if (Yii::app()->user->isGuest == true) {	
+	 													echo "style='display:none'"; 
+	 													}
+	 											else {
+	 												$userId = Yii::app()->user->id;
+	 											}  ?>>
+	 							
 	 						
-								<ul id='userarea'><li id="username"><?php if (Yii::app()->user->isGuest == false){ 
+								<ul id='userarea'><li id="username" onclick="TRACKER.trackUser(<?php echo $userId; ?>)"><?php if (Yii::app()->user->isGuest == false){ 
 																				echo Yii::app()->user->name; 
 																			}?>
 												 </li>
 	 							</ul>							
+	 							<div id="userId" style="display:none;"></div>
 	 							
 	 							<?php 
  									echo CHtml::ajaxLink('<div style="clear:both" id="changePassword" class="userOperations">	

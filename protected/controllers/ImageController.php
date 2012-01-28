@@ -203,20 +203,21 @@ class ImageController extends Controller
 	 * this action is used by mobile clients
 	 */
 	public function actionUpload()
-	{
-		$result = "Missing parameter";
+	{		
+		$result = "Missing parameter";		
 		if (isset($_FILES["image"])
 			&& isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL)
 		{
+			$result = "Upload Error";
 			if ($_FILES["image"]["error"] == UPLOAD_ERR_OK )
 			{
 				$latitude = (float) $_REQUEST['latitude'];
 				$longitude = (float) $_REQUEST['longitude'];
 				$altitude = (float) $_REQUEST['altitude'];
-				$description = $_REQUEST['description'];
+				$description = htmlspecialchars($_REQUEST['description']);
 
 				$publicData = 0;
 				if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
