@@ -20,25 +20,25 @@ class SiteController extends Controller
 		),
 		);
 	}
-	
- 	public function filters()
-    {
-        return array(
+
+	public function filters()
+	{
+		return array(
             'accessControl',
-        );
-    }
-	
- 	public function accessRules()
-    {
-        return array(
-        	array('deny',
+		);
+	}
+
+	public function accessRules()
+	{
+		return array(
+		array('deny',
                 'actions'=>array('changePassword','inviteUser', 'registerGPSTracker'),
         		'users'=>array('?'),
-            )
-        );
-    }
-    
-    
+		)
+		);
+	}
+
+
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -47,10 +47,10 @@ class SiteController extends Controller
 	{
 		// renders the view file 'protected/views/site/index.php'
 		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');		
+		$this->render('index');
 	}
-	
-	
+
+
 
 	/**
 	 * This is the action to handle external exceptions.
@@ -105,6 +105,7 @@ class SiteController extends Controller
 			if($model->validate() && $model->login()) {
 				echo CJSON::encode(array(
 								"result"=> "1",
+								"id"=>Yii::app()->user->id,
 								"realname"=> $model->getName(),
 								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
@@ -119,7 +120,7 @@ class SiteController extends Controller
 
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-				
+
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -129,7 +130,7 @@ class SiteController extends Controller
 			else if ($model->getError('rememberMe') != null) {
 				$result = $model->getError('rememberMe');
 			}
-				
+
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -146,7 +147,7 @@ class SiteController extends Controller
 	 * Logs out the current user and redirect to homepage.
 	 */
 	public function actionLogout()
-	{		
+	{
 		Yii::app()->user->logout();
 		if (isset($_REQUEST['client']) && $_REQUEST['client'] == 'mobile') {
 			// if mobile client end the app, no need to redirect...
@@ -154,8 +155,8 @@ class SiteController extends Controller
 								"result"=> "1"));
 			Yii::app()->end();
 		}
-		else { 
-			$this->redirect(Yii::app()->homeUrl);	
+		else {
+			$this->redirect(Yii::app()->homeUrl);
 		}
 	}
 
@@ -266,7 +267,7 @@ class SiteController extends Controller
 			else if ($model->getError('passwordAgain') != null) {
 				$result = $model->getError('passwordAgain');
 			}
-				
+
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -280,7 +281,7 @@ class SiteController extends Controller
 		}
 
 	}
-	
+
 	public function actionRegisterGPSTracker()
 	{
 		$model = new RegisterGPSTrackerForm;
@@ -301,7 +302,7 @@ class SiteController extends Controller
 				$users = new Users;
 				$users->realname = $model->name;
 				$users->deviceId = $model->deviceId;
-				
+
 				//For database recording, because of email and password are required fields
 				$users->email = $model->deviceId;
 				$users->password = md5($model->name);
@@ -315,8 +316,8 @@ class SiteController extends Controller
 					$friend->friend2 = $users->getPrimaryKey();
 					$friend->friend2Visibility = 1; //default visibility setting is visible
 					$friend->status = 1;
-					
-					if ($friend->save()) 
+						
+					if ($friend->save())
 					{
 						echo CJSON::encode(array("result"=> "1"));
 					}
@@ -329,18 +330,18 @@ class SiteController extends Controller
 				{
 					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
-				
-				
-				
+
+
+
 				Yii::app()->end();
 			}
-			
+				
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
 		}
-		
+
 		if ($isMobileClient == true)
 		{
 			if ($model->getError('password') != null) {
@@ -355,7 +356,7 @@ class SiteController extends Controller
 			else if ($model->getError('passwordAgain') != null) {
 				$result = $model->getError('passwordAgain');
 			}
-				
+
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
@@ -387,11 +388,11 @@ class SiteController extends Controller
 				for ($i = 0; $i < $arrayLength; $i++)
 				{
 					$dt = date("Y-m-d H:m:s");
-						
+
 					$invitedUsers = new InvitedUsers;
 					$invitedUsers->email = $emailArray[$i];
 					$invitedUsers->dt = $dt;
-						
+
 					if ($invitedUsers->save())
 					{
 						$key = md5($emailArray[$i].$dt);
@@ -448,50 +449,41 @@ class SiteController extends Controller
 
 	public function actionActivate()
 	{
-		$email = $_GET['email'];
-		$key = $_GET['key'];
-
-		$processOutput = true;
-		// collect user input data
-
-		$criteria=new CDbCriteria;
-		$criteria->select='Id,email,realname,password,time';
-		$criteria->condition='email=:email';
-		$criteria->params=array(':email'=>$email);
-		$userCandidate = UserCandidates::model()->find($criteria); // $params is not needed
-
-		$generatedKey =  md5($email.$userCandidate->time);
-
-		if ($generatedKey == $key)
+		$result = "Sorry, you entered this page with wrong parameters";
+		if (isset($_GET['email']) && $_GET['email'] != null
+			&& isset($_GET['key']) && $_GET['key'] != null
+			)
 		{
-			$users = new Users;
-			$users->email = $userCandidate->email;
-			$users->realname = $userCandidate->realname;
-			$users->password = $userCandidate->password;
+			$email = $_GET['email'];
+			$key = $_GET['key'];
 
-			if($users->save())
+			$processOutput = true;
+			// collect user input data
+
+			$criteria=new CDbCriteria;
+			$criteria->select='Id,email,realname,password,time';
+			$criteria->condition='email=:email';
+			$criteria->params=array(':email'=>$email);
+			$userCandidate = UserCandidates::model()->find($criteria); // $params is not needed
+
+			$generatedKey =  md5($email.$userCandidate->time);
+			if ($generatedKey == $key)
 			{
-				$userCandidate->delete();
-				echo CJSON::encode(array("result"=> "1"));
+				$users = new Users;
+				$users->email = $userCandidate->email;
+				$users->realname = $userCandidate->realname;
+				$users->password = $userCandidate->password;
+				$result = "Sorry, there is a problem in activating the user";
+				if($users->save())
+				{
+					$userCandidate->delete();
+					$result = "Your account has been activated successfully, you can login now";
+					//echo CJSON::encode(array("result"=> "1"));
+				}
 			}
 		}
-		else
-		{
-			echo CJSON::encode(array("result"=> "0"));
-		}
 
-		Yii::app()->end();
-
-		//G�rsel d�zenlemeler s�ras�nda i�lem ba�ar�l� oldu�unda i�lemin tamamland���na dair mesaj ��kacak ve kullan�c� login olmu� olacak
-
-		//		if (Yii::app()->request->isAjaxRequest) {
-		//			$processOutput = false;
-		//		}
-		//
-		//		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		//		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-		//
-		//		$this->renderPartial('activate',array('model'=>$model), false, $processOutput);
+		$this->renderPartial('accountActivationResult',array('result'=>$result), false, true);
 	}
 }
 

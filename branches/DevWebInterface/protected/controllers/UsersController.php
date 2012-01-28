@@ -126,7 +126,7 @@ class UsersController extends Controller
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
-			$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+			$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 					FROM '. Friends::model()->tableName() . ' f 
 					LEFT JOIN ' . Users::model()->tableName() . ' u
 						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
@@ -137,7 +137,7 @@ class UsersController extends Controller
 			    											'totalItemCount'=>$count,
 														    'sort'=>array(
 							        							'attributes'=>array(
-							             									'id', 'realname',
+							             									'id', 'Name',
 			),
 			),
 														    'pagination'=>array(
@@ -180,10 +180,17 @@ class UsersController extends Controller
 					 		FROM ' . Friends::model()->tableName() . ' f
 					 		LEFT JOIN  '. Users::model()->tableName() . ' u 
 					 			ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+					 				OR
+					 				u.Id = '.Yii::app()->user->id.'
 							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time . '
 								 AND
-								 ((f.friend1 = '. Yii::app()->user->id .' 
-									OR f.friend2 ='. Yii::app()->user->id .') AND f.status= 1)';
+								 ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
+										OR (f.friend2 ='. Yii::app()->user->id .'  AND f.friend1Visibility = 1)
+								    ) 
+								    	AND f.status= 1
+								   )
+								   OR 
+								   u.Id = '.Yii::app()->user->id.')';
 
 					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
@@ -194,11 +201,16 @@ class UsersController extends Controller
 							FROM '. Users::model()->tableName() . ' u 
 							LEFT JOIN ' . Friends::model()->tableName() . ' f
 								ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-							WHERE ((f.friend1 = '. Yii::app()->user->id .' AND f.friend2Visibility = 1) 
-									OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1
+									OR
+									u.Id = '.Yii::app()->user->id.'
+							WHERE ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
+										OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1)
+									OR 
+								   		u.Id = '.Yii::app()->user->id.'
+									)
 									AND unix_timestamp(u.dataArrivedTime) >= '. $time . '
 							LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
-
+					
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
 				}
 
@@ -206,10 +218,11 @@ class UsersController extends Controller
 		}
 		else {
 
-			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+			// +1 is for user himself
+			$sqlCount = 'SELECT ceil((count(*)+1)/'. Yii::app()->params->itemCountInDataListPage .')
 					 FROM '. Friends::model()->tableName() . ' f 
-					 WHERE (friend1 = '.Yii::app()->user->id.' 
-						OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+					 WHERE ((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
+										OR (f.friend2 ='. Yii::app()->user->id .'  AND f.friend1Visibility = 1)) AND status= 1';
 
 			$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
@@ -219,12 +232,14 @@ class UsersController extends Controller
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)		
-				WHERE ((f.friend1 = '. Yii::app()->user->id .' AND f.friend2Visibility = 1) 
-						OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1						
-						
+					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
+						OR
+						u.Id = '.Yii::app()->user->id.'
+				WHERE (((friend1 = '.Yii::app()->user->id.'  AND f.friend2Visibility = 1)  
+						OR (friend2 ='.Yii::app()->user->id.'  AND f.friend1Visibility = 1)) AND status= 1)
+					  OR
+						u.Id = '.Yii::app()->user->id.'
 				LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
-
 
 		$out = $this-> prepareXML($sql, $pageNo, $pageCount, "userList");
 		}
@@ -239,22 +254,39 @@ class UsersController extends Controller
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 			
 			$userId = (int) $_REQUEST['userId'];
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
-						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
-						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
-						1 isFriend
-				FROM '. Friends::model()->tableName() . ' f 
-				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = '. $userId .'
-				WHERE  ((friend1 = '. Yii::app()->user->id .' 
-						 	AND friend2 ='. $userId .')
-						 OR
-						 (friend2 = '. Yii::app()->user->id .' 
-						 	AND friend1 ='. $userId .')) 
-						AND 
-							status= 1
-				LIMIT 1' ;
-
+			if ($userId != Yii::app()->user->id) 
+			{
+				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+							1 isFriend
+					FROM '. Friends::model()->tableName() . ' f 
+					LEFT JOIN ' . Users::model()->tableName() . ' u
+						ON u.Id = '. $userId .'
+					WHERE  (((friend1 = '. Yii::app()->user->id .' 
+							 	AND friend2 ='. $userId .')
+							 OR
+							 (friend2 = '. Yii::app()->user->id .' 
+							 	AND friend1 ='. $userId .')) 
+							AND 
+								status= 1
+							)
+							
+					LIMIT 1' ;
+			}
+			else {
+				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+							1 isFriend
+					FROM '. Friends::model()->tableName() . ' f 
+					LEFT JOIN ' . Users::model()->tableName() . ' u
+						ON u.Id = '. $userId .'
+					WHERE  
+						u.Id = '. Yii::app()->user->id .'							
+					LIMIT 1' ;
+			
+			}
 			$out = $this-> prepareXML($sql, 1, 1, "userList");
 		}
 		
@@ -293,8 +325,8 @@ class UsersController extends Controller
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = IF(f.friend1 != '.$userId .', f.friend1, f.friend2)
-				WHERE (friend1 = '.$userId .' 
-						OR friend2 ='.$userId .') AND status= 1
+				WHERE ((f.friend1 = '. $userId .'  AND f.friend2Visibility = 1) 
+										OR (f.friend2 ='. $userId .'  AND f.friend1Visibility = 1)) AND status= 1
 				 ' ;
 
 			/* 
@@ -330,7 +362,7 @@ class UsersController extends Controller
 			$sql = 'SELECT
 							longitude, latitude, deviceId, 
 							date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
-					FROM ' . UserWasHere::model()->tableName() .'
+					FROM ' . UserWasHere::model()->tableName() .' u
 					WHERE 
 						userId = '. $userId . '
 					ORDER BY 
@@ -371,7 +403,7 @@ class UsersController extends Controller
 				 * if status is 1 it means friend request is confirmed.
 				 * if status is -1 it means there is no relation of any kind between users.
 				 */
-				$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId,
+				$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId,
 								 IF(f.status = 0 OR f.status = 1, f.status, -1) as status,
 								 IF(f.friend1 = '. Yii::app()->user->id .', true, false ) as requester
 						FROM '. Users::model()->tableName() . ' u 
@@ -387,9 +419,10 @@ class UsersController extends Controller
 		    											'totalItemCount'=>$count,
 													    'sort'=>array(
 						        							'attributes'=>array(
-						             									'id', 'realname',
-				),
-				),
+						             									'id', 'Name',
+															),
+														 ),
+														'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
 													    'pagination'=>array(
 													        'pageSize'=>Yii::app()->params->itemCountInOnePage,
 															'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
@@ -479,7 +512,7 @@ class UsersController extends Controller
 		 * to make view show approve link,
 		 * requester who make friend request cannot approve request
 		 */
-		$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId, f.status,
+		$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId, f.status,
 					   false as requester	   
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
@@ -490,7 +523,7 @@ class UsersController extends Controller
 		    											'totalItemCount'=>$count,
 													    'sort'=>array(
 						        							'attributes'=>array(
-						             									'id', 'realname',
+						             									'id', 'Name',
 		),
 		),
 													    'pagination'=>array(

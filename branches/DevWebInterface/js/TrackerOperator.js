@@ -90,7 +90,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.getFriendList = function(pageNo){
 
-		
 		var params = "r=users/getUserListXML&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
@@ -388,5 +387,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}, 1000);
 
 		});
+	}
+	
+	this.showMessageDialog = function(message) {
+		$("#messageDialogText").html(message); 
+		$("#messageDialog").dialog("open"); 
+	}
+	
+	this.showConfirmationDialog = function(question, callback){
+		$("#confirmationDialog #question").html(question); 
+		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
+		// dont forget first button is positivie button so below loop works
+		for(var property in buttons) {
+			buttons[property] = callback;
+			break;
+		}
+		//buttons.OK = callback;
+		$("#confirmationDialog").dialog("option","buttons",buttons);
+		$("#confirmationDialog").dialog("open");	
+	}
+	this.closeConfirmationDialog = function(){
+		$("#confirmationDialog").dialog("close");
 	}
 }

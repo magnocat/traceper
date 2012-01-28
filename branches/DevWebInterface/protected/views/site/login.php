@@ -51,6 +51,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#username").html(obj.realname);
+																			$("#userId").html(obj.id);
 																			//TRACKER.getFriendList(1);
 																			$("#lists").show();
 																			$("#tab_view").tabs("select",0);
