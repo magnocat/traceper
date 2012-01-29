@@ -23,7 +23,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-		<div class="row" style="padding-left:10px">
+		<div class="row" style="padding-top:1em">
+			<?php echo 'Check the groups that you want to enroll the selected user:'; ?>
+		</div>		
+		
+		<div class="row" style="padding-top:2em;padding-left:10px">
 			<?php			
 				if(empty($groupsOfUser))
 				{
@@ -49,9 +53,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			?>				
 		</div>
 		
-		<br/>
-		
-		<div class="row buttons" style="text-align:center">
+		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
 				if(!empty($groupsOfUser))
 				{
