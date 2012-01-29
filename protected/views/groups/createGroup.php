@@ -50,6 +50,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		{
 																			$("#createGroupWindow").dialog("close");
 																		}
+																		else if(obj.result && obj.result == "Duplicate Entry")
+																		{
+																			$("#createGroupWindow").html(result);
+
+																			$("#createGroupWindow").dialog("close");
+																			$("#messageDialogText").html("A group with this name already exists!");
+																			$("#messageDialog").dialog("open");																			
+																		}
 																	}
 																	catch (error){
 																		$("#createGroupWindow").html(result);
