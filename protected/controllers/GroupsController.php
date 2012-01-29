@@ -74,15 +74,33 @@ class GroupsController extends Controller
 				$groups->description = $model->description;
 								
 
-				if($groups->save()) // save the change to database
+				try
 				{
-					echo CJSON::encode(array("result"=> "1"));
+					if($groups->save()) // save the change to database
+					{
+						echo CJSON::encode(array("result"=> "1"));
+					}
+					else
+					{
+						echo CJSON::encode(array("result"=> "Unknown error"));
+					}
+					Yii::app()->end();				
 				}
-				else
+				catch (Exception $e) 
 				{
-					echo CJSON::encode(array("result"=> "Unknown error"));
+    				//Refactor: A macro can be defined in a suitable place
+					if($e->getCode() == 23000) //Duplicate Entry
+					{
+						echo CJSON::encode(array("result"=> "Duplicate Entry"));
+					}
+					Yii::app()->end();
+					
+//					echo 'Caught exception: ',  $e->getMessage(), "\n";    				
+//    				echo 'Code: ', $e->getCode(), "\n";
 				}
-				Yii::app()->end();
+				
+				
+
 			}
 			
 			if(Yii::app()->request->isAjaxRequest) 
@@ -98,7 +116,8 @@ class GroupsController extends Controller
 	}
 	
 	/**
-	 * Updates new group
+	 * Updates user-group relations. Inserts the selected friend into the selected groups or remove the selected friend
+	 * from unselected groups
 	 */
 	public function actionUpdateGroup()
 	{
@@ -145,7 +164,7 @@ class GroupsController extends Controller
 //					echo '</br>';
 //				}
 				
-				//We know the selected groups from $model->groupStatusArray, but now know the unselected ones
+				//We know the selected groups from $model->groupStatusArray, but not know the unselected ones
 				//So construct the unselected groups using $groupsOfUser and $model->groupStatusArray 
 				foreach($groupsOfUser as $selectedOwnerGroup) //Check for all of the user's groups
 				{
@@ -287,54 +306,306 @@ class GroupsController extends Controller
 		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'friendId'=>$friendId), false, $processOutput);
 	}	
 	
-		/**
-	 * Displays the create group page,
-	 * If there is an error in validation or parameters it returns the form code with errors
-	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
-	 */
-	public function actionAddUserToGroup()
+	
+	//Gets the all of the groups that the logged in user owns
+	public function actionGetGroupList()
 	{
-		$model = new UpdateGroupForm;
+		if(Yii::app()->user->id != null)
+		{			
+			$dataProvider=new CActiveDataProvider('Groups', array(
+			    'criteria'=>array(
+				    'condition'=>'owner=:owner',
+				    'params'=>array(':owner'=>Yii::app()->user->id),
+			        //'order'=>'create_time DESC',
+			        //'with'=>array('author'),
+			    ),
+			    'pagination'=>array(
+			        'pageSize'=>20,
+			    ),
+			));			
+			
+		}
+		else
+		{
+			$dataProvider = null;
+		}
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+	}
+	
+	//Deletes the selected group
+	public function actionDeleteGroup()
+	{
+		if (isset($_REQUEST['groupId']))
+		{
+			$groupId = (int)$_REQUEST['groupId'];
+		}	
+		
+		//First delete all of the relations those belong to the selected group
+		UserGroupRelation::model()->deleteAll('groupId=:groupId', array(':groupId'=>$groupId));		
+		
+		$result = Groups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId', 
+		                                                     'params'=>array(':groupId'=>$groupId, 
+		                                                                     ':ownerId'=>Yii::app()->user->id
+		                                                                     )
+		                                                     )
+		                                               );
+		                                               
+		if($result != null) 
+	    {
+			if($result->delete()) // Delete the selected group
+			{
+				//Group deleted from the traceper_groups table
+				
+				echo CJSON::encode(array("result"=> "1"));
+				Yii::app()->end();				
+			}
+			else
+			{
+				echo CJSON::encode(array("result"=> "Unknown error"));
+				Yii::app()->end();
+			}				    					    	
+	    }
+	    else
+	    {
+			//traceper_groups table has not the selected group of the owner
+	    }				                                               
+				                                               		
+	}
+	
+	public function actionSetPrivacyRights()
+	{
+		if (isset($_REQUEST['groupId']))
+		{
+			$groupId = (int)$_REQUEST['groupId'];
+		}	
+		
+		$model = new GroupPrivacySettingsForm;
 
 		$processOutput = true;
-		// collect user input data
-		if(isset($_POST['UpdateGroupForm']))
+		// collect user input data				
+		if(isset($_POST['GroupPrivacySettingsForm']))
 		{
-			$model->attributes = $_POST['UpdateGroupForm'];
-			// validate user input and if ok return json data and end application.
-			if($model->validate()) {
-				$group = Groups::model()->findByPk($model->groupId);
+			$model->attributes = $_POST['GroupPrivacySettingsForm'];
+
+			if($model->validate()) 
+			{				
+				//echo $_POST['GroupPrivacySettingsForm']['allowToSeeMyPosition'];
+				//echo $model->allowToSeeMyPosition;
 				
-				//Add user to the group, if the adder is the user owner
-				if($group->owner == Yii::app()->user->id)
+				if(isset($model->allowToSeeMyPosition))
 				{
-					$userGroupRelation = new UserGroupRelation;
-					//$user=Users::model()->find('email=:email', array(':email'=>$model->email));				
-					$userGroupRelation->userId = $model->userId;
-					//$group=Groups::model()->find('groupName=:groupName', array(':groupName'=>$model->groupName));				
-					$userGroupRelation->groupId = $model->groupId;
-					$userGroupRelation->save();
-	
-					if($groups->save()) // save the change to database
+//					if($model->allowToSeeMyPosition) //Checked
+//					{
+//						echo 'CHECKED';
+//					}
+//					else //Unchecked
+//					{
+//						echo 'UNCHECKED';
+//					}
+					
+					if(Groups::model()->updateByPk($groupId, array("allowedToSeeOwnersPosition"=>$model->allowToSeeMyPosition)) >= 0) // save the change to database
 					{
-						echo CJSON::encode(array("result"=> "1"));
+						//echo 'SAVED';
+						
+						$errorOccured = false;
+		
+						//Take all the user-group relation rows that the selected group added to
+						$relationRowsSelectedGroupBelongsTo = UserGroupRelation::model()->findAll('groupId=:groupId', array(':groupId'=>$groupId));
+						
+						//Get only the user ID fields into $group_members from the obtained rows
+						foreach($relationRowsSelectedGroupBelongsTo as $relationRow)
+						{
+							$friendship = Friends::model()->find(array('condition'=>'(friend1=:friend1Id AND friend2=:friend2Id) OR (friend1=:friend2Id AND friend2=:friend1Id)', 
+							                                                     'params'=>array(':friend1Id'=>Yii::app()->user->id, 
+							                                                                     ':friend2Id'=>$relationRow->userId
+							                                                                     )
+							                                                     )
+							                                               );
+							if($friendship != null)
+							{
+								if($friendship->friend1 == Yii::app()->user->id)
+								{
+									$friendship->friend1Visibility = $model->allowToSeeMyPosition;
+								}
+								else
+								{
+									$friendship->friend2Visibility = $model->allowToSeeMyPosition;
+								}								
+								
+								if($friendship->save())
+								{
+									//Privacy setting saved
+								}
+								else
+								{
+									$errorOccured = true;
+																		
+//									if($friendship->friend1 == Yii::app()->user->id)
+//									{
+//										echo 'f1:user - f2:'.$relationRow->userId.' cannot be saved';
+//									}
+//									else
+//									{
+//										echo 'f1:'.$relationRow->userId.' - f2:user cannot be saved';
+//									}									
+								}
+							}
+							else
+							{
+								//The friendship between the logged in user and $relationRow->userId not found
+								
+								$errorOccured = true;
+								
+								//echo 'friendship does not exist';							
+							}							                                               						    
+						}
+
+						if($errorOccured == false)
+						{
+							echo CJSON::encode(array("result"=> "1"));
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=> "0"));
+						}
+						Yii::app()->end();
+
 					}
 					else
 					{
-						echo CJSON::encode(array("result"=> "Unknown error"));
+						echo CJSON::encode(array("result"=> "0"));
+						Yii::app()->end();
 					}					
+					
 				}
 				else
 				{
-					echo CJSON::encode(array("result"=> "Unknown error"));
+					//$model->allowToSeeMyPosition is UNSET
 				}
 			}
-				
-			Yii::app()->end();
+			
+			if(Yii::app()->request->isAjaxRequest) 
+			{
+				$processOutput = false;
+			}			
 		}
+		else
+		{
+			$group=Groups::model()->findByPk($groupId);
+			$model->allowToSeeMyPosition = $group->allowedToSeeOwnersPosition;
+		}	
+			
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 		
-		//$this->renderPartial('groupInfo',array('model'=>$model), false, $processOutput);
+		$this->renderPartial('groupPrivacySettings',array('model'=>$model, 'groupId'=>$groupId), false, $processOutput);			                                               
+				                                               		
 	}	
+
+	
+//	public function actionSearch() {
+//		$model = new SearchForm();
+//
+//		$dataProvider = null;
+//		if(isset($_REQUEST['SearchForm']))
+//		{
+//			$model->attributes = $_REQUEST['SearchForm'];
+//			if ($model->validate()) {
+//
+//				$sqlCount = 'SELECT count(*)
+//					 FROM '. Users::model()->tableName() . ' u 
+//					 WHERE realname like "%'. $model->keyword .'%"';
+//
+//				$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+//
+//				/*
+//				 * if status is 0 it means friend request made but not yet confirmed
+//				 * if status is 1 it means friend request is confirmed.
+//				 * if status is -1 it means there is no relation of any kind between users.
+//				 */
+//				$sql = 'SELECT u.Id as id, u.realname, f.Id as friendShipId,
+//								 IF(f.status = 0 OR f.status = 1, f.status, -1) as status,
+//								 IF(f.friend1 = '. Yii::app()->user->id .', true, false ) as requester
+//						FROM '. Users::model()->tableName() . ' u 
+//						LEFT JOIN '. Friends::model()->tableName().' f 
+//							ON  (f.friend1 = '. Yii::app()->user->id .' 
+//								 AND f.friend2 =  u.Id)
+//								 OR 
+//								 (f.friend1 = u.Id 
+//								 AND f.friend2 = '. Yii::app()->user->id .' ) 
+//						WHERE u.realname like "%'. $model->keyword .'%"' ;
+//
+//				$dataProvider = new CSqlDataProvider($sql, array(
+//		    											'totalItemCount'=>$count,
+//													    'sort'=>array(
+//						        							'attributes'=>array(
+//						             									'id', 'realname',
+//				),
+//				),
+//													    'pagination'=>array(
+//													        'pageSize'=>Yii::app()->params->itemCountInOnePage,
+//															'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
+//				),
+//				));
+//					
+//			}
+//		}
+//		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+//		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+//		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
+//	}	
+	
+//		/**
+//	 * Displays the create group page,
+//	 * If there is an error in validation or parameters it returns the form code with errors
+//	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
+//	 */
+//	public function actionAddUserToGroup()
+//	{
+//		$model = new UpdateGroupForm;
+//
+//		$processOutput = true;
+//		// collect user input data
+//		if(isset($_POST['UpdateGroupForm']))
+//		{
+//			$model->attributes = $_POST['UpdateGroupForm'];
+//			// validate user input and if ok return json data and end application.
+//			if($model->validate()) {
+//				$group = Groups::model()->findByPk($model->groupId);
+//				
+//				//Add user to the group, if the adder is the user owner
+//				if($group->owner == Yii::app()->user->id)
+//				{
+//					$userGroupRelation = new UserGroupRelation;
+//					//$user=Users::model()->find('email=:email', array(':email'=>$model->email));				
+//					$userGroupRelation->userId = $model->userId;
+//					//$group=Groups::model()->find('groupName=:groupName', array(':groupName'=>$model->groupName));				
+//					$userGroupRelation->groupId = $model->groupId;
+//					$userGroupRelation->save();
+//	
+//					if($groups->save()) // save the change to database
+//					{
+//						echo CJSON::encode(array("result"=> "1"));
+//					}
+//					else
+//					{
+//						echo CJSON::encode(array("result"=> "Unknown error"));
+//					}					
+//				}
+//				else
+//				{
+//					echo CJSON::encode(array("result"=> "Unknown error"));
+//				}
+//			}
+//				
+//			Yii::app()->end();
+//		}
+//		
+//		//$this->renderPartial('groupInfo',array('model'=>$model), false, $processOutput);
+//	}	
 }
 
 

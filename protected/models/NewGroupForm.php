@@ -19,7 +19,7 @@ class NewGroupForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('name, description', 'required','message'=>'Field cannot be blank!'),
+			array('name', 'required','message'=>'Field cannot be blank!'),
 		);
 	}
 
