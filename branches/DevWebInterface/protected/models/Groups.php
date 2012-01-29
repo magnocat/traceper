@@ -8,6 +8,7 @@
  * @property string $name
  * @property string $owner
  * @property string $description
+ * @property integer $allowedToSeeOwnersPosition
  */
 class Groups extends CActiveRecord
 {
@@ -36,13 +37,14 @@ class Groups extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, owner, description', 'required'),
+			array('name, owner', 'required'),
+			array('allowedToSeeOwnersPosition', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>45),
 			array('owner', 'length', 'max'=>10),
 			array('description', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, name, owner, description', 'safe', 'on'=>'search'),
+			array('id, name, owner, description, allowedToSeeOwnersPosition', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,6 +69,7 @@ class Groups extends CActiveRecord
 			'name' => 'Name',
 			'owner' => 'Owner',
 			'description' => 'Description',
+			'allowedToSeeOwnersPosition' => 'Allowed To See Owners Position',
 		);
 	}
 
@@ -85,6 +88,7 @@ class Groups extends CActiveRecord
 		$criteria->compare('name',$this->name,true);
 		$criteria->compare('owner',$this->owner,true);
 		$criteria->compare('description',$this->description,true);
+		$criteria->compare('allowedToSeeOwnersPosition',$this->allowedToSeeOwnersPosition);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

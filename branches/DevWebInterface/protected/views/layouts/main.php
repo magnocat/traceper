@@ -94,8 +94,10 @@
 	echo '<div id="friendRequestsWindow"></div>';
 ///////////////////////////// Create Group Window ///////////////////////////	
 	echo '<div id="createGroupWindow"></div>';	
-	///////////////////////////// Create Group Window ///////////////////////////	
+///////////////////////////// Group Settings Window ///////////////////////////	
 	echo '<div id="groupSettingsWindow"></div>';
+///////////////////////////// Group Privacy Settings Window ///////////////////////////	
+	echo '<div id="groupPrivacySettingsWindow"></div>';	
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
@@ -320,6 +322,8 @@
 																	 'id'=>'users_tab'),
 											        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
 											        				  'id'=>'photos_tab'),
+											        'Groups' => array('ajax' => $this->createUrl('groups/getGroupList'), 
+											        				  'id'=>'groups_tab'),											
 											    ),
 											    'id'=>"tab_view",
 											    // additional javascript options for the tabs plugin
