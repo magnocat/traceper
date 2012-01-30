@@ -7,12 +7,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.http.HttpEntity;
@@ -20,7 +22,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -531,24 +532,24 @@ public class AppService extends Service implements IAppService{
 		try {
 			url = new URL(this.authenticationServerAddress);
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			conn.setDoInput(true);
+			
 			conn.setDoOutput(true);
-			conn.setUseCaches(false);
-			conn.setRequestMethod("POST");
-
-			conn.setRequestProperty("Connection", "Keep-Alive");
-			conn.setRequestProperty("Charset", "UTF-8");
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
 			if (cookieName != null && cookieValue != null) {
 				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
 			}
-			//conn.connect();
-			DataOutputStream ds = new DataOutputStream(conn.getOutputStream());
+			
+			OutputStream output = conn.getOutputStream();
+			DataOutputStream ds = new DataOutputStream(output);
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
 
 			for (int i = 0; i < value.length; i++) {
-				ds.writeBytes(twoHyphens + boundary + end);
-				ds.writeBytes("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+				writer.append(twoHyphens + boundary + end);
+				writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+				writer.flush();
 			}
+			
+			
 			if (filename != null && file != null){
 				ds.writeBytes(twoHyphens + boundary + end);
 				ds.writeBytes("Content-Disposition: form-data; name=\"image\";filename=\"" + filename +"\"" + end + end);
@@ -558,9 +559,10 @@ public class AppService extends Service implements IAppService{
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			ds.flush();
 			ds.close();
-
+			writer.close();
+			
 			getCookie(conn);
-
+			
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
 					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
 			{
