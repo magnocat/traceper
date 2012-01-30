@@ -7,7 +7,7 @@ function processUserPastLocationsXML (MAP, xml) {
 	var userId = $(xml).find("page").attr('userId');
 	var pastPoints = []; 
 	var mapMarker = [];
-	var index = TRACKER.users[userId].mapMarker.length;
+//	var index = TRACKER.users[userId].mapMarker.length;
 
 	$(xml).find("page").find("location").each(function(){
 		var location = $(this);
@@ -76,7 +76,7 @@ function processUserPastLocationsXML (MAP, xml) {
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
 		});
 
-		index++;
+//		index++;
 		mapMarker.push(markerInfoWindow)
 	});
 
@@ -93,8 +93,6 @@ function processUserPastLocationsXML (MAP, xml) {
 		MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
 	}
 	
-	
-
 	var tmp = TRACKER.users[userId].mapMarker;		
 	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
 }
@@ -120,31 +118,7 @@ function processXML(MAP, xml, isFriendList)
 
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 
-		if (userId  != TRACKER.userId ){
-
-			if (isFriend == "1" || isFriend == "2" || isFriend == "3" || isFriendList == true) {
-				var isFriendRequest=true;
-				if (isFriendList == true){
-					isFriendRequest=false;
-				}
-
-				list += "<img class='deleteImageButton' onclick='TRACKER.deleteFriendship("+userId+","+isFriendRequest+")' src='images/delete.png' />";
-				if (isFriend == "2")
-				{
-					list += "<img class='deleteImageButton' src='images/question_mark.png' />";											
-				}	
-				else if (isFriend == "3") {
-					list += "<img class='deleteImageButton' onclick='TRACKER.confirmFriendship("+userId+")' src='images/approve.png' />";
-				}
-			}
-			else {
-				// add as friend button
-				list += "<img class='deleteImageButton' onclick='TRACKER.addAsFriend("+userId+")' src='images/user_add_friend.png' />";
-			}
-
-
-		}
-		list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
+//		list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
 
 		var visible = false;
 		if (isFriend == "1") {
@@ -153,7 +127,6 @@ function processXML(MAP, xml, isFriendList)
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
-
 				var userMarker = MAP.putMarker(location, "images/person.png", visible);
 				var iWindow = MAP.initializeInfoWindow();
 				var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
@@ -170,10 +143,9 @@ function processXML(MAP, xml, isFriendList)
 					mapMarker:new Array(markerInfoWindow),
 					locationCalculatedTime:locationCalculatedTime
 				});
-
 				var content =  '<div>'														   
 					+ '<br/>' + TRACKER.users[userId].realname  
-					+ '<br/>' + TRACKER.users[userId].locationCalculatedTime
+					+ '<br/>' + TRACKER.users[userId].time
 					+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
 
 					+'</div>'
@@ -199,34 +171,18 @@ function processXML(MAP, xml, isFriendList)
 				TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 
 
-
 				MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
 
 					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);	
 				});
-
+				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker,true);						
 				
 				//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
-				// pencerenin yeni konumda da açık olmasının sağlanması
-				/*
-						GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker, "click", function() {
-		  						TRACKER.openMarkerInfoWindow(userId);	
-		  				});
-
-						GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker,"infowindowopen",function(){
-							TRACKER.users[userId].infoWindowIsOpened = true;
-		  				});
-
-		  				GEvent.addListener(TRACKER.users[userId].mapMarker[0].marker,"infowindowclose",function(){
-		  					TRACKER.users[userId].infoWindowIsOpened = false;
-		  				});
-
-				 */
+				//pencerenin yeni konumda da açık olmasının sağlanması
 
 			}
 			else
 			{
-
 				var time = $(user).find("time").text();
 				var deviceId = $(user).find("deviceId").text();
 				MAP.setMarkerPosition(TRACKER.users[userId].mapMarker[0].marker,location);
@@ -297,12 +253,6 @@ function processXML(MAP, xml, isFriendList)
 
 	});
 
-	if (list != "") {
-		list = "<ul>" + list + "</ul>"; 
-	}
-	else {
-		list = null;
-	}
 	return list;		
 };	
 
@@ -312,9 +262,7 @@ function processXML(MAP, xml, isFriendList)
 function processImageXML(MAP, xml){
 	var list = "";
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
-	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
-	var hideMarker = !($('#showPhotosOnMap').attr('checked'));
-
+//	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	$(xml).find("page").find("image").each(function(){
 		var image = $(this);
 		var imageId = $(image).attr('id');
@@ -325,43 +273,22 @@ function processImageXML(MAP, xml){
 		var longitude = $(image).attr('longitude');
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
-
+		var description = ""; //$(image).attr('description');
+		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
-
-		list += "<li>";
-
-		if (TRACKER.userId == userId) {
-			// add delete image button if logged in user and image uploader are same
-			list += "<img class='deleteImageButton' onclick='TRACKER.deleteImage("+imageId+")' src='images/delete.png' />";
-		}				
-		list += "<a href='javascript:TRACKER.showImageWindow("+ imageId +")' id='image"+ imageId +"'>"
-		+ "<div>"
-		+ "<img src='"+ imageURL + TRACKER.imageThumbSuffix +"' class='thumbImage' />" 
-		+ "</div>"
-		+ "<div>"
-		+ TRACKER.langOperator.uploader + ": " + realname 
-		+ "<br/>"
-		/* + TRACKER.langOperator.time + ": " */ +  time									
-		+ "</div>"
-		+ "<div class='rating' id='uploadRating"+ imageId +"' imageId='"+ imageId +"'></div>"
-		+ "</a>"
-		+"</li>";
-
-
-
+		
 		if ($.inArray(imageId, TRACKER.imageIds) == -1)
 		{
 			TRACKER.imageIds.push(imageId);
 		}
+		
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
-
-			image = imageURL + TRACKER.imageThumbSuffix;
-
+				
+			image = imageURL + "&"+ TRACKER.imageThumbSuffix;
 			var userMarker = MAP.putMarker(location, image, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
-			
 
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -372,10 +299,11 @@ function processImageXML(MAP, xml){
 				time:time,
 				rating:rating,
 				mapMarker:markerInfoWindow,
+				description:description,
 			});
 			
 			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
-	
+			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, true);						
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
@@ -389,9 +317,10 @@ function processImageXML(MAP, xml){
 						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
 						+ "</div>"
 						+ "<div>"
-						+ TRACKER.langOperator.uploader + ": " + "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ TRACKER.images[imageId].description + "<br/>"
+						+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
 						+ "<br/>"
-						+ TRACKER.langOperator.upLoadtime + ": " + TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.images[imageId].time + "<br/>"
 						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
 						+ "</div>"
 						+ '<ul class="sf-menu"> '
@@ -421,12 +350,6 @@ function processImageXML(MAP, xml){
 		}
 
 	});
-	if (list != "") {
-		list = "<ul>" + list + "</ul>"; 
-	}
-	else {
-		list = null;
-	}
 	return list;
 }
 //TODO: latitude longitude -> location a cevrilsin
@@ -474,36 +397,4 @@ function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, l
 		+"</ul>";
 
 	return content;
-}
-
-function processCommentXML(xml){
-		
-	var list = "";
-	$(xml).find("page").find("comment").each(function(){
-	
-		var comment = $(this);
-		var commentText = $(comment).text();
-		var commentId = $(comment).attr("Id");
-		var commentTime =  $(comment).attr("time");
-		var userId = $(comment).attr("userId");
-		var userName = $(comment).attr("userName");
-	
-		list += "<li>"
-		// add delete image button if logged in user and image uploader are same
-		+ "<img class='deleteCommentButton' onclick='TRACKER.deleteComment("+commentId+","+userId+")' src='images/delete.png' />"
-		+ "<div>"
-		/*+ TRACKER.langOperator.uploader + ": " */ + userName 
-		+ "<br/>"
-		/* + TRACKER.langOperator.time + ": " */ +  commentTime
-		+ "</a>"
-		+ "<br/>"
-		+ "<div class='comment' id='viewComment"+ commentId +"' commentId='" + commentId +"'>" 
-		+ commentText
-		+ "</div>"
-		+ "<br/>"
-		+ "<hr>"
-		+ "</li>";
-	});
-	
-	return list;
 }
