@@ -1,0 +1,10 @@
+Move Traceper_WebInterface to your apache web root directory,
+edit database parameters in includes/config.php file according to your MySQL account and database
+
+Run traceper.sql in this directory in your MySQL database,
+then delete or move traceper.sql file
+
+then you can login to the system with test@traceper.com and 12345
+you can also login to android client same email and password
+
+
