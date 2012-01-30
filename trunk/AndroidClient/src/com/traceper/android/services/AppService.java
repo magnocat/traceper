@@ -2,74 +2,86 @@
 package com.traceper.android.services;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.xml.sax.SAXException;
-
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
+import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.traceper.R;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
-import com.traceper.android.tools.XMLHandler;
 
 public class AppService extends Service implements IAppService{
 
+	private static final String REQUEST_LOCATION = "com.traceper.android.services.GET_LOCATION";
+	private static final String SEND_LOCATION = "com.traceper.android.services.SEND_LOCATION";
+	private static final String GET_GPS_LOCATION = "com.traceper.android.services.GET_GPS_LOCATION";
+	private static final String GET_NETWORK_LOCATION = "com.traceper.android.services.GET_NETWORK_LOCATION";
 	private ConnectivityManager conManager = null; 
 	private LocationManager locationManager = null;
 	private String deviceId;
 	private boolean isUserAuthenticated = false;
-
+	private NotificationManager mManager;
+	private static int NOTIFICATION_ID = 0;
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
 	private ArrayList<Location> pendingLocations = new ArrayList<Location>();
 
-	private final static String HTTP_ACTION_TAKE_MY_LOCATION = "DeviceTakeMyLocation";
-	private final static String HTTP_ACTION_AUTHENTICATE_ME = "DeviceAuthenticateMe";
-	private final static String HTTP_ACTION_REGISTER_ME = "DeviceRegisterMe";
-	private static final String LOCATION_CHANGED = "location changed";
-	private static final String HTTP_ACTION_GET_IMAGE = "DeviceGetImage";
+	private class Image {
+		public byte[] image;
+		public boolean isPublic;
+		public String description;
+		public Image(byte[] image, boolean isPublic, String description) {
+			super();
+			this.image = image;
+			this.isPublic = isPublic;
+			this.description = description;
+		}
+	}
 
-
+	private Image pendingImage = null;
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -78,12 +90,22 @@ public class AppService extends Service implements IAppService{
 	private String authenticationServerAddress;
 	private Long lastLocationSentTime;
 
-	private LocationHandler locationHandler;
+
 	private int minDataSentInterval = Configuration.MIN_GPS_DATA_SEND_INTERVAL;
 	private int minDistanceInterval = Configuration.MIN_GPS_DISTANCE_INTERVAL;
-	private XMLHandler xmlHandler;
 	private BroadcastReceiver networkStateReceiver;
-
+	private String cookieName = null;
+	private String cookieValue = null;
+	private boolean configurationChanged = false;
+	private boolean autoCheckinEnabled;
+	private PendingIntent getLocationIntent;
+	private AlarmManager am;
+	private PendingIntent sendLocation;
+	private PendingIntent gpsLocationIntent;
+	private PendingIntent networkLocationIntent;
+	private Location gpsLocation;
+	private Location networkLocation;
+	private Location lastSentLocation;
 
 
 	public class IMBinder extends Binder {
@@ -94,14 +116,29 @@ public class AppService extends Service implements IAppService{
 
 	public void onCreate() 
 	{   	
+		startForeground(0, null);
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+		mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		xmlHandler = new XMLHandler();
-		locationHandler = new LocationHandler();
+		Intent intent = new Intent(AppService.this, AppService.class);
+		intent.setAction(REQUEST_LOCATION);
+		getLocationIntent = PendingIntent.getService(AppService.this, 0, intent, 0);
+
+		intent = new Intent(AppService.this, AppService.class);
+		intent.setAction(GET_GPS_LOCATION);
+		gpsLocationIntent = PendingIntent.getService(this, 0, intent, 0);
+
+		intent = new Intent(AppService.this, AppService.class);
+		intent.setAction(GET_NETWORK_LOCATION);
+		networkLocationIntent = PendingIntent.getService(this, 0, intent, 0);
+
+		Intent sendLocationIntent = new Intent(AppService.this, AppService.class);
+		sendLocationIntent.setAction(SEND_LOCATION);
+		sendLocation = PendingIntent.getService(AppService.this, 0, sendLocationIntent, 0);
+
+		am = (AlarmManager)getSystemService(ALARM_SERVICE);			
 
 		networkStateReceiver = new BroadcastReceiver() {
 			@Override
@@ -116,14 +153,232 @@ public class AppService extends Service implements IAppService{
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
 		registerReceiver(networkStateReceiver, filter);
 	}
-	
-	
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent != null) {
+			String action = intent.getAction();
+			if (action != null) {
+				if (action.equals(REQUEST_LOCATION)) {
+					boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
+					boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+					networkLocation = null;
+					gpsLocation = null;
+					boolean requestStarted = false;
+					if (network_enabled == true) {
+						locationManager.removeUpdates(networkLocationIntent);
+						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationIntent);
+						requestStarted = true;
+					}
+					else if (gps_enabled == true) {
+						locationManager.removeUpdates(gpsLocationIntent);
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+						requestStarted = true;
+					}
+
+
+					if (requestStarted == true) 
+					{
+						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+						notification.setLatestEventInfo(AppService.this,
+								getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
+						mManager.notify(NOTIFICATION_ID , notification);
+						am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, sendLocation);
+					}
+					else {
+						notifyNoProviderEnabled();
+					}
+				}
+				else if (action.equals(SEND_LOCATION)) {
+					locationManager.removeUpdates(gpsLocationIntent);
+					locationManager.removeUpdates(networkLocationIntent);
+					if (networkLocation != null) {
+						sendLocation(networkLocation);
+					}
+					else if(gpsLocation != null){
+						sendLocation(gpsLocation);
+					}
+					else {
+						networkLocation = null;
+						gpsLocation = null;
+						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+						notification.setLatestEventInfo(AppService.this,
+								getString(R.string.ApplicationName), getString(R.string.location_fix_problem), contentIntent);	
+
+						mManager.notify(NOTIFICATION_ID , notification);
+					}
+				}
+				else if(action.equals(GET_GPS_LOCATION)) {
+					Bundle extras = intent.getExtras();
+					if (extras.containsKey(LocationManager.KEY_LOCATION_CHANGED)) {
+						gpsLocation = (Location)intent.getExtras().getParcelable(LocationManager.KEY_LOCATION_CHANGED);
+						locationManager.removeUpdates(gpsLocationIntent);
+						sendBestLocation();
+					}
+				}
+				else if(action.equals(GET_NETWORK_LOCATION)) {
+					Bundle extras = intent.getExtras();
+					boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
+
+					if (extras.containsKey(LocationManager.KEY_PROVIDER_ENABLED)) {
+						boolean network_enabled = intent.getExtras().getBoolean(LocationManager.KEY_PROVIDER_ENABLED);
+						if (network_enabled == false) {
+							locationManager.removeUpdates(networkLocationIntent);
+							if (gps_enabled == true) {
+								locationManager.removeUpdates(gpsLocationIntent);
+								locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+							}
+							else {
+								notifyNoProviderEnabled();
+							}
+						}
+					}
+
+					if (extras.containsKey(LocationManager.KEY_STATUS_CHANGED)) 
+					{
+						int status = extras.getInt(LocationManager.KEY_STATUS_CHANGED);
+						if (status == LocationProvider.OUT_OF_SERVICE ||
+								status == LocationProvider.TEMPORARILY_UNAVAILABLE) 
+						{
+							locationManager.removeUpdates(networkLocationIntent);
+							if (gps_enabled == true) {
+								locationManager.removeUpdates(gpsLocationIntent);
+								locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+							} 
+							else {
+								notifyNoProviderEnabled();
+							}
+						}
+					}
+
+					if (extras.containsKey(LocationManager.KEY_LOCATION_CHANGED)) 
+					{
+						networkLocation = (Location)extras.getParcelable(LocationManager.KEY_LOCATION_CHANGED);
+						locationManager.removeUpdates(networkLocationIntent);
+						float accuracy =  networkLocation.getAccuracy();
+						Log.i("network location accuracy", " " + accuracy);
+						if (gps_enabled == false) {
+							sendLocation(networkLocation);
+						}
+						else 
+						{
+							locationManager.removeUpdates(gpsLocationIntent);
+							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
+						}
+					}
+				}
+			}
+		}
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	public void setAutoCheckin(boolean enable){
+
+		if (enable == true && autoCheckinEnabled == false) {			
+			sendLocation(minDataSentInterval, minDistanceInterval);
+		}
+		else if (enable == false){
+			am.cancel(getLocationIntent);
+		}
+		autoCheckinEnabled = enable;
+	}
+
+	public void sendLocationNow(){
+		sendLocation(0, 0);
+	}
+
+	@Override
+	public boolean uploadImage(byte[] picture, boolean publicData, String description) {
+
+		if (lastSentLocation == null || 
+				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+			sendLocationNow();
+			pendingImage = new Image(picture, publicData, description);
+			return false;
+		}		
+
+
+		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+		notification.setLatestEventInfo(this,
+				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
+
+		mManager.notify(NOTIFICATION_ID , notification);
+
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		int inSampleSize = 2;
+		int quality = 75;
+		if (picture.length > 1000000) {
+			inSampleSize = 6;
+			quality = 50;
+		}					
+		options.inSampleSize = inSampleSize;
+		Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
+		int byteCount = bitmap.getRowBytes();
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
+		bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
+
+
+		String result = sendImage(byteArrayOutputStream.toByteArray(), publicData, description, lastSentLocation);
+		String notificationText = getString(R.string.upload_failed);
+		boolean operationResult = false;
+		if (result.equals("1")) {
+			notificationText = getString(R.string.upload_succesfull);
+			operationResult = true;
+		}
+
+		notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
+		mManager.notify(NOTIFICATION_ID, notification);
+
+		return operationResult;
+	}
+
+	public void sendLocation(final int datasentInterval, final int distanceInterval) {
+
+		boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
+		boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+		try {
+			if (datasentInterval > 0) {
+				am.cancel(getLocationIntent);
+				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, AppService.this.minDataSentInterval, getLocationIntent);
+			}
+			else {
+				am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, getLocationIntent);
+			}
+
+		} catch (Exception ex) {
+
+		}
+
+		if (network_enabled == false && gps_enabled == false){
+			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+			notification.setLatestEventInfo(AppService.this,
+					getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
+
+			mManager.notify(NOTIFICATION_ID , notification);
+		}
+
+
+	}
+
+
+
 	private void sendPendingLocations(){
 		Iterator<Location> iterator = pendingLocations.iterator();
 		while (iterator.hasNext()) {
 			Location location = (Location) iterator.next();
-			int result = sendLocationDataAndParseResult(location);
-			if (result == HTTP_RESPONSE_SUCCESS) {
+			String result = sendLocationDataAndParseResult(location);
+			if (result.equals("1")) {
 				iterator.remove();
 			}
 		}
@@ -134,8 +389,7 @@ public class AppService extends Service implements IAppService{
 		return mBinder;
 	}
 
-	//TODO: edit the traceper protocol file
-	private int sendLocationData(String emailText, String passwordText, Location loc) 
+	private String sendLocationData(Location loc) 
 	{		
 		double latitude = 0;
 		double longitude = 0;
@@ -143,82 +397,112 @@ public class AppService extends Service implements IAppService{
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
-			altitude = loc.getLongitude();
+			altitude = loc.getAltitude();
 		}
-		String[] name = new String[8];
-		String[] value = new String[8];
-		name[0] = "action";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "latitude";
-		name[4] = "longitude";
-		name[5] = "altitude";
-		name[6] = "deviceId";
-		name[7] = "time";
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "latitude";
+		name[2] = "longitude";
+		name[3] = "altitude";
+		name[4] = "deviceId";
+		name[5] = "time";
 
-		value[0] = HTTP_ACTION_TAKE_MY_LOCATION;
-		value[1] = emailText;
-		value[2] = passwordText;
-		value[3] = String.valueOf(latitude);
-		value[4] = String.valueOf(longitude);
-		value[5] = String.valueOf(altitude);
-		value[6] = this.deviceId;
-		value[7] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
+		value[0] = "users/takeMyLocation";
+		value[1] = String.valueOf(latitude);
+		value[2] = String.valueOf(longitude);
+		value[3] = String.valueOf(altitude);
+		value[4] = this.deviceId;
+		value[5] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
-		int result = this.evaluateResult(httpRes);
-		if (result == HTTP_RESPONSE_SUCCESS)
-		{			
-			lastLocationSentTime = System.currentTimeMillis();
-			Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-			i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
-			i.putExtra(IAppService.LAST_LOCATION_DATA_SENT_TIME, lastLocationSentTime);
-			sendBroadcast(i);
-			Log.i("broadcast sent", "sendLocationData broadcast sent");			
+		String result = getString(R.string.unknown_error_occured);
+
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+			if (result.equals("1")) 
+			{		
+				int dataSentInterval = Integer.parseInt(jsonObject.getString("minDataSentInterval"));
+				int distanceInterval = Integer.parseInt(jsonObject.getString("minDistanceInterval"));
+				if (dataSentInterval != this.minDataSentInterval || distanceInterval != this.minDistanceInterval){
+					this.configurationChanged  = true;
+					this.minDataSentInterval = dataSentInterval;
+					this.minDistanceInterval = distanceInterval;
+				}
+
+				lastLocationSentTime = System.currentTimeMillis();
+				Intent i = new Intent(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+				i.setAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
+				i.putExtra(IAppService.LAST_LOCATION_DATA_SENT_TIME, lastLocationSentTime);
+				i.putExtra(IAppService.LAST_LOCATION, loc);
+				sendBroadcast(i);
+				Log.i("broadcast sent", "sendLocationData broadcast sent");		
+
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
+
+
 		return result;	
 	}
 
-	public int sendImage(byte[] image, boolean publicData){
-		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	public void notifyNoProviderEnabled(){
+		Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+		notification.setLatestEventInfo(AppService.this,
+				getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
+
+		mManager.notify(NOTIFICATION_ID , notification);
+	}
+
+	public String sendImage(byte[] image, boolean publicData, String description, Location loc)
+	{
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
 		if (loc != null) {
 			latitude = loc.getLatitude();
 			longitude = loc.getLongitude();
-			altitude = loc.getLongitude();
+			altitude = loc.getAltitude();
 		}
 		String params;
 		//		try {
-		String[] name = new String[7];
-		String[] value = new String[7];
-		name[0] = "action";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "latitude";
-		name[4] = "longitude";
-		name[5] = "altitude";
-		name[6] = "publicData";
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "latitude";
+		name[2] = "longitude";
+		name[3] = "altitude";
+		name[4] = "publicData";
+		name[5] = "description";
 
-		value[0] = HTTP_ACTION_GET_IMAGE;
-		value[1] = this.email;
-		value[2] = this.password;
-		value[3] = String.valueOf(latitude);
-		value[4] = String.valueOf(longitude);
-		value[5] = String.valueOf(altitude);
+		value[0] = "image/upload";
+		value[1] = String.valueOf(latitude);
+		value[2] = String.valueOf(longitude);
+		value[3] = String.valueOf(altitude);
 		int publicDataInt = 0;
 		if (publicData == true) {
 			publicDataInt = 1; 
 		} 
-		value[6] = String.valueOf(publicDataInt);
-
+		value[4] = String.valueOf(publicDataInt);
+		value[5] = description;
 
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "image", image);
 		Log.i("img length: ", String.valueOf(img.length()) );
-		int result = this.evaluateResult(httpRes);
+		String result = getString(R.string.unknown_error_occured);
+
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		//		int result = this.evaluateResult(httpRes);
 
 		return result;		
 	}
@@ -234,7 +518,7 @@ public class AppService extends Service implements IAppService{
 
 	public void onDestroy() {
 		Log.i("Traceper-AppService is being destroyed", "...");
-		locationManager.removeUpdates(locationHandler);
+		am.cancel(getLocationIntent);
 		unregisterReceiver(networkStateReceiver);
 		super.onDestroy();
 	}
@@ -248,32 +532,37 @@ public class AppService extends Service implements IAppService{
 		try {
 			url = new URL(this.authenticationServerAddress);
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			conn.setDoInput(true);
+			
 			conn.setDoOutput(true);
-			conn.setUseCaches(false);
-			conn.setRequestMethod("POST");
-
-			conn.setRequestProperty("Connection", "Keep-Alive");
-			conn.setRequestProperty("Charset", "UTF-8");
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
-
-			DataOutputStream ds = new DataOutputStream(conn.getOutputStream());
+			if (cookieName != null && cookieValue != null) {
+				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
+			}
+			
+			OutputStream output = conn.getOutputStream();
+			DataOutputStream ds = new DataOutputStream(output);
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
 
 			for (int i = 0; i < value.length; i++) {
-				ds.writeBytes(twoHyphens + boundary + end);
-				ds.writeBytes("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+				writer.append(twoHyphens + boundary + end);
+				writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+				writer.flush();
 			}
+			
+			
 			if (filename != null && file != null){
 				ds.writeBytes(twoHyphens + boundary + end);
 				ds.writeBytes("Content-Disposition: form-data; name=\"image\";filename=\"" + filename +"\"" + end + end);
 				ds.write(file);
 				ds.writeBytes(end);
-
 			}			
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			ds.flush();
 			ds.close();
-
+			writer.close();
+			
+			getCookie(conn);
+			
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
 					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
 			{
@@ -291,6 +580,7 @@ public class AppService extends Service implements IAppService{
 					result = result.concat(inputLine);				
 				}
 				in.close();	
+
 			}
 
 		} catch (MalformedURLException e) {
@@ -305,7 +595,64 @@ public class AppService extends Service implements IAppService{
 		return null;		
 	}
 
+	private void getCookie(URLConnection conn) {
+		for (int i=0; ; i++) {
+			String headerName = conn.getHeaderFieldKey(i);
+			String headerValue = conn.getHeaderField(i);
+
+			if (headerName == null && headerValue == null) {
+				// No more headers
+				break;
+			}
+			if ("Set-Cookie".equalsIgnoreCase(headerName)) {
+				// Parse cookie
+				String[] fields = headerValue.split(";\\s*");
+
+				String cookie = fields[0];
+				cookieName = cookie.substring(0, cookie.indexOf("="));
+				cookieValue = cookie.substring(cookie.indexOf("=")+1);
+				Log.i("cookie name", cookieName);
+				Log.i("cookie value", cookieValue);
+				String expires = null;
+				String path = null;
+				String domain = null;
+				boolean secure = false;
+
+				// Parse each field
+				for (int j=1; j<fields.length; j++) {
+					if ("secure".equalsIgnoreCase(fields[j])) {
+						secure = true;
+					} else if (fields[j].indexOf('=') > 0) {
+						String[] f = fields[j].split("=");
+						if ("expires".equalsIgnoreCase(f[0])) {
+							expires = f[1];
+						} else if ("domain".equalsIgnoreCase(f[0])) {
+							domain = f[1];
+						} else if ("path".equalsIgnoreCase(f[0])) {
+							path = f[1];
+						}
+					}
+				}
+
+				// Save the cookie...
+			}
+		}
+
+
+	}
+
 	public void exit() {
+
+		if (isUserAuthenticated() == true) {
+			String[] name = new String[2];
+			String[] value = new String[2];
+			name[0] = "r";
+			name[1] = "client";
+			value[0] = "site/logout";
+			value[1] = "mobile";
+
+			String httpRes = sendHttpRequest(name, value, null, null);
+		}
 		this.stopSelf();	
 	}
 
@@ -313,137 +660,140 @@ public class AppService extends Service implements IAppService{
 		return this.email;
 	}
 
+	
+	public JSONObject getUserList() {		
+		
+		
+        JSONObject json = getJSONfromURL(authenticationServerAddress+"?r=users/GetUserListJson&email="+ AppService.this.email +"&password="+ AppService.this.password);
+        
+     
+        return json;
+	}
+	
+	public static JSONObject getJSONfromURL(String url){
+		InputStream is = null;
+		String result = "";
+		JSONObject jArray = null;
+		
+		//http post
+	    try{
+	            HttpClient httpclient = new DefaultHttpClient();
+	            HttpPost httppost = new HttpPost(url);
+	            HttpResponse response = httpclient.execute(httppost);
+	            HttpEntity entity = response.getEntity();
+	            is = entity.getContent();
+
+	    }catch(Exception e){
+	            Log.e("log_tag", "Error in http connection "+e.toString());
+	    }
+	    
+	  //convert response to string
+	    try{
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+	            StringBuilder sb = new StringBuilder();
+	            String line = null;
+	            while ((line = reader.readLine()) != null) {
+	                    sb.append(line + "\n");
+	            }
+	            is.close();
+	            result=sb.toString();
+	    }catch(Exception e){
+	            Log.e("log_tag", "Error converting result "+e.toString());
+	    }
+	    
+	    try{
+	    	
+            jArray = new JSONObject(result);            
+	    }catch(JSONException e){
+	            Log.e("log_tag", "Error parsing data "+e.toString());
+	    }
+    
+	    return jArray;
+	}
+	
 	public boolean isUserAuthenticated() {
 		return this.isUserAuthenticated;
 	}
 
-	public int registerUser(String password, String email, String realname) 
+	public String registerUser(String password, String email, String realname) 
 	{
-		String[] name = new String[4];
-		String[] value = new String[4];
-		name[0] = "action";
-		name[1] = "email";
-		name[2] = "password";
-		name[3] = "realname";
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "RegisterForm[email]";
+		name[2] = "RegisterForm[password]";
+		name[3] = "RegisterForm[passwordAgain]";
+		name[4] = "RegisterForm[name]";
+		name[5] = "client";
 
-		value[0] = HTTP_ACTION_REGISTER_ME;
+		value[0] = "site/register";
 		value[1] = email;
 		value[2] = password;
-		value[3] = realname;
+		value[3] = password;
+		value[4] = realname;
+		value[5] = "mobile";
 
-		String result = this.sendHttpRequest(name, value, null, null);		
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
-		return this.evaluateResult(result);
+		String result = getString(R.string.unknown_error_occured);
+
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 
-	public int authenticateUser(String email, String password) 
+	public String authenticateUser(String email, String password) 
 	{			
 		this.password = password;
 		this.email = email;
 
-		String[] name = new String[4];
-		String[] value = new String[4];
-		name[0] = "action";
-		name[1] = "email";
-		name[2] = "password";
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "LoginForm[email]";
+		name[2] = "LoginForm[password]";
 		name[3] = "deviceId";
+		name[4] = "LoginForm[rememberMe]";
+		name[5] = "client";
 
-		value[0] = HTTP_ACTION_AUTHENTICATE_ME;
+		value[0] = "site/login";
 		value[1] = this.email;
 		value[2] = this.password;
 		value[3] = this.deviceId;
+		value[4] = "1";
+		value[5] = "mobile";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
-		int result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		String result = getString(R.string.unknown_error_occured);
 
-		if (result == HTTP_RESPONSE_SUCCESS) 
-		{			
-			this.isUserAuthenticated = true;
-			this.minDataSentInterval = xmlHandler.getGpsMinDataSentInterval();
-			this.minDistanceInterval = xmlHandler.getGpsMinDistanceInterval();
-
-			Thread locationUpdates = new Thread() {
-				public void run() {
-					Looper.prepare();
-
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, 
-							locationHandler);				       
-
-					Looper.loop();
-				}
-			};
-			locationUpdates.start();
-	
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+			if (result.equals("1")) 
+			{			
+				this.isUserAuthenticated = true;
+				this.minDataSentInterval = Integer.parseInt(jsonObject.getString("minDataSentInterval"));
+				this.minDistanceInterval = Integer.parseInt(jsonObject.getString("minDistanceInterval")); 
+			}
+			else {
+				this.isUserAuthenticated = false;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		else {
-			this.isUserAuthenticated = false;
-		}
+
 		return result;
 	}	
-
-	private int evaluateResult(String result)
-	{
-		int iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
-		if (result == null){
-			iresult = HTTP_REQUEST_FAILED;
-		}
-		else {
-			SAXParser sp;
-			try {
-				sp = SAXParserFactory.newInstance().newSAXParser();
-				sp.parse(new ByteArrayInputStream(result.getBytes()), xmlHandler);
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (FactoryConfigurationError e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}		
-
-			iresult = xmlHandler.getActionResult();
-			switch (iresult)
-			{
-			case HTTP_RESPONSE_SUCCESS:
-				Log.i("HTTP_RESPONSE", "successfull.");
-				break;
-			case HTTP_REQUEST_FAILED:
-				Log.w("HTTP_RESPONSE", "failed: http request failed.");
-				break;
-			case HTTP_RESPONSE_ERROR_MISSING_PARAMETER:
-				Log.w("HTTP_RESPONSE", "failed: http request failed.");
-				break;
-			case HTTP_RESPONSE_ERROR_UNAUTHORIZED_ACCESS:
-				Log.w("HTTP_RESPONSE", "failed: unauthorized access");				
-				break;
-			case HTTP_RESPONSE_ERROR_UNKNOWN:
-				Log.w("HTTP_RESPONSE", "failed: unknown error");
-				break;
-			case HTTP_RESPONSE_ERROR_UNSUPPORTED_ACTION:
-				Log.w("HTTP_RESPONSE", "failed: unsupported action");
-				break;
-			case HTTP_RESPONSE_ERROR_EMAIL_EXISTS:
-				Log.w("HTTP_RESPONSE", "failed registration: email already exists");
-				break;
-			case HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID:
-				Log.w("HTTP_RESPONSE", "failed registration: email is not valid");
-				break;
-			default:
-				iresult = HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE;
-				Log.w("HTTP_RESPONSE", "failed: unknown response returned from server");
-				break;
-			}			
-		}
-
-		return iresult;
-	}
-	
-	public void CancelRegularUpdate(){
-		locationManager.removeUpdates(locationHandler);
-	}
 
 	public void setAuthenticationServerAddress(String address) {
 		this.authenticationServerAddress = address;
@@ -452,77 +802,90 @@ public class AppService extends Service implements IAppService{
 	public Long getLastLocationSentTime() {
 		return lastLocationSentTime;
 	}
-	
-	private int sendLocationDataAndParseResult(Location loc) {
-		int result = AppService.this.sendLocationData(AppService.this.email, AppService.this.password, loc);	
 
-		int dataSentInterval = AppService.this.xmlHandler.getGpsMinDataSentInterval();
-		int distanceInterval = AppService.this.xmlHandler.getGpsMinDistanceInterval();
+	private String sendLocationDataAndParseResult(Location loc) {
+		String result = AppService.this.sendLocationData(loc);	
 
-		// if configuration is changed in server, then arrange itself below by
-		// adding using new params in locationManager. requestLocationUpdates
-		if (dataSentInterval != AppService.this.minDataSentInterval ||
-				distanceInterval != AppService.this.minDistanceInterval)
+		if (configurationChanged == true)
 		{
-			AppService.this.minDataSentInterval = dataSentInterval;
-			AppService.this.minDistanceInterval = distanceInterval;
+			configurationChanged = false;
+			am.cancel(getLocationIntent);
+			long nextRun = SystemClock.elapsedRealtime() + this.minDataSentInterval;
+			am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextRun, AppService.this.minDataSentInterval, getLocationIntent);
 
-			locationManager.removeUpdates(locationHandler);
-			Thread locationUpdates = new Thread() {
-				public void run() {
-					Looper.prepare();
-
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 
-							minDataSentInterval, 
-							minDistanceInterval, 
-							locationHandler);			       
-
-					Looper.loop();
-				}
-
-			};		      
-
-			locationUpdates.start();
 		}
 		return result;
 	}
 
-	private class LocationHandler implements LocationListener{
-		public void onLocationChanged(Location loc){	
-			if (loc != null) {
-				Log.i("location listener", "onLocationChanged");
-				boolean connected = isNetworkConnected();
-				Integer result = null;
-				if (connected == true) {
-					// send pending locations if any...
-					sendPendingLocations();
-					// send last location data
-					result = sendLocationDataAndParseResult(loc);					
-				}
-				if (connected == false || result != HTTP_RESPONSE_SUCCESS){
-					pendingLocations.add(loc);
-				}
-
+	private void sendBestLocation() {
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false ||
+				locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == false)
+		{
+			if (gpsLocation != null) {
+				sendLocation(gpsLocation);
+			}
+			else if (networkLocation != null) {
+				sendLocation(networkLocation);
 			}
 		}
-		public void onProviderDisabled(String provider){
-			Log.i("location listener", "onProviderDisabled");	
-		}
-		public void onProviderEnabled(String provider){					
-			Log.i("location listener", "onProviderEnabled");	
-		}
-		public void onStatusChanged(String provider, int status, Bundle extras){															
-			Log.i("location listener", "onProviderEnabled");	
+		else {
+			if (gpsLocation != null && networkLocation != null) 
+			{
+				if (gpsLocation.hasAccuracy() == true && networkLocation.hasAccuracy() == true) {
+					if (gpsLocation.getAccuracy() < networkLocation.getAccuracy()) {
+						sendLocation(gpsLocation);
+					}
+					else {
+						sendLocation(networkLocation);
+					}
+				} 
+				else {
+					sendLocation(gpsLocation);
+				}
+			}	
 		}	
-		
 	}
-	
-	public int updateLocation(String status){
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minDataSentInterval, minDistanceInterval, locationHandler);
-		int retval = sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-		//this.status = status;
-		locationManager.removeUpdates(locationHandler);
-		return retval;
+
+
+	private void sendLocation(Location loc) {
+		locationManager.removeUpdates(networkLocationIntent);
+		locationManager.removeUpdates(gpsLocationIntent);
+		am.cancel(sendLocation);
+		networkLocation = null;
+		gpsLocation = null;
+		lastSentLocation = loc;
+		boolean connected = isNetworkConnected();
+		String result = null;
+		if (connected == true) {
+			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sending_location_data), contentIntent);
+			mManager.notify(NOTIFICATION_ID, notification);
+			// send pending locations if any...
+			sendPendingLocations();
+			// send last location data
+			result = sendLocationDataAndParseResult(loc);	
+			String processResult = getString(R.string.sending_location_data_failed);
+			if (result.equals("1")) {
+				processResult = getString(R.string.sending_location_data_successfull);
+			}
+			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
+			mManager.notify(NOTIFICATION_ID, notification);
+
+			// upload pending image if any...
+			if (pendingImage != null) {
+				uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
+				pendingImage = null;
+			}
+		}
+		if (connected == false || result.equals("1") == false){
+			pendingLocations.add(loc);
+		}
+
 	}
 
 }

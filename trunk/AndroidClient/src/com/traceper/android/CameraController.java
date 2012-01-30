@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,7 +12,6 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
@@ -30,9 +28,14 @@ import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
@@ -224,73 +227,60 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC:
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(R.string.ask_to_make_image_public)
-			.setCancelable(true)
-			.setPositiveButton(R.string.make_it_public, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					uploadImage(true);
-					CameraController.this.finish();
-				}
-			})
-			.setNegativeButton(R.string.make_it_private, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					uploadImage(false);
-					CameraController.this.finish();
-				}
-			})
-			.setNeutralButton(R.string.cancel_upload, new DialogInterface.OnClickListener() {
+			final Dialog dialog = new Dialog(this);
+
+			dialog.setContentView(R.layout.photo_description);
+			dialog.setTitle(R.string.upload_photo);
+
+			dialog.findViewById(R.id.sendPhotoButton).setOnClickListener(new OnClickListener() {
 				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.cancel();
-					CameraController.this.finish();
+				public void onClick(View v) {
+					CheckBox isPublicCheckbox = (CheckBox)dialog.findViewById(R.id.isPublic);
+					EditText desriptionEditText = (EditText)dialog.findViewById(R.id.photo_description);
+					String description = desriptionEditText.getText().toString();
+					if (description.length() > 0) {
+						uploadImage(isPublicCheckbox.isChecked(), description);
+						dialog.dismiss();
+						CameraController.this.finish();
+					}
+					else {
+					//	showDialog(DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC);
+						Toast.makeText(CameraController.this, R.string.please_enter_description, Toast.LENGTH_SHORT).show();
+					}
+					
 				}
 			});
-			AlertDialog dialog = builder.create();
-			return dialog;
+			dialog.findViewById(R.id.cancelButton).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					dialog.dismiss();
+					finish();
+					
+				}
+			});
 			
+			return dialog;
 		}
 
 		return super.onCreateDialog(id);
 	}
 
-	private void uploadImage(final boolean publicImage){
-		mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-
-		notification.setLatestEventInfo(CameraController.this,
-				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
-
-		mManager.notify(NOTIFICATION_ID , notification);
-
+	private void uploadImage(final boolean publicImage, final String description){
 
 		Thread uploadThread = new Thread(){
-			private Handler handler = new Handler();
 			@Override
 			public void run() {
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				int inSampleSize = 2;
-				int quality = 75;
-				if (picture.length > 1000000) {
-					inSampleSize = 6;
-					quality = 50;
-				}					
-				options.inSampleSize = inSampleSize;
-				Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length, options);
-				int byteCount = bitmap.getRowBytes();
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(byteCount);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
-
-				final int result = appService.sendImage(byteArrayOutputStream.toByteArray(), publicImage);
+				
+				appService.uploadImage(picture, publicImage, description);
+				
+				/*
+				final String result = appService.sendImage(byteArrayOutputStream.toByteArray(), publicImage, description);
 				{
 					handler.post(new Runnable() {							
 						@Override
 						public void run() {
 							String str;
-							if (result == IAppService.HTTP_RESPONSE_SUCCESS) {
+							if (result.equals("1")) {
 								str = getString(R.string.upload_succesfull);
 							}
 							else {
@@ -301,6 +291,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 						}
 					});
 				}
+				*/
 				super.run();
 			}
 		};

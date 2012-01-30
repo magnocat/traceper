@@ -1,5 +1,8 @@
 package com.traceper.android.interfaces;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 
 public interface IAppService {
@@ -16,11 +19,10 @@ public interface IAppService {
 	//self-defined error	
 	public static final int HTTP_RESPONSE_ERROR_UNKNOWN_RESPONSE = -100;
 
-	
+		
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
-	
-	
+	public static final String LAST_LOCATION = "LOCATION";
 	
 	public String getUsername();
 	
@@ -28,16 +30,25 @@ public interface IAppService {
 	
 	public boolean isUserAuthenticated();
 	
+	public void setAutoCheckin(boolean enable);
+	
+	public void sendLocationNow();
+	
 	public Long getLastLocationSentTime();
 	
 	public void exit();
 	
-	public int registerUser(String password, String email, String realname);
+	public String registerUser(String password, String email, String realname);
 	
-	public int authenticateUser(String username, String password);
+	public String authenticateUser(String username, String password);
 	
 	public void setAuthenticationServerAddress(String address);
 	
-	public int sendImage(byte[] image, boolean publicData);
+	public boolean uploadImage(byte[] image, boolean publicData, String description);
+
+	public JSONObject getUserList();
+
+
+
 	
 }
