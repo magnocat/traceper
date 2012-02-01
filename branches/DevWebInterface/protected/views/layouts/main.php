@@ -285,20 +285,10 @@
 	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
  										array(
     										'complete'=> 'function() {var mapStruct = new MapStruct();
-    										var polygon = mapOperator.initializePolygon();    										
-    										var initialLoc1 = new MapStruct.Location({latitude:40.504041,
-			    								  longitude:34.024414});
-			    							var initialLoc2 = new MapStruct.Location({latitude:41.504041,
-			    								  longitude:35.024414});
-			    							var initialLoc3 = new MapStruct.Location({latitude:39.504041,
-			    								  longitude:34.024414});
-			    								  
+    										var polygon = mapOperator.initializePolygon();    										    													    								  
     										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc1);
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc2);
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc3);
-    										mapOperator.setGeoFenceVisibility(geoFence_,true);    									
-    										//mapOperator.initializeGeoFenceControl(geoFence_);
+    										mapOperator.initializeGeoFenceControl(geoFence_,document.getElementById("geoFence"));
+    										    										
     										return false;}',
  											'update'=> '#registerGPSTrackerWindow',
 										),
