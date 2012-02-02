@@ -348,9 +348,10 @@ function MapOperator() {
 	 * @return container that holds the control
 	 */ 
 	MAP_OPERATOR.initializeGeoFenceControl = function(geoFence,controller){		
-		
+		var returnValue = false;
 		var clickPointNumber = 0;
 		var removeGeoFence = false;
+		MAP_OPERATOR.removeAllPointsFromGeoFence(geoFence);
 		
 		google.maps.event.addDomListener(controller, "click", function() {
 			//if(button.img.getAttribute("src") === button.opts.img_up_url){
@@ -371,7 +372,9 @@ function MapOperator() {
 						MAP_OPERATOR.setGeoFenceVisibility(geoFence,true);
 						MAP_OPERATOR.map.setCenter(event.latLng);
 						removeGeoFence = true;
-						clickPointNumber = 0;
+						returnValue = true;
+						clickPointNumber = 0;						
+						MAP_OPERATOR.showConfirmationDialog("Do you want to create this geofence?",createGeofence);
 					}
 				  });
 				/*
@@ -381,7 +384,8 @@ function MapOperator() {
 					geoFence.polygon.getPath().clear();
 				}
 				*/    
-		});  
+		});
+		return returnValue;
 	};
 
 	/*
@@ -453,6 +457,29 @@ function MapOperator() {
 		var position = new google.maps.LatLng(point.latitude, point.longitude);
 		MAP_OPERATOR.map.setCenter(position);
 		MAP_OPERATOR.map.setZoom(zoomlevel);
+	}
+	
+	
+	MAP_OPERATOR.showConfirmationDialog = function(question, callback){
+		$("#confirmationDialog #question").html(question); 
+		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
+		// dont forget first button is positivie button so below loop works
+		for(var property in buttons) {
+			buttons[property] = callback;
+			break;
+		}
+		//buttons.OK = callback;
+		$("#confirmationDialog").dialog("option","buttons",buttons);
+		$("#confirmationDialog").dialog("open");	
+	}
+	
+	MAP_OPERATOR.closeConfirmationDialog = function(){
+		$("#confirmationDialog").dialog("close");
+	}
+	
+	MAP_OPERATOR.showMessageDialog = function(message) {
+		$("#messageDialogText").html(message); 
+		$("#messageDialog").dialog("open"); 
 	}
 }
 
