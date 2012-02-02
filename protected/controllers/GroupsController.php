@@ -335,6 +335,59 @@ class GroupsController extends Controller
 		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
 	
+	//Gets the list of the selected froup members
+	public function actionGetGroupMembers()
+	{
+		echo 'AAAAA';
+		
+		if(isset($_REQUEST['groupId']))
+		{
+			$groupId = (int)$_REQUEST['groupId'];
+		}		
+		
+		$dataProvider = null;
+		
+		if(Yii::app()->user->id != null)
+		{			
+//			$dataProvider=new CActiveDataProvider('UserGroupRelation', array(
+//			    'criteria'=>array(
+//				    'condition'=>'groupId=:groupId',
+//					'join'=>'LEFT JOIN Users ON UserGroupRelation.userId = Users.id',
+//				    'params'=>array(':groupId'=>$groupId),
+//			        //'order'=>'create_time DESC',
+//			        //'with'=>array('author'),
+//			    ),
+//			    'pagination'=>array(
+//			        'pageSize'=>20,
+//			    ),
+//			));
+			
+//			$dataProvider=new CActiveDataProvider('Users', array(
+//			    'criteria'=>array(
+//				    'condition'=>'Id=:Id',
+//				    'params'=>array(':Id'=>2),
+//			        //'order'=>'create_time DESC',
+//			        //'with'=>array('author'),
+//			    ),
+//			    'pagination'=>array(
+//			        'pageSize'=>20,
+//			    ),
+//			));	
+
+			$dataProvider=new CActiveDataProvider('Groups');			
+		}
+		else
+		{
+			$dataProvider = null;
+		}
+		
+		echo 'BBBB';
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		$this->renderPartial('groupMembersDialog',array('dataProvider'=>$dataProvider), false, true);
+	}	
+	
 	//Deletes the selected group
 	public function actionDeleteGroup()
 	{
@@ -371,10 +424,55 @@ class GroupsController extends Controller
 	    else
 	    {
 			//traceper_groups table has not the selected group of the owner
-	    }				                                               
-				                                               		
+	    }				                                               				                                               		
 	}
 	
+	//Deletes the member of the selected group
+	public function actionDeleteGroupMember()
+	{
+		if (isset($_REQUEST['groupId']))
+		{
+			$groupId = (int)$_REQUEST['groupId'];
+		}	
+		
+		if (isset($_REQUEST['userId']))
+		{
+			$userId = (int)$_REQUEST['userId'];
+		}		
+		
+		$relationQueryResult = UserGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+		                                                     'params'=>array(':userId'=>$userId, 
+		                                                                     ':groupId'=>$groupId
+		                                                                     )
+		                                                     )
+		                                               );
+
+	    if($relationQueryResult != null) 
+	    {
+			if($relationQueryResult->delete()) // delete the friend from the group
+			{
+				//Relation deleted from the traceper_user_group_relation table
+				
+				echo 'Group member deleted </br>';
+				
+				echo CJSON::encode(array("result"=> "1"));
+				Yii::app()->end();
+			}
+			else
+			{
+				echo CJSON::encode(array("result"=> "Unknown error"));
+				Yii::app()->end();
+			}				    					    	
+	    }
+	    else
+	    {
+			//traceper_user_group_relation table has not the desired relation, so do nothing
+			
+	    	//echo 'Relation does not already exist for groupId '.$unselectedFriendGroup.'</br>';
+	    } 				                                               				                                               		
+	}	
+	
+	//Sets the privacy rights for the selected group
 	public function actionSetPrivacyRights()
 	{
 		if (isset($_REQUEST['groupId']))
@@ -501,9 +599,8 @@ class GroupsController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 		
-		$this->renderPartial('groupPrivacySettings',array('model'=>$model, 'groupId'=>$groupId), false, $processOutput);			                                               
-				                                               		
-	}	
+		$this->renderPartial('groupPrivacySettings',array('model'=>$model, 'groupId'=>$groupId), false, $processOutput);
+	}
 
 	
 //	public function actionSearch() {
