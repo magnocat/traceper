@@ -44,7 +44,7 @@
 		  												 trackerOp.getImageList(); ',
 		 												CClientScript::POS_READY); 				
 		 }
-	
+
 	?>
  
 	<script type="text/javascript">		
@@ -54,7 +54,8 @@
 		
 		var mapOperator = new MapOperator();
 	</script>
-	   
+	
+	
 	</head>
 	<body>	
 	
@@ -280,20 +281,15 @@
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Register GPS Tracker'));
 											
- 									echo CHtml::ajaxLink('<div  class="userOperations" id="geoFence">	 			
+ 									echo CHtml::link('<div  class="userOperations" id="geoFence">	 			
 	 													<img src="images/geoFence.png"  /><div></div>		
-	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
- 										array(
-    										'complete'=> 'function() {var mapStruct = new MapStruct();
+	 												 </div>', '#', array(
+    										'onclick'=>'var mapStruct = new MapStruct();
     										var polygon = mapOperator.initializePolygon();    										    													    								  
     										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
-    										mapOperator.initializeGeoFenceControl(geoFence_,document.getElementById("geoFence"));
-    										    										
-    										return false;}',
- 											'update'=> '#registerGPSTrackerWindow',
-										),
-										array(
-											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Geo-Fence'));
+    										var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,document.getElementById("geoFence"));    					
+    										return false;', 'class'=>'vtip', 'title'=>'Geo-Fence',
+										));
 										
 									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
