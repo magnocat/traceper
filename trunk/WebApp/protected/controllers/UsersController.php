@@ -184,8 +184,8 @@ class UsersController extends Controller
 					 				u.Id = '.Yii::app()->user->id.'
 							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time . '
 								 AND
-								 ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. Yii::app()->user->id .'  AND f.friend1Visibility = 1)
+								 ((((f.friend1 = '. Yii::app()->user->id .') 
+										OR (f.friend2 ='. Yii::app()->user->id .')
 								    ) 
 								    	AND f.status= 1
 								   )
@@ -203,8 +203,8 @@ class UsersController extends Controller
 								ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 									OR
 									u.Id = '.Yii::app()->user->id.'
-							WHERE ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1)
+							WHERE ((((f.friend1 = '. Yii::app()->user->id .' ) 
+										OR (f.friend2 ='. Yii::app()->user->id .')) AND f.status= 1)
 									OR 
 								   		u.Id = '.Yii::app()->user->id.'
 									)
@@ -235,8 +235,8 @@ class UsersController extends Controller
 					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 						OR
 						u.Id = '.Yii::app()->user->id.'
-				WHERE (((friend1 = '.Yii::app()->user->id.'  AND f.friend2Visibility = 1)  
-						OR (friend2 ='.Yii::app()->user->id.'  AND f.friend1Visibility = 1)) AND status= 1)
+				WHERE (((friend1 = '.Yii::app()->user->id.')  
+						OR (friend2 ='.Yii::app()->user->id.')) AND status= 1)
 					  OR
 						u.Id = '.Yii::app()->user->id.'
 				LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
@@ -325,8 +325,8 @@ class UsersController extends Controller
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
 					ON u.Id = IF(f.friend1 != '.$userId .', f.friend1, f.friend2)
-				WHERE ((f.friend1 = '. $userId .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. $userId .'  AND f.friend1Visibility = 1)) AND status= 1
+				WHERE ((f.friend1 = '. $userId .') 
+										OR (f.friend2 ='. $userId .')) AND status= 1
 				 ' ;
 
 			/* 

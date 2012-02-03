@@ -258,7 +258,7 @@
 										),
 										array(
 											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>'Friend Requests'));
-										
+									/*	
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
 	 													<img src="images/createGroup.png"  /><div></div>
 	 												 </div>', $this->createUrl('groups/createGroup'), 
@@ -268,7 +268,7 @@
 										),
 										array(
 											'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>'Create New Group'));										
-									
+									*/
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
 	 													<img src="images/registerGPSTracker.png"  /><div></div>
@@ -280,31 +280,7 @@
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Register GPS Tracker'));
 											
- 									echo CHtml::ajaxLink('<div  class="userOperations" id="geoFence">	 			
-	 													<img src="images/geoFence.png"  /><div></div>		
-	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
- 										array(
-    										'complete'=> 'function() {var mapStruct = new MapStruct();
-    										var polygon = mapOperator.initializePolygon();    										
-    										var initialLoc1 = new MapStruct.Location({latitude:40.504041,
-			    								  longitude:34.024414});
-			    							var initialLoc2 = new MapStruct.Location({latitude:41.504041,
-			    								  longitude:35.024414});
-			    							var initialLoc3 = new MapStruct.Location({latitude:39.504041,
-			    								  longitude:34.024414});
-			    								  
-    										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc1);
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc2);
-    										mapOperator.addPointToGeoFence(geoFence_,initialLoc3);
-    										mapOperator.setGeoFenceVisibility(geoFence_,true);    									
-    										//mapOperator.initializeGeoFenceControl(geoFence_);
-    										return false;}',
- 											'update'=> '#registerGPSTrackerWindow',
-										),
-										array(
-											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Geo-Fence'));
-										
+ 												
 									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
 	 												 </div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>'Sign Out')); 																			
@@ -322,8 +298,6 @@
 																	 'id'=>'users_tab'),
 											        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
 											        				  'id'=>'photos_tab'),
-											        'Groups' => array('ajax' => $this->createUrl('groups/getGroupList'), 
-											        				  'id'=>'groups_tab'),											
 											    ),
 											    'id'=>"tab_view",
 											    // additional javascript options for the tabs plugin

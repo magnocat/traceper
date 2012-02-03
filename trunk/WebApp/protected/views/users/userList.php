@@ -119,7 +119,7 @@ if ($dataProvider != null) {
 					  				 )',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
-					'visible'=>$isFriendList
+					'visible'=>false,
 		),
 		       
 
