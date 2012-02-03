@@ -65,7 +65,8 @@
     	    android:layout_height="wrap_content"
     	    android:textSize="15px" 
     		android:width="200px" 
-    	    android:text="Friends List" />
+    	    android:text="Friends List"
+    	    android:visibility="gone" />
     	
     </LinearLayout>
     <CheckBox android:layout_width="wrap_content" 
