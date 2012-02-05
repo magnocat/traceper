@@ -88,8 +88,7 @@ class GroupsController extends Controller
 				}
 				catch (Exception $e) 
 				{
-    				//Refactor: A macro can be defined in a suitable place
-					if($e->getCode() == 23000) //Duplicate Entry
+					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
 					{
 						echo CJSON::encode(array("result"=> "Duplicate Entry"));
 					}
@@ -320,10 +319,9 @@ class GroupsController extends Controller
 			        //'with'=>array('author'),
 			    ),
 			    'pagination'=>array(
-			        'pageSize'=>20,
+			        'pageSize'=>Yii::app()->params->itemCountInOnePage,
 			    ),
 			));			
-			
 		}
 		else
 		{
@@ -338,8 +336,6 @@ class GroupsController extends Controller
 	//Gets the list of the selected froup members
 	public function actionGetGroupMembers()
 	{
-		echo 'AAAAA';
-		
 		if(isset($_REQUEST['groupId']))
 		{
 			$groupId = (int)$_REQUEST['groupId'];
@@ -349,39 +345,30 @@ class GroupsController extends Controller
 		
 		if(Yii::app()->user->id != null)
 		{			
-//			$dataProvider=new CActiveDataProvider('UserGroupRelation', array(
-//			    'criteria'=>array(
-//				    'condition'=>'groupId=:groupId',
-//					'join'=>'LEFT JOIN Users ON UserGroupRelation.userId = Users.id',
-//				    'params'=>array(':groupId'=>$groupId),
-//			        //'order'=>'create_time DESC',
-//			        //'with'=>array('author'),
-//			    ),
-//			    'pagination'=>array(
-//			        'pageSize'=>20,
-//			    ),
-//			));
+			$sqlCount = 'SELECT count(*)
+						 FROM '. UserGroupRelation::model()->tableName() . ' ugr 
+						 WHERE groupId = '.$groupId;
+	
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	
+			$sql = 'SELECT u.Id as id, u.realname as Name, ugr.groupId, ugr.userId 	   
+					FROM '. UserGroupRelation::model()->tableName() . ' ugr 
+					LEFT JOIN ' . Users::model()->tableName() . ' u
+						ON u.Id = ugr.userId
+					WHERE groupId='.$groupId;
+	
+			$dataProvider = new CSqlDataProvider($sql, array(
+			    											'totalItemCount'=>$count,		
+														    'pagination'=>array(
+														        'pageSize'=>Yii::app()->params->itemCountInOnePage,
+			),
+			));
 			
-//			$dataProvider=new CActiveDataProvider('Users', array(
-//			    'criteria'=>array(
-//				    'condition'=>'Id=:Id',
-//				    'params'=>array(':Id'=>2),
-//			        //'order'=>'create_time DESC',
-//			        //'with'=>array('author'),
-//			    ),
-//			    'pagination'=>array(
-//			        'pageSize'=>20,
-//			    ),
-//			));	
-
-			$dataProvider=new CActiveDataProvider('Groups');			
 		}
 		else
 		{
 			$dataProvider = null;
 		}
-		
-		echo 'BBBB';
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
