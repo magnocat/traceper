@@ -55,18 +55,18 @@ INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend1Visibility`, `friend2`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `traceper_groups`
+-- Tablo için tablo yapýsý `traceper_privacy_groups`
 --
 
-CREATE TABLE IF NOT EXISTS `traceper_groups` (
+CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `owner` int(10) unsigned NOT NULL,
   `description` varchar(500) NOT NULL DEFAULT '',
   `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=33 ;
+  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=34 ;
 
 
 
@@ -279,17 +279,19 @@ INSERT INTO `traceper_user_candidates` (`Id`, `email`, `realname`, `password`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `traceper_user_group_relation`
+-- Tablo için tablo yapýsý `traceper_user_privacy_group_relation`
 --
 
-CREATE TABLE IF NOT EXISTS `traceper_user_group_relation` (
+CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
   `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `groupOwner` int(11) NOT NULL,
   `userId` int(10) unsigned NOT NULL,
   `groupId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`Id`),
-  KEY `userIdIndex` (`userId`),
-  KEY `groupIdIndex` (`groupId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  UNIQUE KEY `userIdGroupId` (`userId`,`groupId`),
+  UNIQUE KEY `groupOwnerUserId` (`groupOwner`,`userId`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
 
@@ -461,10 +463,10 @@ ALTER TABLE `traceper_upload`
   ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kýsýtlamalarý `traceper_user_group_relation`
+-- Tablo kýsýtlamalarý `traceper_user_privacy_group_relation`
 --
-ALTER TABLE `traceper_user_group_relation`
-  ADD CONSTRAINT `traceper_user_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `traceper_user_privacy_group_relation`
+  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `traceper_user_was_here`

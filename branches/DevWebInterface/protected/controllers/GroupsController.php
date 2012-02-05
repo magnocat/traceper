@@ -68,15 +68,15 @@ class GroupsController extends Controller
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
 				
-				$groups = new Groups;
-				$groups->name = $model->name;
-				$groups->owner = Yii::app()->user->id;
-				$groups->description = $model->description;
+				$privacyGroups = new PrivacyGroups;
+				$privacyGroups->name = $model->name;
+				$privacyGroups->owner = Yii::app()->user->id;
+				$privacyGroups->description = $model->description;
 								
 
 				try
 				{
-					if($groups->save()) // save the change to database
+					if($privacyGroups->save()) // save the change to database
 					{
 						echo CJSON::encode(array("result"=> "1"));
 					}
@@ -124,7 +124,7 @@ class GroupsController extends Controller
 
 		$processOutput = true;		
 		//Get all of the groups that the logged in user has created
-		$groupsOfUser = Groups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
+		$groupsOfUser = PrivacyGroups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
 		
 		$selected_groups=array(); //array to hold all the groups of the user's selected friend to be used for the checking the checkboxes in the initial dialog
 		$unselected_groups=array(); //array to hold the unselected user groups so that it can be used for user removal from unselected groups
@@ -133,7 +133,7 @@ class GroupsController extends Controller
 		{
 			$friendId = (int)$_REQUEST['friendId'];			
 			//Take all the user-group relation rows that the user's friend added to
-			$relationRowsSelectedFriendBelongsTo = UserGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
+			$relationRowsSelectedFriendBelongsTo = UserPrivacyGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
 			
 			//Get only the group ID fields into $selected_groups from the obtained rows
 			foreach($relationRowsSelectedFriendBelongsTo as $relationRow)
@@ -203,52 +203,13 @@ class GroupsController extends Controller
 //
 //					echo '</br>';
 //				}				
-				
-				//Check whether the friend belongs to the selected group or not before. If he does not, add his relation to the traceper_user_group_relation table				
-				if(!empty($model->groupStatusArray)) //Check empty() in order to avoid error in foreach
-				{
-					foreach($model->groupStatusArray as $selectedFriendGroup) //Check for all of the checked groups
-					{
-						$relationQueryResult = UserGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
-						                                                     'params'=>array(':userId'=>$friendId, 
-						                                                                     ':groupId'=>$selectedFriendGroup
-						                                                                     )
-						                                                     )
-						                                               );
-	
-					    if($relationQueryResult != null) 
-					    {
-					    	//traceper_user_group_relation table already has the desired relation, so do nothing
-					    	
-					    	//echo 'Relation already exists for groupId '.$selectedFriendGroup.'</br>';
-					    }
-					    else
-					    {
-							$userGroupRelation = new UserGroupRelation;
-							$userGroupRelation->userId = $friendId;
-							$userGroupRelation->groupId = $selectedFriendGroup;
-	
-							if($userGroupRelation->save()) // save the change to database
-							{
-								//Relation added to the traceper_user_group_relation table
 								
-								//echo 'Relation added for groupId '.$selectedFriendGroup.'</br>';
-							}
-							else
-							{
-								echo CJSON::encode(array("result"=> "Unknown error"));
-								Yii::app()->end();
-							}
-					    } 				
-					}				
-				}
+				//First process the unselected groups for deletion, because if you process the selected groups first, there may be db exceptions at privacy groupings
 
-				
-				
 				//Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
 				foreach($unselected_groups as $unselectedFriendGroup) //Check for all of the checked groups
 				{
-					$relationQueryResult = UserGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+					$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
 					                                                     'params'=>array(':userId'=>$friendId, 
 					                                                                     ':groupId'=>$unselectedFriendGroup
 					                                                                     )
@@ -277,6 +238,46 @@ class GroupsController extends Controller
 						
 				    	//echo 'Relation does not already exist for groupId '.$unselectedFriendGroup.'</br>';
 				    } 				
+				}
+				
+				//Check whether the friend belongs to the selected group or not before. If he does not, add his relation to the traceper_user_group_relation table				
+				if(!empty($model->groupStatusArray)) //Check empty() in order to avoid error in foreach
+				{
+					foreach($model->groupStatusArray as $selectedFriendGroup) //Check for all of the checked groups
+					{
+						$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+						                                                     'params'=>array(':userId'=>$friendId, 
+						                                                                     ':groupId'=>$selectedFriendGroup
+						                                                                     )
+						                                                     )
+						                                               );
+	
+					    if($relationQueryResult != null) 
+					    {
+					    	//traceper_user_group_relation table already has the desired relation, so do nothing
+					    	
+					    	//echo 'Relation already exists for groupId '.$selectedFriendGroup.'</br>';
+					    }
+					    else
+					    {
+							$userPrivacyGroupRelation = new UserPrivacyGroupRelation;
+							$userPrivacyGroupRelation->userId = $friendId;
+							$userPrivacyGroupRelation->groupId = $selectedFriendGroup;
+							$userPrivacyGroupRelation->groupOwner = Yii::app()->user->id;
+	
+							if($userPrivacyGroupRelation->save()) // save the change to database
+							{
+								//Relation added to the traceper_user_group_relation table
+								
+								//echo 'Relation added for groupId '.$selectedFriendGroup.'</br>';
+							}
+							else
+							{
+								echo CJSON::encode(array("result"=> "Unknown error"));
+								Yii::app()->end();
+							}
+					    } 				
+					}				
 				}				
 				
 				echo CJSON::encode(array("result"=> "1"));
@@ -311,7 +312,7 @@ class GroupsController extends Controller
 	{
 		if(Yii::app()->user->id != null)
 		{			
-			$dataProvider=new CActiveDataProvider('Groups', array(
+			$dataProvider=new CActiveDataProvider('PrivacyGroups', array(
 			    'criteria'=>array(
 				    'condition'=>'owner=:owner',
 				    'params'=>array(':owner'=>Yii::app()->user->id),
@@ -346,13 +347,13 @@ class GroupsController extends Controller
 		if(Yii::app()->user->id != null)
 		{			
 			$sqlCount = 'SELECT count(*)
-						 FROM '. UserGroupRelation::model()->tableName() . ' ugr 
+						 FROM '. UserPrivacyGroupRelation::model()->tableName() . ' ugr 
 						 WHERE groupId = '.$groupId;
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 			$sql = 'SELECT u.Id as id, u.realname as Name, ugr.groupId, ugr.userId 	   
-					FROM '. UserGroupRelation::model()->tableName() . ' ugr 
+					FROM '. UserPrivacyGroupRelation::model()->tableName() . ' ugr 
 					LEFT JOIN ' . Users::model()->tableName() . ' u
 						ON u.Id = ugr.userId
 					WHERE groupId='.$groupId;
@@ -384,9 +385,9 @@ class GroupsController extends Controller
 		}	
 		
 		//First delete all of the relations those belong to the selected group
-		UserGroupRelation::model()->deleteAll('groupId=:groupId', array(':groupId'=>$groupId));		
+		UserPrivacyGroupRelation::model()->deleteAll('groupId=:groupId', array(':groupId'=>$groupId));		
 		
-		$result = Groups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId', 
+		$result = PrivacyGroups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId', 
 		                                                     'params'=>array(':groupId'=>$groupId, 
 		                                                                     ':ownerId'=>Yii::app()->user->id
 		                                                                     )
@@ -427,7 +428,7 @@ class GroupsController extends Controller
 			$userId = (int)$_REQUEST['userId'];
 		}		
 		
-		$relationQueryResult = UserGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+		$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
 		                                                     'params'=>array(':userId'=>$userId, 
 		                                                                     ':groupId'=>$groupId
 		                                                                     )
@@ -491,14 +492,14 @@ class GroupsController extends Controller
 //						echo 'UNCHECKED';
 //					}
 					
-					if(Groups::model()->updateByPk($groupId, array("allowedToSeeOwnersPosition"=>$model->allowToSeeMyPosition)) >= 0) // save the change to database
+					if(PrivacyGroups::model()->updateByPk($groupId, array("allowedToSeeOwnersPosition"=>$model->allowToSeeMyPosition)) >= 0) // save the change to database
 					{
 						//echo 'SAVED';
 						
 						$errorOccured = false;
 		
 						//Take all the user-group relation rows that the selected group added to
-						$relationRowsSelectedGroupBelongsTo = UserGroupRelation::model()->findAll('groupId=:groupId', array(':groupId'=>$groupId));
+						$relationRowsSelectedGroupBelongsTo = UserPrivacyGroupRelation::model()->findAll('groupId=:groupId', array(':groupId'=>$groupId));
 						
 						//Get only the user ID fields into $group_members from the obtained rows
 						foreach($relationRowsSelectedGroupBelongsTo as $relationRow)
@@ -579,7 +580,7 @@ class GroupsController extends Controller
 		}
 		else
 		{
-			$group=Groups::model()->findByPk($groupId);
+			$group=PrivacyGroups::model()->findByPk($groupId);
 			$model->allowToSeeMyPosition = $group->allowedToSeeOwnersPosition;
 		}	
 			
@@ -640,55 +641,6 @@ class GroupsController extends Controller
 //		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 //		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 //		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
-//	}	
-	
-//		/**
-//	 * Displays the create group page,
-//	 * If there is an error in validation or parameters it returns the form code with errors
-//	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
-//	 */
-//	public function actionAddUserToGroup()
-//	{
-//		$model = new UpdateGroupForm;
-//
-//		$processOutput = true;
-//		// collect user input data
-//		if(isset($_POST['UpdateGroupForm']))
-//		{
-//			$model->attributes = $_POST['UpdateGroupForm'];
-//			// validate user input and if ok return json data and end application.
-//			if($model->validate()) {
-//				$group = Groups::model()->findByPk($model->groupId);
-//				
-//				//Add user to the group, if the adder is the user owner
-//				if($group->owner == Yii::app()->user->id)
-//				{
-//					$userGroupRelation = new UserGroupRelation;
-//					//$user=Users::model()->find('email=:email', array(':email'=>$model->email));				
-//					$userGroupRelation->userId = $model->userId;
-//					//$group=Groups::model()->find('groupName=:groupName', array(':groupName'=>$model->groupName));				
-//					$userGroupRelation->groupId = $model->groupId;
-//					$userGroupRelation->save();
-//	
-//					if($groups->save()) // save the change to database
-//					{
-//						echo CJSON::encode(array("result"=> "1"));
-//					}
-//					else
-//					{
-//						echo CJSON::encode(array("result"=> "Unknown error"));
-//					}					
-//				}
-//				else
-//				{
-//					echo CJSON::encode(array("result"=> "Unknown error"));
-//				}
-//			}
-//				
-//			Yii::app()->end();
-//		}
-//		
-//		//$this->renderPartial('groupInfo',array('model'=>$model), false, $processOutput);
 //	}	
 }
 
