@@ -1,10 +1,6 @@
 <?php
 
 if ($dataProvider != null) {
-	$isFriendRequestList = isset($friendRequestList) ? true : false;
-	$isSearchResult = isset($searchResult) ? true : false;
-	$isFriendList = isset($friendList) ? true : false;
-
 	//TODO: Refactor make common confirmation dialog 	
 	/** This is the friend ship id holder, when user clicks delete, its content is filled***/
 	echo "<div id='groupId' style='display:none'></div>";
@@ -85,7 +81,20 @@ if ($dataProvider != null) {
 		array(            // display 'create_time' using an expression
 				    'name'=>'Name',
 					'type' => 'raw',
-		            'value'=>'CHtml::link($data["name"], "#", array())',		
+		            'value'=>'CHtml::link($data["name"], "#", array())',
+
+		            'value'=>'CHtml::link($data["name"], "#",
+										array(\'onclick\'=>CHtml::ajax(
+											array(
+												\'url\'=>Yii::app()->createUrl(\'groups/getGroupMembers\', array(\'groupId\'=>$data[\'id\'])),
+												
+					    						\'complete\'=> \'function() { $("#groupMembersWindow").dialog("open"); return false;}\',
+					 							\'update\'=> \'#groupMembersWindow\',	
+					 							
+											)),\'class\'=>\'vtip\', \'title\'=>\'Group Members\')
+					  				 )',		
+		
+		
 		),
 		array(            // display 'create_time' using an expression
 	//    'name'=>'realname',

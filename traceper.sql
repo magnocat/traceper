@@ -461,6 +461,12 @@ ALTER TABLE `traceper_upload`
   ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Tablo kýsýtlamalarý `traceper_user_group_relation`
+--
+ALTER TABLE `traceper_user_group_relation`
+  ADD CONSTRAINT `traceper_user_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `traceper_user_was_here`
 --
 ALTER TABLE `traceper_user_was_here`

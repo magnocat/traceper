@@ -99,6 +99,8 @@
 	echo '<div id="groupSettingsWindow"></div>';
 ///////////////////////////// Group Privacy Settings Window ///////////////////////////	
 	echo '<div id="groupPrivacySettingsWindow"></div>';	
+///////////////////////////// Group Members Window ///////////////////////////	
+	echo '<div id="groupMembersWindow"></div>';
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
