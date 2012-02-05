@@ -11,19 +11,16 @@
     <string name="messaging">Messaging</string>
     <string name="local_service_started">App service started</string>
     <string name="local_service_stopped">App service stopped</string>
-	<string name="local_service_connected">local_service_connected</string>
-	<string name="OK">OK</string>
-	<string name="not_connected_to_service">Not connected to the service and 
-	this is not supposed to happend so please inform this situation to 
-	ahmetmermerkaya@hotmail.com</string>	
-	<string name="fill_both_username_and_password">Please fill both username and password</string>
-	<string name="make_sure_username_and_password_correct">Please make sure that
-	your username and password correct</string>
-	<string name="user_offline">This user is offline</string>
-	<string name="register">Register</string>
-	<string name="exit_application">Exit</string>	
-	<string name="password_again">Password(again):</string>
-	<string name="signup_fill_all_fields">Please fill all fields</string>
+	<string name="local_service_connected">Yerel servis bağlandı</string>
+	<string name="OK">Tamam</string>
+	<string name="not_connected_to_service">Olmaması gereken biçimde servise bağlanılamadı, lütfen bu durumu ahmetmermerkaya@hotmail.com adresine bildiriniz</string>	
+	<string name="fill_both_username_and_password">Lütfen kullanıcı adı ve parola alanlarını doldurunuz</string>
+	<string name="make_sure_username_and_password_correct">Lütfen kullanıcı adı ve parolanızın doğru girildiğinden emin olunuz</string>
+	<string name="user_offline">Bu kullanıcı çevrim dışı</string>
+	<string name="register">Kayıt</string>
+	<string name="exit_application">Çıkış</string>	
+	<string name="password_again">Parola(tekrar):</string>
+	<string name="signup_fill_all_fields">Lütfen tüm alanları doldurunuz</string>
 	<string name="signup_type_same_password_in_password_fields">Type same password in password fields</string>
 	<string name="signup_failed">Sign up failed because of unknown reason</string>
 	<string name="signup_email_crashed">Your email have been already used</string>
