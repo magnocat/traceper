@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ApplicationName">Traceper</string>
-    <string name="hello">Hello World, startApp</string>
-    <string name="friend_list">Friend List</string>
+    <string name="hello">Merhaba Dünya, Uygulamayı Başlat</string>
+    <string name="friend_list">Arkadaş Listesi</string>
     
-    <string name="email">E-mail:</string>
-    <string name="password">Password:</string>
-    <string name="login">Login</string>
-    <string name="cancel">Cancel</string>
-    <string name="messaging">Messaging</string>
-    <string name="local_service_started">App service started</string>
-    <string name="local_service_stopped">App service stopped</string>
+    <string name="email">E-posta:</string>
+    <string name="password">Parola:</string>
+    <string name="login">Oturum Aç</string>
+    <string name="cancel">İptal</string>
+    <string name="messaging">Mesajlaşma</string>
+    <string name="local_service_started">Yerel servis başlatıldı</string>
+    <string name="local_service_stopped">Yerel servis durduruldu</string>
 	<string name="local_service_connected">Yerel servis bağlandı</string>
 	<string name="OK">Tamam</string>
 	<string name="not_connected_to_service">Olmaması gereken biçimde servise bağlanılamadı, lütfen bu durumu ahmetmermerkaya@hotmail.com adresine bildiriniz</string>	
