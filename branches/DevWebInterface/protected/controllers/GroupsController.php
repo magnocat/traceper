@@ -204,84 +204,110 @@ class GroupsController extends Controller
 //					echo '</br>';
 //				}				
 								
-				//First process the unselected groups for deletion, because if you process the selected groups first, there may be db exceptions at privacy groupings
-
-				//Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
-				foreach($unselected_groups as $unselectedFriendGroup) //Check for all of the checked groups
-				{
-					$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
-					                                                     'params'=>array(':userId'=>$friendId, 
-					                                                                     ':groupId'=>$unselectedFriendGroup
-					                                                                     )
-					                                                     )
-					                                               );
-
-				    if($relationQueryResult != null) 
-				    {
-						if($relationQueryResult->delete()) // delete the undesired subscription
-						{
-							//Relation deleted from the traceper_user_group_relation table
-							
-							//echo 'Relation deleted for groupId '.$unselectedFriendGroup.'</br>';
-							
-							
-						}
-						else
-						{
-							echo CJSON::encode(array("result"=> "Unknown error"));
-							Yii::app()->end();
-						}				    					    	
-				    }
-				    else
-				    {
-						//traceper_user_group_relation table has not the desired relation, so do nothing
-						
-				    	//echo 'Relation does not already exist for groupId '.$unselectedFriendGroup.'</br>';
-				    } 				
-				}
 				
-				//Check whether the friend belongs to the selected group or not before. If he does not, add his relation to the traceper_user_group_relation table				
-				if(!empty($model->groupStatusArray)) //Check empty() in order to avoid error in foreach
+				//Check for privacy groups
+				if(count($model->groupStatusArray) > 1)
 				{
-					foreach($model->groupStatusArray as $selectedFriendGroup) //Check for all of the checked groups
+					echo CJSON::encode(array("result"=> "Duplicate Entry"));
+					Yii::app()->end();				
+				}
+				else
+				{
+					//First process the unselected groups for deletion, because if you process the selected groups first, there may be db exceptions at privacy groupings
+	
+					//Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
+					foreach($unselected_groups as $unselectedFriendGroup) //Check for all of the checked groups
 					{
 						$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
 						                                                     'params'=>array(':userId'=>$friendId, 
-						                                                                     ':groupId'=>$selectedFriendGroup
+						                                                                     ':groupId'=>$unselectedFriendGroup
 						                                                                     )
 						                                                     )
 						                                               );
 	
 					    if($relationQueryResult != null) 
 					    {
-					    	//traceper_user_group_relation table already has the desired relation, so do nothing
-					    	
-					    	//echo 'Relation already exists for groupId '.$selectedFriendGroup.'</br>';
-					    }
-					    else
-					    {
-							$userPrivacyGroupRelation = new UserPrivacyGroupRelation;
-							$userPrivacyGroupRelation->userId = $friendId;
-							$userPrivacyGroupRelation->groupId = $selectedFriendGroup;
-							$userPrivacyGroupRelation->groupOwner = Yii::app()->user->id;
-	
-							if($userPrivacyGroupRelation->save()) // save the change to database
+							if($relationQueryResult->delete()) // delete the undesired subscription
 							{
-								//Relation added to the traceper_user_group_relation table
+								//Relation deleted from the traceper_user_group_relation table
 								
-								//echo 'Relation added for groupId '.$selectedFriendGroup.'</br>';
+								//echo 'Relation deleted for groupId '.$unselectedFriendGroup.'</br>';
+								
+								
 							}
 							else
 							{
 								echo CJSON::encode(array("result"=> "Unknown error"));
 								Yii::app()->end();
-							}
+							}				    					    	
+					    }
+					    else
+					    {
+							//traceper_user_group_relation table has not the desired relation, so do nothing
+							
+					    	//echo 'Relation does not already exist for groupId '.$unselectedFriendGroup.'</br>';
 					    } 				
+					}
+					
+					//Check whether the friend belongs to the selected group or not before. If he does not, add his relation to the traceper_user_group_relation table				
+					if(!empty($model->groupStatusArray)) //Check empty() in order to avoid error in foreach
+					{
+						foreach($model->groupStatusArray as $selectedFriendGroup) //Check for all of the checked groups
+						{
+							$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId', 
+							                                                     'params'=>array(':userId'=>$friendId, 
+							                                                                     ':groupId'=>$selectedFriendGroup
+							                                                                     )
+							                                                     )
+							                                               );
+		
+						    if($relationQueryResult != null) 
+						    {
+						    	//traceper_user_group_relation table already has the desired relation, so do nothing
+						    	
+						    	//echo 'Relation already exists for groupId '.$selectedFriendGroup.'</br>';
+						    }
+						    else
+						    {
+								$userPrivacyGroupRelation = new UserPrivacyGroupRelation;
+								$userPrivacyGroupRelation->userId = $friendId;
+								$userPrivacyGroupRelation->groupId = $selectedFriendGroup;
+								$userPrivacyGroupRelation->groupOwner = Yii::app()->user->id;
+	
+								try
+								{
+									if($userPrivacyGroupRelation->save()) // save the change to database
+									{
+										//Relation added to the traceper_user_group_relation table
+										
+										//echo 'Relation added for groupId '.$selectedFriendGroup.'</br>';
+									}
+									else
+									{
+										echo CJSON::encode(array("result"=> "Unknown error"));
+										Yii::app()->end();
+									}							
+								}
+						    	catch (Exception $e) 
+								{
+									if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+									{
+										echo CJSON::encode(array("result"=> "Duplicate Entry"));
+									}
+									Yii::app()->end();
+									
+				//					echo 'Caught exception: ',  $e->getMessage(), "\n";    				
+				//    				echo 'Code: ', $e->getCode(), "\n";
+								}
+						    } 				
+						}				
 					}				
-				}				
-				
-				echo CJSON::encode(array("result"=> "1"));
-				Yii::app()->end();
+					
+					echo CJSON::encode(array("result"=> "1"));
+					Yii::app()->end();				
+				}	
+
+
 			}
 			
 			if(Yii::app()->request->isAjaxRequest) 
