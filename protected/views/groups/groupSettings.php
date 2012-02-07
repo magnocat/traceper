@@ -42,6 +42,10 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					  array()
 					);	
 					
+//					$form->dropDownList($model,'groupStatusArray', CHtml::listData($groupsOfUser, 'id', 'name'), array('empty'=>'Select Group'));
+//					
+//					CHtml::dropDownList('listname', $select, array('M' => 'Male', 'F' => 'Female'), array('empty' => '(Select a gender)'));					
+					
 //					echo CHtml::checkboxList(
 //					  'Groups', CHtml::listData($relationRowsSelectedFriendBelongsTo, 'groupId', 'groupId'), 
 //					  CHtml::listData($groupsOfUser, 'id', 'name'),
@@ -68,6 +72,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																					$("#messageDialogText").html("Your settings have been saved");
 																					$("#messageDialog").dialog("open");																					
 																				}
+																				else if(obj.result && obj.result == "Duplicate Entry")
+																				{
+																					$("#groupSettingsWindow").html(result);
+		
+																					$("#groupSettingsWindow").dialog("close");
+																					$("#messageDialogText").html("Select only one privacy group!");
+																					$("#messageDialog").dialog("open");																			
+																				}																				
 																			}
 																			catch (error){
 																				$("#groupSettingsWindow").html(result);
