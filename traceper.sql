@@ -445,6 +445,26 @@ INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitu
 (128, 1, '2011-12-22 03:29:20', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17'),
 (129, 1, '2011-12-22 03:30:19', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17');
 
+
+-- --------------------------------------------------------
+
+--
+-- Tablo yap?s?: `traceper_geofence`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_geofence` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
+
+
 --
 -- Constraints for dumped tables
 --
