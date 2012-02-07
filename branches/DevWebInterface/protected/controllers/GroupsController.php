@@ -328,9 +328,12 @@ class GroupsController extends Controller
 		{
 			$dataProvider = null;
 		}
+		
+		//echo 'groupsInfo called'.date("Y-m-d H:i:s");
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		//TODO: added below line because gridview.js is loaded before.
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
 	
@@ -372,7 +375,8 @@ class GroupsController extends Controller
 		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		//TODO: added below line because gridview.js is loaded before.
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('groupMembersDialog',array('dataProvider'=>$dataProvider), false, true);
 	}	
 	
@@ -639,6 +643,7 @@ class GroupsController extends Controller
 //			}
 //		}
 //		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+//		//TODO: added below line because gridview.js is loaded before.
 //		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 //		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 //	}	
