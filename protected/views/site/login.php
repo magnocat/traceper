@@ -69,8 +69,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			'url'=> $this->createUrl('image/getList'),
 																			'update'=>'#photos_tab',
 																			)
-																		)																			
-																		
+																		)
+																		. '  '.
+																		CHtml::ajax(
+																			array(
+																			'url'=> $this->createUrl('groups/getGroupList'),
+																			'update'=>'#groups_tab',
+																			)
+																		)																	
 																		 .'	
 																			$("#loginBlock").hide();
 																			$("#userBlock").show();
