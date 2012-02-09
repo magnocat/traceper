@@ -5,7 +5,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'userLoginWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Login'),
+	        'title'=>Yii::t('site', 'Login'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,			      
@@ -43,7 +43,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton('Login', $this->createUrl('site/login'), 
+			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), $this->createUrl('site/login'), 
 												array(
 													'success'=> 'function(result){ 
 																	try {
