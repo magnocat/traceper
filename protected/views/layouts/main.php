@@ -101,6 +101,8 @@
 	echo '<div id="groupPrivacySettingsWindow"></div>';	
 ///////////////////////////// Group Members Window ///////////////////////////	
 	echo '<div id="groupMembersWindow"></div>';
+///////////////////////////// Geofence Settings Window ///////////////////////////	
+	echo '<div id="geofenceSettingsWindow"></div>';	
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
