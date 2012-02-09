@@ -293,6 +293,25 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
   KEY `userId` (`userId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapýsý `traceper_user_privacy_geofence_relation`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_user_privacy_geofence_relation` (
+  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `geofenceOwner` int(11) NOT NULL,
+  `userId` int(10) unsigned NOT NULL,
+  `geofenceId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `userIdGeofenceId` (`userId`,`geofenceId`),
+  UNIQUE KEY `geofenceOwnerId` (`geofenceOwner`,`userId`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
+
+
 -- --------------------------------------------------------
 
 --
