@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 01, 2012 at 01:16 PM
--- Server version: 5.1.54
--- PHP Version: 5.3.5-1ubuntu7.2
+-- Generation Time: Feb 10, 2012 at 01:33 AM
+-- Server version: 5.1.58
+-- PHP Version: 5.3.6-13ubuntu3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -36,8 +36,9 @@ CREATE TABLE IF NOT EXISTS `traceper_friends` (
   PRIMARY KEY (`Id`),
   UNIQUE KEY `friend1_2` (`friend1`,`friend2`),
   KEY `friend1` (`friend1`),
-  KEY `friend2` (`friend2`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=63 ;
+  KEY `friend2` (`friend2`),
+  KEY `status` (`status`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=73 ;
 
 --
 -- Dumping data for table `traceper_friends`
@@ -50,25 +51,35 @@ INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend1Visibility`, `friend2`,
 (41, 1, 1, 5, 0, 1),
 (42, 1, 0, 6, 1, 1),
 (43, 1, 0, 8, 0, 1),
-(44, 1, 1, 9, 0, 1);
+(44, 1, 1, 9, 0, 1),
+(63, 1, 0, 11, 0, 0),
+(64, 15, 0, 18, 0, 0),
+(65, 12, 0, 13, 0, 0),
+(66, 12, 0, 14, 0, 0),
+(67, 12, 0, 15, 0, 0),
+(68, 12, 0, 16, 0, 0),
+(69, 12, 0, 17, 0, 0),
+(70, 12, 0, 18, 0, 0),
+(71, 12, 0, 19, 0, 0),
+(72, 12, 0, 20, 0, 0);
 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapýsý `traceper_privacy_groups`
+-- Table structure for table `traceper_geofence`
 --
 
-CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `owner` int(10) unsigned NOT NULL,
-  `description` varchar(500) NOT NULL DEFAULT '',
-  `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=34 ;
-
-
+CREATE TABLE IF NOT EXISTS `traceper_geofence` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
 
@@ -90,6 +101,22 @@ CREATE TABLE IF NOT EXISTS `traceper_invitedusers` (
 
 INSERT INTO `traceper_invitedusers` (`Id`, `email`, `dt`) VALUES
 (1, 'qwerrq@werq.com', '2011-10-04 22:10:35');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `traceper_privacy_groups`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `owner` int(10) unsigned NOT NULL,
+  `description` varchar(500) NOT NULL DEFAULT '',
+  `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=34 ;
 
 -- --------------------------------------------------------
 
@@ -279,7 +306,7 @@ INSERT INTO `traceper_user_candidates` (`Id`, `email`, `realname`, `password`, `
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapýsý `traceper_user_privacy_group_relation`
+-- Table structure for table `traceper_user_privacy_group_relation`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
@@ -464,26 +491,6 @@ INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitu
 (128, 1, '2011-12-22 03:29:20', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17'),
 (129, 1, '2011-12-22 03:30:19', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17');
 
-
--- --------------------------------------------------------
-
---
--- Tablo yap?s?: `traceper_geofence`
---
-
-CREATE TABLE IF NOT EXISTS `traceper_geofence` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
-  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`Id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
-
-
 --
 -- Constraints for dumped tables
 --
@@ -502,7 +509,7 @@ ALTER TABLE `traceper_upload`
   ADD CONSTRAINT `traceper_upload_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Tablo kýsýtlamalarý `traceper_user_privacy_group_relation`
+-- Constraints for table `traceper_user_privacy_group_relation`
 --
 ALTER TABLE `traceper_user_privacy_group_relation`
   ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;

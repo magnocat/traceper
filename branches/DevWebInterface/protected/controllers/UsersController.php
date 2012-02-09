@@ -154,6 +154,49 @@ class UsersController extends Controller
 	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
 	}
+	
+	private function unsetFriendIdList() {
+		unset(Yii::app()->session['friendList']);
+		unset(Yii::app()->session['friendCount']);
+	}
+	
+	private function getFriendCount() {
+		if (isset(Yii::app()->session['friendCount'])== false) {
+			$this->getFriendIdList();
+		}
+		
+		return Yii::app()->session['friendCount'];
+	}
+	
+	private function getFriendIdList() {
+	
+		if (isset(Yii::app()->session['friendList']) == false) {
+			$sql = "SELECT IF( friend1 != ". Yii::app()->user->id .", friend1, friend2 ) as friend \n"
+	    			. "FROM traceper_friends\n"
+				    . "WHERE \n"
+				    . "((friend1=".Yii::app()->user->id." AND friend2Visibility=1)\n"
+				    . "OR (friend2=".Yii::app()->user->id." AND friend1Visibility=1)\n"
+				    . ")\n"
+				    . "AND STATUS =1";
+				    
+			$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
+			$length = count($friendsResult);
+			Yii::app()->session['friendCount'] = $length;
+			$friends = array();			
+			for ($i = 0; $i < $length; $i++) {
+				array_push($friends, $friendsResult[$i]['friend']);			
+			}
+			$result = -1;
+			if (count($friends) > 0) {		
+				$result = implode(',', $friends);
+			}	
+			Yii::app()->session['friendList'] = $result; 				    
+		}
+		
+		return Yii::app()->session['friendList'];	
+	}
+	
+	
 
 	/**
 	 * this function returns users and images in xml format
@@ -176,39 +219,31 @@ class UsersController extends Controller
 				$time = Yii::app()->session[$dataFetchedTimeKey];
 				if ($time !== null && $time !== false)
 				{
-					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
-					 		FROM ' . Friends::model()->tableName() . ' f
-					 		LEFT JOIN  '. Users::model()->tableName() . ' u 
-					 			ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-					 				OR
-					 				u.Id = '.Yii::app()->user->id.'
-							WHERE unix_timestamp(u.dataArrivedTime) >= '. $time . '
-								 AND
-								 ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. Yii::app()->user->id .'  AND f.friend1Visibility = 1)
-								    ) 
-								    	AND f.status= 1
-								   )
-								   OR 
-								   u.Id = '.Yii::app()->user->id.')';
-
-					$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+					
+					$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+					$friendIdList = $this->getFriendIdList();
+				
+					if ($friendIdList != -1) {
+						$friendIdList .= ',' . Yii::app()->user->id;
+					}
+					else {
+						$friendIdList = Yii::app()->user->id;
+					}
+					
+					$sqlPageCount = 'SELECT ceil(count(*)/'.Yii::app()->params->itemCountInDataListPage.')
+									 FROM '. Users::model()->tableName() . ' u 
+									 WHERE u.Id IN ('. $friendIdList .')
+								  		AND unix_timestamp(u.dataArrivedTime) >= '. $time;
+					
+					$pageCount = Yii::app()->db->createCommand($sqlPageCount)->queryScalar();
+					
+					$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, 
 								date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
 								date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 								1 isFriend
 							FROM '. Users::model()->tableName() . ' u 
-							LEFT JOIN ' . Friends::model()->tableName() . ' f
-								ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-									OR
-									u.Id = '.Yii::app()->user->id.'
-							WHERE ((((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. Yii::app()->user->id .' AND f.friend1Visibility = 1)) AND f.status= 1)
-									OR 
-								   		u.Id = '.Yii::app()->user->id.'
-									)
-									AND unix_timestamp(u.dataArrivedTime) >= '. $time . '
+							WHERE u.Id IN ('. $friendIdList .')
+								  AND unix_timestamp(u.dataArrivedTime) >= '. $time . '
 							LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
 					
 					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
@@ -218,28 +253,25 @@ class UsersController extends Controller
 		}
 		else {
 
-			// +1 is for user himself
-			$sqlCount = 'SELECT ceil((count(*)+1)/'. Yii::app()->params->itemCountInDataListPage .')
-					 FROM '. Friends::model()->tableName() . ' f 
-					 WHERE ((f.friend1 = '. Yii::app()->user->id .'  AND f.friend2Visibility = 1) 
-										OR (f.friend2 ='. Yii::app()->user->id .'  AND f.friend1Visibility = 1)) AND status= 1';
-
-			$pageCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
+			$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+			$pageCount = ceil($friendCount / Yii::app()->params->itemCountInDataListPage);
+					
+			$friendIdList = $this->getFriendIdList();
+									
+			if ($friendIdList != -1) {
+				$friendIdList .= ',' . Yii::app()->user->id;
+			}
+			else {
+				$friendIdList = Yii::app()->user->id;
+			}
+					
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, 
 						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
 						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 						1 isFriend
-				FROM '. Friends::model()->tableName() . ' f 
-				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
-						OR
-						u.Id = '.Yii::app()->user->id.'
-				WHERE (((friend1 = '.Yii::app()->user->id.'  AND f.friend2Visibility = 1)  
-						OR (friend2 ='.Yii::app()->user->id.'  AND f.friend1Visibility = 1)) AND status= 1)
-					  OR
-						u.Id = '.Yii::app()->user->id.'
-				LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
+					FROM '. Users::model()->tableName() . ' u
+					WHERE u.Id IN ('. $friendIdList .')
+					LIMIT ' . $offset . ' , ' . Yii::app()->params->itemCountInDataListPage;
 
 		$out = $this-> prepareXML($sql, $pageNo, $pageCount, "userList");
 		}
@@ -486,6 +518,7 @@ class UsersController extends Controller
 			$result = 'Error occured';
 			if ($friendShip != null && $friendShip->delete()){
 				$result = 1;
+				$this->unsetFriendIdList();
 			}
 		}
 
@@ -554,6 +587,7 @@ class UsersController extends Controller
 				$friendShip->status = 1;
 				if ($friendShip->save()) {
 					$result = 1;
+					$this->unsetFriendIdList();
 				}
 			}
 		}
