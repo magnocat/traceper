@@ -87,6 +87,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			appService = null;
 		}
 	};
+	private Button recordVideoButton;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -117,6 +118,19 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		});
 		takePictureButton.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 
+		recordVideoButton = (Button) findViewById(R.id.recordVideoButton);
+		recordVideoButton.bringToFront();
+		recordVideoButton.setOnClickListener(new View.OnClickListener() {			
+
+			public void onClick(View arg0) {
+				Intent i = new Intent(CameraController.this, VideoController.class);				
+				startActivity(i);
+				
+				finish();
+			}
+		});
+
+		
 
 	}
 
