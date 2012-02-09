@@ -133,7 +133,7 @@ class GroupsController extends Controller
 		{
 			$friendId = (int)$_REQUEST['friendId'];			
 			//Take all the user-group relation rows that the user's friend added to
-			$relationRowsSelectedFriendBelongsTo = UserPrivacyGroupRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
+			$relationRowsSelectedFriendBelongsTo = UserPrivacyGroupRelation::model()->findAll('userId=:userId AND groupOwner=:groupOwner', array(':userId'=>$friendId, ':groupOwner'=>Yii::app()->user->id));
 			
 			//Get only the group ID fields into $selected_groups from the obtained rows
 			foreach($relationRowsSelectedFriendBelongsTo as $relationRow)
