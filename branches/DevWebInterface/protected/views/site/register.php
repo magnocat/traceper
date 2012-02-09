@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'registerWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Register'),
+	        'title'=>Yii::t('site', 'Register'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -58,7 +58,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>		
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton('Register', $this->createUrl('site/register'), 
+			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Save'), $this->createUrl('site/register'), 
 												array(
 													'success'=> 'function(result){ 
 																	try {
