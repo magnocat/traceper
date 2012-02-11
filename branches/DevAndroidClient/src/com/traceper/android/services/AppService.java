@@ -22,6 +22,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -106,7 +107,7 @@ public class AppService extends Service implements IAppService{
 	private Location gpsLocation;
 	private Location networkLocation;
 	private Location lastSentLocation;
-
+	private JSONObject json;
 
 	public class IMBinder extends Binder {
 		public IAppService getService() {
@@ -660,6 +661,7 @@ public class AppService extends Service implements IAppService{
 		return this.email;
 	}
 
+
 	
 	public JSONObject getUserList() {		
 		
@@ -774,7 +776,8 @@ public class AppService extends Service implements IAppService{
 
 		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
-
+		
+		
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
@@ -795,6 +798,82 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}	
 
+	public String getUserLocation(int userid){
+		String userloc = null;
+		InputStream is = null;
+		String result = "";
+		JSONObject jArray = null;
+	 		
+			String[] name = new String[3];
+			String[] value = new String[3];
+			name[0] = "r";
+			name[1] = "email";
+			name[2] = "password";
+	
+
+			value[0] = "users/GetUserListJson";
+			value[1] = AppService.this.email;
+			value[2] = AppService.this.password;
+		
+
+			String httpRes = this.sendHttpRequest(name, value, null, null);	
+			
+			result = getString(R.string.unknown_error_occured);
+			
+			 try{
+				 jArray = new JSONObject(httpRes);            
+			    }catch(JSONException e){
+			            Log.e("log_tag", "Error parsing data "+e.toString());
+			    }
+		    
+		
+			 
+		 	
+		         try{
+		         	
+		         	JSONArray  userlist = jArray.getJSONArray("userlist");
+		    	
+		 	        for(int i=0;i<userlist.length();i++){						
+		 					
+		 				JSONObject e = userlist.getJSONObject(i);
+		 				
+		 				if (e.getInt("user")==userid){
+		 				//userloc = ("{result:SHOW_USER_LOCATION,latitude:" + e.getString("latitude") + ",longitude:" +(e.getString("longitude")+"}"));
+		 				
+		 					/*
+		 				JSONObject object = new JSONObject();
+		 				try {
+		 					object.put("result", "SHOW_USER_LOCATION");
+		 					object.put("latitude",  new Double(e.getString("latitude")));
+		 					object.put("longitude", new Double(e.getString("longitude")));
+		 				} catch (JSONException ee) {
+		 					ee.printStackTrace();
+		 				}
+		 				
+		 				userloc = object;
+		 				System.out.println(object);
+		 				*/
+		 				
+		 					Intent i1 = new Intent(IAppService.SHOW_USER_LOCATION);
+		 					i1.setAction(IAppService.SHOW_USER_LOCATION);
+		 					i1.putExtra(IAppService.SHOW_USER_LOCATION_LATITUDE ,e.getString("latitude"));
+		 					i1.putExtra(IAppService.SHOW_USER_LOCATION_LONGITUDE, e.getString("longitude"));
+		 					sendBroadcast(i1);
+		 					Log.i("broadcast sent", "sendUserLocationData broadcast sent");		
+		 				
+		 				}
+		 			}	
+		 	        
+		         }catch(JSONException e)        {
+		         	 Log.e("log_tag", "Error parsing data "+e.toString());
+		         }
+		         	
+
+	         
+		return userloc;
+	}
+	
+	
 	public void setAuthenticationServerAddress(String address) {
 		this.authenticationServerAddress = address;
 	}

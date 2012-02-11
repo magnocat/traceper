@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +42,7 @@ public class friends extends ListActivity {
     /** Called when the activity is first created. */
 	private IAppService appService = null;
 	private JSONObject json;
-	
+	private ProgressDialog progressDialog;
 	
 	
 	
@@ -81,13 +82,14 @@ public class friends extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       
+        progressDialog = ProgressDialog.show(friends.this, "", getString(R.string.loading), true, false);	
     }
     
     public void listele(){
     	 setContentView(R.layout.listph);
          
          ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
+         
        
         
        // JSONObject json = getJSONfromURL("http://192.168.43.250");
@@ -103,29 +105,45 @@ public class friends extends ListActivity {
  				HashMap<String, String> fri = new HashMap<String, String>();	
  				JSONObject e = userlist.getJSONObject(i);
  				
- 				fri.put("id",  String.valueOf(i));
+ 				fri.put("id",  e.getString("user"));
  	        	fri.put("realname", "User Name:" + e.getString("realname"));
- 	        	fri.put("time", "Time: " +  e.getString("time"));
+ 	        	fri.put("latitude",  e.getString("latitude"));
+ 	        	fri.put("longitude", e.getString("longitude"));
  	        	mylist.add(fri);			
- 			}		
+ 			}	
+ 	        
          }catch(JSONException e)        {
          	 Log.e("log_tag", "Error parsing data "+e.toString());
          }
          
          ListAdapter adapter = new SimpleAdapter(this, mylist , R.layout.f_list, 
-                         new String[] { "realname", "time" }, 
-                         new int[] { R.id.item_title, R.id.item_subtitle });
+                         new String[] { "realname", "latitude" ,"longitude"}, 
+                         new int[] { R.id.item_title, R.id.item_subtitle , R.id.item_subtitle_2 });
          
          setListAdapter(adapter);
-         
+         progressDialog.dismiss();
          final ListView lv = getListView();
          lv.setTextFilterEnabled(true);	
          lv.setOnItemClickListener(new OnItemClickListener() {
          	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {        		
          		@SuppressWarnings("unchecked")
- 				HashMap<String, String> o = (HashMap<String, String>) lv.getItemAtPosition(position);	        		
+         		
+ 				HashMap<String, String> o = (HashMap<String, String>) lv.getItemAtPosition(position);        		
          		Toast.makeText(friends.this, "ID '" + o.get("id") + "' was clicked.", Toast.LENGTH_SHORT).show(); 
 
+         		
+         		double lati =Double.valueOf(o.get("latitude"));
+         		double longi =Double.valueOf(o.get("longitude"));
+         		int userid =Integer.valueOf(o.get("id"));
+         		
+         		  Intent i = new Intent(friends.this, MapViewController.class);  
+         		  i.setAction(IAppService.SHOW_USER_LOCATION);
+                  i.putExtra("userid",userid);
+                  i.putExtra("latitude",lati);
+                  i.putExtra("longitude",longi);
+                  startActivity(i);
+         		
+         		
  			}
  		});
     }
