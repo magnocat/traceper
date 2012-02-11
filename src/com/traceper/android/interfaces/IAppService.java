@@ -22,7 +22,20 @@ public interface IAppService {
 		
 //	public static final int ACTION_LAST_LOCATION_DATA_SENT_TIME = 1001;
 	public static final String LAST_LOCATION_DATA_SENT_TIME = "LAST_LOCATION_DATA_SENT_TIME";
-	public static final String LAST_LOCATION = "LOCATION";
+	public static final String LAST_LOCATION = "LOCATION"; 
+	
+	
+	public static final String SHOW_MY_LOCATION = "SHOW_MY_LOCATION";
+	public static final String SHOW_USER_LOCATION = "SHOW_USER_LOCATION";
+	public static final String SHOW_ALL_USER_LOCATIONS = "SHOW_ALL_USER_LOCATIONS";
+	
+	
+	public static final JSONObject SHOW_USER_LOCATION_LOC = null;
+	
+	public static final String SHOW_USER_LOCATION_LATITUDE = "SHOW_USER_LOCATION_LATITUDE";
+	public static final String SHOW_USER_LOCATION_LONGITUDE = "SHOW_USER_LOCATION_LONGITUDE";
+	
+	
 	
 	public String getUsername();
 	
@@ -37,6 +50,8 @@ public interface IAppService {
 	public Long getLastLocationSentTime();
 	
 	public void exit();
+	
+	public String getUserLocation(int userid);
 	
 	public String registerUser(String password, String email, String realname);
 	

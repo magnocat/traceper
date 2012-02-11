@@ -174,6 +174,7 @@ public class Main extends Activity
 
 				if (lastLocation != null){
 					Intent i = new Intent(Main.this, MapViewController.class);
+	         		i.setAction(IAppService.SHOW_MY_LOCATION);
 					i.putExtra(IAppService.LAST_LOCATION, lastLocation);
 					startActivity(i);
 				}

@@ -10,6 +10,6 @@
         android:layout_height="fill_parent"
         android:enabled="true"
         android:clickable="true"
-        android:apiKey="0nUSUsbqKoZkdlCrV-Nw0iWxH1BoYbceeri9ybQ"
+        android:apiKey="0_N0WwH5Typ8e9MObmx0hxJeWEP4Bg7pl0cGPWQ"
         />
 </LinearLayout>

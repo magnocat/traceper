@@ -18,4 +18,10 @@
     android:layout_height="wrap_content" 
     android:padding="2dp"
     android:textSize="13dp" />
+    <TextView  
+	android:id="@+id/item_subtitle_2"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:padding="2dp"
+    android:textSize="13dp" />
 </LinearLayout>
