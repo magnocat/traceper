@@ -18,7 +18,7 @@ a {
 	height:100%;	
 }
 #sideBar{
-	width:25%;
+	width:26%;
 	height:100%;
 	background: #fff;
 	z-index:100;
@@ -47,7 +47,7 @@ a {
 	background-position:center;
 	z-index: 150;
 	position: absolute;
-	right:75%;
+	right:74%;
 	width:1%;	
 	cursor:pointer;
 		

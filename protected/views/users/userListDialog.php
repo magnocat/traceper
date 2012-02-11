@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'friendRequestsWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Friend Requests'),
+	        'title'=>Yii::t('users', 'Friendship Requests'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false      
