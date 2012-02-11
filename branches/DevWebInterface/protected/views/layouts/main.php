@@ -66,7 +66,7 @@
 	    'id'=>'Logo',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'About'),
+	        'title'=>Yii::t('layout', 'About'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -75,7 +75,8 @@
 	));
 
 	echo '<div id="logo"></div>';	
-	echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
+	//echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
+	echo Yii::t('layout', 'Traceper Info');
 			
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 
@@ -108,7 +109,7 @@
 	    'id'=>'photoCommentWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Comment Window'),
+	        'title'=>Yii::t('layout', 'Comment Window'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -119,7 +120,7 @@
 	
 	echo '	<div id="photoCommentForm" class="">
 		<div id="photoCommentLabel">Comment:</div>
-		<textarea id="photoCommentTextBox" cols="40" rows="7" style="resize:none">Enter your comments here...	</textarea><br/>
+		<textarea id="photoCommentTextBox" cols="40" rows="7" style="resize:none">'.Yii::t('layout', 'Enter your comments here...').'</textarea><br/>
 		<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
 		<input type="button" id="deleteCommentButton" value="Delete Comment" />	 
 	</div>';
@@ -132,7 +133,7 @@
 	    'id'=>'messageDialog',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Message'),
+	        'title'=>Yii::t('layout', 'Message'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -157,7 +158,7 @@
 	    'id'=>'confirmationDialog',
 		// additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Confirmation'),
+	        'title'=>Yii::t('layout', 'Confirmation'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -179,7 +180,7 @@
 					<div id='content'>	
  							<?php 
  										echo CHtml::link('<div id="logo"></div>', '#', array(
-    										'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>'Click here to learn about traceper',
+    										'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
 										));									
 							?>		
 							<?php if (Yii::app()->user->isGuest == true) { ?>									 						
@@ -187,7 +188,7 @@
 		 								<?php 	
 											$this->widget('zii.widgets.jui.CJuiButton', array(
 															'name'=>'login',
-															'caption'=>'Login',
+															'caption'=>Yii::t('layout', 'Login'),
 															'id'=>'showLoginWindow',											
 														    'onclick'=>'function(){ '.
 																			CHtml::ajax(
@@ -201,7 +202,7 @@
 		 								
 											$this->widget('zii.widgets.jui.CJuiButton', array(
 															'name'=>'register',
-															'caption'=>'Register',
+															'caption'=>Yii::t('layout', 'Register'),
 															'id'=>'showRegisterWindow',											
 														    'onclick'=>'function(){ '.
 																			CHtml::ajax(
@@ -226,8 +227,8 @@
 	 											}  ?>>
 	 							
 	 						
-								<ul id='userarea'><li id="username" onclick="TRACKER.trackUser(<?php echo $userId; ?>)"><?php if (Yii::app()->user->isGuest == false){ 
-																				echo Yii::app()->user->name; 
+								<ul id='userarea'><li id="username" onclick="TRACKER.trackUser(<?php echo $userId; ?>)" class="vtip" title="<?php echo Yii::t('layout', 'See your position on the map'); ?>"><?php if (Yii::app()->user->isGuest == false){ 
+																				echo Yii::app()->user->name;
 																			}?>
 												 </li>
 	 							</ul>							
@@ -242,7 +243,7 @@
  											'update'=> '#changePasswordWindow',
 										),
 										array(
-											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>'Change Password')); 
+											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'))); 
 
  									echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
 	 													<img src="images/invite.png"  /><div></div>
@@ -252,7 +253,7 @@
  											'update'=> '#inviteUsersWindow',
 										),
 										array(
-											'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>'Invite Friends'));										
+											'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends')));										
 									
 									echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
 	 													<img src="images/friends.png"  /><div></div>
@@ -262,7 +263,7 @@
  											'update'=> '#friendRequestsWindow',
 										),
 										array(
-											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>'Friend Requests'));
+											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Friendship Requests')));
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
 	 													<img src="images/createGroup.png"  /><div></div>
@@ -272,7 +273,7 @@
  											'update'=> '#createGroupWindow',
 										),
 										array(
-											'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>'Create New Group'));										
+											'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')));										
 									
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
@@ -283,7 +284,7 @@
  											'update'=> '#registerGPSTrackerWindow',
 										),
 										array(
-											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>'Register GPS Tracker'));
+											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
 											
  									echo CHtml::link('<div  class="userOperations" id="geoFence">	 			
 	 													<img src="images/geoFence.png"  /><div></div>		
@@ -292,12 +293,12 @@
     										var polygon = mapOperator.initializePolygon();    										    													    								  
     										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
     										var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,document.getElementById("geoFence"));    					
-    										return false;', 'class'=>'vtip', 'title'=>'Geo-Fence',
+    										return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Create Geo-Fence'),
 										));
 										
 									echo CHtml::link('<div  class="userOperations" id="signout">	 			
 	 													<img src="images/signout.png"  /><div></div>		
-	 												 </div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>'Sign Out')); 																			
+	 												 </div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out'))); 																			
 	 							?>
 	 						</div>
 	 						
@@ -308,11 +309,11 @@
 								    	{
 											$this->widget('zii.widgets.jui.CJuiTabs', array(
 											    'tabs' => array(
-													'Users' => array('ajax' => $this->createUrl('users/getFriendList'), 
+													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
 																	 'id'=>'users_tab'),
-											        'Photos' => array('ajax' => $this->createUrl('image/getList'), 
+											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('image/getList'), 
 											        				  'id'=>'photos_tab'),
-											        'Groups' => array('ajax' => $this->createUrl('groups/getGroupList'), 
+											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'), 
 											        				  'id'=>'groups_tab'),											
 											    ),
 											    'id'=>"tab_view",

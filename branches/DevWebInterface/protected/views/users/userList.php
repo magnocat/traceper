@@ -15,7 +15,7 @@ if ($dataProvider != null) {
 	$addAsFriendQuestion = "Do you want to add this user as a friend?";
 	if ($isFriendRequestList == true) {
 		$deleteFrienshipQuestion = "Do you want to reject this user's friend request?";
-		$emptyText = "There is no friend requests found";
+		$emptyText = "There is no friendship requests found";
 	}
 	else if ($isSearchResult == true){
 		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;

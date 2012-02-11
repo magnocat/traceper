@@ -8,8 +8,10 @@
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'Traceper',
-	'sourceLanguage'=>'en',
+	'sourceLanguage'=>'xyz', //It is a trick to be able to use abbreviation for long strings in both real source and 
+							 //target languages, since the translation is not performed when source and target languases are same
 	'language'=>'tr',
+	//'language'=>'en',
 
 	// preloading 'log' component
 	'preload'=>array('log'),
