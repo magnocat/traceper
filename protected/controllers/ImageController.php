@@ -232,9 +232,9 @@ class ImageController extends Controller
 					
 					$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
-									(userId, latitude, longitude, altitude, uploadtime, publicData, description)
+									(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
 									VALUES(%d, %s, %s, %s, NOW(), %d, "%s")', 
-									Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
+									0/*Image*/, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
 					$result = "Unknown Error";
 					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 					if ($effectedRows == 1)
