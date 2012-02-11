@@ -112,11 +112,11 @@ CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `owner` int(10) unsigned NOT NULL,
-  `description` varchar(500) NOT NULL DEFAULT '',
+  `description` varchar(500) DEFAULT NULL,
   `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=34 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
 
 -- --------------------------------------------------------
 
@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS `traceper_status_messages` (
 
 CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `fileType` tinyint(4) NOT NULL,
   `userId` int(11) unsigned NOT NULL,
   `latitude` decimal(8,6) NOT NULL,
   `longitude` decimal(9,6) NOT NULL,
@@ -154,19 +155,19 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   KEY `publicData` (`publicData`),
   KEY `userId` (`userId`),
   KEY `descriptioon` (`description`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
 
 --
 -- Dumping data for table `traceper_upload`
 --
 
-INSERT INTO `traceper_upload` (`Id`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`) VALUES
-(7, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, ''),
-(10, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, ''),
-(11, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, ''),
-(12, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, ''),
-(13, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, ''),
-(14, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj');
+INSERT INTO `traceper_upload` (`Id`, `fileType`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`) VALUES
+(7, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, ''),
+(10, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, ''),
+(11, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, ''),
+(12, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, ''),
+(13, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, ''),
+(14, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj');
 
 -- --------------------------------------------------------
 

@@ -5,15 +5,17 @@
  *
  * The followings are the available columns in table 'traceper_upload':
  * @property integer $Id
- * @property integer $userId
+ * @property integer $fileType
+ * @property string $userId
  * @property string $latitude
  * @property string $longitude
  * @property string $altitude
  * @property string $uploadTime
  * @property integer $publicData
+ * @property string $description
  *
  * The followings are the available model relations:
- * @property TraceperFriends $user
+ * @property TraceperUsers $user
  */
 class Upload extends CActiveRecord
 {
@@ -42,14 +44,16 @@ class Upload extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('userId, latitude, longitude, altitude, uploadTime', 'required'),
-			array('userId, publicData', 'numerical', 'integerOnly'=>true),
+			array('fileType, userId, latitude, longitude, altitude, uploadTime', 'required'),
+			array('fileType, publicData', 'numerical', 'integerOnly'=>true),
+			array('userId', 'length', 'max'=>11),
 			array('latitude', 'length', 'max'=>8),
 			array('longitude', 'length', 'max'=>9),
 			array('altitude', 'length', 'max'=>15),
+			array('description', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, userId, latitude, longitude, altitude, uploadTime, publicData', 'safe', 'on'=>'search'),
+			array('Id, fileType, userId, latitude, longitude, altitude, uploadTime, publicData, description', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -61,7 +65,7 @@ class Upload extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'user' => array(self::BELONGS_TO, 'Users', 'userId'),
+			'user' => array(self::BELONGS_TO, 'TraceperUsers', 'userId'),
 		);
 	}
 
@@ -72,12 +76,14 @@ class Upload extends CActiveRecord
 	{
 		return array(
 			'Id' => 'ID',
+			'fileType' => 'File Type',
 			'userId' => 'User',
 			'latitude' => 'Latitude',
 			'longitude' => 'Longitude',
 			'altitude' => 'Altitude',
 			'uploadTime' => 'Upload Time',
 			'publicData' => 'Public Data',
+			'description' => 'Description',
 		);
 	}
 
@@ -93,12 +99,14 @@ class Upload extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('Id',$this->Id);
-		$criteria->compare('userId',$this->userId);
+		$criteria->compare('fileType',$this->fileType);
+		$criteria->compare('userId',$this->userId,true);
 		$criteria->compare('latitude',$this->latitude,true);
 		$criteria->compare('longitude',$this->longitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
 		$criteria->compare('uploadTime',$this->uploadTime,true);
 		$criteria->compare('publicData',$this->publicData);
+		$criteria->compare('description',$this->description,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
