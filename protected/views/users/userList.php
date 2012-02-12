@@ -94,7 +94,8 @@ if ($dataProvider != null) {
 		 								". CHtml::ajax(
 											array(
 												'url'=>Yii::app()->createUrl('geofence/CreateGeofence'),
-												'data'=> array('point1Latitude'=>1,
+												'data'=> array('name'=>'1',
+																'point1Latitude'=>1,
 																'point1Longitude'=>1,
 																'point2Latitude'=>2,
 																'point2Longitude'=>2,
