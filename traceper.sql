@@ -66,12 +66,14 @@ INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend1Visibility`, `friend2`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `traceper_geofence`
+-- Tablo yap?s?: `traceper_geofence`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_geofence` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,  
+  `description` varchar(500) NOT NULL DEFAULT '',
   `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
   `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
   `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
@@ -325,17 +327,16 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapýsý `traceper_user_privacy_geofence_relation`
+-- Tablo için tablo yapýsý `traceper_geofence_user_relation`
 --
 
-CREATE TABLE IF NOT EXISTS `traceper_user_privacy_geofence_relation` (
+CREATE TABLE IF NOT EXISTS `traceper_geofence_user_relation` (
   `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `geofenceOwner` int(11) NOT NULL,
-  `userId` int(10) unsigned NOT NULL,
-  `geofenceId` int(10) unsigned NOT NULL,
+  `geofenceId` int(11) unsigned NOT NULL,
+  `userId` int(11) unsigned NOT NULL,  
+  `status` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `userIdGeofenceId` (`userId`,`geofenceId`),
-  UNIQUE KEY `geofenceOwnerId` (`geofenceOwner`,`userId`),
+  UNIQUE KEY `geofenceUserId` (`geofenceId`,`userId`),  
   KEY `userId` (`userId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 

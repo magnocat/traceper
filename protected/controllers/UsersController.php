@@ -40,7 +40,7 @@ class UsersController extends Controller
     {
         return array(
         	array('deny',
-                'actions'=>array('addAsFriend', 'approveFriendShip', 'createGeoFence', 
+                'actions'=>array('addAsFriend', 'approveFriendShip', 
                 				 'deleteFriendShip','getFriendRequestList',
         						 'getUserPastPointsXML', 'getUserListXML', 'search',
         						 'takeMyLocation', 'getUserInfo'),
@@ -467,41 +467,6 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
-
-	public function actionCreateGeofence() {
-		$fence=new Geofence;
-		$result = "Missing parameter";
-		if (isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
-		&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
-		&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
-		{
-			$point1Lat = (float) $_REQUEST['point1Latitude'];
-			$point1Long = (float) $_REQUEST['point1Longitude'];
-			$point2Lat = (float) $_REQUEST['point2Latitude'];
-			$point2Long = (float) $_REQUEST['point2Longitude'];
-			$point3Lat = (float) $_REQUEST['point3Latitude'];
-			$point3Long = (float) $_REQUEST['point3Longitude'];
-
-			$fence->point1Latitude = $point1Lat;
-			$fence->point1Longitude = $point1Long;
-			$fence->point2Latitude = $point2Lat;
-			$fence->point2Longitude = $point2Long;
-			$fence->point3Latitude = $point3Lat;
-			$fence->point3Longitude = $point3Long;
-
-			$fence->userId = Yii::app()->user->id;
-
-			$result = "Error in operation";
-			if ($fence->save()) {
-				$result = 1;
-			}
-
-			echo CJSON::encode(array(
-                                         	"result"=>$result,
-			));
-		}
-	}
-
 
 	public function actionDeleteFriendShip(){
 		$result = 'Missing Data';
