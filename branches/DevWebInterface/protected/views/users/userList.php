@@ -102,18 +102,18 @@ if ($dataProvider != null) {
 																'point3Longitude'=>3),
 												'success'=> 'function(result) { 	
 															 	try {
-															 		mapOperator.closeConfirmationDialog();
+															 		TRACKER.closeConfirmationDialog();
 																	var obj = jQuery.parseJSON(result);
 																	if (obj.result && obj.result == "1") 
 																	{
 																	}
 																	else 
 																	{
-																		mapOperator.showMessageDialog("Sorry,an error occured in operation1");
+																		TRACKER.showMessageDialog("Sorry,an error occured in operation1");
 																	}
 																}
 																catch(ex) {
-																	mapOperator.showMessageDialog("Sorry,an error occured in operation2");
+																	TRACKER.showMessageDialog("Sorry,an error occured in operation2");
 																}
 															}',
 											)).
