@@ -70,18 +70,18 @@ class ImageController extends Controller
 			
 			$sqlCount = 'SELECT count(*)
 						 FROM '. Upload::model()->tableName() . ' u 
-						 WHERE userId in ('. $friendList .') 
+						 WHERE (fileType = 0) AND (userId in ('. $friendList .') 
 						 		OR userId = '. Yii::app()->user->id .' OR 
-						 		publicData = 1';
+						 		publicData = 1)';
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId
 						 FROM '. Upload::model()->tableName() . ' u 
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-						 WHERE userId in ('. $friendList .') OR 
+						 WHERE (fileType = 0) AND (userId in ('. $friendList .') OR 
 						 	   userId = '. Yii::app()->user->id .' OR 
-						 	   publicData = 1
+						 	   publicData = 1)
 						  ORDER BY u.Id DESC';
 
 	
@@ -122,7 +122,7 @@ class ImageController extends Controller
 				$sqlCount = 'SELECT count(*)
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE (u.userId in ('. $friendList .') 
+					 WHERE (fileType = 0) AND (u.userId in ('. $friendList .') 
 					 			OR 
 						 		u.userId = '. Yii::app()->user->id .'
 						 		OR
@@ -137,7 +137,7 @@ class ImageController extends Controller
 				$sql ='SELECT u.Id as id, u.description, s.realname, s.Id as userId
 					 FROM '. Upload::model()->tableName() . ' u
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-					 WHERE (u.userId in ('. $friendList .') 
+					 WHERE (fileType = 0) AND (u.userId in ('. $friendList .') 
 					 			OR 
 						 		u.userId = '. Yii::app()->user->id .' 
 						 		OR
@@ -311,7 +311,7 @@ class ImageController extends Controller
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 								 FROM '. Upload::model()->tableName() . ' u 
-								 WHERE (userId in ('. $friendList .') 
+								 WHERE (fileType = 0) AND (userId in ('. $friendList .') 
 								        OR userId = '. Yii::app()->user->id .'
 								        OR publicData = 1)
 								        AND unix_timestamp(u.uploadTime) >= '. $time;
@@ -321,7 +321,7 @@ class ImageController extends Controller
 					$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
 								 FROM '. Upload::model()->tableName() . ' u 
 								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-								 WHERE (userId in ('. $friendList .') 
+								 WHERE (fileType = 0) AND (userId in ('. $friendList .') 
 								 		OR userId = '. Yii::app()->user->id .'
 								 		OR publicData = 1)
 								 		AND unix_timestamp(u.uploadTime) >= '. $time . '
@@ -338,18 +338,18 @@ class ImageController extends Controller
 			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 					 FROM '. Upload::model()->tableName() . ' u 
-					 WHERE userId in ('. $friendList .') OR 
+					 WHERE (fileType = 0) AND (userId in ('. $friendList .') OR 
 					 	   userId = '. Yii::app()->user->id .' OR
-					 	   publicData = 1';
+					 	   publicData = 1)';
 
 			$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 
 			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
 					 FROM '. Upload::model()->tableName() . ' u 
 					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-					 WHERE userId in ('. $friendList .') OR 
+					 WHERE (fileType = 0) AND (userId in ('. $friendList .') OR 
 					 	   userId = '. Yii::app()->user->id .' OR
-					 	   publicData = 1
+					 	   publicData = 1)
 					 ORDER BY u.Id DESC
 					 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
 
