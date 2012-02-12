@@ -39,31 +39,41 @@ class GeofenceController extends Controller
 	}
 	
 
+	
 	public function actionCreateGeofence() {
-		$fence=new Geofence;
+		$geofence=new Geofence;
 		$result = "Missing parameter";
-		if (isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
+		if (isset($_REQUEST['name']) && isset($_REQUEST['name'])
+		&& isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
 		&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
 		&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
 		{
+			$name = $_REQUEST['name'];			
 			$point1Lat = (float) $_REQUEST['point1Latitude'];
 			$point1Long = (float) $_REQUEST['point1Longitude'];
 			$point2Lat = (float) $_REQUEST['point2Latitude'];
 			$point2Long = (float) $_REQUEST['point2Longitude'];
 			$point3Lat = (float) $_REQUEST['point3Latitude'];
 			$point3Long = (float) $_REQUEST['point3Longitude'];
-
-			$fence->point1Latitude = $point1Lat;
-			$fence->point1Longitude = $point1Long;
-			$fence->point2Latitude = $point2Lat;
-			$fence->point2Longitude = $point2Long;
-			$fence->point3Latitude = $point3Lat;
-			$fence->point3Longitude = $point3Long;
-
-			$fence->userId = Yii::app()->user->id;
+			
+			$geofence->name = $name;			
+			$geofence->point1Latitude = $point1Lat;
+			$geofence->point1Longitude = $point1Long;
+			$geofence->point2Latitude = $point2Lat;
+			$geofence->point2Longitude = $point2Long;
+			$geofence->point3Latitude = $point3Lat;
+			$geofence->point3Longitude = $point3Long;
+			
+			if (isset($_REQUEST['description']) && isset($_REQUEST['description']))
+			{
+				$description = $_REQUEST['description'];
+				$geofence->description = $description;
+			}
+			
+			$geofence->userId = Yii::app()->user->id;
 
 			$result = "Error in operation";
-			if ($fence->save()) {
+			if ($geofence->save()) {
 				$result = 1;
 			}
 
@@ -74,11 +84,6 @@ class GeofenceController extends Controller
 	}
 	
 	
-/**
-	 * Updates user-Geofence relations. 
-	 * Inserts the selected friend into the viewer of geofence or remove the selected friend
-	 * from the viewer of geofence
-	 */
 	public function actionUpdateGeofencePrivacy()
 	{
 		$model = new GeofenceSettingsForm;
@@ -94,7 +99,7 @@ class GeofenceController extends Controller
 		{
 			$friendId = (int)$_REQUEST['friendId'];			
 			//Take all the user-group relation rows that the user's friend added to
-			$relationRowsSelectedFriendBelongsTo = UserPrivacyGeofenceRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
+			$relationRowsSelectedFriendBelongsTo = GeofenceUserRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
 			
 			//Get only the group ID fields into $selected_users from the obtained rows
 			foreach($relationRowsSelectedFriendBelongsTo as $relationRow)
@@ -111,19 +116,7 @@ class GeofenceController extends Controller
 			//$model->groupStatusArray = $_POST['GroupSettingsForm']['groupStatusArray'];
 			
 			if($model->validate()) 
-			{
-//				if(!empty($model->groupStatusArray)) //Check empty() in order to avoid error in foreach
-//				{
-//					echo 'Selecteds: ';
-//					
-//					foreach($model->groupStatusArray as $selectedItem)
-//					{
-//						echo $selectedItem.' ';
-//					}
-//
-//					echo '</br>';
-//				}
-				
+			{				
 				//We know the selected groups from $model->groupStatusArray, but not know the unselected ones
 				//So construct the unselected groups using $geofencesOfUser and $model->groupStatusArray 
 				foreach($geofencesOfUser as $selectedOwnerGroup) //Check for all of the user's groups
@@ -152,20 +145,7 @@ class GeofenceController extends Controller
 						$unselected_users[] = $selectedOwnerGroup->id;
 					}
 				}
-
-//				if(!empty($unselected_users)) //Check empty() in order to avoid error in foreach
-//				{
-//					echo 'UnSelecteds: ';
-//					
-//					foreach($unselected_users as $unselectedItem)
-//					{
-//						echo $unselectedItem.' ';
-//					}	
-//
-//					echo '</br>';
-//				}				
-								
-				
+													
 				//Check for privacy groups
 				if(count($model->geofenceStatusArray) > 1)
 				{
@@ -179,7 +159,7 @@ class GeofenceController extends Controller
 					//Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
 					foreach($unselected_users as $unselectedFriendGroup) //Check for all of the checked groups
 					{
-						$relationQueryResult = UserPrivacyGeofenceRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId', 
+						$relationQueryResult = GeofenceUserRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId', 
 						                                                     'params'=>array(':userId'=>$friendId, 
 						                                                                     ':geofenceId'=>$unselectedFriendGroup
 						                                                                     )
@@ -215,7 +195,7 @@ class GeofenceController extends Controller
 					{
 						foreach($model->geofenceStatusArray as $selectedFriendGroup) //Check for all of the checked groups
 						{
-							$relationQueryResult = UserPrivacyGeofenceRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId', 
+							$relationQueryResult = GeofenceUserRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId', 
 							                                                     'params'=>array(':userId'=>$friendId, 
 							                                                                     ':geofenceId'=>$selectedFriendGroup
 							                                                                     )
@@ -230,14 +210,14 @@ class GeofenceController extends Controller
 						    }
 						    else
 						    {
-								$userPrivacyGeofenceRelation = new UserPrivacyGeofenceRelation;
-								$userPrivacyGeofenceRelation->userId = $friendId;
-								$userPrivacyGeofenceRelation->geofenceId = $selectedFriendGroup;
-								$userPrivacyGeofenceRelation->geofenceOwner = Yii::app()->user->id;
+								$geofenceUserRelation = new GeofenceUserRelation;
+								$geofenceUserRelation->userId = $friendId;
+								$geofenceUserRelation->geofenceId = $selectedFriendGroup;
+								$geofenceUserRelation->geofenceOwner = Yii::app()->user->id;
 	
 								try
 								{
-									if($userPrivacyGeofenceRelation->save()) // save the change to database
+									if($geofenceUserRelation->save()) // save the change to database
 									{
 										//Relation added to the traceper_user_group_relation table
 										
@@ -291,6 +271,5 @@ class GeofenceController extends Controller
 		
 		//$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$geofencesOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
 		$this->renderPartial('geofenceSettings',array('model'=>$model, 'geofencesOfUser'=>$geofencesOfUser, 'friendId'=>$friendId), false, $processOutput);
-	}
-	
+	}		
 }

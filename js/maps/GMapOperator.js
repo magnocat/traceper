@@ -471,15 +471,6 @@ function MapOperator() {
 		//buttons.OK = callback;
 		$("#confirmationDialog").dialog("option","buttons",buttons);
 		$("#confirmationDialog").dialog("open");	
-	}
-	
-	MAP_OPERATOR.closeConfirmationDialog = function(){
-		$("#confirmationDialog").dialog("close");
-	}
-	
-	MAP_OPERATOR.showMessageDialog = function(message) {
-		$("#messageDialogText").html(message); 
-		$("#messageDialog").dialog("open"); 
-	}
+	}		
 }
 

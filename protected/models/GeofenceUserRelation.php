@@ -1,19 +1,19 @@
 <?php
 
 /**
- * This is the model class for table "traceper_user_privacy_geofence_relation".
+ * This is the model class for table "traceper_geofence_user_relation".
  *
- * The followings are the available columns in table 'traceper_user_privacy_geofence_relation':
+ * The followings are the available columns in table 'traceper_geofence_user_relation':
  * @property string $Id
- * @property integer $geofenceOwner
- * @property string $userId
  * @property string $geofenceId
+ * @property string $userId
+ * @property integer $status
  */
-class UserPrivacyGeofenceRelation extends CActiveRecord
+class GeofenceUserRelation extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return UserPrivacyGeofenceRelation the static model class
+	 * @return GeofenceUserRelation the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -25,7 +25,7 @@ class UserPrivacyGeofenceRelation extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'traceper_user_privacy_geofence_relation';
+		return 'traceper_geofence_user_relation';
 	}
 
 	/**
@@ -36,12 +36,12 @@ class UserPrivacyGeofenceRelation extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('geofenceOwner, userId, geofenceId', 'required'),
-			array('geofenceOwner', 'numerical', 'integerOnly'=>true),
-			array('userId, geofenceId', 'length', 'max'=>10),
+			array('geofenceId, userId', 'required'),
+			array('status', 'numerical', 'integerOnly'=>true),
+			array('geofenceId, userId', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, geofenceOwner, userId, geofenceId', 'safe', 'on'=>'search'),
+			array('Id, geofenceId, userId, status', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,9 +63,9 @@ class UserPrivacyGeofenceRelation extends CActiveRecord
 	{
 		return array(
 			'Id' => 'ID',
-			'geofenceOwner' => 'Geofence Owner',
-			'userId' => 'User',
 			'geofenceId' => 'Geofence',
+			'userId' => 'User',
+			'status' => 'Status',
 		);
 	}
 
@@ -81,9 +81,9 @@ class UserPrivacyGeofenceRelation extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('Id',$this->Id,true);
-		$criteria->compare('geofenceOwner',$this->geofenceOwner);
-		$criteria->compare('userId',$this->userId,true);
 		$criteria->compare('geofenceId',$this->geofenceId,true);
+		$criteria->compare('userId',$this->userId,true);
+		$criteria->compare('status',$this->status);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
