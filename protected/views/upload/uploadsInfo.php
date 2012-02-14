@@ -13,7 +13,7 @@
 		<div class="row">
 			<?php	echo $form->textField($model,'keyword', array('class'=>'searchBox')); ?>
 	
-			<?php  echo CHtml::ajaxSubmitButton('Search', $this->createUrl('upload/search'), 
+			<?php  echo CHtml::ajaxSubmitButton('Search', $this->createUrl('upload/search', array('fileType'=>$fileType)), 
 												array(
 													'complete'=> 'function() { $("#uploadSearchResults").dialog("open"); return false;}',
 													'update'=> '#uploadSearchResults',

@@ -222,7 +222,9 @@ if ($dataProvider != null) {
 					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
 					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
 													 TRACKER.showConfirmationDialog(\"'.$addAsFriendQuestion.'\", addasFriend); 
-													 "									
+													 ",
+										  "class"=>"vtip", 
+										  "title"=>"Add as Friend"													 									
 					  					)
 					 				)
 					 			: "";',
