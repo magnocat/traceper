@@ -33,7 +33,7 @@ class GroupsController extends Controller
     	//TODO: actionUpload can be added list below after mobile app is able to login the framework
         return array(
         	array('deny',
-                'actions'=>array('createGroup', 'updateGroup', 'addUserToGroup'),
+                'actions'=>array('createGroup', 'updateGroup', 'getGroupList', 'getGroupMembers', 'deleteGroup', 'deleteGroupMember', 'setPrivacyRights'),
         		'users'=>array('?'),
             )
         );
@@ -417,6 +417,7 @@ class GroupsController extends Controller
 		//First delete all of the relations those belong to the selected group
 		UserPrivacyGroupRelation::model()->deleteAll('groupId=:groupId', array(':groupId'=>$groupId));		
 		
+		//Since a group can be deleted only by its owner, check also the group owner
 		$result = PrivacyGroups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId', 
 		                                                     'params'=>array(':groupId'=>$groupId, 
 		                                                                     ':ownerId'=>Yii::app()->user->id

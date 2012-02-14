@@ -111,7 +111,7 @@ class UploadController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true), false, true);
+		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType), false, true);
 	}
 
 	public function actionSearch() {
@@ -121,11 +121,13 @@ class UploadController extends Controller
 		if(isset($_REQUEST['SearchForm']))
 		{
 			$model->attributes = $_REQUEST['SearchForm'];
-			if ($model->validate()) {
-				if (isset($_GET['fileType']) && $_GET['fileType'] != NULL)
+			
+			if (isset($_GET['fileType']) && $_GET['fileType'] != NULL)
+			{
+				$fileType = $_GET['fileType'];
+				
+				if ($model->validate()) 
 				{
-					$fileType = $_GET['fileType'];
-					
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					
 					$sqlCount = 'SELECT count(*)
@@ -143,7 +145,7 @@ class UploadController extends Controller
 	
 					$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
-					$sql ='SELECT u.Id as id, u.description, s.realname, s.Id as userId
+					$sql ='SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
 						 FROM '. Upload::model()->tableName() . ' u
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
 						 WHERE (fileType = '.$fileType.') AND (u.userId in ('. $friendList .') 
@@ -155,7 +157,7 @@ class UploadController extends Controller
 						 	   (s.realname like "%'. $model->keyword .'%"
 						 			OR
 						 	   		u.description like "%'. $model->keyword.'%")';
-	
+
 					$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,
 														    'sort'=>array(
@@ -167,18 +169,18 @@ class UploadController extends Controller
 														        'pageSize'=>Yii::app()->params->uploadCountInOnePage,
 																'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
 															),
-									));							
-				}
-				else
-				{
-					$dataProvider = null;
-				}						
+									));									
+				}				
 			}
+			else
+			{
+				$dataProvider = null;
+			}			
 		}
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('searchUploadResults', array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('searchUploadResults', array('model'=>$model, 'dataProvider'=>$dataProvider, 'fileType'=>$fileType), false, true);
 	}
 
 	public function actionGet()
@@ -201,7 +203,7 @@ class UploadController extends Controller
 				$thumb = true;
 			}
 			if ($thumb == true) {
-				$fileName = $this->getFileName($uploadId, $fileType, true);;
+				$fileName = $this->getFileName($uploadId, $fileType, true);
 				if (file_exists($fileName) === false) {
 					$this->createThumb($uploadId, $fileType);
 				}
@@ -209,10 +211,18 @@ class UploadController extends Controller
 
 		}
 		else {
-			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'images/image_missing.png';
+			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';
 		}
-		header('Content-Type: image/jpeg;');
-		echo file_get_contents($fileName);
+		
+		if($fileType == 0) //Image
+		{
+			header('Content-Type: image/jpeg;');
+			echo file_get_contents($fileName);		
+		}
+		else 
+		{
+		
+		}
 
 		Yii::app()->end();
 	}
@@ -274,9 +284,11 @@ class UploadController extends Controller
 
 	private function getFileName($uploadId, $fileType, $thumb = false)
 	{
-		$fileName = Yii::app()->params->uploadPath. '/' . $uploadId . ($fileType == 0)?'.jpg':'.flv';
+		$fileExtension = ($fileType == 0)?'.jpg':'.flv';
+		
+		$fileName = Yii::app()->params->uploadPath. '/' . $uploadId . $fileExtension;
 		if ($thumb == true) {
-			$fileName = Yii::app()->params->uploadPath . '/' . $uploadId . self::thumbSuffix .($fileType == 0)?'.jpg':'.flv';
+			$fileName = Yii::app()->params->uploadPath . '/' . $uploadId . self::thumbSuffix .$fileExtension;
 		}
 		return $fileName;
 	}
@@ -423,9 +435,6 @@ class UploadController extends Controller
 
 		return $out;
 	}
-
-
-
 
 	private function getUploadXMLItem($row)
 	{
