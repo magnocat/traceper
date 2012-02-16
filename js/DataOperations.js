@@ -263,7 +263,7 @@ function processImageXML(MAP, xml){
 	var list = "";
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
-	$(xml).find("page").find("image").each(function(){
+	$(xml).find("page").find("upload").each(function(){
 		var image = $(this);
 		var imageId = $(image).attr('id');
 		var imageURL =  decodeURIComponent($(image).attr('url'));
