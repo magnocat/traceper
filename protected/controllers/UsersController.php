@@ -157,16 +157,24 @@ class UsersController extends Controller
 	
 	private function unsetFriendIdList() {
 		unset(Yii::app()->session['friendList']);
-		unset(Yii::app()->session['friendCount']);
 	}
 	
 	private function getFriendCount() {
-		if (isset(Yii::app()->session['friendCount'])== false) {
+		if (isset(Yii::app()->session['friendList'])== false) {
 			$this->getFriendIdList();
 		}
 		
 		return Yii::app()->session['friendCount'];
 	}
+	
+	private function getFriendArray() {
+		if (isset(Yii::app()->session['friendList'])== false) {
+			$this->getFriendIdList();
+		}
+		
+		return Yii::app()->session['friendArray'];
+	}
+	
 	
 	private function getFriendIdList() {
 	
@@ -190,6 +198,7 @@ class UsersController extends Controller
 			if (count($friends) > 0) {		
 				$result = implode(',', $friends);
 			}	
+			Yii::app()->session['friendArray'] = $friends;
 			Yii::app()->session['friendList'] = $result; 				    
 		}
 		
@@ -286,40 +295,21 @@ class UsersController extends Controller
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 			
 			$userId = (int) $_REQUEST['userId'];
-			if ($userId != Yii::app()->user->id) 
-			{
-				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
-							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
-							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
-							1 isFriend
-					FROM '. Friends::model()->tableName() . ' f 
-					LEFT JOIN ' . Users::model()->tableName() . ' u
-						ON u.Id = '. $userId .'
-					WHERE  (((friend1 = '. Yii::app()->user->id .' 
-							 	AND friend2 ='. $userId .')
-							 OR
-							 (friend2 = '. Yii::app()->user->id .' 
-							 	AND friend1 ='. $userId .')) 
-							AND 
-								status= 1
-							)
-							
-					LIMIT 1' ;
-			}
-			else {
-				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, 
-							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
-							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
-							1 isFriend
-					FROM '. Friends::model()->tableName() . ' f 
-					LEFT JOIN ' . Users::model()->tableName() . ' u
-						ON u.Id = '. $userId .'
-					WHERE  
-						u.Id = '. Yii::app()->user->id .'							
-					LIMIT 1' ;
 			
+			$friendArray = $this->getFriendArray(); 
+			$out = "No permission to get this user location";
+			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
+			{
+				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude,  
+							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+							1 isFriend
+					FROM ' . Users::model()->tableName() . ' u 
+					WHERE  u.Id = '. $userId .'							
+					LIMIT 1' ;
+				$out = $this-> prepareXML($sql, 1, 1, "userList");
 			}
-			$out = $this-> prepareXML($sql, 1, 1, "userList");
+			
 		}
 		
 		echo $out;
