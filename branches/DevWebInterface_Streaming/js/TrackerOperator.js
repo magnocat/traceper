@@ -257,7 +257,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 
 
-	this.showUploadWindow = function(uploadId){
+	this.showMediaWindow = function(uploadId){
 		if (typeof TRACKER.images[uploadId] == "undefined") {
 			TRACKER.getImageList(function(){
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');	
