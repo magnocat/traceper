@@ -21,8 +21,6 @@
 			</intent-filter>
 		</activity>	
 		
-		<activity android:name=".android.VideoController" android:screenOrientation="landscape" />	
-		
 		<activity android:name=".android.Register">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
