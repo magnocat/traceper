@@ -69,19 +69,20 @@ public class AppService extends Service implements IAppService{
 	 */
 	private ArrayList<Location> pendingLocations = new ArrayList<Location>();
 
-	private class Image {
+	private class UploadFile {
 		public byte[] image;
 		public boolean isPublic;
 		public String description;
-		public Image(byte[] image, boolean isPublic, String description) {
+		public UploadFile(byte[] data, boolean isPublic, String description) {
 			super();
-			this.image = image;
+			this.image = data;
 			this.isPublic = isPublic;
 			this.description = description;
 		}
 	}
 
-	private Image pendingImage = null;
+	private UploadFile pendingImage = null;
+	private UploadFile pendingVideo = null;
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -298,7 +299,7 @@ public class AppService extends Service implements IAppService{
 		if (lastSentLocation == null || 
 				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
 			sendLocationNow();
-			pendingImage = new Image(picture, publicData, description);
+			pendingImage = new UploadFile(picture, publicData, description);
 			return false;
 		}		
 
@@ -471,16 +472,17 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "r";
 		name[1] = "latitude";
 		name[2] = "longitude";
 		name[3] = "altitude";
 		name[4] = "publicData";
 		name[5] = "description";
+		name[6] = "fileType";
 
-		value[0] = "image/upload";
+		value[0] = "upload/upload";
 		value[1] = String.valueOf(latitude);
 		value[2] = String.valueOf(longitude);
 		value[3] = String.valueOf(altitude);
@@ -490,9 +492,10 @@ public class AppService extends Service implements IAppService{
 		} 
 		value[4] = String.valueOf(publicDataInt);
 		value[5] = description;
+		value[6] = "0";
 
 		String img = new String(image);
-		String httpRes = this.sendHttpRequest(name, value, "image", image);
+		String httpRes = this.sendHttpRequest(name, value, "upload", image);
 		Log.i("img length: ", String.valueOf(img.length()) );
 		String result = getString(R.string.unknown_error_occured);
 
@@ -552,7 +555,7 @@ public class AppService extends Service implements IAppService{
 			
 			if (filename != null && file != null){
 				ds.writeBytes(twoHyphens + boundary + end);
-				ds.writeBytes("Content-Disposition: form-data; name=\"image\";filename=\"" + filename +"\"" + end + end);
+				ds.writeBytes("Content-Disposition: form-data; name=\""+ filename +"\";filename=\"" + filename +"\"" + end + end);
 				ds.write(file);
 				ds.writeBytes(end);
 			}			
@@ -881,11 +884,90 @@ public class AppService extends Service implements IAppService{
 				uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
 				pendingImage = null;
 			}
+			if (pendingVideo != null){
+				uploadVideo(pendingVideo.image, pendingVideo.isPublic, pendingVideo.description);
+				pendingVideo = null;
+			}
 		}
 		if (connected == false || result.equals("1") == false){
 			pendingLocations.add(loc);
 		}
 
+	}
+
+	@Override
+	public boolean uploadVideo(byte[] video, boolean publicData, String description) {
+		if (lastSentLocation == null || 
+				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+			sendLocationNow();
+			pendingVideo = new UploadFile(video, publicData, description);
+			return false;
+		}		
+
+		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+		notification.setLatestEventInfo(this,
+				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
+
+		mManager.notify(NOTIFICATION_ID , notification);
+		String result = sendVideo(video, publicData, description, lastSentLocation);
+		String notificationText = getString(R.string.upload_failed);
+		boolean operationResult = false;
+		if (result.equals("1")) {
+			notificationText = getString(R.string.upload_succesfull);
+			operationResult = true;
+		}
+		notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
+		mManager.notify(NOTIFICATION_ID, notification);
+		return operationResult;
+	}
+
+	private String sendVideo(byte[] video, boolean publicData, String description, Location loc) {
+		double latitude = 0;
+		double longitude = 0;
+		double altitude = 0;
+		if (loc != null) {
+			latitude = loc.getLatitude();
+			longitude = loc.getLongitude();
+			altitude = loc.getAltitude();
+		}
+		String params;
+		//		try {
+		String[] name = new String[7];
+		String[] value = new String[7];
+		name[0] = "r";
+		name[1] = "latitude";
+		name[2] = "longitude";
+		name[3] = "altitude";
+		name[4] = "publicData";
+		name[5] = "description";
+		name[6] = "fileType";
+
+		value[0] = "upload/upload";
+		value[1] = String.valueOf(latitude);
+		value[2] = String.valueOf(longitude);
+		value[3] = String.valueOf(altitude);
+		int publicDataInt = 0;
+		if (publicData == true) {
+			publicDataInt = 1; 
+		} 
+		value[4] = String.valueOf(publicDataInt);
+		value[5] = description;
+		value[6] = "1";
+		
+		String httpRes = this.sendHttpRequest(name, value, "upload", video);
+		String result = getString(R.string.unknown_error_occured);
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		//		int result = this.evaluateResult(httpRes);
+
+		return result;
 	}
 
 }

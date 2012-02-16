@@ -2,6 +2,9 @@ package com.traceper.android;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.app.Activity;
@@ -18,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -43,7 +47,7 @@ import com.traceper.android.services.AppService;
 
 public class CameraController extends Activity implements SurfaceHolder.Callback{
 
-	private Camera camera;
+	private Camera mCamera;
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private boolean isPreviewRunning;
@@ -57,7 +61,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private Button takePictureButton = null;
 	private NotificationManager mManager;
 	private static int NOTIFICATION_ID = 0;
-	private static final int DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC = 0;	
+	private static final int DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC = 0;
+	private Button recordVideoButton;
+	private MediaRecorder mMediaRecorder;
+	private String videoPath = "/sdcard/myvideo.mp4";
 
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
@@ -78,7 +85,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		}  
 	};
 
-
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {          
 			appService = ((AppService.IMBinder)service).getService();    
@@ -87,7 +93,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			appService = null;
 		}
 	};
-	private Button recordVideoButton;
+
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -104,6 +110,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		surfaceHolder = surfaceView.getHolder();
 		surfaceHolder.addCallback(this);
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		
+		mCamera = Camera.open();
 
 		takePictureButton = (Button) findViewById(R.id.takePictureButton);
 		takePictureButton.bringToFront();
@@ -111,7 +119,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 			public void onClick(View arg0) {
 				pictureTaken = true;
-				camera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);  
+				mCamera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);  
 				openOptionsMenu();
 
 			}
@@ -122,47 +130,81 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		recordVideoButton.bringToFront();
 		recordVideoButton.setOnClickListener(new View.OnClickListener() {			
 
+			private boolean recording = false;
+
 			public void onClick(View arg0) {
-				Intent i = new Intent(CameraController.this, VideoController.class);				
-				startActivity(i);
+				if(recording ){
+					mMediaRecorder.stop();  // stop the recording
+					releaseMediaRecorder(); // release the MediaRecorder object
+					mCamera.lock();
+					try {
+						mCamera.reconnect();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					recording = false;
+					recordVideoButton.setText("START");
+					uploadVideo();
+
+				}else{
+					if (prepareVideoRecorder()) {
+						// Camera is available and unlocked, MediaRecorder is prepared,
+						// now you can start recording
+						mMediaRecorder.start();
+						// inform the user that recording has started
+						recording = true;
+						//      new FileListener(videoPath);
+					} else {
+						// prepare didn't work, release the camera
+						releaseMediaRecorder();
+						// inform user
+					}
+					recordVideoButton.setText("STOP");
+				}
 				
-				finish();
+				
+//				Intent i = new Intent(CameraController.this, VideoController.class);				
+//				startActivity(i);
+//				
+//				finish();
 			}
 		});
-
-		
-
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		if (isPreviewRunning) {  
-			camera.stopPreview();  
+			mCamera.stopPreview();  
 		}  
 
 		try {
-			camera.setPreviewDisplay(holder);
+			mCamera.setPreviewDisplay(holder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
 
-		camera.startPreview(); 
+		mCamera.startPreview(); 
 
 		isPreviewRunning = true; 
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		camera = Camera.open();	
+		try {		
+			mCamera.setPreviewDisplay(holder);
+			mCamera.startPreview();
+		} catch (IOException e) {
 
+		}
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
-		camera.stopPreview();
 		isPreviewRunning = false;
-		camera.release();		
 	}
+	
+	
 
 	public boolean onCreateOptionsMenu(Menu menu){
 		boolean result  = super.onCreateOptionsMenu(menu);
@@ -202,7 +244,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			break;
 		case TAKE_ANOTHER_PHOTO:
 			pictureTaken = false;
-			camera.startPreview();  
+			mCamera.startPreview();  
 			break;
 		case BACK:
 			CameraController.this.finish();
@@ -218,7 +260,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		}  
 		else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {  
 			pictureTaken = true;
-			camera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);  
+			mCamera.takePicture(mShutterCallback, mPictureCallbackRaw, mPictureCallbackJpeg);  
 			this.openOptionsMenu();
 			return true;  
 		}  
@@ -234,6 +276,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	@Override
 	protected void onPause() {
 		unbindService(mConnection);
+		releaseMediaRecorder();       // if you are using MediaRecorder, release it first
+		releaseCamera(); 
 		super.onPause();
 	}
 
@@ -284,32 +328,90 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		Thread uploadThread = new Thread(){
 			@Override
 			public void run() {
-				
 				appService.uploadImage(picture, publicImage, description);
-				
-				/*
-				final String result = appService.sendImage(byteArrayOutputStream.toByteArray(), publicImage, description);
-				{
-					handler.post(new Runnable() {							
-						@Override
-						public void run() {
-							String str;
-							if (result.equals("1")) {
-								str = getString(R.string.upload_succesfull);
-							}
-							else {
-								str = getString(R.string.upload_failed);
-							}
-							notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), str, contentIntent);
-							mManager.notify(NOTIFICATION_ID, notification);
-						}
-					});
-				}
-				*/
-				super.run();
 			}
 		};
 		uploadThread.start();
+	}
+	
+	private boolean prepareVideoRecorder(){
+
+		mMediaRecorder = new MediaRecorder();
+
+		// Step 1: Unlock and set camera to MediaRecorder
+		mCamera.unlock();
+		mMediaRecorder.setCamera(mCamera);
+
+		// Step 2: Set sources
+		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+		// Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
+		//mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+
+
+		// Step 4: Set output file
+		mMediaRecorder.setOutputFile(videoPath);
+
+		// Step 5: Set the preview output
+		mMediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
+
+		// Step 6: Prepare configured MediaRecorder
+		try {
+			mMediaRecorder.prepare();
+		} catch (IllegalStateException e) {
+			releaseMediaRecorder();
+			return false;
+		} catch (IOException e) {
+			releaseMediaRecorder();
+			return false;
+		}
+		return true;
+	}
+
+
+	private void releaseMediaRecorder(){
+		if (mMediaRecorder != null) {
+			mMediaRecorder.reset();   // clear recorder configuration
+			mMediaRecorder.release(); // release the recorder object
+			mMediaRecorder = null;
+			mCamera.lock();           // lock camera for later use
+		}
+	}
+
+	private void releaseCamera(){
+		if (mCamera != null){
+			mCamera.release();        // release the camera for other applications
+			mCamera = null;
+		}
+	}
+	
+	private void uploadVideo() {
+		File file = new File(videoPath);
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(file);
+			final byte[] buffer = new byte[(int) file.length()];
+			fin.read(buffer);
+			fin.close();
+
+			Thread uploadThread = new Thread(){
+				@Override
+				public void run() {
+					appService.uploadVideo(buffer, false, "Video description");
+				}
+			};
+			uploadThread.start();
+		} 
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
+
 }
