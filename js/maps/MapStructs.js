@@ -27,6 +27,7 @@ MapStruct.MapMarker = function(){
 
 MapStruct.GeoFence = function(){
 	var geoFenceId;
+	var listener;
 	var polygon;
 	
 	for (var n in arguments[0]) { 

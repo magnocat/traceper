@@ -74,13 +74,14 @@ CREATE TABLE IF NOT EXISTS `traceper_geofence` (
   `userId` int(11) NOT NULL,
   `name` varchar(45) NOT NULL,  
   `description` varchar(500) NOT NULL DEFAULT '',
-  `point1Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point1Latitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
   `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point2Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point2Latitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
   `point2Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  `point3Latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `point3Latitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
   `point3Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `ownerHasUniqueGeofenceName` (`name`,`userId`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
