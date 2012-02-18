@@ -90,40 +90,7 @@ if ($dataProvider != null) {
 		 												CClientScript::POS_READY);									
 	}
 	
-	$createGeofenceJSFunction = "function createGeofence(){
-		 								". CHtml::ajax(
-											array(
-												'url'=>Yii::app()->createUrl('geofence/CreateGeofence'),
-												'data'=> array('name'=>'1',
-																'point1Latitude'=>1,
-																'point1Longitude'=>1,
-																'point2Latitude'=>2,
-																'point2Longitude'=>2,
-																'point3Latitude'=>3,
-																'point3Longitude'=>3),
-												'success'=> 'function(result) { 	
-															 	try {
-															 		TRACKER.closeConfirmationDialog();
-																	var obj = jQuery.parseJSON(result);
-																	if (obj.result && obj.result == "1") 
-																	{
-																	}
-																	else 
-																	{
-																		TRACKER.showMessageDialog("Sorry,an error occured in operation1");
-																	}
-																}
-																catch(ex) {
-																	TRACKER.showMessageDialog("Sorry,an error occured in operation2");
-																}
-															}',
-											)).
-										"}";
-
-	Yii::app()->clientScript->registerScript('getGeofenceInBackground',
-														$createGeofenceJSFunction,
-		 												CClientScript::POS_READY);
-	
+		
 
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,

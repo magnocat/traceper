@@ -18,7 +18,7 @@ class GeofenceController extends Controller
     	//TODO: actionUpload can be added list below after mobile app is able to login the framework
         return array(
         	array('deny',
-                'actions'=>array('CreateGeofence', 'UpdateGeofencePrivacy'),
+                'actions'=>array('CreateGeofence', 'UpdateGeofencePrivacy', 'SendGeofenceData'),
         		'users'=>array('?'),
             )
         );
@@ -41,46 +41,89 @@ class GeofenceController extends Controller
 
 	
 	public function actionCreateGeofence() {
-		$geofence=new Geofence;
-		$result = "Missing parameter";
-		if (isset($_REQUEST['name']) && isset($_REQUEST['name'])
-		&& isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
-		&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
-		&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
-		{
-			$name = $_REQUEST['name'];			
-			$point1Lat = (float) $_REQUEST['point1Latitude'];
-			$point1Long = (float) $_REQUEST['point1Longitude'];
-			$point2Lat = (float) $_REQUEST['point2Latitude'];
-			$point2Long = (float) $_REQUEST['point2Longitude'];
-			$point3Lat = (float) $_REQUEST['point3Latitude'];
-			$point3Long = (float) $_REQUEST['point3Longitude'];
-			
-			$geofence->name = $name;			
-			$geofence->point1Latitude = $point1Lat;
-			$geofence->point1Longitude = $point1Long;
-			$geofence->point2Latitude = $point2Lat;
-			$geofence->point2Longitude = $point2Long;
-			$geofence->point3Latitude = $point3Lat;
-			$geofence->point3Longitude = $point3Long;
-			
-			if (isset($_REQUEST['description']) && isset($_REQUEST['description']))
-			{
-				$description = $_REQUEST['description'];
-				$geofence->description = $description;
+		
+		$model=new NewGeofenceForm;
+		
+		$processOutput = true;
+						
+		// collect user input data
+		if(isset($_POST['NewGeofenceForm']))
+		{									
+			$model->attributes=$_POST['NewGeofenceForm'];
+			// validate user input and if ok return json data and end application.		
+			if($model->validate()) {								
+				
+				echo CJSON::encode(array(
+                                "result"=> "1",
+								"name"=>$model->name,
+								"description"=> $model->description,
+					));
+				Yii::app()->end();				
 			}
 			
-			$geofence->userId = Yii::app()->user->id;
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
 
-			$result = "Error in operation";
-			if ($geofence->save()) {
-				$result = 1;
-			}
-
-			echo CJSON::encode(array(
-                                         	"result"=>$result,
-			));
+			}												
 		}
+		else
+		{			
+		}
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+
+		$this->renderPartial('createGeofence',array('model'=>$model), false, $processOutput);
+	}
+	
+	
+	public function actionSendGeofenceData() {
+		
+				$geofence=new Geofence;
+				$result = "Missing parameter";
+		
+				if (isset($_REQUEST['name']) && isset($_REQUEST['name'])
+				&& isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
+				&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
+				&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
+				{
+					$geofence->name = $_REQUEST['name'];			
+					$geofence->point1Latitude = (float) $_REQUEST['point1Latitude'];
+					$geofence->point1Longitude = (float) $_REQUEST['point1Longitude'];
+					$geofence->point2Latitude = (float) $_REQUEST['point2Latitude'];
+					$geofence->point2Longitude = (float) $_REQUEST['point2Longitude'];
+					$geofence->point3Latitude = (float) $_REQUEST['point3Latitude'];
+					$geofence->point3Longitude = (float) $_REQUEST['point3Longitude'];
+													
+					if (isset($_REQUEST['description']) && isset($_REQUEST['description']))
+					{
+						$description = $_REQUEST['description'];
+						$geofence->description = $description;
+					}
+			
+					$geofence->userId = Yii::app()->user->id;
+					
+					try
+					{
+						if($geofence->save()) // save the change to database
+						{
+							echo CJSON::encode(array("result"=> "1"));
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=> "Unknown error"));
+						}
+						Yii::app()->end();						
+					}
+					catch (Exception $e) 
+					{
+						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+						{
+							echo CJSON::encode(array("result"=> "Duplicate Entry"));
+						}
+						Yii::app()->end();					
+					}
+				}
+				Yii::app()->end();					
 	}
 	
 	
@@ -271,5 +314,50 @@ class GeofenceController extends Controller
 		
 		//$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$geofencesOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
 		$this->renderPartial('geofenceSettings',array('model'=>$model, 'geofencesOfUser'=>$geofencesOfUser, 'friendId'=>$friendId), false, $processOutput);
-	}		
+	}
+
+	public function  actionIsGeoFenceContainsLocation($geoFence, $point) {
+
+		// Raycast point in polygon method
+		$numPoints = count($geoFence); //MAP_OPERATOR.getPointNumberOfGeoFencePath(geoFence);
+		$inPoly = false;
+		$j = $numPoints-1;
+		
+		for($i = 0; $i < $numPoints; $i++) 
+		{ 
+			if ($geoFence[$i]['longitude'] < $point['longitude'] 
+				&& $geoFence[$j]['longitude'] >= $point['longitude'] 
+				|| $geoFence[$j]['longitude'] < $point['longitude'] 
+				&& $geoFence[$i]['longitude']  >= $point['longitude'])	
+			 {
+				if ($geoFence[$i]['latitude'] + ($point['longitude'] - $geoFence[$i]['longitude']) / ($geoFence[$j]['longitude'] - $geoFence[$i]['longitude']) * ($geoFence[$j]['latitude'] - $geoFence[$i]['latitude']) <$point['latitude']) {
+					$inPoly = !$inPoly;
+				}
+			}
+			$j = $i;
+		}
+		return $inPoly;
+	}
+	
+	/*
+$geoFence = array(
+					array('latitude'=>38.445388,
+						 'longitude'=>-85.341797),
+					array('latitude'=>35.353216,
+						 'longitude'=>-94.438477),
+					array('latitude'=>41.228249,
+						 'longitude'=>-96.031494),
+				);
+$point = array('latitude'=>35.35326,
+				'longitude'=>-94.43846);
+
+if (GeoFenceOperator::isGeoFenceContainsLocation($geoFence, $point))
+{
+	echo "true";
+}
+else 
+{
+	echo "false";
+}
+*/
 }

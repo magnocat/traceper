@@ -44,7 +44,23 @@
 		  												 trackerOp.getImageList(); ',
 		 												CClientScript::POS_READY); 				
 		 }
-
+		 
+		 
+		 $createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
+										.CHtml::ajax(
+											array(
+												'url'=>Yii::app()->createUrl('geofence/createGeofence'),
+												'complete'=> 'function(result) { 	
+															 	$("#createGeofenceWindow").dialog("open"); return false;
+															}',					
+	 											'update'=> '#createGeofenceWindow',																							
+											)).
+										"}";
+																																																		
+										
+		  Yii::app()->clientScript->registerScript('getGeofenceInBackground',
+														$createGeofenceFormJSFunction,
+		 												CClientScript::POS_BEGIN);		 
 	?>
  
 	<script type="text/javascript">		
@@ -104,6 +120,8 @@
 	echo '<div id="groupMembersWindow"></div>';
 ///////////////////////////// Geofence Settings Window ///////////////////////////	
 	echo '<div id="geofenceSettingsWindow"></div>';	
+////////// Create Geofence Window ///////////////////////////	
+	echo '<div id="createGeofenceWindow"></div>';
 ///////////////////////////// Photo Comment Window ///////////////////////////	
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'photoCommentWindow',
@@ -290,9 +308,17 @@
 	 													<img src="images/geoFence.png"  /><div></div>		
 	 												 </div>', '#', array(
     										'onclick'=>'var mapStruct = new MapStruct();
-    										var polygon = mapOperator.initializePolygon();    										    													    								  
-    										var geoFence_ = new MapStruct.GeoFence({geoFenceId:1,polygon:polygon});
-    										var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,document.getElementById("geoFence"));    					
+    										var geoFence_ = mapOperator.newGeofence;
+    										if (geoFence_==null)
+    										{
+    											var polygon = mapOperator.initializePolygon();    										    													    								  
+    											geoFence_ = new MapStruct.GeoFence({geoFenceId:1,listener:null,polygon:polygon});    											
+    										}
+    										if (geoFence_.listener == null)
+    										{
+    											TRACKER.showInfoBar("Select 3 points to generate a Geofence");
+    										}
+    										var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,createGeofenceForm);    					
     										return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Create Geo-Fence'),
 										));
 										

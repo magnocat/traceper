@@ -3,6 +3,7 @@
 function MapOperator() {
 
 	MAP_OPERATOR = this;
+	var newGeofence = null;
 	/*
 	 * GMap Object
 	 */
@@ -347,44 +348,42 @@ function MapOperator() {
 	 * Extend for polygon specific implementation
 	 * @return container that holds the control
 	 */ 
-	MAP_OPERATOR.initializeGeoFenceControl = function(geoFence,controller){		
+	MAP_OPERATOR.initializeGeoFenceControl = function(geoFence,callback){		
 		var returnValue = false;
 		var clickPointNumber = 0;
 		var removeGeoFence = false;
 		MAP_OPERATOR.removeAllPointsFromGeoFence(geoFence);
+		MAP_OPERATOR.newGeofence = geoFence;
 		
-		google.maps.event.addDomListener(controller, "click", function() {
-			//if(button.img.getAttribute("src") === button.opts.img_up_url){
-				
-				google.maps.event.addListener(MAP_OPERATOR.map, 'click', function(event) {
-					if (removeGeoFence)
-					{
-						MAP_OPERATOR.removeAllPointsFromGeoFence(geoFence);
-						removeGeoFence = false;
-					}
-					var location = new MapStruct.Location({latitude:event.latLng.lat(),
-						  longitude:event.latLng.lng()}); 
-					clickPointNumber++;
-					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
-					MAP_OPERATOR.addPointToGeoFence(geoFence,location);
-					if (clickPointNumber==3)
-					{
-						MAP_OPERATOR.setGeoFenceVisibility(geoFence,true);
-						MAP_OPERATOR.map.setCenter(event.latLng);
-						removeGeoFence = true;
-						returnValue = true;
-						clickPointNumber = 0;						
-						MAP_OPERATOR.showConfirmationDialog("Do you want to create this geofence?",createGeofence);
-					}
-				  });
-				/*
-				} else {
-					MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
-					clickPointNumber = 0;
-					geoFence.polygon.getPath().clear();
+		if (geoFence.listener == null)
+		{
+			geoFence.listener = google.maps.event.addListener(MAP_OPERATOR.map, 'click', function(event) {
+				if (removeGeoFence)
+				{
+					MAP_OPERATOR.removeAllPointsFromGeoFence(geoFence);
+					removeGeoFence = false;
 				}
-				*/    
-		});
+				var location = new MapStruct.Location({latitude:event.latLng.lat(),
+					longitude:event.latLng.lng()}); 
+				clickPointNumber++;
+				//MAP_OPERATOR.setGeoFenceVisibility(geoFence,false);
+				MAP_OPERATOR.addPointToGeoFence(geoFence,location);
+				if (clickPointNumber==3)
+				{
+					MAP_OPERATOR.setGeoFenceVisibility(geoFence,true);
+					MAP_OPERATOR.map.setCenter(event.latLng);
+					removeGeoFence = true;
+					returnValue = true;
+					clickPointNumber = 0;
+					callback(geoFence);
+				}		   
+			});
+		}
+		else
+		{
+			google.maps.event.removeListener(geoFence.listener);
+			geoFence.listener = null;
+		}
 		return returnValue;
 	};
 
@@ -457,20 +456,6 @@ function MapOperator() {
 		var position = new google.maps.LatLng(point.latitude, point.longitude);
 		MAP_OPERATOR.map.setCenter(position);
 		MAP_OPERATOR.map.setZoom(zoomlevel);
-	}
-	
-	
-	MAP_OPERATOR.showConfirmationDialog = function(question, callback){
-		$("#confirmationDialog #question").html(question); 
-		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
-		// dont forget first button is positivie button so below loop works
-		for(var property in buttons) {
-			buttons[property] = callback;
-			break;
-		}
-		//buttons.OK = callback;
-		$("#confirmationDialog").dialog("option","buttons",buttons);
-		$("#confirmationDialog").dialog("open");	
-	}		
+	}					
 }
 

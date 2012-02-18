@@ -46,7 +46,7 @@ class Geofence extends CActiveRecord
 			array('userId', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>45),
 			array('description', 'length', 'max'=>500),
-			array('point1Latitude, point2Latitude, point3Latitude', 'length', 'max'=>8),
+			array('point1Latitude, point2Latitude, point3Latitude', 'length', 'max'=>9),
 			array('point1Longitude, point2Longitude, point3Longitude', 'length', 'max'=>9),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
