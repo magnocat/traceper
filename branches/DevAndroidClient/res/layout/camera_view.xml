@@ -12,7 +12,16 @@
 	    android:paddingRight="20px"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-    />	
+    />
+<Button android:id="@+id/recordVideoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+	    android:paddingLeft="20px"
+	    android:paddingRight="20px"
+	    android:text="Switcht to Video"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+    />    	
 <SurfaceView android:id="@+id/surface"
 			android:layout_width="fill_parent" 
 			android:layout_height="fill_parent"			

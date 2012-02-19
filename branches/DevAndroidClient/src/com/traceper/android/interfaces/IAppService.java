@@ -61,6 +61,8 @@ public interface IAppService {
 	
 	public boolean uploadImage(byte[] image, boolean publicData, String description);
 
+	public boolean uploadVideo(byte[] video, boolean publicData, String description);
+	
 	public JSONObject getUserList();
 
 
