@@ -133,6 +133,7 @@ public class Main extends Activity
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				Intent i = new Intent(Main.this, CameraController.class);
+			//	Intent i = new Intent(Main.this, VideoController.class);				
 				startActivity(i);
 			}
 		});
