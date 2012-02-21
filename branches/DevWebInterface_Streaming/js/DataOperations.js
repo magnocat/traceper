@@ -274,6 +274,7 @@ function processImageXML(MAP, xml){
 		var time = $(image).attr('time');
 		var rating = $(image).attr('rating');
 		var description = ""; //$(image).attr('description');
+		var fileType = $(image).attr("fileType");
 		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		
@@ -314,7 +315,7 @@ function processImageXML(MAP, xml){
 					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
-						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+						+ (fileType == 0)?("<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"):("<embed src='images/Deneme.swf' height='200' width='200'/>")
 						+ "</div>"
 						+ "<div>"
 						+ TRACKER.images[imageId].description + "<br/>"
