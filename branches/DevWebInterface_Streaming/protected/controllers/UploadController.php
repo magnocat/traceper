@@ -359,7 +359,7 @@ class UploadController extends Controller
 						
 					$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 						
-					$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+					$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
 								 FROM '. Upload::model()->tableName() . ' u 
 								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
 								 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
@@ -443,12 +443,13 @@ class UploadController extends Controller
 		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
 		$row['uploadTime'] = isset($row['uploadTime']) ? $row['uploadTime'] : null;
 		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		$row['fileType'] = isset($row['fileType']) ? $row['fileType'] : null;
 		$row['userId'] = isset($row['userId']) ? $row['userId'] : null;
 		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
 		$row['rating'] = isset($row['rating']) ? $row['rating'] : null;
 		$row['description'] = isset($row['description']) ? $row['description'] : null;
 
-		$str = '<upload description="'.$row['description'].'" url="'. Yii::app()->homeUrl .urlencode('?r=upload/get&id='. $row['id']) .'"   id="'. $row['id']  .'" byUserId="'. $row['userId'] .'" byRealName="'. $row['realname'] .'" altitude="'.$row['altitude'].'" latitude="'. $row['latitude'].'"	longitude="'. $row['longitude'] .'" rating="'. $row['rating'] .'" time="'.$row['uploadTime'].'" />';
+		$str = '<upload description="'.$row['description'].'" url="'. Yii::app()->homeUrl .urlencode('?r=upload/get&id='. $row['id']) .'"   id="'. $row['id'] .'"   fileType="'. $row['fileType']'" byUserId="'. $row['userId'] .'" byRealName="'. $row['realname'] .'" altitude="'.$row['altitude'].'" latitude="'. $row['latitude'].'"	longitude="'. $row['longitude'] .'" rating="'. $row['rating'] .'" time="'.$row['uploadTime'].'" />';
 
 		return $str;
 	}
