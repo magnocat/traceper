@@ -315,7 +315,32 @@ class UsersController extends Controller
 		echo $out;
 		Yii::app()->end();
 	}
-	
+	public function actionGetUserInfoJSON()
+	{
+		$out = "Missing parameter";
+		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
+			
+			$userId = (int) $_REQUEST['userId'];
+			
+			$friendArray = $this->getFriendArray(); 
+			$out = "No permission to get this user location";
+			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
+			{
+				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude,  
+							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+							1 isFriend
+					FROM ' . Users::model()->tableName() . ' u 
+					WHERE  u.Id = '. $userId .'							
+					LIMIT 1' ;
+				$out = $this-> prepareJson($sql, "userInfo",$userId);
+			}
+			
+		}
+		
+		echo $out;
+		Yii::app()->end();
+	}	
 	/**
 	 * this is intented to be used by mobile app
 	 * Enter description here ...
@@ -628,7 +653,7 @@ class UsersController extends Controller
 		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
 	}
 
-	public function PrepareJson($sql, $type="userList", $userId=NULL)
+	public function PrepareJson($sql, $type, $userId=NULL)
 	{
 	
 
@@ -654,6 +679,14 @@ class UsersController extends Controller
 
 				$str= json_encode($JSON);
 				*/
+			}
+			else if ($type == "userInfo")
+			{
+				
+					$row = $dataReader->read();
+					$str .= $this->getUserJsonItem($row);
+			
+				
 			}
 			else if ($type == "userPastLocations")
 			{
