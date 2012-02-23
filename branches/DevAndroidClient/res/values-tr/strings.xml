@@ -62,11 +62,11 @@
 	<string name="check_in_automatically">Arkaplanda otomatik olarak konum bilgileri gönderilsin</string>
 	<string name="check_in_manually">Şimdi konum bilgileri gönderilsin</string>
 	<string name="location_hasnt_received">Konum bilgileri henüz alınamadı</string>
-	<string name="gps_disabled_message">GPS kapalı durumda! GPS'i açmak istermisiniz?</string>
-	<string name="enable_gps">GPS'i aç</string>
+	<string name="gps_disabled_message">GPS kapalı durumda! GPS\'i açmak istermisiniz?</string>
+	<string name="enable_gps">GPS\'i aç</string>
 	<string name="sending_location_data">Konum bilgileri sunucuya gönderiliyor...</string>
 	<string name="sending_location_data_failed">Konum bilgileri gönderilemedi, tekrar gönderilmeye çalışılacak...</string>
-	<string name="no_location_provider">Lütfen, konum bilgilerini almak için GPS'i veya veri bağlantısını açınız</string>
+	<string name="no_location_provider">Lütfen, konum bilgilerini almak için GPS\'i veya veri bağlantısını açınız</string>
 	<string name="description">Tanım</string>
 	<string name="makeItPublic">Herkes erişebilsin</string>
 	<string name="upload_photo">Fotoğraf Yükle</string>
