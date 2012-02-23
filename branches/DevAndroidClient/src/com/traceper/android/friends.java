@@ -25,6 +25,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -43,8 +45,9 @@ public class friends extends ListActivity {
 	private IAppService appService = null;
 	private JSONObject json;
 	private ProgressDialog progressDialog;
-	
-	
+	public static final int ALL_USER_MAPVIEW = Menu.FIRST;
+	public static final int EXIT_APP_ID = Menu.FIRST + 1;
+	public static final int LIST_REFRESH = Menu.FIRST + 2;
 	
 	private ServiceConnection mConnection = new ServiceConnection() 
 	{
@@ -90,16 +93,10 @@ public class friends extends ListActivity {
          
          ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
          
-       
-        
-       // JSONObject json = getJSONfromURL("http://192.168.43.250");
-          
-         json= appService.getUserList();
- 		
  		
          try{
          	
-         	JSONArray  userlist = json.getJSONArray("userlist");
+         	JSONArray  userlist =  appService.getUserList();
     	
  	        for(int i=0;i<userlist.length();i++){						
  				HashMap<String, String> fri = new HashMap<String, String>();	
@@ -147,7 +144,42 @@ public class friends extends ListActivity {
  			}
  		});
     }
-
-
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {		
+		boolean result = super.onCreateOptionsMenu(menu);
+		/* 
+		 * show sign up menu item if registration is made enabled.
+		 */
+		 menu.add(0, LIST_REFRESH, 0, R.string.list_refresh).setIcon(R.drawable.rfrsh);
+		
+		 menu.add(0, ALL_USER_MAPVIEW, 0, R.string.show_all_user_location_on_map).setIcon(R.drawable.users);
+		 
+		 menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.power);
+		 
+		return result;
+	}
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	    
+		switch(item.getItemId()) 
+	    {
+	    	case LIST_REFRESH:
+	    		listele();
+   		
+    		return true;
+	    	case ALL_USER_MAPVIEW:
+	    		Intent i = new Intent(friends.this, MapViewController.class);  
+	    		i.setAction(IAppService.SHOW_ALL_USER_LOCATIONS);
+                startActivity(i);
+       		
+	    		return true;
+	    	case EXIT_APP_ID:
+				finish();
+				
+	    		return true;
+	    }
+	       
+	    return super.onMenuItemSelected(featureId, item);
+	} 
     
 }
