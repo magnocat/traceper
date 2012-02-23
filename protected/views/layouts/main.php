@@ -303,6 +303,48 @@
 										),
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
+										
+									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+	 													<img src="images/userGeofences.png"  /><div></div>
+	 												 </div>', $this->createUrl('geofence/getGeofences'), 
+ 										array(
+													'success'=> 'function(result){ 
+																	try {
+																		var obj = jQuery.parseJSON(result);
+																																				
+																		if (obj.count > 0)
+																		{
+																			for(var i=0; i<obj.count; i++) {
+																				var poly = mapOperator.initializePolygon();
+																				var mapStruct = new MapStruct();
+																				geoFence = new MapStruct.GeoFence({geoFenceId:i,listener:null,polygon:poly});
+																			
+			    																var Loc1 = new MapStruct.Location({latitude:obj.dataProvider[i].Point1Latitude,
+			    								  								longitude:obj.dataProvider[i].Point1Longitude});
+			    								  								mapOperator.addPointToGeoFence(geoFence,Loc1);
+			    								  							
+			    								  								var Loc2 = new MapStruct.Location({latitude:obj.dataProvider[i].Point2Latitude,
+			    								  								longitude:obj.dataProvider[i].Point2Longitude});
+			    								  								mapOperator.addPointToGeoFence(geoFence,Loc2);
+			    								  							
+			    								  								var Loc3 = new MapStruct.Location({latitude:obj.dataProvider[i].Point3Latitude,
+			    								  								longitude:obj.dataProvider[i].Point3Longitude});
+			    								  								mapOperator.addPointToGeoFence(geoFence,Loc3);
+			    								  							
+			    								  								mapOperator.setGeoFenceVisibility(geoFence,true);
+																			}																			
+																		}
+																		else
+																		{
+																			TRACKER.showMessageDialog("There is no geofence");
+																		}
+																	}
+																	catch (error){
+																	}
+																 }',
+													 ),
+										array(
+											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Show Geofences')));
 											
  									echo CHtml::link('<div  class="userOperations" id="geoFence">	 			
 	 													<img src="images/geoFence.png"  /><div></div>		
