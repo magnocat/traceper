@@ -51,7 +51,7 @@ public interface IAppService {
 	
 	public void exit();
 	
-	public String getUserLocation(int userid);
+	public JSONObject getUserInfo(int userid);
 	
 	public String registerUser(String password, String email, String realname);
 	
@@ -63,7 +63,7 @@ public interface IAppService {
 
 	public boolean uploadVideo(byte[] video, boolean publicData, String description);
 	
-	public JSONObject getUserList();
+	public JSONArray getUserList();
 
 
 
