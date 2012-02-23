@@ -666,55 +666,59 @@ public class AppService extends Service implements IAppService{
 
 
 	
-	public JSONObject getUserList() {		
+	public JSONArray getUserList() {		
+		
+		JSONArray userlist = null;
+	
+		String result = "";
+		JSONObject jArray = null;
+	 		
+			String[] name = new String[3];
+			String[] value = new String[3];
+			name[0] = "r";
+			name[1] = "email";
+			name[2] = "password";
+	
+
+			value[0] = "users/GetUserListJson";
+			value[1] = AppService.this.email;
+			value[2] = AppService.this.password;
+		
+
+			String httpRes = this.sendHttpRequest(name, value, null, null);	
+			
+			result = getString(R.string.unknown_error_occured);
+			
+			 try{
+				 jArray = new JSONObject(httpRes);            
+			    }catch(JSONException e){
+			            Log.e("log_tag", "Error parsing data "+e.toString());
+			    }
+		    
+		 	
+		     try{
+		         	
+		         	 userlist = jArray.getJSONArray("userlist");		 	        
+		 	        
+		         }catch(JSONException e)        {
+		         	 Log.e("log_tag", "Error parsing data "+e.toString());
+		         }
+		         	
+
+	         
+		        
+		return userlist;
 		
 		
+	/*	
         JSONObject json = getJSONfromURL(authenticationServerAddress+"?r=users/GetUserListJson&email="+ AppService.this.email +"&password="+ AppService.this.password);
         
      
         return json;
+	*/
 	}
 	
-	public static JSONObject getJSONfromURL(String url){
-		InputStream is = null;
-		String result = "";
-		JSONObject jArray = null;
-		
-		//http post
-	    try{
-	            HttpClient httpclient = new DefaultHttpClient();
-	            HttpPost httppost = new HttpPost(url);
-	            HttpResponse response = httpclient.execute(httppost);
-	            HttpEntity entity = response.getEntity();
-	            is = entity.getContent();
 
-	    }catch(Exception e){
-	            Log.e("log_tag", "Error in http connection "+e.toString());
-	    }
-	    
-	  //convert response to string
-	    try{
-	            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-	            StringBuilder sb = new StringBuilder();
-	            String line = null;
-	            while ((line = reader.readLine()) != null) {
-	                    sb.append(line + "\n");
-	            }
-	            is.close();
-	            result=sb.toString();
-	    }catch(Exception e){
-	            Log.e("log_tag", "Error converting result "+e.toString());
-	    }
-	    
-	    try{
-	    	
-            jArray = new JSONObject(result);            
-	    }catch(JSONException e){
-	            Log.e("log_tag", "Error parsing data "+e.toString());
-	    }
-    
-	    return jArray;
-	}
 	
 	public boolean isUserAuthenticated() {
 		return this.isUserAuthenticated;
@@ -801,82 +805,49 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}	
 
-	public String getUserLocation(int userid){
-		String userloc = null;
-		InputStream is = null;
+	
+	
+	public JSONObject getUserInfo(int userid){
+		JSONArray userlist = null;
 		String result = "";
 		JSONObject jArray = null;
+		String uId = String.valueOf(userid);
+		
 	 		
-			String[] name = new String[3];
-			String[] value = new String[3];
+			String[] name = new String[4];
+			String[] value = new String[4];
 			name[0] = "r";
 			name[1] = "email";
 			name[2] = "password";
+			name[3] = "userId";
 	
 
-			value[0] = "users/GetUserListJson";
+			value[0] = "users/GetUserInfoJSON";
 			value[1] = AppService.this.email;
 			value[2] = AppService.this.password;
-		
+			value[3] = uId;
 
 			String httpRes = this.sendHttpRequest(name, value, null, null);	
 			
 			result = getString(R.string.unknown_error_occured);
-			
 			 try{
 				 jArray = new JSONObject(httpRes);            
 			    }catch(JSONException e){
 			            Log.e("log_tag", "Error parsing data "+e.toString());
 			    }
 		    
-		
-			 
-		 	
-		         try{
-		         	
-		         	JSONArray  userlist = jArray.getJSONArray("userlist");
-		    	
-		 	        for(int i=0;i<userlist.length();i++){						
-		 					
-		 				JSONObject e = userlist.getJSONObject(i);
-		 				
-		 				if (e.getInt("user")==userid){
-		 				//userloc = ("{result:SHOW_USER_LOCATION,latitude:" + e.getString("latitude") + ",longitude:" +(e.getString("longitude")+"}"));
-		 				
-		 					/*
-		 				JSONObject object = new JSONObject();
-		 				try {
-		 					object.put("result", "SHOW_USER_LOCATION");
-		 					object.put("latitude",  new Double(e.getString("latitude")));
-		 					object.put("longitude", new Double(e.getString("longitude")));
-		 				} catch (JSONException ee) {
-		 					ee.printStackTrace();
-		 				}
-		 				
-		 				userloc = object;
-		 				System.out.println(object);
-		 				*/
-		 				
-		 					Intent i1 = new Intent(IAppService.SHOW_USER_LOCATION);
-		 					i1.setAction(IAppService.SHOW_USER_LOCATION);
-		 					i1.putExtra(IAppService.SHOW_USER_LOCATION_LATITUDE ,e.getString("latitude"));
-		 					i1.putExtra(IAppService.SHOW_USER_LOCATION_LONGITUDE, e.getString("longitude"));
-		 					sendBroadcast(i1);
-		 					Log.i("broadcast sent", "sendUserLocationData broadcast sent");		
-		 				
-		 				}
-		 			}	
-		 	        
-		         }catch(JSONException e)        {
-		         	 Log.e("log_tag", "Error parsing data "+e.toString());
-		         }
-		         	
 
-	         
-		return userloc;
+
+			return  jArray;
+
 	}
 	
 	
+	private String getString(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public void setAuthenticationServerAddress(String address) {
 		this.authenticationServerAddress = address;
 	}

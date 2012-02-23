@@ -76,4 +76,7 @@
 <string name="please_enter_description">Please enter description</string>
 <string name="location_fix_problem">Location fix hasn\'t been received.</string>
 <string name="signingout">Signing out...</string>
+<string name="show_all_user_location_on_map">Show all us. l. o. m.</string>
+<string name="list_refresh">Refresh - Friends list</string>
+<string name="map_refresh">Refresh - Users location</string>
 </resources>
