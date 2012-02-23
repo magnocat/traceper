@@ -285,11 +285,11 @@ function processImageXML(MAP, xml){
 
 		if (typeof TRACKER.images[imageId] == "undefined") {
 				
-			image = imageURL + "&"+ TRACKER.imageThumbSuffix;
+			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			var userMarker = MAP.putMarker(location, image, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
-
+			
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
 				userId:userId,
@@ -307,7 +307,7 @@ function processImageXML(MAP, xml){
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
-				image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
+				image.src= TRACKER.images[imageId].imageURL + "&fileType=0"; // + TRACKER.imageOrigSuffix;
 				$("#loading").show();
 				$(image).load(function(){
 					$("#loading").hide();
