@@ -301,6 +301,7 @@ function processImageXML(MAP, xml){
 				rating:rating,
 				mapMarker:markerInfoWindow,
 				description:description,
+				fileType:fileType
 			});
 			
 			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
@@ -308,14 +309,17 @@ function processImageXML(MAP, xml){
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
-				image.src= TRACKER.images[imageId].imageURL + TRACKER.imageOrigSuffix;
+				image.src= TRACKER.images[imageId].imageURL/* + TRACKER.imageOrigSuffix*/;
 				$("#loading").show();
 				$(image).load(function(){
 					$("#loading").hide();
 					
+					var uploadContent = (fileType == 0)?("<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"):("<embed src='images/Deneme.swf' height='200' width='200'/>");
+					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
-						+ (fileType == 0)?("<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"):("<embed src='images/Deneme.swf' height='200' width='200'/>")
+						+ uploadContent
+						//+ "<embed src='images/Deneme.swf' height='200' width='200'/>"
 						+ "</div>"
 						+ "<div>"
 						+ TRACKER.images[imageId].description + "<br/>"

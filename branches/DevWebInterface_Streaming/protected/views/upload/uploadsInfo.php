@@ -31,7 +31,7 @@
 	if (isset($dataProvider)) {
 		$params = array('dataProvider'=>$dataProvider);
 		if (isset($uploadList) && $uploadList == true) {
-			$params = array_merge($params, array('uploadList'=>true));
+			$params = array_merge($params, array('uploadList'=>true, 'fileType'=>$fileType));
 		}
 		$this->renderPartial('getList', $params, false, true);
 	}
