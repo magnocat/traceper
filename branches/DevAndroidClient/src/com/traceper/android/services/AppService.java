@@ -841,7 +841,54 @@ public class AppService extends Service implements IAppService{
 			return  jArray;
 
 	}
-	
+	public JSONArray getUserPlaces(int userid){
+		String uId = String.valueOf(userid);
+		JSONArray userwashere = null;
+		String result = "";
+		JSONObject jArray = null;
+		
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "userId";
+		name[4] = "offset";
+		name[5] = "range";
+
+
+		value[0] = "users/GetUserPastPointsJSON";
+		value[1] = AppService.this.email;
+		value[2] = AppService.this.password;
+		value[3] = uId;
+		value[4] = "";
+		value[5] = "";
+		
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		
+		result = getString(R.string.unknown_error_occured);
+		
+		 try{
+			 jArray = new JSONObject(httpRes);            
+		    }catch(JSONException e){
+		            Log.e("log_tag", "Error parsing data "+e.toString());
+		    }
+	    
+	 	
+	     try{
+	    	 	userwashere = jArray.getJSONArray("userwashere");		 	        
+	 	        
+	         }catch(JSONException e)        {
+	         	 Log.e("log_tag", "Error parsing data "+e.toString());
+	         }
+	         	
+
+         
+	        
+	return userwashere;
+		
+		
+	}
 	
 	private String getString(String string) {
 		// TODO Auto-generated method stub

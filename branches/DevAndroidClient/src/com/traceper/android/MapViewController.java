@@ -163,12 +163,7 @@ public class MapViewController extends MapActivity {
 
 	public void updateLocation(){
 		
-		
-		
-
-   	 
-		 
-  		double latitude = 0;
+		double latitude = 0;
   		double longitude = 0;
   		
 	     Drawable marker=getResources().getDrawable(android.R.drawable.star_big_on);
@@ -210,14 +205,13 @@ public class MapViewController extends MapActivity {
 					
 			         Bundle extra = getIntent().getExtras();
 			         if (extra != null) {
-			 
 
 			        	    int userid = extra.getInt("userid");
 
 			        	    try{
 
-			         				JSONObject e = appService.getUserInfo(userid);
-			         				
+			         		JSONObject e = appService.getUserInfo(userid);
+			         		if ((e.getString("latitude")!=null) & (e.getString("longitude")!=null)) {	
 			         		latitude = e.getDouble("latitude");
 			        	    longitude = e.getDouble("longitude");	
 			        	    
@@ -227,38 +221,37 @@ public class MapViewController extends MapActivity {
 						     mapItemizedOverlay.addItem(myPoint1 , e.getString("realname")
 					         	         , e.getString("time"));
 						     mapController.animateTo(myPoint1);
-			         				
-			                 }catch(JSONException e)        {
+			         			}	
+			                
+			        	    }catch(JSONException e)        {
 			                 	 Log.e("log_tag", "Error parsing data "+e.toString());
-			                 }
-			        	    
-					      
+			                 }     
 			        		 
 			         }
 					
 				}else if (action.equals(IAppService.SHOW_ALL_USER_LOCATIONS))	{
 	   
-
-				   						
-				     
 			         try{
 			          	
 			          	JSONArray  userlist =  appService.getUserList();
 			     	
 			  	        for(int i=0;i<userlist.length();i++){						
 			  				
+			  	        	
 			  				JSONObject e = userlist.getJSONObject(i);
-			  					  				
+			  				
+			  				if ((e.getString("latitude")!=null) & (e.getString("longitude")!=null)) {	  				
 							lati = Double.parseDouble(e.getString("latitude"));
 						    longi =Double.parseDouble(e.getString("longitude"));
 			  				
-			  	      geoPoints.add( new GeoPoint(
+						    geoPoints.add( new GeoPoint(
 		                         (int) (lati * 1E6), 
 		                         (int) (longi * 1E6)));
-			  	      //mapItemizedOverlay.addItem(geoPoints.get(i), e.getString("realname"), e.getString("user"));
+						    
 			  	      
-			  	    mapItemizedOverlay.addItem(geoPoints.get(i), e.getString("realname"), e.getString("time"));
-			  	      mapController.animateTo(geoPoints.get(i));
+						    mapItemizedOverlay.addItem(geoPoints.get(i), e.getString("realname"), e.getString("calculatedTime"));
+						    mapController.animateTo(geoPoints.get(i));
+			  				}
 			  			}	
 			  	        
 			          }catch(JSONException e)        {
@@ -267,10 +260,59 @@ public class MapViewController extends MapActivity {
 
 	        		  
 	                  mapController.setZoom(4);
-				}
+				}else if (action.equals(IAppService.SHOW_USER_PAST_POINT_ON_MAP))	{
+				
+		         Bundle extra = getIntent().getExtras();
+		         if (extra != null) {
+		 
+		        	    
+		         		latitude = extra.getDouble("latitude");
+		        	    longitude = extra.getDouble("longitude");	
+		        	    
+		        	    GeoPoint myPoint1 =new GeoPoint(
+		                         (int) (latitude * 1E6), 
+		                         (int) (longitude * 1E6));
+					    mapItemizedOverlay.addItem(myPoint1 , extra.getString("userid")
+				         	         , extra.getString("userid"));
+					    mapController.animateTo(myPoint1);     
+		        		 
+		         }				
+			}else if (action.equals(IAppService.SHOW_USER_ALL_PAST_POINT_ON_MAP))	{
+				       			
+		         Bundle extra = getIntent().getExtras();
+		         if (extra != null) {
+		 
+		        	    int userid = extra.getInt("userid");
+				
+		         try{
+		          	
+		          	JSONArray  userlist =  appService.getUserPlaces(userid);
+		     	
+		  	        for(int i=0;i<userlist.length();i++){						
+		  				
+		  				JSONObject e = userlist.getJSONObject(i);
+		  					  				
+						lati = Double.parseDouble(e.getString("latitude"));
+					    longi =Double.parseDouble(e.getString("longitude"));
+		  				
+		  	      geoPoints.add( new GeoPoint(
+	                         (int) (lati * 1E6), 
+	                         (int) (longi * 1E6)));
+		  	      
+		  	      mapItemizedOverlay.addItem(geoPoints.get(i), e.getString("calculatedTime"), e.getString("time"));
+		  	      mapController.animateTo(geoPoints.get(i));
+		  			}	
+		  	        
+		          }catch(JSONException e)        {
+		          	 Log.e("log_tag", "Error parsing data "+e.toString());
+		          }
+
+       		  
+                 mapController.setZoom(4);
+		         }
 			}
      
-         
+			}
 
          mapView.invalidate();
 
