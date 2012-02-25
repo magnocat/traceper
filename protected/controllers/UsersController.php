@@ -429,7 +429,37 @@ class UsersController extends Controller
 		}
 		echo $out;
 	}
+	public function actionGetUserPastPointsJSON(){
 
+		if (isset($_REQUEST['userId']))
+		{
+			$userId = (int) $_REQUEST['userId'];
+			if (!empty($_REQUEST['offset'])){
+			$offset = (int) $_REQUEST['offset'];
+			}else{
+			$offset = 0;
+			}
+			if(!empty($_REQUEST['range'])){
+			$range= (int) $_REQUEST['range'];
+			}else{
+			$range=29;
+			}
+						
+			$sql = 'SELECT
+							longitude, latitude, deviceId, 
+							date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+					FROM ' . UserWasHere::model()->tableName() .' u
+					WHERE 
+						userId = '. $userId . '
+					ORDER BY 
+						Id DESC
+					LIMIT '. $offset . ','
+					. $range ;
+				
+					$out = $this->PrepareJson($sql, "userPastLocations", $userId);
+		}
+		echo $out;
+	}
 	public function actionSearch() {
 		$model = new SearchForm();
 
@@ -700,16 +730,17 @@ class UsersController extends Controller
 					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
 	
 					
-					$str = CJSON::encode(array(
+					$str .= CJSON::encode(array(
 							'latitude'=>$row['latitude'],
 							'longitude'=>$row['longitude'],
                     		'altitude'=>$row['altitude'],
 							'calculatedTime'=>$row['dataCalculatedTime'],
 							'time'=>$row['dataArrivedTime'],
 							'deviceId'=>$row['deviceId'],		
-                            ));
+                            )).',';
 					
 				}
+				$str='{"userwashere":['.$str.']}';
 			}
 		}
 
