@@ -42,7 +42,12 @@
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
-		
+		<activity android:name=".android.PastPoints"  >
+			<intent-filter>
+				<action android:name="com.traceper.PASTPOINTS"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+			</intent-filter>
+		</activity>
 </application>
 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>

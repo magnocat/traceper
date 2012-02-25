@@ -29,6 +29,9 @@ public interface IAppService {
 	public static final String SHOW_USER_LOCATION = "SHOW_USER_LOCATION";
 	public static final String SHOW_ALL_USER_LOCATIONS = "SHOW_ALL_USER_LOCATIONS";
 	
+	public static final String SHOW_USER_PAST_POINT = "SHOW_USER_PAST_POINT";
+	public static final String SHOW_USER_PAST_POINT_ON_MAP = "SHOW_USER_PAST_POINT_ON_MAP";
+	public static final String SHOW_USER_ALL_PAST_POINT_ON_MAP = "SHOW_USER_ALL_PAST_POINT_ON_MAP";
 	
 	public static final JSONObject SHOW_USER_LOCATION_LOC = null;
 	
@@ -64,7 +67,8 @@ public interface IAppService {
 	public boolean uploadVideo(byte[] video, boolean publicData, String description);
 	
 	public JSONArray getUserList();
-
+	
+	public JSONArray getUserPlaces(int userid);
 
 
 	
