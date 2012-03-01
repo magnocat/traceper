@@ -133,31 +133,36 @@ class GeofenceController extends Controller
 
 		$processOutput = true;
 		//Get all of the geofences that the logged in user has created
-		$geofencesOfUser = Geofence::model()->findAll('userId=:userId', array(':userId'=>Yii::app()->user->id));
+		$geofencesOfUser = Geofence::model()->findAll('userId=:userId', array(':userId'=>Yii::app()->user->id));				
 
 		$selected_users=array(); //array to hold all the groups of the user's selected friend to be used for the checking the checkboxes in the initial dialog
 		$unselected_users=array(); //array to hold the unselected user groups so that it can be used for user removal from unselected groups
-
+		
 		if (isset($_REQUEST['friendId']))
 		{
 			$friendId = (int)$_REQUEST['friendId'];
 			//Take all the user-group relation rows that the user's friend added to
 			$relationRowsSelectedFriendBelongsTo = GeofenceUserRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
-				
+			
+			//Get all points of the friends that the logged in user has created
+			//TODO: get last location record, but first record is taken			
+			$lastLocationOfFriend = UserWasHere::model()->find(array('condition'=>'userId =:userId','params'=>array(':userId'=>$friendId)));
+			$locationPointOfFriend = array('latitude'=>$lastLocationOfFriend->latitude,
+								 'longitude'=>$lastLocationOfFriend->longitude);
+			//$sql=;
+			//$locationsOfFriend = UserWasHere::model()->findAllBySql($sql,array(':userId'=>$friendId));
+									
 			//Get only the group ID fields into $selected_users from the obtained rows
 			foreach($relationRowsSelectedFriendBelongsTo as $relationRow)
 			{
 				$selected_users[] = $relationRow->geofenceId;
-			}
+			}			
 		}
-
+		
 		if(isset($_POST['GeofenceSettingsForm']))
 		{
-			//echo 'SET';
-				
 			$model->attributes = $_POST['GeofenceSettingsForm'];
-			//$model->groupStatusArray = $_POST['GroupSettingsForm']['groupStatusArray'];
-				
+
 			if($model->validate())
 			{
 				//We know the selected groups from $model->groupStatusArray, but not know the unselected ones
@@ -165,29 +170,31 @@ class GeofenceController extends Controller
 				foreach($geofencesOfUser as $selectedOwnerGroup) //Check for all of the user's groups
 				{
 					$groupFound = false;
-						
-					if(!empty($model->geofenceStatusArray)) //Check empty() in order to avoid error in foreach
-					{
-						foreach($model->geofenceStatusArray as $selectedFriendGroup) //Check for all of the checked groups
-						{
-							if($selectedOwnerGroup->id == $selectedFriendGroup)
-							{
-								$groupFound = true;
-								break;
-							}
-						}
-					}
-					else //None of the checkboxes selected so all of the user groups will be in $unselected_users
-					{
-							
-					}
+					
+					$geofencePoints = array(
+								 array('latitude'=>$selectedOwnerGroup->point1Latitude,
+								 'longitude'=>$selectedOwnerGroup->point1Longitude),
+								 array('latitude'=>$selectedOwnerGroup->point2Latitude,
+								 'longitude'=>$selectedOwnerGroup->point2Longitude),
+								 array('latitude'=>$selectedOwnerGroup->point3Latitude,
+								 'longitude'=>$selectedOwnerGroup->point3Longitude),
+								 );		
 
-						
+					//$deneme=$this->isGeofenceContainsLocation($geofencePoints, $locationPointOfFriend);
+											
+					if($this->isGeofenceContainsLocation($geofencePoints, $locationPointOfFriend)) //Check empty() in order to avoid error in foreach
+					{
+						$groupFound = true;								
+					}
+											
 					if($groupFound == false)
 					{
-						$unselected_users[] = $selectedOwnerGroup->id;
+						$unselected_users[] = $selectedOwnerGroup->Id;
 					}
 				}
+				
+				echo CJSON::encode(array("result"=> $groupFound));
+				Yii::app()->end();
 					
 				//Check for privacy groups
 				if(count($model->geofenceStatusArray) > 1)
@@ -302,17 +309,13 @@ class GeofenceController extends Controller
 		}
 		else
 		{
-			//echo 'ELSE';
-
 			//If the form is opened, check the checkboxes according to traceper_user_group_relation table
-			//Here $model->groupStatusArray is assigned to all of the groups that the user's friend is resgistered no matter the groups' owner is the logged user or not
+			//Here $model->groupStatusArray is assigned to all of the groups that the user's friend is resgistered no matter the groups' owner is the logged user or not		
 			$model->geofenceStatusArray=$selected_users;
 		}
-
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-		//$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$geofencesOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
 		$this->renderPartial('geofenceSettings',array('model'=>$model, 'geofencesOfUser'=>$geofencesOfUser, 'friendId'=>$friendId), false, $processOutput);
 	}
 
@@ -361,8 +364,8 @@ class GeofenceController extends Controller
 		
 	}
 
-
-	public function  actionIsGeoFenceContainsLocation($geoFence, $point) {
+	
+	private function  isGeofenceContainsLocation($geoFence, $point) {
 
 		// Raycast point in polygon method
 		$numPoints = count($geoFence); //MAP_OPERATOR.getPointNumberOfGeoFencePath(geoFence);

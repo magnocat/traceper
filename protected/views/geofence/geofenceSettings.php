@@ -38,7 +38,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				{
 					echo CHtml::activeCheckboxList(
 					  $model, 'geofenceStatusArray', 
-					  CHtml::listData($geofencesOfUser, 'id', 'name'),
+					  CHtml::listData($geofencesOfUser, 'Id', 'name'),
 					  array()
 					);	
 				}				
