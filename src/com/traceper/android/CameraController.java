@@ -1,7 +1,6 @@
 package com.traceper.android;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,22 +8,19 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -35,10 +31,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.traceper.R;
@@ -51,7 +47,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private boolean isPreviewRunning;
-	private ProgressDialog pdialog = null; 
 	private static final int UPLOAD_PHOTO = Menu.FIRST;
 	private static final int TAKE_ANOTHER_PHOTO = Menu.FIRST + 1;
 	private static final int BACK = Menu.FIRST + 2;
@@ -64,7 +59,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private static final int DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC = 0;
 	private Button recordVideoButton;
 	private MediaRecorder mMediaRecorder;
-	private String videoPath = "/sdcard/myvideo.mp4";
+	private String videoDirPath = "/sdcard/traceper";
 
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
@@ -93,6 +88,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			appService = null;
 		}
 	};
+	private PowerManager pw;
 
 
 	public void onCreate(Bundle savedInstanceState){
@@ -101,18 +97,19 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
 
-
 		setContentView(R.layout.camera_view);
-
 		getWindow().setFormat(PixelFormat.TRANSLUCENT);
-
+		
+		pw = (PowerManager)getSystemService(Service.POWER_SERVICE);
 		surfaceView = (SurfaceView) findViewById(R.id.surface);
 		surfaceHolder = surfaceView.getHolder();
 		surfaceHolder.addCallback(this);
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		
+		LinearLayout linearlayout = (LinearLayout) findViewById(R.id.buttonsLayout);
+		linearlayout.bringToFront();
+		
 		mCamera = Camera.open();
-
 		takePictureButton = (Button) findViewById(R.id.takePictureButton);
 		takePictureButton.bringToFront();
 		takePictureButton.setOnClickListener(new View.OnClickListener() {			
@@ -127,10 +124,13 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		takePictureButton.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_camera,0,0,0);
 
 		recordVideoButton = (Button) findViewById(R.id.recordVideoButton);
+		recordVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record, 0, 0, 0);
 		recordVideoButton.bringToFront();
+		
 		recordVideoButton.setOnClickListener(new View.OnClickListener() {			
 
 			private boolean recording = false;
+			private WakeLock wl;
 
 			public void onClick(View arg0) {
 				if(recording ){
@@ -144,10 +144,11 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 						e.printStackTrace();
 					}
 					recording = false;
-					recordVideoButton.setText("START");
-					uploadVideo();
-
-				}else{
+					recordVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record, 0, 0, 0);
+					appService.stopLiveVideoUploading();
+					wl.release();
+				}
+				else{
 					if (prepareVideoRecorder()) {
 						// Camera is available and unlocked, MediaRecorder is prepared,
 						// now you can start recording
@@ -155,21 +156,54 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 						// inform the user that recording has started
 						recording = true;
 						//      new FileListener(videoPath);
+						//logFileLength();
+						appService.startLiveVideoUploading(getVideoPath());
+						wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+						wl.acquire();
+						recordVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record_stop, 0, 0, 0);
 					} else {
 						// prepare didn't work, release the camera
 						releaseMediaRecorder();
 						// inform user
 					}
-					recordVideoButton.setText("STOP");
+					
 				}
-				
-				
-//				Intent i = new Intent(CameraController.this, VideoController.class);				
-//				startActivity(i);
-//				
-//				finish();
 			}
 		});
+	}
+	
+	private void logFileLength() {
+//				Timer t = new Timer();
+//				TimerTask task = new TimerTask() {
+//					@Override
+//					public void run() {
+//						File f = new File(getVideoPath());
+//						Log.i("file length", "" + f.length());
+//						
+//					}
+//				};
+//				t.schedule(task, 5000, 5000);
+/*
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				int t = 0;
+				while (t < 1000) {
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					File f = new File(getVideoPath());
+					Log.i("file length", "" + f.length());
+
+				}
+			}
+		});
+		*/
+		
 	}
 
 	@Override
@@ -354,7 +388,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 
 		// Step 4: Set output file
-		mMediaRecorder.setOutputFile(videoPath);
+		
+		mMediaRecorder.setOutputFile(getVideoPath());
 
 		// Step 5: Set the preview output
 		mMediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
@@ -389,8 +424,18 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		}
 	}
 	
-	private void uploadVideo() {
-		File file = new File(videoPath);
+	private String getVideoPath() 
+	{
+		File videoDir = new File(videoDirPath);
+		if (videoDir.exists() == false) {
+			videoDir.mkdir();
+		}
+		return videoDir + "/videoPath.mp4";
+	}
+	
+	private void uploadVideo() 
+	{
+		File file = new File(getVideoPath());
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(file);

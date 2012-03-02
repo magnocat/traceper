@@ -4,6 +4,9 @@ package com.traceper.android.services;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +19,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -43,6 +48,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
@@ -81,8 +87,233 @@ public class AppService extends Service implements IAppService{
 		}
 	}
 
+	private class UploadLiveVideo {
+		public String path;
+		public boolean isPublic;
+		public String description;
+		public UploadLiveVideo(String path, boolean isPublic, String description) {
+			super();
+			this.path = path;
+			this.isPublic = isPublic;
+			this.description = description;
+		}
+
+	}
+
+	private class FileListener {
+		private Timer timer;
+		private int offset = 0;
+		private File file;
+		private FileInputStream fin;
+		private boolean isSyncPacketSent = false;
+		private int uploadKey = (int)(System.currentTimeMillis() * Math.random() * 10000);
+
+		final String end = "\r\n";
+		final String twoHyphens = "--";
+		final String boundary = "*****++++++************++++++++++++";
+		private HttpURLConnection conn;
+
+		public FileListener(final String fileName, boolean isPublic, String description, Location loc) {
+			timer = new Timer();
+			
+			final DataOutputStream outputStream = this.sendRequest(loc, isPublic, description);
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					if (file == null) {
+						try {
+							file = new File(fileName);
+							fin = new FileInputStream(file);
+							outputStream.writeBytes(twoHyphens + boundary + end);
+							outputStream.writeBytes("Content-Disposition: form-data; name=\""+ "upload" +"\";filename=\"" + "upload" +"\"" + end + end);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if (file.exists()) {
+						Log.i("traceper","file length " + file.length());
+					}
+					int byteCount = (int)(file.length()) - offset;
+					byte[] data = new byte[byteCount];
+					if (byteCount > 0) {
+						int readByteCount;
+						try {
+							readByteCount = fin.read(data, offset, data.length);
+							if (readByteCount == -1) {
+
+							}
+							else {
+								offset += readByteCount;
+								outputStream.write(data, 0, readByteCount);
+								if (isSyncPacketSent == false) {
+									isSyncPacketSent = sendSyncPacket();
+								}
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if (liveVideoActive == false) 
+					{
+						timer.cancel();
+						String notificationText = getString(R.string.upload_failed);
+						try {
+							outputStream.writeBytes(end);
+							outputStream.writeBytes(twoHyphens + boundary + twoHyphens + end);
+							outputStream.flush();
+							outputStream.close();
+
+							if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
+									conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
+							{
+								conn.disconnect();
+								AppService.this.authenticationServerAddress += "/";
+							}
+							else
+							{
+								BufferedReader in = new BufferedReader(
+										new InputStreamReader(conn.getInputStream()));
+								String inputLine;
+
+								String result = new String();
+								while ((inputLine = in.readLine()) != null) {
+									result = result.concat(inputLine);				
+								}
+								Log.i("traceper", "Result " + result);
+								in.close();								
+
+								try {
+									JSONObject jsonObject = new JSONObject(result);
+									result = jsonObject.getString("result");
+									if (result.equals("1")) {
+										notificationText = getString(R.string.upload_succesfull);
+									}
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+							}
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						finally {
+							Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+							notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
+							mManager.notify(NOTIFICATION_ID, notification);
+						}
+					} 
+				}}, 5000, 5000);
+
+
+		}
+		
+		private boolean sendSyncPacket() {
+			String[] name = new String[3];
+			String[] value = new String[3];
+			name[0] = "r";
+			name[1] = "uploadKey";
+			name[2] = "fileType";			
+			
+			value[0] = "upload/uploadStarted";
+			value[1] = String.valueOf(this.uploadKey);			
+			value[2] = "1";			
+			
+			String response = sendHttpRequest(name, value, null, null);			
+			try {
+				JSONObject jsonObject = new JSONObject(response);
+				response = jsonObject.getString("result");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			boolean result = false;
+			if (response.equals("1")) {
+				result = true;
+			}
+			return result;
+		}
+
+		private DataOutputStream sendRequest(Location loc, boolean publicData, String description) {
+			double latitude = 0;
+			double longitude = 0;
+			double altitude = 0;
+			if (loc != null) {
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				altitude = loc.getAltitude();
+			}
+			//		try {
+			String[] name = new String[8];
+			String[] value = new String[8];
+			name[0] = "r";
+			name[1] = "latitude";
+			name[2] = "longitude";
+			name[3] = "altitude";
+			name[4] = "publicData";
+			name[5] = "description";
+			name[6] = "fileType";
+			name[7] = "APC_UPLOAD_PROGRESS";
+
+			value[0] = "upload/upload";
+			value[1] = String.valueOf(latitude);
+			value[2] = String.valueOf(longitude);
+			value[3] = String.valueOf(altitude);
+			int publicDataInt = 0;
+			if (publicData == true) {
+				publicDataInt = 1; 
+			} 
+			value[4] = String.valueOf(publicDataInt);
+			value[5] = description;
+			value[6] = "1";
+			value[7] = String.valueOf(this.uploadKey);
+
+			DataOutputStream outputStream = getDataOutputStream(name, value);
+
+			return outputStream;
+		}
+
+		private DataOutputStream getDataOutputStream(String[] name, String[] value){
+
+			URL url;
+			String result = new String();
+			try {
+				url = new URL(AppService.this.authenticationServerAddress);
+				conn = (HttpURLConnection)url.openConnection();
+
+				conn.setDoOutput(true);
+				conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
+				if (cookieName != null && cookieValue != null) {
+					conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
+				}
+
+				OutputStream output = conn.getOutputStream();
+				DataOutputStream ds = new DataOutputStream(output);
+				PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
+
+				for (int i = 0; i < value.length; i++) {
+					writer.append(twoHyphens + boundary + end);
+					writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
+					writer.flush();
+				}
+				return ds;
+				
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return null;		
+		}
+
+	}
+
 	private UploadFile pendingImage = null;
 	private UploadFile pendingVideo = null;
+	private UploadLiveVideo pendingLiveVideo = null;
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -107,6 +338,7 @@ public class AppService extends Service implements IAppService{
 	private Location gpsLocation;
 	private Location networkLocation;
 	private Location lastSentLocation;
+	private boolean liveVideoActive;
 
 
 	public class IMBinder extends Binder {
@@ -346,30 +578,24 @@ public class AppService extends Service implements IAppService{
 		boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);;
 		boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-		try {
-			if (datasentInterval > 0) {
-				am.cancel(getLocationIntent);
-				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, AppService.this.minDataSentInterval, getLocationIntent);
-			}
-			else {
-				am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, getLocationIntent);
-			}
+		if (gps_enabled == true || network_enabled == true) 
+		{
+			try {
+				if (datasentInterval > 0) {
+					am.cancel(getLocationIntent);
+					am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, AppService.this.minDataSentInterval, getLocationIntent);
+				}
+				else {
+					am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, getLocationIntent);
+				}
 
-		} catch (Exception ex) {
+			} catch (Exception ex) {
+			}
+		}
+		else {
+			notifyNoProviderEnabled();
 
 		}
-
-		if (network_enabled == false && gps_enabled == false){
-			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-			notification.setLatestEventInfo(AppService.this,
-					getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
-
-			mManager.notify(NOTIFICATION_ID , notification);
-		}
-
-
 	}
 
 
@@ -535,13 +761,13 @@ public class AppService extends Service implements IAppService{
 		try {
 			url = new URL(this.authenticationServerAddress);
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			
+
 			conn.setDoOutput(true);
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
 			if (cookieName != null && cookieValue != null) {
 				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
 			}
-			
+
 			OutputStream output = conn.getOutputStream();
 			DataOutputStream ds = new DataOutputStream(output);
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
@@ -551,8 +777,8 @@ public class AppService extends Service implements IAppService{
 				writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
 				writer.flush();
 			}
-			
-			
+
+
 			if (filename != null && file != null){
 				ds.writeBytes(twoHyphens + boundary + end);
 				ds.writeBytes("Content-Disposition: form-data; name=\""+ filename +"\";filename=\"" + filename +"\"" + end + end);
@@ -563,9 +789,9 @@ public class AppService extends Service implements IAppService{
 			ds.flush();
 			ds.close();
 			writer.close();
-			
+
 			getCookie(conn);
-			
+
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
 					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
 			{
@@ -583,7 +809,6 @@ public class AppService extends Service implements IAppService{
 					result = result.concat(inputLine);				
 				}
 				in.close();	
-
 			}
 
 		} catch (MalformedURLException e) {
@@ -663,57 +888,53 @@ public class AppService extends Service implements IAppService{
 		return this.email;
 	}
 
-	
+
 	public JSONObject getUserList() {		
-		
-		
-        JSONObject json = getJSONfromURL(authenticationServerAddress+"?r=users/GetUserListJson&email="+ AppService.this.email +"&password="+ AppService.this.password);
-        
-     
-        return json;
+		JSONObject json = getJSONfromURL(authenticationServerAddress+"?r=users/GetUserListJson&email="+ AppService.this.email +"&password="+ AppService.this.password);
+		return json;
 	}
-	
+
 	public static JSONObject getJSONfromURL(String url){
 		InputStream is = null;
 		String result = "";
 		JSONObject jArray = null;
-		
-		//http post
-	    try{
-	            HttpClient httpclient = new DefaultHttpClient();
-	            HttpPost httppost = new HttpPost(url);
-	            HttpResponse response = httpclient.execute(httppost);
-	            HttpEntity entity = response.getEntity();
-	            is = entity.getContent();
 
-	    }catch(Exception e){
-	            Log.e("log_tag", "Error in http connection "+e.toString());
-	    }
-	    
-	  //convert response to string
-	    try{
-	            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-	            StringBuilder sb = new StringBuilder();
-	            String line = null;
-	            while ((line = reader.readLine()) != null) {
-	                    sb.append(line + "\n");
-	            }
-	            is.close();
-	            result=sb.toString();
-	    }catch(Exception e){
-	            Log.e("log_tag", "Error converting result "+e.toString());
-	    }
-	    
-	    try{
-	    	
-            jArray = new JSONObject(result);            
-	    }catch(JSONException e){
-	            Log.e("log_tag", "Error parsing data "+e.toString());
-	    }
-    
-	    return jArray;
+		//http post
+		try{
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(url);
+			HttpResponse response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			is = entity.getContent();
+
+		}catch(Exception e){
+			Log.e("log_tag", "Error in http connection "+e.toString());
+		}
+
+		//convert response to string
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			is.close();
+			result=sb.toString();
+		}catch(Exception e){
+			Log.e("log_tag", "Error converting result "+e.toString());
+		}
+
+		try{
+
+			jArray = new JSONObject(result);            
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
+
+		return jArray;
 	}
-	
+
 	public boolean isUserAuthenticated() {
 		return this.isUserAuthenticated;
 	}
@@ -888,11 +1109,47 @@ public class AppService extends Service implements IAppService{
 				uploadVideo(pendingVideo.image, pendingVideo.isPublic, pendingVideo.description);
 				pendingVideo = null;
 			}
+			if (pendingLiveVideo != null) {
+				new FileListener(pendingLiveVideo.path, pendingLiveVideo.isPublic, pendingLiveVideo.description, lastSentLocation);
+				pendingLiveVideo = null;
+			}
 		}
 		if (connected == false || result.equals("1") == false){
 			pendingLocations.add(loc);
 		}
+	}
 
+
+	public void startLiveVideoUploading(final String videoPath) {
+		this.liveVideoActive = true;
+
+		if (lastSentLocation == null || 
+				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+			sendLocationNow();
+			pendingLiveVideo = new UploadLiveVideo(videoPath, false, "Live Video");
+			return;
+		}	
+
+		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+		notification.setLatestEventInfo(this,
+				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
+
+		mManager.notify(NOTIFICATION_ID , notification);
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				new FileListener(videoPath, false, "Live Video", lastSentLocation);
+			}
+		};
+		thread.start();
+	}
+
+	@Override
+	public void stopLiveVideoUploading() {
+			this.liveVideoActive = false;
 	}
 
 	@Override
@@ -956,7 +1213,7 @@ public class AppService extends Service implements IAppService{
 		value[4] = String.valueOf(publicDataInt);
 		value[5] = description;
 		value[6] = "1";
-		
+
 		String httpRes = this.sendHttpRequest(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
 		try {
