@@ -49,6 +49,10 @@ public interface IAppService {
 	public boolean uploadVideo(byte[] video, boolean publicData, String description);
 	
 	public JSONObject getUserList();
+	
+	public void startLiveVideoUploading(String videoPath);
+	
+	public void stopLiveVideoUploading();
 
 
 

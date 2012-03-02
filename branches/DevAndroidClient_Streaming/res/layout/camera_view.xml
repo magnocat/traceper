@@ -5,28 +5,33 @@
 				android:orientation="vertical"
 			   >  
 
-<Button android:id="@+id/takePictureButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-	    android:paddingLeft="20px"
-	    android:paddingRight="20px"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-    />
-<Button android:id="@+id/recordVideoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-	    android:paddingLeft="20px"
-	    android:paddingRight="20px"
-	    android:text="Switcht to Video"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-    />    	
+<LinearLayout
+	android:layout_alignParentRight="true"
+    android:id="@+id/buttonsLayout" 
+    android:orientation="vertical" 
+    android:layout_width="wrap_content" 
+    android:layout_height="fill_parent"
+    
+    >
+	<Button android:id="@+id/takePictureButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="5px"
+		    android:paddingRight="5px"
+	    />
+	<Button android:id="@+id/recordVideoButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+		    android:paddingLeft="5px"
+		    android:paddingRight="5px"		    
+		    android:layout_gravity="center"
+	    />    	
+</LinearLayout>  
 <SurfaceView android:id="@+id/surface"
 			android:layout_width="fill_parent" 
 			android:layout_height="fill_parent"			
-			>
-			
-</SurfaceView>	
+			/>	
+ 
+    
 		  
 </RelativeLayout>
