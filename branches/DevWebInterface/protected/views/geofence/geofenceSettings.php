@@ -24,7 +24,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 	
 		<div class="row" style="padding-top:1em">
-			<?php echo 'Check the geofences that you want to enroll the selected user:'; ?>
+			<?php echo 'Check the geofences that you want to follow the selected user:'; ?>
 		</div>		
 		
 		<div class="row" style="padding-top:2em;padding-left:10px">

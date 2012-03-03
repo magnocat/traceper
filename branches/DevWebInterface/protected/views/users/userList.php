@@ -122,6 +122,25 @@ if ($dataProvider != null) {
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList
 		),
+		
+		array(            // display 'create_time' using an expression
+					'name'=>'Geofence Settings',
+					'type' => 'raw',
+					
+		            'value'=>'CHtml::link("<img src=\"images/GeofenceSettings.png\"  />", "#",
+										array(\'onclick\'=>CHtml::ajax(
+											array(
+												\'url\'=>Yii::app()->createUrl(\'geofence/UpdateGeofencePrivacy\', array(\'friendId\'=>$data[\'id\'])),
+												
+					    						\'complete\'=> \'function() { $("#geofenceSettingsWindow").dialog("open"); return false;}\',
+					 							\'update\'=> \'#geofenceSettingsWindow\',	
+					 							
+											)),\'class\'=>\'vtip\', \'title\'=>\'Edit Settings\')
+					  				 )',		
+		
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
+					'visible'=>$isFriendList
+		),
 		       
 
 		array(            // display 'create_time' using an expression
