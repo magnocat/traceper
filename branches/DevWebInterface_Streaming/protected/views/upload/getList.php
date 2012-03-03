@@ -66,14 +66,15 @@ if ($dataProvider != null) {
 														 "thumb"=>"ok"
 														)
 										  			)."\"  />", "#",
-										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].");")
+										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].",".$data["fileType"].");")
 					  				  )',
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:5px;'),
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>'Description',
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["description"], "#", array(
-    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].");",
+    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].",".$data["fileType"].");",
 										))',	
 				),
 				array(            // display 'create_time' using an expression

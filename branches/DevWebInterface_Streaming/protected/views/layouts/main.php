@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-	<head>
+	<head>	
 		<title><?php echo Yii::app()->name; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="keywords"  content="" />
@@ -16,6 +16,8 @@
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/TrackerOperator.js"></script>
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>		
 	<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>	
+	<script type="text/javascript" src="jwplayer/jwplayer.js"></script>
+	
 
 	<?php 
 		Yii::app()->clientScript->registerScript('appStart',"var checked = false;
@@ -40,8 +42,8 @@
 		
 		 if (Yii::app()->user->isGuest == false){
 		 		Yii::app()->clientScript->registerScript('getDataInBackground',
-														'trackerOp.getFriendList(1);	
-		  												 trackerOp.getImageList(); ',
+														'trackerOp.getFriendList(1);
+														',                             //trackerOp.getImageList();
 		 												CClientScript::POS_READY); 				
 		 }
 
@@ -54,10 +56,15 @@
 		
 		var mapOperator = new MapOperator();
 	</script>
-	
-	
+			
 	</head>
-	<body>	
+	<body>
+
+	
+	<!-- START OF THE PLAYER EMBEDDING TO COPY-PASTE -->
+	<!-- <div id="mediaplayer">JW Player goes here</div><script type="text/javascript">jwplayer("mediaplayer").setup({flashplayer: "jwplayer/player.swf",file: "upload/video.mp4",image: "upload/preview.jpg"});</script> -->
+	<!-- END OF THE PLAYER EMBEDDING -->
+	
 	
 	<?php
 
@@ -225,14 +232,13 @@
 	 											else {
 	 												$userId = Yii::app()->user->id;
 	 											}  ?>>
-	 							
 	 						
 								<ul id='userarea'><li id="username" onclick="TRACKER.trackUser(<?php echo $userId; ?>)" class="vtip" title="<?php echo Yii::t('layout', 'See your position on the map'); ?>"><?php if (Yii::app()->user->isGuest == false){ 
 																				echo Yii::app()->user->name;
 																			}?>
 												 </li>
 	 							</ul>							
-	 							<div id="userId" style="display:none;"></div>
+	 							<div id="userId" style="display:none;"></div>	 							
 	 							
 	 							<?php 
  									echo CHtml::ajaxLink('<div style="clear:both" id="changePassword" class="userOperations">	
@@ -311,7 +317,7 @@
 											    'tabs' => array(
 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
 																	 'id'=>'users_tab'),
-											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image 
+											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>1)), //0:image 
 											        				  'id'=>'photos_tab'),
 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'), 
 											        				  'id'=>'groups_tab'),											

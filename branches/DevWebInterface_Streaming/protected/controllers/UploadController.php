@@ -185,6 +185,8 @@ class UploadController extends Controller
 
 	public function actionGet()
 	{
+		//echo '11111111111111111';
+		
 		if (!isset($_REQUEST['id'])) {
 			echo "No id";
 			Yii::app()->end();
@@ -203,15 +205,28 @@ class UploadController extends Controller
 				$thumb = true;
 			}
 			if ($thumb == true) {
-				$fileName = $this->getFileName($uploadId, $fileType, true);
-				if (file_exists($fileName) === false) {
-					$this->createThumb($uploadId, $fileType);
+				if($fileType == 0) //Image
+				{
+					$fileName = $this->getFileName($uploadId, $fileType, true);
+					if (file_exists($fileName) === false) {
+						$this->createThumb($uploadId, $fileType);
+					}
+					//echo 'AAAAAAAAAAAAAAAAAAAAAAAA';
 				}
+
 			}
+			else
+			{
+				//echo 'BBBBBBBBBBBBBBBBBBBBBBB';				
+			}
+
+			//$fileName = 'D:/eclipse/workspace/traceper/branches/DevWebInterface_Streaming/upload/19_thumb';
 
 		}
 		else {
-			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';
+			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . (($fileType == 0)?'images/image_missing.png':'images/video.png');
+			
+			//echo 'CCCCCCCCCCCCCCCCCCCC';
 		}
 		
 		if($fileType == 0) //Image
@@ -219,12 +234,50 @@ class UploadController extends Controller
 			header('Content-Type: image/jpeg;');
 			echo file_get_contents($fileName);		
 		}
-		else 
-		{
-		
+		else //Video
+		{	
+			if (isset($_REQUEST['thumb']))
+			{
+				header('Content-Type: image/jpeg;');
+				echo file_get_contents($fileName);								
+			}
+			else
+			{				
+// 				if (is_file($filename))
+// 				{
+// // 					header('Content-Type: video/x-flv');
+// // 					header("Content-Disposition: attachment; filename=video.flv");
+					
+// 					header('Content-type: video/mp4');
+// 					header('Content-type: video/mpeg');
+// 					header('Content-disposition: inline');
+// 					header("Content-Transfer-Encoding:­ binary");
+// 					header("Content-Length: ".filesize($filename));
+						
+					
+// 					$fd = fopen($filename, "r");
+				
+// 					while(!feof($fd))
+// 					{
+// 						echo fread($fd, 1024 * 5);
+// 						flush_buffers();
+// 					}
+				
+// 					fclose ($fd);
+// 					exit();
+// 				}
+			}					
 		}
 
 		Yii::app()->end();
+	}
+	
+	private function flush_buffers()
+	{
+	    ob_end_flush();
+	    ob_flush();
+	    flush();
+	    ob_start();
 	}
 
 	/**
@@ -269,7 +322,7 @@ class UploadController extends Controller
 					if ($effectedRows == 1)
 					{
 						$result = "Error in moving uploading file";
-						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.flv')))
+						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.mp4')))
 						{
 							$result = "1";
 						}
@@ -284,7 +337,7 @@ class UploadController extends Controller
 
 	private function getFileName($uploadId, $fileType, $thumb = false)
 	{
-		$fileExtension = ($fileType == 0)?'.jpg':'.flv';
+		$fileExtension = (($fileType == 0)?'.jpg':'.mp4');
 		
 		$fileName = Yii::app()->params->uploadPath. '/' . $uploadId . $fileExtension;
 		if ($thumb == true) {

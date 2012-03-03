@@ -307,50 +307,108 @@ function processImageXML(MAP, xml){
 			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, true);						
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
-				var image = new Image();
-
-				image.src= TRACKER.images[imageId].imageURL/* + TRACKER.imageOrigSuffix*/;
-				$("#loading").show();
-				$(image).load(function(){
-					$("#loading").hide();
+				if(fileType == 0)
+				{
+					var image = new Image();
+					image.src= TRACKER.images[imageId].imageURL/* + TRACKER.imageOrigSuffix*/;
 					
-					var uploadContent = (fileType == 0)?("<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"):("<embed src='images/Deneme.swf' height='200' width='200'/>");
+					//alert('imageURL:'+TRACKER.images[imageId].imageURL);
+					//alert('image.src:'+image.src);
 					
-					var content = "<div class='origImageContainer'>"
-						+ "<div>"
-						+ uploadContent
-						//+ "<embed src='images/Deneme.swf' height='200' width='200'/>"
-						+ "</div>"
-						+ "<div>"
-						+ TRACKER.images[imageId].description + "<br/>"
-						+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
-						+ "<br/>"
-						+ TRACKER.images[imageId].time + "<br/>"
-						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
-						+ "</div>"
-						+ '<ul class="sf-menu"> '
-						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-						+ TRACKER.langOperator.zoom
-						+'</a>'+ '</li>'
-						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-						+ TRACKER.langOperator.zoomMax
-						+'</a>'+'</li>'
-						+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
-						+'</a>'+'</li>'
-						+'</li>'
-						+ '</ul>'
-						+ "</div>";
-					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
-					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
+					$("#loading").show();
+					$(image).load(function(){
+						$("#loading").hide();
+						
+						var uploadContent = "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />";
+						
+						var content = "<div class='origImageContainer'>"
+							+ "<div>"
+							+ uploadContent
+							//+ "<embed src='images/Deneme.swf' height='200' width='200'/>"
+							+ "</div>"
+							+ "<div>"
+							+ TRACKER.images[imageId].description + "<br/>"
+							+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+							+ "<br/>"
+							+ TRACKER.images[imageId].time + "<br/>"
+							+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+							+ "</div>"
+							+ '<ul class="sf-menu"> '
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoom
+							+'</a>'+ '</li>'
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoomMax
+							+'</a>'+'</li>'
+							+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+							+'</a>'+'</li>'
+							+'</li>'
+							+ '</ul>'
+							+ "</div>";
+						MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
+						MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
 
-					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
-						if ($('#showPhotosOnMap').attr('checked') == false){
-							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
-						}
-					});
+						MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
+							if ($('#showPhotosOnMap').attr('checked') == false){
+								MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
+							}
+						});
 
-				});		
+					});					
+				}
+				else
+				{
+						var videoSrc = TRACKER.images[imageId].imageURL;
+						//alert('videoSrc:'+videoSrc);
 
+						//var uploadContent = "<embed src='upload/video.mp4' height='320' width='320'/>";
+						
+						var uploadContent = "<div id='mediaplayer'>JW Player goes here</div><script type='text/javascript' src='jwplayer/jwplayer.js'></script><script type='text/javascript'>jwplayer('mediaplayer').setup({flashplayer: 'jwplayer/player.swf',file: 'upload/video.mp4',image: 'upload/preview.jpg'});</script>";
+
+//						var uploadContent = "<div id='mediaplayer'>JW Player goes here</div>" +
+//						
+//											"<script type='text/javascript'>" +
+//												"jwplayer('mediaplayer').setup({" +
+//													"flashplayer: 'jwplayer/player.swf'," +
+//													"file: 'upload/video.mp4'," +
+//													"image: 'upload/preview.jpg'" +
+//												"});" +
+//											"</script>";						
+						
+						var content = "<div class='origImageContainer'>"
+							+ "<div>"
+							+ uploadContent
+							//+ "<embed src='images/Deneme.swf' height='200' width='200'/>"
+							+ "</div>"
+							+ "<div>"
+							+ TRACKER.images[imageId].description + "<br/>"
+							+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+							+ "<br/>"
+							+ TRACKER.images[imageId].time + "<br/>"
+							+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+							+ "</div>"
+							+ '<ul class="sf-menu"> '
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoom
+							+'</a>'+ '</li>'
+							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+							+ TRACKER.langOperator.zoomMax
+							+'</a>'+'</li>'
+							+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+							+'</a>'+'</li>'
+							+'</li>'
+							+ '</ul>'
+							+ "</div>";
+						MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
+						MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
+
+						MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
+							if ($('#showPhotosOnMap').attr('checked') == false){
+								MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
+							}
+						});
+					
+				}
 			});			
 		}
 

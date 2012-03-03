@@ -121,8 +121,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}, true);
 	};
 
-	this.getImageList = function(callback){
-		var params = "r=upload/getUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&"; 
+	this.getImageList = function(fileType, callback){
+		var params = "r=upload/getUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=" + fileType + "&"; 
+		
+		//alert('fileType:'+fileType);
+		//alert('params:'+params);
 
 		if (TRACKER.allImagesFetched == true) {
 			params += "list=onlyUpdated";
@@ -257,9 +260,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 
 
-	this.showMediaWindow = function(uploadId){
+	this.showMediaWindow = function(uploadId, fileType){
+		//alert('showMediaWindow() called with fileType:'+fileType);
+
 		if (typeof TRACKER.images[uploadId] == "undefined") {
-			TRACKER.getImageList(function(){
+			TRACKER.getImageList(fileType, function(){
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');	
 			});
 		}
