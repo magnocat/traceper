@@ -360,10 +360,12 @@ function processImageXML(MAP, xml){
 				{
 						var videoSrc = TRACKER.images[imageId].imageURL;
 						//alert('videoSrc:'+videoSrc);
+						
+						var uploadContent = "<embed src='" + videoSrc + "' height='320' width='320'/>";
 
 						//var uploadContent = "<embed src='upload/video.mp4' height='320' width='320'/>";
 						
-						var uploadContent = "<div id='mediaplayer'>JW Player goes here</div><script type='text/javascript' src='jwplayer/jwplayer.js'></script><script type='text/javascript'>jwplayer('mediaplayer').setup({flashplayer: 'jwplayer/player.swf',file: 'upload/video.mp4',image: 'upload/preview.jpg'});</script>";
+						//var uploadContent = "<div id='mediaplayer'>JW Player goes here</div><script type='text/javascript' src='jwplayer/jwplayer.js'></script><script type='text/javascript'>jwplayer('mediaplayer').setup({flashplayer: 'jwplayer/player.swf',file: 'upload/video.mp4',image: 'upload/preview.jpg'});</script>";
 
 //						var uploadContent = "<div id='mediaplayer'>JW Player goes here</div>" +
 //						

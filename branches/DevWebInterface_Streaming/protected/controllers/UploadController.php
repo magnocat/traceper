@@ -243,29 +243,37 @@ class UploadController extends Controller
 			}
 			else
 			{				
-// 				if (is_file($filename))
-// 				{
-// // 					header('Content-Type: video/x-flv');
-// // 					header("Content-Disposition: attachment; filename=video.flv");
+				if (is_file($fileName))
+				{
+					header('Content-Type: video/x-flv');
+					header("Content-Disposition: attachment; filename=video.flv");
 					
-// 					header('Content-type: video/mp4');
-// 					header('Content-type: video/mpeg');
-// 					header('Content-disposition: inline');
-// 					header("Content-Transfer-Encoding:­ binary");
-// 					header("Content-Length: ".filesize($filename));
-						
+					header('Content-type: video/mp4');
+					header('Content-type: video/mpeg');
+					header('Content-disposition: inline');
+					header("Content-Transfer-Encoding:­ binary");
+					header("Content-Length: ".filesize($fileName));
 					
-// 					$fd = fopen($filename, "r");
+					//readfile($fileName);
+										
+					$fd = fopen($fileName, "rb");
+
+					while(!feof($fd))
+					{						
+						echo fread($fd, 1024 * 5);
+						//flush_buffers();
+					}
 				
-// 					while(!feof($fd))
-// 					{
-// 						echo fread($fd, 1024 * 5);
-// 						flush_buffers();
-// 					}
-				
-// 					fclose ($fd);
-// 					exit();
-// 				}
+					fclose ($fd);
+// 					//exit();
+					
+// 					header('Content-type: video/mpeg');					
+// 					header('Content-Length: '.filesize($fileName)); // provide file size					
+// 					header("Expires: -1");
+// 					header("Cache-Control: no-store, no-cache, must-revalidate");					
+// 					header("Cache-Control: post-check=0, pre-check=0", false);					
+// 					readfile($fileName);					
+				}
 			}					
 		}
 
@@ -274,11 +282,11 @@ class UploadController extends Controller
 	
 	private function flush_buffers()
 	{
-	    ob_end_flush();
-	    ob_flush();
-	    flush();
-	    ob_start();
-	}
+		ob_end_flush();
+		//ob_flush();
+		flush();
+		ob_start();
+	}	
 
 	/**
 	 * this action is used by mobile clients
@@ -356,7 +364,7 @@ class UploadController extends Controller
 			if($fileType == 0) //Image
 			{
 				// Get new dimensions
-				list($width_orig, $height_orig) = getuploadsize($filename);
+				list($width_orig, $height_orig) = getimagesize($filename);
 	
 				$width = ($height / $height_orig) * $width_orig;
 	
