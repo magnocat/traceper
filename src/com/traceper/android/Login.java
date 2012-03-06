@@ -1,5 +1,7 @@
 package com.traceper.android;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +15,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +26,16 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
+import com.facebook.android.Facebook.DialogListener;
+
+
+
 import com.traceper.R;
+
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
 
@@ -38,9 +50,12 @@ public class Login extends Activity {
 	private static final int HTTP_REQUEST_FAILED = 6;
 	private static final int HTTP_MISSING_PARAMETER = 7;
 	private static final int CUSTOM_MESSAGE_DIALOG = 8;
+
+	
 	private EditText emailText;
     private EditText passwordText;
     private Button cancelButton;
+    private Button fbconnect;
     private CheckBox rememberMeCheckBox;
     private String dialogMessage;
     private IAppService appManager;
@@ -48,8 +63,10 @@ public class Login extends Activity {
     public static final int SIGN_UP_ID = Menu.FIRST;
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
-	
-   
+    private static String[] PERMISSIONS = 
+        new String[] { "offline_access", "read_stream", "publish_stream" };
+    private Handler handler = new Handler();
+    
 
    
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -85,7 +102,7 @@ public class Login extends Activity {
         }
     };
 	
-	
+    
 	
     
     
@@ -101,13 +118,15 @@ public class Login extends Activity {
         emailText = (EditText) findViewById(R.id.email);
         passwordText = (EditText) findViewById(R.id.password);   
         rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
-    
+        fbconnect = (Button) findViewById(R.id.fbconnect);
         
         SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
         emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
         passwordText.setText(preferences.getString(Configuration.PREFERENCES_PASSWORD, ""));
         rememberMeCheckBox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, false));
         
+
+		
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
@@ -156,8 +175,7 @@ public class Login extends Activity {
 										}
 										editor.commit();	
 																		
-										Intent i = new Intent(Login.this, Main.class);												
-										//i.putExtra(FRIEND_LIST, result);						
+										Intent i = new Intent(Login.this, Main.class);																		
 										startActivity(i);	
 										Login.this.finish();										
 									}
@@ -187,6 +205,15 @@ public class Login extends Activity {
 			{					
 				appManager.exit();
 				finish();				
+			}        	
+        }); 
+        fbconnect.setOnClickListener(new OnClickListener(){
+			public void onClick(View arg0) 
+			{			
+				 final Facebook faceb = new Facebook(LoginControl.FB_APP_ID);
+		         Session.waitForAuthCallback(faceb);
+		         faceb.authorize(Login.this, PERMISSIONS, new AppLoginListener(faceb));	
+			
 			}        	
         }); 
     }
@@ -309,7 +336,6 @@ public class Login extends Activity {
         			}
         		})        
         		.create(); 
-    		
     		default:
     			return null;
     	}
@@ -345,7 +371,11 @@ public class Login extends Activity {
 		return result;
 	}
 	
-
+    protected void onActivityResult(int requestCode, int resultCode,
+            Intent data) {
+    	Facebook fb = Session.wakeupForAuthCallback();
+    	fb.authorizeCallback(requestCode, resultCode, data);
+    }
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 	    
@@ -364,5 +394,80 @@ public class Login extends Activity {
 	    }
 	       
 	    return super.onMenuItemSelected(featureId, item);
-	}    
+	}
+	
+		
+	        private class AppLoginListener implements DialogListener {
+
+            private Facebook fb;
+
+            public AppLoginListener(Facebook fb) {
+                this.fb = fb;
+            }
+
+            public void onCancel() {
+                Log.d("app", "login canceled");
+            }
+
+            public void onComplete(Bundle values) {
+                /**
+                 * We request the user's info so we can cache it locally and
+                 * use it to render the new html snippets
+                 * when the user updates her status or comments on a post. 
+                 */
+            	progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
+                new AsyncFacebookRunner(fb).request("/me", 
+                        new AsyncRequestListener() {
+                    public void onComplete(JSONObject obj, final Object state) {
+                        // save the session data
+                        String uid = obj.optString("id");
+                        String name = obj.optString("name");
+                        String email = obj.optString("email");
+                        new Session(fb, uid, name , email).save(Login.this);
+                        fb_save_user(name,email,uid);
+                        
+            
+                    }
+                }, null);
+            }
+
+            public void onError(DialogError e) {
+                Log.d("app", "dialog error: " + e);               
+            }
+
+            public void onFacebookError(FacebookError e) {
+                Log.d("app", "facebook error: " + e);
+            }
+            //save new user
+            public void fb_save_user(final String name,final String email,final String uid){
+            	String result; 
+				if (uid.length() > 0 && 
+						uid.length() > 0 &&
+						email.length() > 0 &&
+						name.length() > 0
+						)
+					{
+					// record the information directly with facebook 
+					result = appManager.registerFBUser(uid, email, name);
+					progressDialog.dismiss();
+					if (result.equals("9") == true) {
+						Intent i = new Intent(Login.this, LoginControl.class);																		
+						startActivity(i);	
+						Login.this.finish();
+						}		
+					else {
+						Login.this.dialogMessage = result;
+						Intent i = new Intent(Login.this, LoginControl.class);																		
+						startActivity(i);	
+						Login.this.finish();
+					}
+            	
+					}
+            }
+            
+            
+        }
+    
+	
+	
 }

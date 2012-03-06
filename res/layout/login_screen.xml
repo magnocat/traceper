@@ -75,5 +75,26 @@
     />
 	</LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/account_login"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        
+        
+        
+     >
+
+        	<Button
+            android:id="@+id/fbconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttonfb" 
+            />
+
+    </LinearLayout>
+    
+
 </LinearLayout>
 </ScrollView>

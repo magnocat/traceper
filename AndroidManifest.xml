@@ -13,10 +13,17 @@
 			</intent-filter>
 		</activity>
 		<service android:name=".android.services.AppService"></service>
-		<activity android:name=".android.Login">
+		<activity android:name=".android.LoginControl">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
 				<category android:name="android.intent.category.LAUNCHER">
+				</category>
+			</intent-filter>
+		</activity>	
+		<activity android:name=".android.Login">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"></action>
+				<category android:name="android.intent.category.DEFAULT">
 				</category>
 			</intent-filter>
 		</activity>	
