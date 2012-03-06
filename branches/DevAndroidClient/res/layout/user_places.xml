@@ -23,7 +23,7 @@
         
 	</LinearLayout>
     
-	<!-- Title Of Song-->
+	<!-- Title Of Point-->
     <TextView
         android:id="@+id/point_time"
         android:layout_width="wrap_content"

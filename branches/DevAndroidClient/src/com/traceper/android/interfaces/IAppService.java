@@ -58,6 +58,8 @@ public interface IAppService {
 	
 	public String registerUser(String password, String email, String realname);
 	
+	public String registerFBUser(String password, String email, String realname);
+	
 	public String authenticateUser(String username, String password);
 	
 	public void setAuthenticationServerAddress(String address);
