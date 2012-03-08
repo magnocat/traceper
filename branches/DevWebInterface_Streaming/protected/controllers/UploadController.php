@@ -4,6 +4,8 @@ class UploadController extends Controller
 {
 	const thumbSuffix = '_thumb';
 	
+	private $uniqueId;
+	
  	public function filters()
     {
         return array(
@@ -183,10 +185,62 @@ class UploadController extends Controller
 		$this->renderPartial('searchUploadResults', array('model'=>$model, 'dataProvider'=>$dataProvider, 'fileType'=>$fileType), false, true);
 	}
 
+	
+	public function actionUploadStarted()
+	{
+		if (!isset($_REQUEST['id'])) {
+			echo "No id";
+			Yii::app()->end();
+		}
+
+		$this->uniqueId = $_REQUEST['id'];
+	}
+	
+	public function actionLiveGet()
+	{
+		# get seek position
+		if (isset($_GET['start'])) {
+			$seekPos = intval($_GET['start']);
+		} else {
+			$seekPos = 0;
+		}
+		
+		$uploadInfo = apc_fetch('upload_'.$this->uniqueId);
+		$fileName = $uploadInfo[‘temp_filename’];
+		
+		$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
+			
+		header('Content-Type: video/x-flv');
+		header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
+		header('Content-disposition: inline');
+		header("Content-Transfer-Encoding:­ binary");
+		header("Content-Length: ".$fileSize);
+			
+		# FLV file format header
+		if($seekPos != 0) 
+		{
+			print('FLV');
+			print(pack('C', 1));
+			print(pack('C', 1));
+			print(pack('N', 9));
+			print(pack('N', 9));
+		}
+		
+		# seek to requested file position
+		fseek($fh, $seekPos);
+
+		$fd = fopen($fileName, "rb");
+	
+		while(!feof($fd))
+		{
+			echo fread($fd, 1024 * 5);
+		}
+	
+		fclose ($fd);		
+	}	
+	
 	public function actionGet()
 	{
-		//echo '11111111111111111';
-		
 		if (!isset($_REQUEST['id'])) {
 			echo "No id";
 			Yii::app()->end();
@@ -242,17 +296,38 @@ class UploadController extends Controller
 				echo file_get_contents($fileName);								
 			}
 			else
-			{				
+			{								
 				if (is_file($fileName))
 				{
-					header('Content-Type: video/x-flv');
-					header("Content-Disposition: attachment; filename=video.flv");
+					# get seek position
+					if (isset($_GET['start'])) {
+						$seekPos = intval($_GET['start']);
+					} else {
+						$seekPos = 0;
+					}
+
+					$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
 					
-					header('Content-type: video/mp4');
-					header('Content-type: video/mpeg');
+					header('Content-Type: video/x-flv');
+					header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
+					
+// 					header('Content-type: video/mp4');
+// 					header('Content-type: video/mpeg');
 					header('Content-disposition: inline');
 					header("Content-Transfer-Encoding:­ binary");
-					header("Content-Length: ".filesize($fileName));
+					header("Content-Length: ".$fileSize);
+					
+					# FLV file format header
+					if($seekPos != 0) {
+						print('FLV');
+						print(pack('C', 1));
+						print(pack('C', 1));
+						print(pack('N', 9));
+						print(pack('N', 9));
+					}
+
+					# seek to requested file position
+					fseek($fh, $seekPos);					
 					
 					//readfile($fileName);
 										
@@ -330,7 +405,7 @@ class UploadController extends Controller
 					if ($effectedRows == 1)
 					{
 						$result = "Error in moving uploading file";
-						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.mp4')))
+						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.flv')))
 						{
 							$result = "1";
 						}
@@ -345,7 +420,7 @@ class UploadController extends Controller
 
 	private function getFileName($uploadId, $fileType, $thumb = false)
 	{
-		$fileExtension = (($fileType == 0)?'.jpg':'.mp4');
+		$fileExtension = (($fileType == 0)?'.jpg':'.flv');
 		
 		$fileName = Yii::app()->params->uploadPath. '/' . $uploadId . $fileExtension;
 		if ($thumb == true) {
