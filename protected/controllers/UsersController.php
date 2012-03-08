@@ -56,6 +56,7 @@ class UsersController extends Controller
 	public function actionTakeMyLocation()
 	{
 		$result = "Missing parameter";
+		$resultArray = array("result"=>$result);
 		if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 		&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 		&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
@@ -111,7 +112,7 @@ class UsersController extends Controller
 		echo CJSON::encode(
                  		$resultArray
 		);
-
+		$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		Yii::app()->end();
 	}
 

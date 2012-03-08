@@ -289,22 +289,22 @@ class GeofenceController extends Controller
 	public function actionCheckGeofenceBoundaries()
 	{
 		$processOutput = true;
-
-		
-		$locationPointOfFriend = array('latitude'=>32.11,
+					
+		if (isset($_REQUEST['friendLatitude']) && isset($_REQUEST['friendLongitude'])
+			&& isset($_REQUEST['friendId']))
+		{			
+			/*
+			$locationPointOfFriend = array('latitude'=>32.11,
 								 'longitude'=>25.11);
 								 
-		$locationPointOfFriend = array('latitude'=>42.148642,
+			$locationPointOfFriend = array('latitude'=>42.148642,
 								 'longitude'=>24.749107);
+			*/
+			$latitude = (float) $_REQUEST['friendLatitude'];
+			$longitude = (float) $_REQUEST['friendLongitude'];
+			$locationPointOfFriend = array('latitude'=>$latitude,
+								 'longitude'=>$longitude);			
 		
-		if (isset($_REQUEST['friendLatitude']) && isset($_REQUEST['friendLongitude']))
-		{
-			$locationPointOfFriend->latitude = (float) $_REQUEST['friendLatitude'];
-			$locationPointOfFriend->longitude = (float) $_REQUEST['friendLongitude'];
-		}
-		
-		if (isset($_REQUEST['friendId']))
-		{
 			$friendId = (int)$_REQUEST['friendId'];
 			//Take all the user-group relation rows that the user's friend added to
 			$relationRowsSelectedFriendBelongsTo = GeofenceUserRelation::model()->findAll('userId=:userId', array(':userId'=>$friendId));
