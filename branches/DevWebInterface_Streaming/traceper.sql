@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS `traceper_status_messages` (
 
 CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniqueId` int(11) NOT NULL DEFAULT '0',
   `fileType` tinyint(4) NOT NULL,
   `userId` int(11) unsigned NOT NULL,
   `latitude` decimal(8,6) NOT NULL,
@@ -151,6 +152,7 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `altitude` decimal(15,6) NOT NULL,
   `uploadTime` datetime NOT NULL,
   `publicData` tinyint(4) NOT NULL DEFAULT '0',
+  `live` tinyint(4) NOT NULL DEFAULT '0',
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`) USING BTREE,
   KEY `index2` (`uploadTime`),
@@ -163,13 +165,13 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
 -- Dumping data for table `traceper_upload`
 --
 
-INSERT INTO `traceper_upload` (`Id`, `fileType`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`) VALUES
-(7, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, ''),
-(10, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, ''),
-(11, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, ''),
-(12, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, ''),
-(13, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, ''),
-(14, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj');
+INSERT INTO `traceper_upload` (`Id`, `uniqueId`, `fileType`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `live`, `description`) VALUES
+(7, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, 0, ''),
+(10, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, 0, ''),
+(11, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, 0, ''),
+(12, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, 0, ''),
+(13, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, 0, ''),
+(14, 0, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 0, 'ghj');
 
 -- --------------------------------------------------------
 

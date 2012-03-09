@@ -3,9 +3,7 @@
 class UploadController extends Controller
 {
 	const thumbSuffix = '_thumb';
-	
-	private $uniqueId;
-	
+
  	public function filters()
     {
         return array(
@@ -193,7 +191,20 @@ class UploadController extends Controller
 			Yii::app()->end();
 		}
 
-		$this->uniqueId = $_REQUEST['id'];
+		$uniqueId = $_REQUEST['id'];
+		
+		if (Yii::app()->user->id != null)
+		{
+			//Insert a row with uniqueId and live fields, give other mandatory fields default values, they will be updated when upload is finished
+			
+			$sql = sprintf('INSERT INTO '
+			. Upload::model()->tableName() .'
+											(uniqueId, fileType, userId, latitude, longitude, altitude, uploadtime, live)
+											VALUES(%d, %d, %d, %s, %s, %s, NOW(), %d)', 
+											$uniqueId, 1/*Video*/, Yii::app()->user->id, 0, 0, 0, 1); //The unspecified fields have already default values in the table
+			
+			Yii::app()->db->createCommand($sql)->execute();
+		}		
 	}
 	
 	public function actionLiveGet()
@@ -204,39 +215,50 @@ class UploadController extends Controller
 		} else {
 			$seekPos = 0;
 		}
-		
-		$uploadInfo = apc_fetch('upload_'.$this->uniqueId);
-		$fileName = $uploadInfo[‘temp_filename’];
-		
-		$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
-			
-		header('Content-Type: video/x-flv');
-		header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
-		header('Content-disposition: inline');
-		header("Content-Transfer-Encoding:­ binary");
-		header("Content-Length: ".$fileSize);
-			
-		# FLV file format header
-		if($seekPos != 0) 
-		{
-			print('FLV');
-			print(pack('C', 1));
-			print(pack('C', 1));
-			print(pack('N', 9));
-			print(pack('N', 9));
-		}
-		
-		# seek to requested file position
-		fseek($fh, $seekPos);
 
-		$fd = fopen($fileName, "rb");
-	
-		while(!feof($fd))
+		//$sql = 'SELECT u.uniqueId as uniqueId FROM'.Upload::model()->tableName().' u WHERE (userId = '.Yii::app()->user->id.') AND (live = 1)';
+		
+		$liveUploadRow = Upload::model()->find('userId=:userId AND live=:live', array(':userId'=>Yii::app()->user->id, ':live'=>1));
+		
+		if($liveUploadRow != null) //Check whether there is a live record
 		{
-			echo fread($fd, 1024 * 5);
-		}
-	
-		fclose ($fd);		
+			$uploadInfo = apc_fetch('upload_'.($liveUploadRow->uniqueId));
+			$fileName = $uploadInfo[‘temp_filename’];
+			
+			$fd = fopen($fileName, "rb");
+			$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
+				
+			header('Content-Type: video/x-flv');
+					header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
+			header('Content-disposition: inline');
+					header("Content-Transfer-Encoding:­ binary");
+					header("Content-Length: ".$fileSize);
+				
+			# FLV file format header
+			if($seekPos != 0)
+			{
+				print('FLV');
+				print(pack('C', 1));
+				print(pack('C', 1));
+				print(pack('N', 9));
+				print(pack('N', 9));
+			}
+			
+			# seek to requested file position
+			fseek($fd, $seekPos);
+
+			//Continue streaming until the upload is finished and liveness ends 
+			while(Upload::model()->find('userId=:userId AND live=:live', array(':userId'=>Yii::app()->user->id, ':live'=>1)) != null)
+			{
+				while(!feof($fd))
+				{
+					echo fread($fd, 1024 * 5);
+				}
+				sleep(1); #Wait 1 sec to get uploaded	
+			}
+						
+			fclose ($fd);						
+		}		
 	}	
 	
 	public function actionGet()
@@ -395,20 +417,37 @@ class UploadController extends Controller
 
 				if (Yii::app()->user->id != null) 
 				{					
-					$sql = sprintf('INSERT INTO '
-									. Upload::model()->tableName() .'
-									(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
-									VALUES(%d, %s, %s, %s, NOW(), %d, "%s")', 
-									$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
-					$result = "Unknown Error";
-					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-					if ($effectedRows == 1)
+					$liveUploadRow = Upload::model()->find('userId=:userId AND live=:live', array(':userId'=>Yii::app()->user->id, ':live'=>1));
+					
+					//If there is no live record, then this upload record will be inserted for the first time
+					if($liveUploadRow == null)
 					{
-						$result = "Error in moving uploading file";
-						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.flv')))
+						$sql = sprintf('INSERT INTO '
+						. Upload::model()->tableName() .'
+															(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
+															VALUES(%d, %d, %s, %s, %s, NOW(), %d, "%s")', 
+						$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
+						$result = "Unknown Error";
+						$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+						if ($effectedRows == 1)
 						{
-							$result = "1";
-						}
+							$result = "Error in moving uploading file";
+							if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.flv')))
+							{
+								$result = "1";
+							}
+						}												
+					}
+					else //If there is a live record, then this upload record will update the live record (Assumpiton: During live streaming no other media can be uploaded)
+					{
+						$liveUploadRow->latitude = $latitude;
+						$liveUploadRow->longitude = $longitude;
+						$liveUploadRow->altitude = $altitude;
+						$liveUploadRow->uploadtime = date('Y-m-d H:i:s');
+						$liveUploadRow->publicData = $publicData;
+						$liveUploadRow->live = 0; //Upload completed, so the upload is no longer live
+						$liveUploadRow->description = $description;
+						$liveUploadRow->save();
 					}
 				}		
 			}
