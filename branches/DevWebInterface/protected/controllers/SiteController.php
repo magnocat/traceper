@@ -355,6 +355,78 @@ class SiteController extends Controller
 
 	}
 
+	public function actionGP_M_Register()
+	{
+		$model = new RegisterForm;
+
+		$processOutput = true;
+		$isMobileClient = false;
+		// collect user input data
+		if(isset($_POST['RegisterForm']))
+		{
+			$isMobileClient = false;
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') {
+				$isMobileClient = true;
+			}
+			$model->attributes = $_POST['RegisterForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {
+
+				$time = date('Y-m-d h:i:s');
+
+				$users = new Users;
+				$users->email = $model->email;
+				$users->realname = $model->name;
+				$users->password = md5($model->password);
+				$result = "Unknown error";
+				
+			if($users->save())
+				{
+					
+					echo CJSON::encode(array("result"=> "9"));
+					//echo CJSON::encode(array("result"=> "1"));
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "Unknown error"));
+				}
+				Yii::app()->end();
+			}
+
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+
+			}
+		}
+
+		if ($isMobileClient == true)
+		{
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+
+			echo CJSON::encode(array(
+								"result"=> $result,
+			));
+			Yii::app()->end();
+		}
+		else {
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+
+			$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+		}
+
+	}	
 	public function actionRegisterGPSTracker()
 	{
 		$model = new RegisterGPSTrackerForm;
