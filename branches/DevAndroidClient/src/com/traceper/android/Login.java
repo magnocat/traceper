@@ -34,6 +34,7 @@ import com.facebook.android.Facebook.DialogListener;
 
 
 
+
 import com.traceper.R;
 
 import com.traceper.android.interfaces.IAppService;
@@ -56,6 +57,7 @@ public class Login extends Activity {
     private EditText passwordText;
     private Button cancelButton;
     private Button fbconnect;
+    private Button gpconnect;
     private CheckBox rememberMeCheckBox;
     private String dialogMessage;
     private IAppService appManager;
@@ -119,6 +121,7 @@ public class Login extends Activity {
         passwordText = (EditText) findViewById(R.id.password);   
         rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
         fbconnect = (Button) findViewById(R.id.fbconnect);
+        gpconnect = (Button) findViewById(R.id.gpbutton);
         
         SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
         emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
@@ -216,6 +219,16 @@ public class Login extends Activity {
 			
 			}        	
         }); 
+        gpconnect.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+			
+				Intent i = new Intent(Login.this, OAuth.class);																		
+				startActivity(i);	
+				Login.this.finish();
+				
+			}
+        });
     }
     
     @Override
@@ -438,7 +451,7 @@ public class Login extends Activity {
             public void onFacebookError(FacebookError e) {
                 Log.d("app", "facebook error: " + e);
             }
-            //save new user
+            //save new facebook user
             public void fb_save_user(final String name,final String email,final String uid){
             	String result; 
 				if (uid.length() > 0 && 

@@ -100,7 +100,7 @@ public class LoginControl extends Activity {
         // immediately. Otherwise, render the login page.
         Session session = Session.restore(this);
         if (session != null) {
-          //  dispatcher.runHandler("stream");
+          
         	usermail = session.getEmail();
         	userid = session.getUid();
         	FB_LOGIN = true;
