@@ -789,7 +789,38 @@ public class AppService extends Service implements IAppService{
 
 		return result;
 	}
+	public String registerGPUser(String password, String email, String realname) 
+	{ // register google user
+		String[] name = new String[6];
+		String[] value = new String[6];
+		name[0] = "r";
+		name[1] = "RegisterForm[email]";
+		name[2] = "RegisterForm[password]";
+		name[3] = "RegisterForm[passwordAgain]";
+		name[4] = "RegisterForm[name]";
+		name[5] = "client";
 
+		value[0] = "site/GP_M_Register";
+		value[1] = email;
+		value[2] = password;
+		value[3] = password;
+		value[4] = realname;
+		value[5] = "mobile";
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+
+		String result = getString(R.string.unknown_error_occured);
+
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
 
 	public String authenticateUser(String email, String password) 
 	{			
