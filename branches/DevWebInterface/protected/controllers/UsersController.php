@@ -368,7 +368,7 @@ class UsersController extends Controller
 		$dataFetchedTimeKey = "UsersController.dataFetchedTime";
 		
 	
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime,
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, f.Id as friendShipId, u.dataArrivedTime, u.dataCalculatedTime, u.gp_image, u.fb_id, u.g_id, u.account_type,
 						1 isFriend
 				FROM '. Friends::model()->tableName() . ' f 
 				LEFT JOIN ' . Users::model()->tableName() . ' u
@@ -790,8 +790,12 @@ class UsersController extends Controller
 							'time'=>$row['dataArrivedTime'],
 							'message'=>$row['message'],
                     		'status_message'=>$row['status_message'],
-							'deviceId'=>$row['deviceId'],		
-                            ));
+							'deviceId'=>$row['deviceId'],
+		                   	'gp_image'=>$row['gp_image'],
+		                    'fb_id'=>$row['fb_id'],
+		                    'g_id'=>$row['g_id'],		
+                            'account_type'=>$row['account_type'], 
+		                   ));
                             
 
                             
