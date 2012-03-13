@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -27,13 +28,15 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+
+
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
 
 
 
-public class friends extends ListActivity {
+public class friends extends Activity {
 
 	private IAppService appService = null;
 	private JSONObject json;
@@ -45,15 +48,23 @@ public class friends extends ListActivity {
 	final int CONTEXT_MENU_on_map =1;
 	final int CONTEXT_MENU_past_points =2;
 	
-	ListView lv;
+	static final String KEY_USERNAME = "f_username"; // parent node
+	static final String KEY_ID = "id";
+	static final String KEY_DURATIONTIME = "Time";
+	static final String KEY_LOCATION = "Latitude";
+	static final String KEY_THUMB_URL = "gp_image";
+	static final String KEY_USERLISTNO = "";
+	ArrayList<HashMap<String, String>> frlist = new ArrayList<HashMap<String, String>>();
 	
+	ListView list;
+	FriendsListAdapter adapter;
 	
 	
 	private ServiceConnection mConnection = new ServiceConnection() 
 	{
 		public void onServiceConnected(ComponentName className, IBinder service) {          
 			appService = ((AppService.IMBinder)service).getService();  
-			
+			progressDialog = ProgressDialog.show(friends.this, "", getString(R.string.loading), true, false);	
 			listele();
 
 		}
@@ -85,14 +96,15 @@ public class friends extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        progressDialog = ProgressDialog.show(friends.this, "", getString(R.string.loading), true, false);	
+       
+      
     }
     
     public void listele(){
     	 setContentView(R.layout.listph);
          
-         ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
-         
+    	 frlist.clear();
+    	
  		
          try{
          	
@@ -101,28 +113,44 @@ public class friends extends ListActivity {
  	        for(int i=0;i<userlist.length();i++){						
  				HashMap<String, String> fri = new HashMap<String, String>();	
  				JSONObject e = userlist.getJSONObject(i);
+ 				String getimage = "";
  				
- 				fri.put("id",  e.getString("user"));
- 	        	fri.put("realname", "User Name:" + e.getString("realname"));
- 	        	fri.put("latitude",  e.getString("latitude"));
- 	        	fri.put("longitude", e.getString("longitude"));
- 	        	mylist.add(fri);			
+ 				if (e.getInt("account_type")==1){
+ 					String faceid = e.getString("fb_id");
+ 					getimage = "https://graph.facebook.com/" + faceid + "/picture";
+ 				}
+ 				else if (e.getInt("account_type")==2){
+ 					getimage = e.getString("gp_image");
+ 				}
+ 				
+ 				
+ 				fri.put(KEY_USERLISTNO, (String.valueOf(i+1) + "/" + String.valueOf(userlist.length()-1)));
+ 				fri.put(KEY_ID,  e.getString("user"));
+ 	        	fri.put(KEY_USERNAME, e.getString("realname"));
+ 	        	fri.put(KEY_LOCATION, "Lati= " + e.getString("latitude") + " Longi= " + e.getString("longitude"));
+ 	        	fri.put(KEY_DURATIONTIME, e.getString("time"));
+ 	        	fri.put(KEY_THUMB_URL, getimage);
+ 	        	frlist.add(fri);			
  			}	
  	        
          }catch(JSONException e)        {
          	 Log.e("log_tag", "Error parsing data "+e.toString());
          }
          
-         ListAdapter adapter = new SimpleAdapter(this, mylist , R.layout.f_list, 
-                         new String[] { "realname", "latitude" ,"longitude"}, 
-                         new int[] { R.id.item_title, R.id.item_subtitle , R.id.item_subtitle_2 });
-         
-         setListAdapter(adapter);
-         progressDialog.dismiss();
-         lv = getListView();
-         lv.setTextFilterEnabled(true);	
-         registerForContextMenu(lv);
+         list=(ListView)findViewById(R.id.list);
+ 	
+ 		// Getting adapter by passing xml data ArrayList
+         adapter=new FriendsListAdapter(this, frlist);  
 
+
+         
+         list.setAdapter(null);
+         list.setAdapter(adapter);
+      
+         registerForContextMenu(list);
+      
+        
+         progressDialog.dismiss();
     }
 
     @Override
@@ -134,34 +162,37 @@ public class friends extends ListActivity {
     }
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-
+    	 
          AdapterView.AdapterContextMenuInfo info= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-         Long id = getListAdapter().getItemId(info.position);/*what item was selected is ListView*/
-         HashMap<String, String> o = (HashMap<String, String>) lv.getItemAtPosition(info.position);  
+       //  int id =int.valueOf(adapter.getItemId(info.position));/*what item was selected is ListView*/
+         HashMap<String, String> o = (HashMap<String, String>) frlist.get(info.position);  
          switch (item.getItemId()) {
                  case CONTEXT_MENU_on_map:
        		
-                 		double lati =Double.valueOf(o.get("latitude"));
-                  		double longi =Double.valueOf(o.get("longitude"));
+                 		//double lati =Double.valueOf(o.get("latitude"));
+                  		//double longi =Double.valueOf(o.get("longitude"));
                   		int userid =Integer.valueOf(o.get("id"));
                   		
                   		  Intent i = new Intent(friends.this, MapViewController.class);  
                   		  i.setAction(IAppService.SHOW_USER_LOCATION);
                            i.putExtra("userid",userid);
-                           i.putExtra("latitude",lati);
-                           i.putExtra("longitude",longi);
+                         //  i.putExtra("latitude",lati);
+                         //  i.putExtra("longitude",longi);
                            startActivity(i);
                      
                       return(true);
                 case CONTEXT_MENU_past_points:
                 	
-               		int user =Integer.valueOf(o.get("id"));
-
+                	try{
+             		  int user =Integer.valueOf(o.get("id"));
              		  Intent i1 = new Intent(friends.this, PastPoints.class);  
               		  i1.setAction(IAppService.SHOW_USER_PAST_POINT);
                       i1.putExtra("user",user);
                       startActivity(i1);
-
+                	
+                	}catch(Exception e)        {
+                		Log.e("log_tag", "Error parsing data "+e.toString());
+                	}
                       return(true);    
          }
      return(super.onOptionsItemSelected(item));

@@ -58,9 +58,9 @@ public interface IAppService {
 	
 	public String registerUser(String password, String email, String realname);
 	
-	public String registerFBUser(String password, String email, String realname);
+	public String registerFBUser(String password, String email, String realname, String fb_id);
 	
-	public String registerGPUser(String password, String email, String realname);
+	public String registerGPUser(String password, String email, String realname, String image, String gp_id);
 	
 	public String authenticateUser(String username, String password);
 	

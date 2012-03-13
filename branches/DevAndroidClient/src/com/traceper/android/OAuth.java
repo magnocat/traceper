@@ -176,6 +176,7 @@ private void gp_save(){
 	String name = profile.getDisplayName();
 	String uid = profile.getId();
 	String gender = profile.getGender();
+	String gp_image = profile.getImage().getUrl();
 	String email = "";
 	String result = "";
 	
@@ -192,7 +193,7 @@ private void gp_save(){
 		email = "nomail@gmail.com";
 	}
 		try{
-			result = appService.registerGPUser(uid, email, name);
+			result = appService.registerGPUser(uid, email, name, gp_image, uid);
 			
 			SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 			editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, true);

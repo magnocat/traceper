@@ -461,7 +461,7 @@ public class Login extends Activity {
 						)
 					{
 					// record the information directly with facebook 
-					result = appManager.registerFBUser(uid, email, name);
+					result = appManager.registerFBUser(uid, email, name, uid);
 					progressDialog.dismiss();
 					if (result.equals("9") == true) {
 						Intent i = new Intent(Login.this, LoginControl.class);																		
