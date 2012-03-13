@@ -305,6 +305,8 @@ class SiteController extends Controller
 				$users->email = $model->email;
 				$users->realname = $model->name;
 				$users->password = md5($model->password);
+				$users->account_type = $model->account_type;
+				$users->fb_id = $model->ac_id;
 				$result = "Unknown error";
 				
 			if($users->save())
@@ -378,6 +380,9 @@ class SiteController extends Controller
 				$users->email = $model->email;
 				$users->realname = $model->name;
 				$users->password = md5($model->password);
+				$users->gp_image = substr($model->image,0,strlen($model->image)-6);
+				$users->account_type = $model->account_type;
+				$users->g_id = $model->ac_id;
 				$result = "Unknown error";
 				
 			if($users->save())

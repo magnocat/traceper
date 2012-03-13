@@ -60,11 +60,15 @@ class Users extends CActiveRecord
 			array('realname', 'length', 'max'=>80),
 			array('email', 'length', 'max'=>100),
 			array('deviceId', 'length', 'max'=>64),
+			array('gp_image', 'length', 'max'=>255),
+			array('account_type', 'length', 'max'=>1),
+			array('fb_id', 'length', 'max'=>50),
+			array('g_id', 'length', 'max'=>50),
 			array('status_message', 'length', 'max'=>128),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, gp_image, account_type, fb_id, g_id, dataCalculatedTime', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -103,6 +107,10 @@ class Users extends CActiveRecord
 			'status_source' => 'Status Source',
 			'status_message_time' => 'Status Message Time',
 			'dataCalculatedTime' => 'Data Calculated Time',
+			'gp_image' => 'Google User image',
+			'account_type' => 'User account type',
+			'fb_id' => 'Facebook user id',
+			'g_id' => 'Google plus user id',
 		);
 	}
 
@@ -131,6 +139,10 @@ class Users extends CActiveRecord
 		$criteria->compare('status_source',$this->status_source);
 		$criteria->compare('status_message_time',$this->status_message_time,true);
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
+		$criteria->compare('gp_image',$this->gp_image);
+		$criteria->compare('account_type',$this->account_type,true);
+		$criteria->compare('fb_id',$this->fb_id);
+		$criteria->compare('g_id',$this->g_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
