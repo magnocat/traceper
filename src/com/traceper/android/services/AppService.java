@@ -59,6 +59,9 @@ public class AppService extends Service implements IAppService{
 	private static final String SEND_LOCATION = "com.traceper.android.services.SEND_LOCATION";
 	private static final String GET_GPS_LOCATION = "com.traceper.android.services.GET_GPS_LOCATION";
 	private static final String GET_NETWORK_LOCATION = "com.traceper.android.services.GET_NETWORK_LOCATION";
+	private static final String GOOGLE_ACCOUNT = "2";
+	private static final String FACEBOOK_ACCOUNT = "1";
+	private static final String DEFAULT_ACCOUNT = "0";
 	private ConnectivityManager conManager = null; 
 	private LocationManager locationManager = null;
 	private String deviceId;
@@ -726,21 +729,23 @@ public class AppService extends Service implements IAppService{
 
 	public String registerUser(String password, String email, String realname) 
 	{
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "r";
 		name[1] = "RegisterForm[email]";
 		name[2] = "RegisterForm[password]";
 		name[3] = "RegisterForm[passwordAgain]";
 		name[4] = "RegisterForm[name]";
-		name[5] = "client";
+		name[5] = "RegisterForm[account_type]";
+		name[6] = "client";
 
 		value[0] = "site/register";
 		value[1] = email;
 		value[2] = password;
 		value[3] = password;
 		value[4] = realname;
-		value[5] = "mobile";
+		value[5] = DEFAULT_ACCOUNT;
+		value[6] = "mobile";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
@@ -757,23 +762,27 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}
 
-	public String registerFBUser(String password, String email, String realname) 
+	public String registerFBUser(String password, String email, String realname, String fb_id) 
 	{ // register facebook user
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[8];
+		String[] value = new String[8];
 		name[0] = "r";
 		name[1] = "RegisterForm[email]";
 		name[2] = "RegisterForm[password]";
 		name[3] = "RegisterForm[passwordAgain]";
 		name[4] = "RegisterForm[name]";
-		name[5] = "client";
+		name[5] = "RegisterForm[account_type]";
+		name[6] = "RegisterForm[ac_id]";	
+		name[7] = "client";
 
 		value[0] = "site/FB_M_register";
 		value[1] = email;
 		value[2] = password;
 		value[3] = password;
 		value[4] = realname;
-		value[5] = "mobile";
+		value[5] = FACEBOOK_ACCOUNT;
+		value[6] = fb_id;
+		value[7] = "mobile";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
@@ -789,23 +798,29 @@ public class AppService extends Service implements IAppService{
 
 		return result;
 	}
-	public String registerGPUser(String password, String email, String realname) 
+	public String registerGPUser(String password, String email, String realname ,String image, String gp_id) 
 	{ // register google user
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[9];
+		String[] value = new String[9];
 		name[0] = "r";
 		name[1] = "RegisterForm[email]";
 		name[2] = "RegisterForm[password]";
 		name[3] = "RegisterForm[passwordAgain]";
 		name[4] = "RegisterForm[name]";
-		name[5] = "client";
+		name[5] = "RegisterForm[image]";
+		name[6] = "RegisterForm[account_type]";
+		name[7] = "RegisterForm[ac_id]";
+		name[8] = "client";
 
 		value[0] = "site/GP_M_Register";
 		value[1] = email;
 		value[2] = password;
 		value[3] = password;
 		value[4] = realname;
-		value[5] = "mobile";
+		value[5] = image;
+		value[6] = GOOGLE_ACCOUNT;
+		value[7] = gp_id;
+		value[8] = "mobile";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 

@@ -101,7 +101,7 @@ public class PastPoints extends ListActivity {
 
     public void user_places(int userid){
     
-		setContentView(R.layout.listph);
+		setContentView(R.layout.past_point);
 
 		ArrayList<HashMap<String, String>> u_places = new ArrayList<HashMap<String, String>>();
 
