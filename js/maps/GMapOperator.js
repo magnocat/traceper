@@ -3,11 +3,13 @@
 function MapOperator() {
 
 	MAP_OPERATOR = this;
-	var newGeofence = null;
+	var newGeofence = null;	
 	/*
 	 * GMap Object
 	 */
 	map = null;
+	
+	this.geofences = [];
 	/*
 	 * this loads the gmap js file and css file
 	 */
@@ -341,6 +343,7 @@ function MapOperator() {
 				fillOpacity: opacity,
 				strokeOpacity: opacity,
 		}
+		geoFence.visibility=visible;
 		geoFence.polygon.setOptions(options);
 	}
 	

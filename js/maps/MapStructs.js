@@ -29,6 +29,7 @@ MapStruct.GeoFence = function(){
 	var geoFenceId;
 	var listener;
 	var polygon;
+	var visibility;
 	
 	for (var n in arguments[0]) { 
 		this[n] = arguments[0][n]; 
