@@ -304,7 +304,7 @@
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
 										
-									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+									echo CHtml::ajaxLink('<div class="userOperations" id="showGeofence">
 	 													<img src="images/userGeofences.png"  /><div></div>
 	 												 </div>', $this->createUrl('geofence/getGeofences'), 
  										array(
@@ -315,23 +315,28 @@
 																		if (obj.count > 0)
 																		{
 																			for(var i=0; i<obj.count; i++) {
-																				var poly = mapOperator.initializePolygon();
-																				var mapStruct = new MapStruct();
-																				geoFence = new MapStruct.GeoFence({geoFenceId:i,listener:null,polygon:poly});
+																				if (typeof mapOperator.geofences[obj.dataProvider[i].id] == "undefined") 
+																				{		
+																					var poly = mapOperator.initializePolygon();
+																					var mapStruct = new MapStruct();
+																					geoFence = new MapStruct.GeoFence({geoFenceId:obj.dataProvider[i].id,listener:null,polygon:poly});
 																			
-			    																var Loc1 = new MapStruct.Location({latitude:obj.dataProvider[i].Point1Latitude,
-			    								  								longitude:obj.dataProvider[i].Point1Longitude});
-			    								  								mapOperator.addPointToGeoFence(geoFence,Loc1);
+			    																	var Loc1 = new MapStruct.Location({latitude:obj.dataProvider[i].Point1Latitude,
+			    								  									longitude:obj.dataProvider[i].Point1Longitude});
+			    								  									mapOperator.addPointToGeoFence(geoFence,Loc1);
 			    								  							
-			    								  								var Loc2 = new MapStruct.Location({latitude:obj.dataProvider[i].Point2Latitude,
-			    								  								longitude:obj.dataProvider[i].Point2Longitude});
-			    								  								mapOperator.addPointToGeoFence(geoFence,Loc2);
+			    								  									var Loc2 = new MapStruct.Location({latitude:obj.dataProvider[i].Point2Latitude,
+			    								  									longitude:obj.dataProvider[i].Point2Longitude});
+			    								  									mapOperator.addPointToGeoFence(geoFence,Loc2);
 			    								  							
-			    								  								var Loc3 = new MapStruct.Location({latitude:obj.dataProvider[i].Point3Latitude,
-			    								  								longitude:obj.dataProvider[i].Point3Longitude});
-			    								  								mapOperator.addPointToGeoFence(geoFence,Loc3);
-			    								  							
-			    								  								mapOperator.setGeoFenceVisibility(geoFence,true);
+			    								  									var Loc3 = new MapStruct.Location({latitude:obj.dataProvider[i].Point3Latitude,
+			    								  									longitude:obj.dataProvider[i].Point3Longitude});
+			    								  									mapOperator.addPointToGeoFence(geoFence,Loc3);
+																					
+																					mapOperator.geofences[obj.dataProvider[i].id] = geoFence;
+																				}
+																							    								  							
+			    								  								mapOperator.setGeoFenceVisibility(mapOperator.geofences[obj.dataProvider[i].id],true);
 																			}																			
 																		}
 																		else
@@ -344,8 +349,37 @@
 																 }',
 													 ),
 										array(
-											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Show Geofences')));
-											
+											'id'=>'showGeofenceWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Show Geofences')));																														
+
+									echo CHtml::ajaxLink('<div class="userOperations" id="hideGeofence">
+	 													<img src="images/hideGeofences.png"  /><div></div>
+	 												 </div>', $this->createUrl('geofence/getGeofences'), 
+ 										array(
+													'success'=> 'function(result){ 
+																	try {
+																		var obj = jQuery.parseJSON(result);
+																																				
+																		if (obj.count > 0)
+																		{
+																			for(var i=0; i<obj.count; i++) {
+																				if (typeof mapOperator.geofences[obj.dataProvider[i].id] == "undefined") 
+																				{																					
+																				}
+																							    								  							
+			    								  								mapOperator.setGeoFenceVisibility(mapOperator.geofences[obj.dataProvider[i].id],false);
+																			}																			
+																		}
+																		else
+																		{
+																		}
+																	}
+																	catch (error){
+																	}
+																 }',
+													 ),
+										array(
+											'id'=>'hideGeofenceWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Hide Geofences')));
+										
  									echo CHtml::link('<div  class="userOperations" id="geoFence">	 			
 	 													<img src="images/geoFence.png"  /><div></div>		
 	 												 </div>', '#', array(
