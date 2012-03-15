@@ -223,7 +223,7 @@ class UploadController extends Controller
 		if($liveUploadRow != null) //Check whether there is a live record
 		{
 			$uploadInfo = apc_fetch('upload_'.($liveUploadRow->uniqueId));
-			$fileName = $uploadInfo[‘temp_filename’];
+			$fileName = $uploadInfo[ï¿½temp_filenameï¿½];
 			
 			$fd = fopen($fileName, "rb");
 			$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
@@ -231,7 +231,7 @@ class UploadController extends Controller
 			header('Content-Type: video/x-flv');
 					header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
 			header('Content-disposition: inline');
-					header("Content-Transfer-Encoding:­ binary");
+					header("Content-Transfer-Encoding:ï¿½ binary");
 					header("Content-Length: ".$fileSize);
 				
 			# FLV file format header
@@ -336,7 +336,7 @@ class UploadController extends Controller
 // 					header('Content-type: video/mp4');
 // 					header('Content-type: video/mpeg');
 					header('Content-disposition: inline');
-					header("Content-Transfer-Encoding:­ binary");
+					header("Content-Transfer-Encoding:ï¿½ binary");
 					header("Content-Length: ".$fileSize);
 					
 					# FLV file format header
@@ -414,14 +414,17 @@ class UploadController extends Controller
 						$publicData = 1;
 					}
 				}
+				
 
 				if (Yii::app()->user->id != null) 
 				{					
 					$liveUploadRow = Upload::model()->find('userId=:userId AND live=:live', array(':userId'=>Yii::app()->user->id, ':live'=>1));
 					
+
 					//If there is no live record, then this upload record will be inserted for the first time
 					if($liveUploadRow == null)
 					{
+						
 						$sql = sprintf('INSERT INTO '
 						. Upload::model()->tableName() .'
 															(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
@@ -447,7 +450,10 @@ class UploadController extends Controller
 						$liveUploadRow->publicData = $publicData;
 						$liveUploadRow->live = 0; //Upload completed, so the upload is no longer live
 						$liveUploadRow->description = $description;
-						$liveUploadRow->save();
+						$result = "Unknown Error";
+						if ($liveUploadRow->save()) {
+							$result = "1";							
+						}
 					}
 				}		
 			}
