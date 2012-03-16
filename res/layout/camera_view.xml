@@ -5,32 +5,59 @@
 				android:orientation="vertical"
 			   >  
 
-<LinearLayout
+<TableLayout
 	android:layout_alignParentRight="true"
     android:id="@+id/buttonsLayout" 
-    android:orientation="vertical" 
     android:layout_width="wrap_content" 
     android:layout_height="fill_parent"
     
     >
+    <TableRow android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"	  
+	        android:layout_weight="1"
+	        >
+	        
 	<Button android:id="@+id/takePictureButton"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:paddingLeft="5px"
-		    android:paddingRight="5px"
+	        android:paddingLeft="5dp"
+		    android:paddingRight="5dp"
+		    android:layout_gravity="center"
+		    
 	    />
+	</TableRow>
+	<TableRow android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"	        
+	        android:layout_weight="1"
+	        >
 	<Button android:id="@+id/recordVideoButton"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-		    android:paddingLeft="5px"
-		    android:paddingRight="5px"		    
+		    android:paddingLeft="5dp"
+		    android:paddingRight="5dp"		    
 		    android:layout_gravity="center"
-	    />    	
-</LinearLayout>  
+		    android:text="Live"
+	    />    
+	 </TableRow>
+	 <TableRow android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"	        
+	        android:layout_weight="1"
+	        >
+		<Button android:id="@+id/sendAfterRecord"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+			    android:paddingLeft="5dp"
+			    android:paddingRight="5dp"		    
+			    android:layout_gravity="center"
+			    android:text="Record"
+		    />    
+	 </TableRow>	
+</TableLayout>  
+
 <SurfaceView android:id="@+id/surface"
-			android:layout_width="fill_parent" 
-			android:layout_height="fill_parent"			
-			/>	
+                        android:layout_width="fill_parent" 
+                        android:layout_height="fill_parent"                     
+                        />   
  
     
 		  

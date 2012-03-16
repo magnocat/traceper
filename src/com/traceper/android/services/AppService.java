@@ -106,207 +106,67 @@ public class AppService extends Service implements IAppService{
 		private File file;
 		private FileInputStream fin;
 		private boolean isSyncPacketSent = false;
-		private int uploadKey = (int)(System.currentTimeMillis() * Math.random() * 10000);
+		private int uploadKey = 0;
 
-		final String end = "\r\n";
-		final String twoHyphens = "--";
-		final String boundary = "*****++++++************++++++++++++";
-		private HttpURLConnection conn;
 
-		public FileListener(final String fileName, boolean isPublic, String description, Location loc) {
+		public FileListener(final String fileName, final boolean isPublic, final String description, final Location loc) {
 			timer = new Timer();
-			
-			final DataOutputStream outputStream = this.sendRequest(loc, isPublic, description);
+
+			uploadKey = (int)(System.currentTimeMillis() * Math.random() * 10000);
+
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					if (file == null) {
-						try {
-							file = new File(fileName);
-							fin = new FileInputStream(file);
-							outputStream.writeBytes(twoHyphens + boundary + end);
-							outputStream.writeBytes("Content-Disposition: form-data; name=\""+ "upload" +"\";filename=\"" + "upload" +"\"" + end + end);
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+//					if (file == null) {
+//						try {
+//							file = new File(fileName);
+//							fin = new FileInputStream(file);
+//						} catch (FileNotFoundException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//					if (file.exists()) {
+//						Log.i("traceper","file length " + file.length());
+//						Log.i("traceper offset", "offset " + offset);
+//					}
+					
+					try {
+						file = new File(fileName);
+						fin = new FileInputStream(file);
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
 					}
-					if (file.exists()) {
-						Log.i("traceper","file length " + file.length());
-					}
-					int byteCount = (int)(file.length()) - offset;
+					
+					int byteCount = (int)(file.length());// - offset;
 					byte[] data = new byte[byteCount];
+					Log.i("Traceper byte count", "" + data.length);
 					if (byteCount > 0) {
 						int readByteCount;
 						try {
-							readByteCount = fin.read(data, offset, data.length);
+							boolean isLastPacket = false;
+							if (liveVideoActive == false) 
+							{
+								timer.cancel();
+								isLastPacket = true;
+							}
+						//	long skipCount = fin.skip(offset);
+							readByteCount = fin.read(data); //, 0, data.length);
+							fin.close();
 							if (readByteCount == -1) {
 
 							}
 							else {
 								offset += readByteCount;
-								outputStream.write(data, 0, readByteCount);
-								if (isSyncPacketSent == false) {
-									isSyncPacketSent = sendSyncPacket();
-								}
+								byte[] video = new byte[readByteCount];
+								System.arraycopy(data, 0, video, 0, readByteCount);
+								uploadVideo(data, false, "description", uploadKey, true, isLastPacket);	
 							}
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
 					}
-					if (liveVideoActive == false) 
-					{
-						timer.cancel();
-						String notificationText = getString(R.string.upload_failed);
-						try {
-							outputStream.writeBytes(end);
-							outputStream.writeBytes(twoHyphens + boundary + twoHyphens + end);
-							outputStream.flush();
-							outputStream.close();
 
-							if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
-									conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
-							{
-								conn.disconnect();
-								AppService.this.authenticationServerAddress += "/";
-							}
-							else
-							{
-								BufferedReader in = new BufferedReader(
-										new InputStreamReader(conn.getInputStream()));
-								String inputLine;
-
-								String result = new String();
-								while ((inputLine = in.readLine()) != null) {
-									result = result.concat(inputLine);				
-								}
-								Log.i("traceper", "Result " + result);
-								in.close();								
-
-								try {
-									JSONObject jsonObject = new JSONObject(result);
-									result = jsonObject.getString("result");
-									if (result.equals("1")) {
-										notificationText = getString(R.string.upload_succesfull);
-									}
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}
-							}
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						finally {
-							Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-							PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-							notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), notificationText, contentIntent);
-							mManager.notify(NOTIFICATION_ID, notification);
-						}
-					} 
 				}}, 5000, 5000);
-
-
-		}
-		
-		private boolean sendSyncPacket() {
-			String[] name = new String[3];
-			String[] value = new String[3];
-			name[0] = "r";
-			name[1] = "uploadKey";
-			name[2] = "fileType";			
-			
-			value[0] = "upload/uploadStarted";
-			value[1] = String.valueOf(this.uploadKey);			
-			value[2] = "1";			
-			
-			String response = sendHttpRequest(name, value, null, null);			
-			try {
-				JSONObject jsonObject = new JSONObject(response);
-				response = jsonObject.getString("result");
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			
-			boolean result = false;
-			if (response.equals("1")) {
-				result = true;
-			}
-			return result;
-		}
-
-		private DataOutputStream sendRequest(Location loc, boolean publicData, String description) {
-			double latitude = 0;
-			double longitude = 0;
-			double altitude = 0;
-			if (loc != null) {
-				latitude = loc.getLatitude();
-				longitude = loc.getLongitude();
-				altitude = loc.getAltitude();
-			}
-			//		try {
-			String[] name = new String[8];
-			String[] value = new String[8];
-			name[0] = "r";
-			name[1] = "latitude";
-			name[2] = "longitude";
-			name[3] = "altitude";
-			name[4] = "publicData";
-			name[5] = "description";
-			name[6] = "fileType";
-			name[7] = "APC_UPLOAD_PROGRESS";
-
-			value[0] = "upload/upload";
-			value[1] = String.valueOf(latitude);
-			value[2] = String.valueOf(longitude);
-			value[3] = String.valueOf(altitude);
-			int publicDataInt = 0;
-			if (publicData == true) {
-				publicDataInt = 1; 
-			} 
-			value[4] = String.valueOf(publicDataInt);
-			value[5] = description;
-			value[6] = "1";
-			value[7] = String.valueOf(this.uploadKey);
-
-			DataOutputStream outputStream = getDataOutputStream(name, value);
-
-			return outputStream;
-		}
-
-		private DataOutputStream getDataOutputStream(String[] name, String[] value){
-
-			URL url;
-			String result = new String();
-			try {
-				url = new URL(AppService.this.authenticationServerAddress);
-				conn = (HttpURLConnection)url.openConnection();
-
-				conn.setDoOutput(true);
-				conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
-				if (cookieName != null && cookieValue != null) {
-					conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
-				}
-
-				OutputStream output = conn.getOutputStream();
-				DataOutputStream ds = new DataOutputStream(output);
-				PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
-
-				for (int i = 0; i < value.length; i++) {
-					writer.append(twoHyphens + boundary + end);
-					writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
-					writer.flush();
-				}
-				return ds;
-				
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return null;		
 		}
 
 	}
@@ -722,7 +582,7 @@ public class AppService extends Service implements IAppService{
 
 		String img = new String(image);
 		String httpRes = this.sendHttpRequest(name, value, "upload", image);
-		Log.i("img length: ", String.valueOf(img.length()) );
+		Log.i("Traceper -> Upload image result -> ", httpRes);
 		String result = getString(R.string.unknown_error_occured);
 
 		try {
@@ -1110,8 +970,13 @@ public class AppService extends Service implements IAppService{
 				pendingVideo = null;
 			}
 			if (pendingLiveVideo != null) {
-				new FileListener(pendingLiveVideo.path, pendingLiveVideo.isPublic, pendingLiveVideo.description, lastSentLocation);
-				pendingLiveVideo = null;
+				new Thread(){
+					public void run() {
+						new FileListener(pendingLiveVideo.path, pendingLiveVideo.isPublic, pendingLiveVideo.description, lastSentLocation);
+						pendingLiveVideo = null;
+					}
+				}.start();
+
 			}
 		}
 		if (connected == false || result.equals("1") == false){
@@ -1149,11 +1014,16 @@ public class AppService extends Service implements IAppService{
 
 	@Override
 	public void stopLiveVideoUploading() {
-			this.liveVideoActive = false;
+		this.liveVideoActive = false;
 	}
 
 	@Override
 	public boolean uploadVideo(byte[] video, boolean publicData, String description) {
+		return uploadVideo(video, publicData, description, 0, false, false);
+	}
+	
+	
+	public boolean uploadVideo(byte[] video, boolean publicData, String description, int uniqueId, boolean isLive, boolean isLastPacket) {
 		if (lastSentLocation == null || 
 				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
 			sendLocationNow();
@@ -1169,7 +1039,7 @@ public class AppService extends Service implements IAppService{
 				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
 
 		mManager.notify(NOTIFICATION_ID , notification);
-		String result = sendVideo(video, publicData, description, lastSentLocation);
+		String result = sendVideo(video, publicData, description, lastSentLocation, uniqueId, isLive, isLastPacket);
 		String notificationText = getString(R.string.upload_failed);
 		boolean operationResult = false;
 		if (result.equals("1")) {
@@ -1182,6 +1052,11 @@ public class AppService extends Service implements IAppService{
 	}
 
 	private String sendVideo(byte[] video, boolean publicData, String description, Location loc) {
+
+		return sendVideo(video, publicData, description, loc, 0, false, false);
+	}
+
+	private String sendVideo(byte[] video, boolean publicData, String description, Location loc, int uniqueId, boolean isLive, boolean isLastPacket) {
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
@@ -1192,8 +1067,8 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[7];
-		String[] value = new String[7];
+		String[] name = new String[10];
+		String[] value = new String[10];
 		name[0] = "r";
 		name[1] = "latitude";
 		name[2] = "longitude";
@@ -1201,6 +1076,9 @@ public class AppService extends Service implements IAppService{
 		name[4] = "publicData";
 		name[5] = "description";
 		name[6] = "fileType";
+		name[7] = "uniqueId";
+		name[8] = "isLive";
+		name[9] = "isLastPacket";
 
 		value[0] = "upload/upload";
 		value[1] = String.valueOf(latitude);
@@ -1213,6 +1091,13 @@ public class AppService extends Service implements IAppService{
 		value[4] = String.valueOf(publicDataInt);
 		value[5] = description;
 		value[6] = "1";
+		value[7] = String.valueOf(uniqueId);
+		if (isLive == true)  value[8] = "1";
+		else value[8] = "0";
+		
+		if (isLastPacket == true) value[9] = "1";
+		else value[9] = "0";
+		
 
 		String httpRes = this.sendHttpRequest(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
@@ -1221,8 +1106,7 @@ public class AppService extends Service implements IAppService{
 			result = jsonObject.getString("result");
 		} catch (JSONException e) {
 			e.printStackTrace();
-		}
-		//		int result = this.evaluateResult(httpRes);
+		}		
 
 		return result;
 	}
