@@ -315,7 +315,7 @@
 																		if (obj.count > 0)
 																		{
 																			for(var i=0; i<obj.count; i++) {
-																				if (typeof mapOperator.geofences[obj.dataProvider[i].id] == "undefined") 
+																				if (typeof TRACKER.geofences[obj.dataProvider[i].id] == "undefined") 
 																				{		
 																					var poly = mapOperator.initializePolygon();
 																					var mapStruct = new MapStruct();
@@ -333,10 +333,10 @@
 			    								  									longitude:obj.dataProvider[i].Point3Longitude});
 			    								  									mapOperator.addPointToGeoFence(geoFence,Loc3);
 																					
-																					mapOperator.geofences[obj.dataProvider[i].id] = geoFence;
+																					TRACKER.geofences[obj.dataProvider[i].id] = geoFence;
 																				}
 																							    								  							
-			    								  								mapOperator.setGeoFenceVisibility(mapOperator.geofences[obj.dataProvider[i].id],true);
+			    								  								mapOperator.setGeoFenceVisibility(TRACKER.geofences[obj.dataProvider[i].id],true);
 																			}																			
 																		}
 																		else
@@ -362,11 +362,11 @@
 																		if (obj.count > 0)
 																		{
 																			for(var i=0; i<obj.count; i++) {
-																				if (typeof mapOperator.geofences[obj.dataProvider[i].id] == "undefined") 
+																				if (typeof TRACKER.geofences[obj.dataProvider[i].id] == "undefined") 
 																				{																					
 																				}
 																							    								  							
-			    								  								mapOperator.setGeoFenceVisibility(mapOperator.geofences[obj.dataProvider[i].id],false);
+			    								  								mapOperator.setGeoFenceVisibility(TRACKER.geofences[obj.dataProvider[i].id],false);
 																			}																			
 																		}
 																		else
