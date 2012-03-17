@@ -34,6 +34,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.friendPageResetCount = Number(0);	
 	this.users = [];
+	
+	this.geofences = [];
 	/**
 	 * this is just a flag to know whether images are fetched
 	 * it is used when photos tab is clicked...

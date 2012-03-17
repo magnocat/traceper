@@ -8,8 +8,7 @@ function MapOperator() {
 	 * GMap Object
 	 */
 	map = null;
-	
-	this.geofences = [];
+		
 	/*
 	 * this loads the gmap js file and css file
 	 */
