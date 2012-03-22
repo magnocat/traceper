@@ -23,7 +23,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `traceper_friends`
+-- Table structure for table `traceper_friends` 
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_friends` (
@@ -242,6 +242,11 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   `status_source` tinyint(4) DEFAULT NULL,
   `status_message_time` datetime DEFAULT NULL,
   `dataCalculatedTime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `fb_id` varchar(50) NOT NULL DEFAULT '0',
+  `g_id` varchar(50) NOT NULL DEFAULT '0',
+  `gender` varchar(6) NOT NULL,
+  `account_type` int(1) NOT NULL,
+  `gp_image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `email` (`email`),
   KEY `dataArrivedTime` (`dataArrivedTime`),
@@ -328,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapýsý `traceper_geofence_user_relation`
+-- Tablo i\E7in tablo yap\FDs\FD `traceper_geofence_user_relation`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_geofence_user_relation` (
