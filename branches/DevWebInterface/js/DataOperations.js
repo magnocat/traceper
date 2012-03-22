@@ -301,8 +301,7 @@ function processImageXML(MAP, xml){
 				mapMarker:markerInfoWindow,
 				description:description,
 			});
-			
-			TRACKER.images[imageId].mapMarker.infoWindow = MAP.initializeInfoWindow();
+						
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, true);						
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
