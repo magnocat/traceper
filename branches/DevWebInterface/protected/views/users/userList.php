@@ -68,6 +68,7 @@ if ($dataProvider != null) {
 															var obj = jQuery.parseJSON(result);
 															if (obj.result && obj.result == "1") 
 															{
+																TRACKER.showMessageDialog("Friend request is sent");
 																$.fn.yiiGridView.update($("#gridViewId").text());
 															}
 															else 
