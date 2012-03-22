@@ -456,31 +456,44 @@ class SiteController extends Controller
 				//For database recording, because of email and password are required fields
 				$users->email = $model->deviceId;
 				$users->password = md5($model->name);
-				$users->save();
-
-				if($users->save()) // save the change to database
+				
+				try
 				{
-					$friend = new Friends();
-					$friend->friend1 = Yii::app()->user->id;
-					$friend->friend1Visibility = 1; //default visibility setting is visible
-					$friend->friend2 = $users->getPrimaryKey();
-					$friend->friend2Visibility = 1; //default visibility setting is visible
-					$friend->status = 1;
-						
-					if ($friend->save())
+					if($users->save()) // save the change to database
 					{
-						echo CJSON::encode(array("result"=> "1"));
+						$friend = new Friends();
+						$friend->friend1 = Yii::app()->user->id;
+						$friend->friend1Visibility = 1; //default visibility setting is visible
+						$friend->friend2 = $users->getPrimaryKey();
+						$friend->friend2Visibility = 1; //default visibility setting is visible
+						$friend->status = 1;
+							
+						if ($friend->save())
+						{
+							echo CJSON::encode(array("result"=> "1"));
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=> "Unknown error"));
+						}
 					}
 					else
 					{
 						echo CJSON::encode(array("result"=> "Unknown error"));
-					}
+					}							
 				}
-				else
+		    	catch (Exception $e) 
 				{
-					echo CJSON::encode(array("result"=> "Unknown error"));
+					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+					{
+						echo CJSON::encode(array("result"=> "Duplicate Entry"));
+					}
+					Yii::app()->end();
+					
+//					echo 'Caught exception: ',  $e->getMessage(), "\n";    				
+//    				echo 'Code: ', $e->getCode(), "\n";
 				}
-
+				
 
 
 				Yii::app()->end();

@@ -52,6 +52,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			
 																			$("#registerMessage").dialog("open");
 																		}
+																		else if(obj.result && obj.result == "Duplicate Entry")
+																		{
+																			$("#registerGPSTrackerWindow").html(result);
+
+																			$("#registerGPSTrackerWindow").dialog("close");
+																			$("#messageDialogText").html("Add only one GPS Tracker with same id");
+																			$("#messageDialog").dialog("open");																			
+																		}
 																	}
 																	catch (error){
 																		$("#registerGPSTrackerWindow").html(result);
