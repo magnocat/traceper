@@ -5,6 +5,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	MAP = map;
 	this.langOperator;
 	this.userId;
+	this.preUserId = -1;
 	this.language = "en";
 	this.ajaxUrl = url;
 	this.facebookId = null;
@@ -174,7 +175,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 			MAP.panMapTo(location);
+			if(TRACKER.preUserId != -1)//Check for the first click in order not to take "undefined" error
+			{
+				MAP.closeInfoWindow(TRACKER.users[TRACKER.preUserId].mapMarker[0].infoWindow);
+			}
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
+			TRACKER.preUserId = userId;
 		}
 	};
 
