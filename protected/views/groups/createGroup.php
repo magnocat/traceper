@@ -49,6 +49,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#createGroupWindow").dialog("close");
+																			$("#messageDialogText").html("The group is created successfully");
+																			$("#messageDialog").dialog("open");																			
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
 																		{
