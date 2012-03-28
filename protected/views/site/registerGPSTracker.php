@@ -49,24 +49,32 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#registerGPSTrackerWindow").dialog("close");
-																			
-																			$("#registerMessage").dialog("open");
+																			$("#messageDialogText").html("The device is registered successfully");
+																			$("#messageDialog").dialog("open");	
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
 																		{
 																			$("#registerGPSTrackerWindow").html(result);
 
 																			$("#registerGPSTrackerWindow").dialog("close");
-																			$("#messageDialogText").html("Add only one GPS Tracker with same id");
+																			$("#messageDialogText").html("You can add only one GPS Tracker with the same id!");
 																			$("#messageDialog").dialog("open");																			
 																		}
+																		else if(obj.result && obj.result == "Duplicate Name")
+																		{
+																			$("#registerGPSTrackerWindow").html(result);
+
+																			$("#registerGPSTrackerWindow").dialog("close");
+																			$("#messageDialogText").html("You can add only one GPS Tracker with the same name!");
+																			$("#messageDialog").dialog("open");																			
+																		}																		
 																	}
 																	catch (error){
-																		$("#registerGPSTrackerWindow").html(result);
-																		var confirmMessage = document.getElementById("registerMessage");
-																		if(confirmMessage.style.display != "block") {																		
-																			confirmMessage.style.display = "none";
-																		}
+																		$("#registerGPSTrackerWindow").html(result);	
+
+																		$("#registerGPSTrackerWindow").dialog("close");
+																		$("#messageDialogText").html("Device could not be registered!");
+																		$("#messageDialog").dialog("open");																			
 																	}
 																 }',
 													 ),
@@ -82,26 +90,5 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	<?php $this->endWidget(); ?>
 </div>
 <?php 
-	$this->endWidget('zii.widgets.jui.CJuiDialog');
-?>
-
-<?php
-$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'registerMessage',
-	    // additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('general', 'Info Message'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false,
-			'width'=>'520px',
-			'rows'=>1,
-			'htmlOptions'=>array('style'=>'text-align: center'),			
-	    ),
-	));
-?>
-	<div align="center" class="row"> <?php echo '<br/> GPS Tracker is added to your list <br/><br/>'; ?> </div>
-	<div align="center" class="row buttons"> <?php echo CHtml::htmlButton(Yii::t('general', 'Ok'), array('onclick'=>'$("#registerMessage").dialog("close"); return false;','width'=>'200px'), null); ?> </div>
-<?php	
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 ?>

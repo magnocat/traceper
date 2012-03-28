@@ -448,54 +448,62 @@ class SiteController extends Controller
 			$model->attributes = $_POST['RegisterGPSTrackerForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-
-				$users = new Users;
-				$users->realname = $model->name;
-				$users->deviceId = $model->deviceId;
-
-				//For database recording, because of email and password are required fields
-				$users->email = $model->deviceId;
-				$users->password = md5($model->name);
 				
-				try
+				//Check whether a device exists with the same name in the Users table (Since the table 'Users' is used as common for both 
+				//real users and devices we cannot add unique index for realname, so we have to check same name existance manually)
+				if(Users::model()->find('gender=:gender AND realname=:name', array(':gender'=>'device', ':name'=>$model->name)) == null)
 				{
-					if($users->save()) // save the change to database
+					$users = new Users;
+					$users->realname = $model->name;
+					$users->deviceId = $model->deviceId;
+					
+					//For database recording, because of email and password are required fields
+					$users->email = $model->deviceId;
+					$users->password = md5($model->name);
+					$users->gender = 'device';
+					
+					try
 					{
-						$friend = new Friends();
-						$friend->friend1 = Yii::app()->user->id;
-						$friend->friend1Visibility = 1; //default visibility setting is visible
-						$friend->friend2 = $users->getPrimaryKey();
-						$friend->friend2Visibility = 1; //default visibility setting is visible
-						$friend->status = 1;
-							
-						if ($friend->save())
+						if($users->save()) // save the change to database
 						{
-							echo CJSON::encode(array("result"=> "1"));
+							$friend = new Friends();
+							$friend->friend1 = Yii::app()->user->id;
+							$friend->friend1Visibility = 1; //default visibility setting is visible
+							$friend->friend2 = $users->getPrimaryKey();
+							$friend->friend2Visibility = 1; //default visibility setting is visible
+							$friend->status = 1;
+					
+							if ($friend->save())
+							{
+								echo CJSON::encode(array("result"=> "1"));
+							}
+							else
+							{
+								echo CJSON::encode(array("result"=> "Unknown error"));
+							}
 						}
 						else
 						{
 							echo CJSON::encode(array("result"=> "Unknown error"));
 						}
 					}
-					else
+					catch (Exception $e)
 					{
-						echo CJSON::encode(array("result"=> "Unknown error"));
-					}							
+						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+						{
+							echo CJSON::encode(array("result"=> "Duplicate Entry"));
+						}
+						Yii::app()->end();
+							
+						//					echo 'Caught exception: ',  $e->getMessage(), "\n";
+						//    				echo 'Code: ', $e->getCode(), "\n";
+					}									
 				}
-		    	catch (Exception $e) 
+				else
 				{
-					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
-					{
-						echo CJSON::encode(array("result"=> "Duplicate Entry"));
-					}
-					Yii::app()->end();
-					
-//					echo 'Caught exception: ',  $e->getMessage(), "\n";    				
-//    				echo 'Code: ', $e->getCode(), "\n";
+					echo CJSON::encode(array("result"=> "Duplicate Name"));
 				}
 				
-
-
 				Yii::app()->end();
 			}
 				
