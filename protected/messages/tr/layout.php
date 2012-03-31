@@ -40,7 +40,8 @@ return array(
 	'Photos' => 'Fotolar',
 	'Groups' => 'Gruplar',
 	'See your position on the map' => 'Konumunuzu haritada görün',
-	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',	
+	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',
+	'Search' => 'Ara',
 );
 
 
