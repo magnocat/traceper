@@ -15,6 +15,7 @@ function processUserPastLocationsXML (MAP, xml) {
 		var longitude = $(location).attr('longitude');
 		var time = $(location).find('time').text();
 		var deviceId = $(location).find('deviceId').text();
+		var fb_id = $(location).find('fb_id').text();
 
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		pastPoints.push(point);
@@ -115,7 +116,8 @@ function processXML(MAP, xml, isFriendList)
 		var longitude = $(user).find("location").attr('longitude');
 		var locationCalculatedTime = $(user).find("location").attr('calculatedTime');
 		var status_message = $(user).find("status_message").text();
-
+		var fb_id = $(user).find("fb_id").text();
+		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 
 //		list += "<li><a href='javascript:TRACKER.trackUser("+ userId +")' id='user"+ userId +"'>"+ realname + " " + status_message +"</a></li>";
@@ -127,7 +129,12 @@ function processXML(MAP, xml, isFriendList)
 		{
 			if (typeof TRACKER.users[userId] == "undefined") 
 			{		
-				var userMarker = MAP.putMarker(location, "images/person.png", visible);
+				if(fb_id != 0){
+					var userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible);
+				}else{
+					var userMarker = MAP.putMarker(location, "images/person.png", visible);
+				}
+					
 				var iWindow = MAP.initializeInfoWindow();
 				var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
 				

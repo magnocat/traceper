@@ -92,16 +92,21 @@ class SiteController extends Controller
 	 * if everything is ok, it returns JSON with result=>1 and realname=>"..." parameters
 	 * ATTENTION: This function is also used by mobile clients
 	 */
-	public function actionLogin()
+	public function fbLogin($str)
 	{
 		$model = new LoginForm;
-
+			
+		
 		$processOutput = true;
+		
+			//	echo print_r($str);
+				//exit;
 		// collect user input data
-		if(isset($_POST['LoginForm']))
+		if(isset($str))
 		{
-			$model->attributes = $_POST['LoginForm'];
+			$model->attributes = $str;
 			// validate user input and if ok return json data and end application.
+			
 			if($model->validate() && $model->login()) {
 				echo CJSON::encode(array(
 								"result"=> "1",
@@ -110,13 +115,14 @@ class SiteController extends Controller
 								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
 				));
-				Yii::app()->end();
+				//Yii::app()->end();
 			}
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 
 			}
 		}
+	
 
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
@@ -134,12 +140,102 @@ class SiteController extends Controller
 			echo CJSON::encode(array(
 								"result"=> $result,
 			));
+			
 			Yii::app()->end();
 		}
 		else {
 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+		}
+	}
+	public function actionLogin()
+	{
+		$model = new LoginForm;
+			
+		$processOutput = true;
+		
+		// collect user input data
+		if(isset($_REQUEST['LoginForm']))
+		{
+			$model->attributes = $_REQUEST['LoginForm'];
+			// validate user input and if ok return json data and end application.
+			
+			if($model->validate() && $model->login()) {
+				echo CJSON::encode(array(
+								"result"=> "1",
+								"id"=>Yii::app()->user->id,
+								"realname"=> $model->getName(),
+								"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+								"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+				));
+				Yii::app()->end();
+			}
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+
+			}
+		}
+	
+
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+		{
+
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('rememberMe') != null) {
+				$result = $model->getError('rememberMe');
+			}
+
+			echo CJSON::encode(array(
+								"result"=> $result,
+			));
+			
+			Yii::app()->end();
+		}
+		else {
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+		}
+	}
+	/** 
+	 * 
+	 * facebook login action
+	 */
+	public function actionFacebooklogin() {
+		Yii::import('ext.facebook.*');
+	    $ui = new FacebookUserIdentity('370934372924974', 'c1e85ad2e617b480b69a8e14cfdd16c7');
+
+		if ($ui->authenticate()) {
+	        $user=Yii::app()->user;
+	        $user->login($ui);
+	
+	       $this->FB_Web_Register($nd);
+	        if($nd == 0)
+	        {
+	  
+	   
+
+				$str=array("email" => Yii::app()->session['facebook_user']['email'] ,"password" => Yii::app()->session['facebook_user']['id']) ;
+				        	 
+	        
+	        	$this->fbLogin($str);
+	          
+	       
+	        }else {
+	        	
+	        }
+	    
+	       
+	         //exit;
+	    	$this->redirect($user->returnUrl);
+	 	} else {
+	    	throw new CHttpException(401, $ui->error);
 		}
 	}
 
@@ -159,7 +255,8 @@ class SiteController extends Controller
 			$this->redirect(Yii::app()->homeUrl);
 		}
 	}
-
+	
+	
 	/**
 	 * Changes the user's current password with the new one
 	 */
@@ -432,6 +529,47 @@ class SiteController extends Controller
 		}
 
 	}	
+	
+	//facebook web register
+	public function FB_Web_Register()
+	{
+
+		
+			
+		$result = 0;
+			
+			// validate user input and if ok return json data and end application.
+			if(Yii::app()->session['facebook_user']) {
+
+				$time = date('Y-m-d h:i:s');
+				$users = new Users;
+				$users->email = Yii::app()->session['facebook_user']['email'];
+				$users->realname = Yii::app()->session['facebook_user']['name'];
+				$users->password = md5(Yii::app()->session['facebook_user']['id']);
+				$users->account_type = 1;
+				$users->fb_id = Yii::app()->session['facebook_user']['id'];
+				$result = "Unknown error";
+	
+				
+				try
+				{
+				$users->save();	
+				$result = 1;	
+				}catch (Exception $e) 
+				{
+				$result = 0; 	
+				}
+			
+			
+				
+				
+			
+			}
+			return $result;
+
+	}
+	
+	
 	public function actionRegisterGPSTracker()
 	{
 		$model = new RegisterGPSTrackerForm;

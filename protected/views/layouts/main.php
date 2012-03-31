@@ -231,6 +231,11 @@
 																			)).
 																		' }',
 													));
+													$this->widget('zii.widgets.CMenu',array(
+   													 'items'=>array(   											  
+        											array('label'=>'Sign in with Facebook', 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
+       													   ),
+													));
 									?>		
 		 						</div>
 	 						<?php }?>

@@ -20,6 +20,8 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+    	'ext.facebook.*',  // get facebook lib
+    	'ext.facebook.lib.*',
 	),
 
 	'modules'=>array(
@@ -83,10 +85,10 @@ return array(
 		// uncomment the following to use a MySQL database
 		*/
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=php',
+			'connectionString' => 'mysql:host=localhost;dbname=php2',
 			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
+			'username' => 'yudu_1',
+			'password' => 'yudu1234',
 			'charset' => 'utf8',
 		),
 		

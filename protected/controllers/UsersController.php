@@ -112,7 +112,7 @@ class UsersController extends Controller
 		echo CJSON::encode(
                  		$resultArray
 		);
-		$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
+		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		Yii::app()->end();
 	}
 
@@ -275,7 +275,7 @@ class UsersController extends Controller
 				$friendIdList = Yii::app()->user->id;
 			}
 					
-			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, 
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, u.fb_id,
 						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
 						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 						1 isFriend
@@ -301,7 +301,7 @@ class UsersController extends Controller
 			$out = "No permission to get this user location";
 			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
 			{
-				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude,  
+				$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, u.fb_id,  
 							date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
 							date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
 							1 isFriend
@@ -350,7 +350,17 @@ class UsersController extends Controller
 	{
 		$email = $_REQUEST['email'];
 		$password = $_REQUEST['password'];
-
+		if (!empty($_REQUEST['offset'])){
+			$offset = (int) $_REQUEST['offset'];
+			}else{
+			$offset = 0;
+			}
+			if(!empty($_REQUEST['range'])){
+			$range= (int) $_REQUEST['range'];
+			}else{
+			$range=29;
+			}
+		
 		$sql = sprintf('SELECT Id
 								FROM '.  Users::model()->tableName() .' 
 							WHERE email = "%s" 
@@ -358,12 +368,14 @@ class UsersController extends Controller
 						  		  password = "%s"
 							LIMIT 1', $email, md5($password));
 		$userId = Yii::app()->db->createCommand($sql)->queryScalar();
+		
 		$result = "Email or password not correct";
 		if ($userId == false) {
 			return;
 		}
 		
-	
+
+	/*
 		$out = '';
 		$dataFetchedTimeKey = "UsersController.dataFetchedTime";
 		
@@ -386,7 +398,7 @@ class UsersController extends Controller
 				WHERE (friend1 = '.Yii::app()->user->id.' 
 						OR friend2 ='.Yii::app()->user->id.') AND status= 1
 				 ' ;
-			 */
+			 
 			
 
 		$out = $this-> prepareJson($sql, "userList");
@@ -394,6 +406,37 @@ class UsersController extends Controller
 		echo $out;
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
+		
+		
+		*/
+		
+		
+			$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+		
+					
+			$friendIdList = $this->getFriendIdList();
+				
+			if ($friendIdList != -1) {
+				$friendIdList .= ',' . Yii::app()->user->id;
+			}
+			else {
+				$friendIdList = Yii::app()->user->id;
+			}
+					
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, u.gp_image, u.fb_id, u.g_id, u.account_type,
+						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+						1 isFriend
+					FROM '. Users::model()->tableName() . ' u
+					WHERE u.Id IN ('. $friendIdList .')
+					LIMIT ' . $offset . ' , ' . $range;
+
+		$out = $this-> prepareJson($sql, "userList");
+		
+		echo $out;
+		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->end();
+		
 	}
 	
 	public function actionGetUserPastPointsXML(){
@@ -765,6 +808,7 @@ class UsersController extends Controller
 	}
 
 	private function getUserJsonItem($row){
+	
 		$row['id'] = isset($row['id']) ? $row['id'] : null;
 		//		$row->username = isset($row->username) ? $row->username : null;
 		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
@@ -809,6 +853,7 @@ class UsersController extends Controller
 	private function getUserXMLItem($row)
 	{
 		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : null;
 		//		$row->username = isset($row->username) ? $row->username : null;
 		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
 		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
@@ -825,6 +870,7 @@ class UsersController extends Controller
 		$str = '<user>'
 		. '<Id isFriend="'.$row['isFriend'].'">'. $row['id'] .'</Id>'
 		//		. '<username>' . $row->username . '</username>'
+		. '<fb_id>' . $row['fb_id'] . '</fb_id>'
 		. '<realname>' . $row['realname'] . '</realname>'
 		. '<location latitude="' . $row['latitude'] . '"  longitude="' . $row['longitude'] . '" altitude="' . $row['altitude'] . '" calculatedTime="' . $row['dataCalculatedTime'] . '"/>'
 		. '<time>' . $row['dataArrivedTime'] . '</time>'
