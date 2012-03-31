@@ -7,15 +7,15 @@ if ($dataProvider != null) {
 
 	$viewId = isset($viewId) ? $viewId : 'userListView';
 
-	$emptyText = "No users found";
+	$emptyText = Yii::t('users', 'No users found');
 	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
 	// keyword parameter
 	$ajaxUrl = null;
-	$deleteFrienshipQuestion = "Do you want to delete this user from your friend list?";
-	$addAsFriendQuestion = "Do you want to add this user as a friend?";
+	$deleteFrienshipQuestion = Yii::t('users', 'Do you want to delete this user from your friend list?');
+	$addAsFriendQuestion = Yii::t('users', 'Do you want to add this user as a friend?');
 	if ($isFriendRequestList == true) {
-		$deleteFrienshipQuestion = "Do you want to reject this user's friend request?";
-		$emptyText = "There is no friendship requests found";
+		$deleteFrienshipQuestion = Yii::t('users', 'Do you want to reject this user\'s friend request?');
+		$emptyText = Yii::t('users', 'No friendship requests found');
 	}
 	else if ($isSearchResult == true){
 		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
@@ -46,11 +46,11 @@ if ($dataProvider != null) {
 																	}
 																	else 
 																	{
-																		TRACKER.showMessageDialog("Sorry,an error occured in operation");
+																		TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 																	}
 																}
 																catch(ex) {
-																	TRACKER.showMessageDialog("Sorry,an error occured in operation");
+																	TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 																}
 															}',
 											)).
@@ -68,16 +68,16 @@ if ($dataProvider != null) {
 															var obj = jQuery.parseJSON(result);
 															if (obj.result && obj.result == "1") 
 															{
-																TRACKER.showMessageDialog("Friend request is sent");
+																TRACKER.showMessageDialog("'.Yii::t('users', 'Friend request is sent').'");
 																$.fn.yiiGridView.update($("#gridViewId").text());
 															}
 															else 
 															{
-																TRACKER.showMessageDialog("Sorry,an error occured in operation");
+																TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 															}
 														}
 														catch(ex) {
-															TRACKER.showMessageDialog("Sorry,an error occured in operation");
+															TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 														}
 					  							  		
 													}'
@@ -106,7 +106,7 @@ if ($dataProvider != null) {
 			       ),
 		    'columns'=>array(
 		array(            // display 'create_time' using an expression
-					'name'=>'Group Settings',
+					'name'=>Yii::t('users', 'Group Settings'),
 					'type' => 'raw',
 					
 		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
@@ -125,7 +125,7 @@ if ($dataProvider != null) {
 		),
 		
 		array(            // display 'create_time' using an expression
-					'name'=>'Geofence Settings',
+					'name'=>Yii::t('users', 'Geofence Settings'),
 					'type' => 'raw',
 					
 		            'value'=>'CHtml::link("<img src=\"images/GeofenceSettings.png\"  />", "#",
@@ -145,7 +145,7 @@ if ($dataProvider != null) {
 		       
 
 		array(            // display 'create_time' using an expression
-				    'name'=>'Name',
+				    'name'=>Yii::t('users', 'Name'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
 		            'value'=>'CHtml::link($data["Name"], "#", array(
@@ -184,12 +184,12 @@ if ($dataProvider != null) {
 														}
 														else 
 														{
-															$("#messageDialogText").html("Sorry,an error occured in operation");
+															$("#messageDialogText").html("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 															$("#messageDialog").dialog("open");
 														}
 													}
 													catch(ex) {
-														$("#messageDialogText").html("Sorry,an error occured in operation");
+														$("#messageDialogText").html("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 														$("#messageDialog").dialog("open");
 													}
 													
