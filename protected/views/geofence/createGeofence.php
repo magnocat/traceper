@@ -7,7 +7,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '340px'      
+			'width'=> '340px',
+	    	'close' => 'js:function(event, ui) { mapOperator.removeAllPointsFromGeoFence(mapOperator.newGeofence);return false; }'
 	    ),
 	));
 ?>
