@@ -397,8 +397,12 @@
     										}
     										if (geoFence_.listener == null)
     										{
-    											TRACKER.showInfoBar("Select 3 points to generate a Geofence");
+    											TRACKER.showInfoBar("Select 3 points to generate a Geofence");		 		
     										}
+	 										else
+	 										{
+												TRACKER.showInfoBar("Geofence points selection disabled");
+											}		 		
     										var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,createGeofenceForm);    					
     										return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Create Geo-Fence'),
 										));
