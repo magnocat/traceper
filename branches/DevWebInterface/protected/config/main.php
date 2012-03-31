@@ -85,11 +85,11 @@ return array(
 		// uncomment the following to use a MySQL database
 		*/
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=php2',
+			'connectionString' => 'mysql:host=localhost;dbname=php',
 			'emulatePrepare' => true,
-			'username' => 'yudu_1',
-			'password' => 'yudu1234',
-			'charset' => 'utf8',
+			'username' => 'root',
+			'password' => '',
+			'charset' => 'utf8',				
 		),
 		
 		'errorHandler'=>array(
