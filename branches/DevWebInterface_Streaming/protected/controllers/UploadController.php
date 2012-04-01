@@ -223,16 +223,16 @@ class UploadController extends Controller
 		if($liveUploadRow != null) //Check whether there is a live record
 		{
 			$uploadInfo = apc_fetch('upload_'.($liveUploadRow->uniqueId));
-			$fileName = $uploadInfo[�temp_filename�];
+			$fileName = $uploadInfo['temp_filename'];
 			
 			$fd = fopen($fileName, "rb");
 			$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
 				
 			header('Content-Type: video/x-flv');
-					header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
-			header('Content-disposition: inline');
-					header("Content-Transfer-Encoding:� binary");
-					header("Content-Length: ".$fileSize);
+			header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
+// 			header('Content-disposition: inline');
+// 			header("Content-Transfer-Encoding: binary");
+			header("Content-Length: ".$fileSize);
 				
 			# FLV file format header
 			if($seekPos != 0)
@@ -336,7 +336,7 @@ class UploadController extends Controller
 // 					header('Content-type: video/mp4');
 // 					header('Content-type: video/mpeg');
 					header('Content-disposition: inline');
-					header("Content-Transfer-Encoding:� binary");
+					header("Content-Transfer-Encoding: binary");
 					header("Content-Length: ".$fileSize);
 					
 					# FLV file format header
