@@ -22,6 +22,9 @@ public class Configuration {
 	public static final String PREFRENCES_AUTO_SEND_CHECKBOX = "PREFRENCES_AUTO_SEND_CHECKBOX";
 	
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
+	public static String PREFERENCE_SPS = "Preference_SPS";
+	public static String PREFERENCE_PPS = "Preference_PPS";
+	public static String PREFERENCE_DATA_POSITION = "PREFERENCE_DATA_POSITION";
 	
 
 	

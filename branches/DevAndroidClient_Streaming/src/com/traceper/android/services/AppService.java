@@ -48,7 +48,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.FileObserver;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
@@ -57,6 +56,7 @@ import android.util.Log;
 import com.traceper.R;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
+import com.traceper.android.tools.live.FLVCreator;
 
 public class AppService extends Service implements IAppService{
 
@@ -103,8 +103,6 @@ public class AppService extends Service implements IAppService{
 	private class FileListener {
 		private Timer timer;
 		private int offset = 0;
-		private File file;
-		private FileInputStream fin;
 		private boolean isSyncPacketSent = false;
 		private int uploadKey = 0;
 
@@ -112,61 +110,24 @@ public class AppService extends Service implements IAppService{
 		public FileListener(final String fileName, final boolean isPublic, final String description, final Location loc) {
 			timer = new Timer();
 
+			flvCreator.setFile(fileName);
+
 			uploadKey = (int)(System.currentTimeMillis() * Math.random() * 10000);
 
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-//					if (file == null) {
-//						try {
-//							file = new File(fileName);
-//							fin = new FileInputStream(file);
-//						} catch (FileNotFoundException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//					if (file.exists()) {
-//						Log.i("traceper","file length " + file.length());
-//						Log.i("traceper offset", "offset " + offset);
-//					}
-					
-					try {
-						file = new File(fileName);
-						fin = new FileInputStream(file);
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
+					boolean isLastPacket = false;
+					if (liveVideoActive == false) 
+					{
+						timer.cancel();
+						isLastPacket = true;
 					}
-					
-					int byteCount = (int)(file.length());// - offset;
-					byte[] data = new byte[byteCount];
-					Log.i("Traceper byte count", "" + data.length);
-					if (byteCount > 0) {
-						int readByteCount;
-						try {
-							boolean isLastPacket = false;
-							if (liveVideoActive == false) 
-							{
-								timer.cancel();
-								isLastPacket = true;
-							}
-						//	long skipCount = fin.skip(offset);
-							readByteCount = fin.read(data); //, 0, data.length);
-							fin.close();
-							if (readByteCount == -1) {
-
-							}
-							else {
-								offset += readByteCount;
-								byte[] video = new byte[readByteCount];
-								System.arraycopy(data, 0, video, 0, readByteCount);
-								uploadVideo(data, false, "description", uploadKey, true, isLastPacket);	
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+					byte[] data = flvCreator.parse();
+					if (data != null) {
+						uploadVideo(data, false, "description", uploadKey, true, isLastPacket);	
 					}
-
-				}}, 5000, 5000);
+				}}, 15000, 15000);
 		}
 
 	}
@@ -199,6 +160,7 @@ public class AppService extends Service implements IAppService{
 	private Location networkLocation;
 	private Location lastSentLocation;
 	private boolean liveVideoActive;
+	private FLVCreator flvCreator;
 
 
 	public class IMBinder extends Binder {
@@ -668,7 +630,7 @@ public class AppService extends Service implements IAppService{
 				while ((inputLine = in.readLine()) != null) {
 					result = result.concat(inputLine);				
 				}
-				in.close();	
+				in.close();				
 			}
 
 		} catch (MalformedURLException e) {
@@ -985,8 +947,11 @@ public class AppService extends Service implements IAppService{
 	}
 
 
-	public void startLiveVideoUploading(final String videoPath) {
+	public void startLiveVideoUploading(final String videoPath, byte[] sps, byte[] pps, int startOfDataFrame) {
 		this.liveVideoActive = true;
+
+		flvCreator = new FLVCreator();
+		flvCreator.setVideoParams(sps, pps, startOfDataFrame);
 
 		if (lastSentLocation == null || 
 				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
@@ -1021,8 +986,8 @@ public class AppService extends Service implements IAppService{
 	public boolean uploadVideo(byte[] video, boolean publicData, String description) {
 		return uploadVideo(video, publicData, description, 0, false, false);
 	}
-	
-	
+
+
 	public boolean uploadVideo(byte[] video, boolean publicData, String description, int uniqueId, boolean isLive, boolean isLastPacket) {
 		if (lastSentLocation == null || 
 				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
@@ -1094,10 +1059,10 @@ public class AppService extends Service implements IAppService{
 		value[7] = String.valueOf(uniqueId);
 		if (isLive == true)  value[8] = "1";
 		else value[8] = "0";
-		
+
 		if (isLastPacket == true) value[9] = "1";
 		else value[9] = "0";
-		
+
 
 		String httpRes = this.sendHttpRequest(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
