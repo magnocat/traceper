@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'groupSettingsWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Group Settings'),
+	        'title'=>Yii::t('groups', 'Group Settings'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -24,15 +24,15 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 	
 		<div class="row" style="padding-top:1em">
-			<?php echo 'Check the groups that you want to enroll the selected user:'; ?>
+			<?php echo Yii::t('groups', 'Check the groups that you want to enroll the selected user:'); ?>
 		</div>		
 		
 		<div class="row" style="padding-top:2em;padding-left:10px">
 			<?php			
 				if(empty($groupsOfUser))
 				{
-					echo '</br></br> There is no group to show... </br></br>';
-					echo 'First create some group(s) please';
+					echo '</br></br>'.Yii::t('groups', 'There is no group to show...').'</br></br>';
+					echo Yii::t('groups', 'First create some group(s) please');
 				}
 				else
 				{
@@ -69,7 +69,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#groupSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("Your settings have been saved");
+																					$("#messageDialogText").html("'.Yii::t('groups', 'Your settings have been saved').'");
 																					$("#messageDialog").dialog("open");																					
 																				}
 																				else if(obj.result && obj.result == "Duplicate Entry")
@@ -77,7 +77,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																					$("#groupSettingsWindow").html(result);
 		
 																					$("#groupSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("Select only one privacy group!");
+																					$("#messageDialogText").html("'.Yii::t('groups', 'Select only one privacy group!').'");
 																					$("#messageDialog").dialog("open");																			
 																				}																				
 																			}

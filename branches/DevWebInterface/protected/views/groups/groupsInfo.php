@@ -38,7 +38,7 @@
 	}
 	else
 	{
-		echo 'No groups to show... <br/> <br/>';				
+		echo Yii::t('groups', 'No groups to show...').'<br/> <br/>';
 	}
 	
 	echo '<div id="groupSearchResults"></div>';

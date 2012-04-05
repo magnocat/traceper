@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'createGroupWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Create New Group'),
+	        'title'=>Yii::t('groups', 'Create New Group'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -49,7 +49,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#createGroupWindow").dialog("close");
-																			$("#messageDialogText").html("The group is created successfully");
+																			$("#messageDialogText").html("'.Yii::t('groups', 'The group is created successfully').'");
 																			$("#messageDialog").dialog("open");																			
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
@@ -57,7 +57,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			$("#createGroupWindow").html(result);
 
 																			$("#createGroupWindow").dialog("close");
-																			$("#messageDialogText").html("A group with this name already exists!");
+																			$("#messageDialogText").html("'.Yii::t('groups', 'A group with this name already exists!').'");
 																			$("#messageDialog").dialog("open");																			
 																		}
 																	}
