@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'groupPrivacySettingsWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Group Privacy Settings'),
+	        'title'=>Yii::t('groups', 'Group Privacy Settings'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -24,7 +24,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 	
 		<div class="row" style="padding-top:1em">
-			<?php echo 'Give permissions to group members by checking/unchecking the fields below:'; ?>
+			<?php echo Yii::t('groups', 'Give permissions to group members by checking/unchecking the fields below:'); ?>
 		</div>		
 	
 		<div class="row" style="padding-top:2em">
@@ -43,7 +43,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			if (obj.result && obj.result == "1") 
 																			{
 																				$("#groupPrivacySettingsWindow").dialog("close");
-																				$("#messageDialogText").html("Your settings have been saved");
+																				$("#messageDialogText").html("'.Yii::t('groups', 'Your settings have been saved').'");
 																				$("#messageDialog").dialog("open");																					
 																			}
 																		}

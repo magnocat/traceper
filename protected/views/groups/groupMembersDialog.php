@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'groupMembersWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Group Members'),
+	        'title'=>Yii::t('groups', 'Group Members'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false      

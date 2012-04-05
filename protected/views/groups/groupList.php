@@ -8,7 +8,7 @@ if ($dataProvider != null) {
 	    'id'=>'groupDeleteConfirmation',
 		// additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Delete Group'),
+	        'title'=>Yii::t('groups', 'Delete Group'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -28,13 +28,13 @@ if ($dataProvider != null) {
 																}
 																else 
 																{
-																	$("#messageDialogText").html("Sorry,an error occured in operation - 1");
+																	$("#messageDialogText").html("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
 																	$("#messageDialog").dialog("open");
 																}
 
 															}
 															catch(ex) {
-																$("#messageDialogText").html("Sorry,an error occured in operation - 2");
+																$("#messageDialogText").html("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
 																$("#messageDialog").dialog("open");
 															}
 														}',
@@ -45,7 +45,7 @@ if ($dataProvider != null) {
 			}" 
 			)),
 		));	
-	echo "Do you want to delete this group?";
+	echo Yii::t('groups', 'Do you want to delete this group?').'<br/> <br/>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 	
 
