@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -14,10 +16,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -40,6 +45,7 @@ import android.widget.Toast;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
+import com.traceper.android.tools.live.FLVCreator;
 
 public class CameraController extends Activity implements SurfaceHolder.Callback{
 
@@ -61,7 +67,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private Button recordLiveVideoButton;
 	private MediaRecorder mMediaRecorder;
 	private String videoDirPath = "/sdcard/traceper";
-
+	private byte[] sps;
+	private byte[] pps;
+	private int startOfDataFrame;
+	
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
 			Log.e(getClass().getSimpleName(), "PICTURE CALLBACK RAW: " + data);  
@@ -151,25 +160,122 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					wl.release();
 				}
 				else{
-					if (prepareVideoRecorder()) {
-						// Camera is available and unlocked, MediaRecorder is prepared,
-						// now you can start recording
-						mMediaRecorder.start();
-						// inform the user that recording has started
-						recording = true;
-						//      new FileListener(videoPath);
-						//logFileLength();
-						appService.startLiveVideoUploading(getVideoPath());
-						wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-						wl.acquire();
-						recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record_stop, 0, 0, 0);
-					} else {
-						// prepare didn't work, release the camera
-						releaseMediaRecorder();
-						// inform user
+					SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
+					String sps = preferences.getString(Configuration.PREFERENCE_SPS, null);
+					boolean videoParamsReady = false;
+					String pps = null;
+					int dataPos = 0;
+					if (sps != null) {
+						pps = preferences.getString(Configuration.PREFERENCE_PPS, null);
+						if (pps != null) {
+							dataPos = preferences.getInt(Configuration.PREFERENCE_DATA_POSITION, 0);
+							if (dataPos != 0) {
+								videoParamsReady = true;
+							}
+						}
+					}
+					if (videoParamsReady == true) {
+						
+						if (prepareVideoRecorder(false)) {
+							// Camera is available and unlocked, MediaRecorder is prepared,
+							// now you can start recording
+							mMediaRecorder.start();
+							// inform the user that recording has started
+							recording = true;
+							//      new FileListener(videoPath);
+							//logFileLength();
+							appService.startLiveVideoUploading(getVideoPath(), CameraController.this.sps, CameraController.this.pps, CameraController.this.startOfDataFrame);
+							wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+							wl.acquire();
+							recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record_stop, 0, 0, 0);
+						} else {
+							// prepare didn't work, release the camera
+							releaseMediaRecorder();
+							// inform user
+						}
+					}
+					else {
+						startRecordSampleVideo();				        
 					}
 
 				}
+			}
+
+			private void startRecordSampleVideo() {
+				if (prepareVideoRecorder(true)) {
+					// Camera is available and unlocked, MediaRecorder is prepared,
+					// now you can start recording
+					mMediaRecorder.start();
+					// inform the user that recording has started
+					//recording = true;
+					//      new FileListener(videoPath);
+					//logFileLength();
+					wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+					wl.acquire();
+				} else {
+					// prepare didn't work, release the camera
+					releaseMediaRecorder();
+					// inform user
+				}
+				
+				TimerTask task = new TimerTask() {
+					Handler handler = new Handler();
+					@Override
+					public void run() {
+						mMediaRecorder.stop();  // stop the recording
+						releaseMediaRecorder(); // release the MediaRecorder object
+						mCamera.lock();
+						try {
+							mCamera.reconnect();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						wl.release();
+						
+						File f = new File(getSampleVideoPath());
+						byte[] buffer = new byte[(int)f.length()];
+						FileInputStream fileInputStream;
+						try {
+							fileInputStream = new FileInputStream(f);
+							fileInputStream.read(buffer);
+							fileInputStream.close();
+							FLVCreator flvCreator = new FLVCreator();
+							flvCreator.prepareVideoParams(buffer);
+							byte[] sps = flvCreator.getSps();
+							byte[] pps = flvCreator.getPps();
+							int startOfDataFrame = flvCreator.getStartOfDataFrame();
+							CameraController.this.sps = sps;
+							CameraController.this.pps = pps;
+							CameraController.this.startOfDataFrame = startOfDataFrame;
+							SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+							editor.putString(Configuration.PREFERENCE_SPS, new String(sps));
+							editor.putString(Configuration.PREFERENCE_PPS, new String(pps));
+							editor.putInt(Configuration.PREFERENCE_DATA_POSITION, startOfDataFrame);
+							editor.commit();
+							
+							handler.post(new Runnable() {
+								
+								@Override
+								public void run() {
+									recordLiveVideoButton.performClick();
+									
+								}
+							});							
+							
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
+						
+						
+					}
+				}; 
+				
+				Timer timer = new Timer();
+				timer.schedule(task, 1000);
+				
 			}
 		});
 
@@ -196,8 +302,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					showDialog(DIALOG_ASK_TO_MAKE_VIDEO_PUBLIC);
 				}
 				else {
-
-					if (prepareVideoRecorder()) {
+					if (prepareVideoRecorder(false)) {
 						// Camera is available and unlocked, MediaRecorder is prepared,
 						// now you can start recording
 						mMediaRecorder.start();
@@ -208,11 +313,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					} else {
 						// prepare didn't work, release the camera
 						releaseMediaRecorder();
-						// inform user
 					}
-
 				}
-
 			}
 		});
 
@@ -276,8 +378,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			menu.removeItem(UPLOAD_PHOTO);
 			menu.removeItem(TAKE_ANOTHER_PHOTO);
 		}
-
-
 		return result;		
 	}
 
@@ -419,7 +519,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		uploadThread.start();
 	}
 
-	private boolean prepareVideoRecorder(){
+	private boolean prepareVideoRecorder(boolean sample){
 
 		mMediaRecorder = new MediaRecorder();
 
@@ -431,16 +531,36 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
 		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
+		CamcorderProfile targetProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
+		targetProfile.quality = 60;
+		targetProfile.videoFrameWidth = 320;
+		targetProfile.videoFrameHeight = 240;
+		targetProfile.videoFrameRate = 30;
+		targetProfile.videoCodec = MediaRecorder.VideoEncoder.H264;
+		targetProfile.audioCodec = MediaRecorder.AudioEncoder.AAC;
+		targetProfile.fileFormat = MediaRecorder.OutputFormat.MPEG_4;
+		targetProfile.audioSampleRate = 8000;
+		mMediaRecorder.setProfile(targetProfile);
+
+		/*		
+
 		// Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
 		//mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		//mMediaRecorder.setVideoSize(480, 352);
+		//mMediaRecorder.setVideoFrameRate(25);
+		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+		 */
 
 
 		// Step 4: Set output file
-
-		mMediaRecorder.setOutputFile(getVideoPath());
+		String videoPath = getVideoPath();
+		if (sample == true) {
+			videoPath = getSampleVideoPath();
+		}
+		
+		mMediaRecorder.setOutputFile(videoPath);
 
 		// Step 5: Set the preview output
 		mMediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
@@ -456,6 +576,15 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			return false;
 		}
 		return true;
+	}
+
+
+	private String getSampleVideoPath() {
+		File videoDir = new File(videoDirPath);
+		if (videoDir.exists() == false) {
+			videoDir.mkdir();
+		}
+		return videoDir + "/SampleVideo.mp4";
 	}
 
 
