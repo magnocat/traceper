@@ -53,7 +53,7 @@
 	<string name="make_it_private">Hayır, sadece arkadaşlarım erişebilir</string>
 	<string name="cancel_upload">Yüklemeyi İptal Et</string>
 	<string name="uploading">Yükleniyor, lütfen bekleyiniz...</string>
-	<string name="loading">İndiriliyor, lütfen bekleyiniz...</string>
+	<string name="loading">Yükleniyor, lütfen bekleyiniz...</string>
 	<string name="traceper_login">Traceper-Oturum Aç</string>
 	<string name="traceper_register">Traceper-Kayıt Ol</string>
 	<string name="saving">Kaydediliyor, lütfen bekleyiniz...</string>
