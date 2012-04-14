@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'geofenceSettingsWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Geofence Settings'),
+	        'title'=>Yii::t('geofence', 'Geofence Settings'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -24,15 +24,15 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	)); ?>
 	
 		<div class="row" style="padding-top:1em">
-			<?php echo 'Check the geofences that you want to follow the selected user:'; ?>
+			<?php echo Yii::t('geofence', 'Check the geofences that you want to follow the selected user:'); ?>
 		</div>		
 		
 		<div class="row" style="padding-top:2em;padding-left:10px">
 			<?php			
 				if(empty($geofencesOfUser))
 				{
-					echo '</br></br> There is no geofence to show... </br></br>';
-					echo 'First create some geofence(s) please';
+					echo '</br></br>'.Yii::t('geofence', 'There is no geofence to show...').'</br></br>';
+					echo Yii::t('geofence', 'First create some geofence(s) please');
 				}
 				else
 				{
@@ -59,7 +59,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#geofenceSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("Your settings have been saved");
+																					$("#messageDialogText").html("'.Yii::t('geofence', 'Your settings have been saved').'");
 																					$("#messageDialog").dialog("open");																					
 																				}
 																				else if(obj.result && obj.result == "Duplicate Entry")
@@ -67,7 +67,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																					$("#geofenceSettingsWindow").html(result);
 		
 																					$("#geofenceSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("Select only one geofence!");
+																					$("#messageDialogText").html("'.Yii::t('geofence', 'Select only one geofence!').'");
 																					$("#messageDialog").dialog("open");																			
 																				}																				
 																			}
