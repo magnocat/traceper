@@ -1,0 +1,37 @@
+<?php 
+/**
+ * This file is the translation of files under views/users folder.
+ */
+
+/*
+ * Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
+Türkçe UTF-8
+Ý 	Ä°
+ý 	Ä±
+Ö 	Ã–
+ö 	Ã¶
+Ü 	Ãœ
+ü 	Ã¼
+Ç 	Ã‡
+ç 	Ã§
+Ð 	ÄŸ
+ð 	ÄŸ
+Þ 	Å
+þ 	ÅŸ
+*/
+return array(
+	'Create New Geofence' => 'Yeni JeoÃ§it Oluþtur',
+	'A geofence with this name already exists!' => 'Ayný isimle JeoÃ§it bulunmaktadýr',	
+	'Geofence Settings' => 'JeoÃ§it Ayarlarý',	
+	'Check the geofences that you want to follow the selected user:' => 'SeÃ§ilen kullanÄ±cÄ± iÃ§in JeoÃ§it kontrol et',
+	'There is no geofence to show...' => 'GÃ¶sterilecek hiÃ§bir JeoÃ§it bulunmamaktadÄ±r...',
+	'First create some geofence(s) please' => 'Ã–ncelikle JeoÃ§it(ler) oluÅŸturun...',
+	'Your settings have been saved' => 'AyarlarÄ±nÄ±z kaydedilmiÅŸtir',
+	'Select only one geofence!'=> 'Sadece bir JeoÃ§it seÃ§iniz!',
+
+	
+										
+);
+
+
+?>

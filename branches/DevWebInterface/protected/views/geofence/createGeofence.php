@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'createGeofenceWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Create New Geofence'),
+	        'title'=>Yii::t('geofence', 'Create New Geofence'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -62,7 +62,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			$("#createGeofenceWindow").html(result);
 
 																			$("#createGeofenceWindow").dialog("close");
-																			$("#messageDialogText").html("A geofence with this name already exists!");
+																			$("#messageDialogText").html("'.Yii::t('geofence', 'A geofence with this name already exists!').'");
 																			$("#messageDialog").dialog("open");																			
 																		}
 																	}

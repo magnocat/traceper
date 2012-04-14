@@ -397,7 +397,7 @@
     										}
     										if (geoFence_.listener == null)
     										{
-    											TRACKER.showInfoBar("Select 3 points to generate a Geofence");		 		
+    											TRACKER.showInfoBar("Select 3 points to generate a Geofence");
     										}
 	 										else
 	 										{
