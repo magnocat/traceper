@@ -319,26 +319,23 @@ class UploadController extends Controller
 			}
 			else
 			{								
-				if (is_file($fileName))
+				if(isset($_REQUEST['uniqueId'])) //Live video get
 				{
-					# get seek position
-					if (isset($_GET['start'])) {
-						$seekPos = intval($_GET['start']);
-					} else {
+					$uniqueId = (int) $_REQUEST['uniqueId'];
+					$filename = Yii::app()->params->uploadPath .'/'.$uniqueId.'.flv';
+					
+					$seekPos = filesize($fileName) - 100*1024; //Get 100K before if enough data has been streamed
+					if($seekPos < 0)
+					{
 						$seekPos = 0;
 					}
-
-					$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
 					
 					header('Content-Type: video/x-flv');
 					header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
-					
-// 					header('Content-type: video/mp4');
-// 					header('Content-type: video/mpeg');
 					header('Content-disposition: inline');
 					header("Content-Transfer-Encoding: binary");
 					header("Content-Length: ".$fileSize);
-					
+						
 					# FLV file format header
 					if($seekPos != 0) {
 						print('FLV');
@@ -347,30 +344,80 @@ class UploadController extends Controller
 						print(pack('N', 9));
 						print(pack('N', 9));
 					}
-
-					# seek to requested file position
-					fseek($fh, $seekPos);					
-					
+						
 					//readfile($fileName);
-										
+					
 					$fd = fopen($fileName, "rb");
-
+					
+					# seek to requested file position
+					fseek($fd, $seekPos);
+					
 					while(!feof($fd))
-					{						
+					{
 						echo fread($fd, 1024 * 5);
 						//flush_buffers();
 					}
-				
-					fclose ($fd);
-// 					//exit();
-					
-// 					header('Content-type: video/mpeg');					
-// 					header('Content-Length: '.filesize($fileName)); // provide file size					
-// 					header("Expires: -1");
-// 					header("Cache-Control: no-store, no-cache, must-revalidate");					
-// 					header("Cache-Control: post-check=0, pre-check=0", false);					
-// 					readfile($fileName);					
+						
+					fclose ($fd);					
 				}
+				else
+				{
+					if (is_file($fileName))
+					{
+						# get seek position
+						if (isset($_GET['start'])) 
+						{
+							$seekPos = intval($_GET['start']);
+						} 
+						else 
+						{
+							$seekPos = 0;
+						}
+					
+						$fileSize = filesize($fileName) - (($seekPos > 0) ? $seekPos + 1 : 0);
+							
+						header('Content-Type: video/x-flv');
+						header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
+							
+						// 					header('Content-type: video/mp4');
+						// 					header('Content-type: video/mpeg');
+						header('Content-disposition: inline');
+						header("Content-Transfer-Encoding: binary");
+						header("Content-Length: ".$fileSize);
+							
+						# FLV file format header
+						if($seekPos != 0) {
+							print('FLV');
+							print(pack('C', 1));
+							print(pack('C', 1));
+							print(pack('N', 9));
+							print(pack('N', 9));
+						}
+							
+						//readfile($fileName);
+				
+						$fd = fopen($fileName, "rb");
+				
+						# seek to requested file position
+						fseek($fd, $seekPos);
+				
+						while(!feof($fd))
+						{
+							echo fread($fd, 1024 * 5);
+							//flush_buffers();
+						}
+					
+						fclose ($fd);
+						// 					//exit();
+							
+						// 					header('Content-type: video/mpeg');
+						// 					header('Content-Length: '.filesize($fileName)); // provide file size
+						// 					header("Expires: -1");
+						// 					header("Cache-Control: no-store, no-cache, must-revalidate");
+						// 					header("Cache-Control: post-check=0, pre-check=0", false);
+						// 					readfile($fileName);
+					}					
+				}				
 			}					
 		}
 
