@@ -138,6 +138,8 @@ public class LoginControl extends Activity {
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
         				/* User clicked OK so do some stuff */
+        				Session.clearSavedSession(getApplicationContext());
+        				finish();
         			}
         		})        
         		.create();    
@@ -149,6 +151,7 @@ public class LoginControl extends Activity {
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
         				/* User clicked OK so do some stuff */
+        			
         			}
         		})        
         		.create();  

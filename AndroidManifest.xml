@@ -55,6 +55,12 @@
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
+		<activity android:name=".android.SearchUsers"  >
+			<intent-filter>
+				<action android:name="com.traceper.SEARCHUSERS"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+			</intent-filter>
+		</activity>
  <activity
             android:launchMode="singleTask"
             android:name=".android.OAuth" >

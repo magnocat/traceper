@@ -78,4 +78,9 @@
 <string name="map_refresh">Kullanıcı konumunu yenile</string>
 <string name="past_points_refresh">İz geçmişini yenile</string>
 <string name="all_past_points_on_map">İzleri harita üzerinde göster</string>
+<string name="search_users">Arkadaş Ara</string>
+<string name="friendship_requests">Arkadaşlık istekleri</string>
+<string name="search_failed">adında kullanıcı mevcut değil</string>
+<string name="couldnt_find">her hangi bir kayıt bulunamadı!</string>
+<string name="turn_back">Geri</string>
 </resources>

@@ -38,7 +38,8 @@ public interface IAppService {
 	public static final String SHOW_USER_LOCATION_LATITUDE = "SHOW_USER_LOCATION_LATITUDE";
 	public static final String SHOW_USER_LOCATION_LONGITUDE = "SHOW_USER_LOCATION_LONGITUDE";
 	
-	
+	public static final String SHOW_USER_SEARCH_LIST = "SHOW_USER_SEARCH_LIST";
+	public static final String SHOW_USER_INVITATION_LIST="SHOW_USER_INVITATION_LIST";
 	
 	public String getUsername();
 	
@@ -58,11 +59,19 @@ public interface IAppService {
 	
 	public String registerUser(String password, String email, String realname);
 	
+	public JSONArray SearchJSON(String search);
+	
 	public String registerFBUser(String password, String email, String realname, String fb_id);
 	
 	public String registerGPUser(String password, String email, String realname, String image, String gp_id);
 	
 	public String authenticateUser(String username, String password);
+	
+	public String AddAsFriend(String FriendId);
+	
+	public String approveFriendShip(String friendShipId);
+	
+	public JSONArray GetFriendRequestListJson(); 
 	
 	public void setAuthenticationServerAddress(String address);
 	

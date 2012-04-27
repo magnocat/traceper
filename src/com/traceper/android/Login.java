@@ -66,7 +66,7 @@ public class Login extends Activity {
     public static final int SETTINGS_ID = Menu.FIRST + 1;
     public static final int EXIT_APP_ID = Menu.FIRST + 2;
     private static String[] PERMISSIONS = 
-        new String[] { "offline_access", "read_stream", "publish_stream" };
+        new String[] { "offline_access", "read_stream", "publish_stream", "email" };
     private Handler handler = new Handler();
     
 
