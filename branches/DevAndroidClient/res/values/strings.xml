@@ -81,4 +81,9 @@
 <string name="map_refresh">Refresh - Users location</string>
 <string name="past_points_refresh">Refresh - Past Points</string>
 <string name="all_past_points_on_map">All points on the map</string>
+<string name="search_users">Search Users</string>
+<string name="friendship_requests">Friendship Requests</string>
+<string name="search_failed">named user does not exist!</string>
+<string name="couldnt_find">any request could not find!</string>
+<string name="turn_back">Turn Back</string>
 </resources>

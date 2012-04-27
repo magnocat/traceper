@@ -798,6 +798,7 @@ public class AppService extends Service implements IAppService{
 
 		return result;
 	}
+	
 	public String registerGPUser(String password, String email, String realname ,String image, String gp_id) 
 	{ // register google user
 		String[] name = new String[9];
@@ -883,9 +884,107 @@ public class AppService extends Service implements IAppService{
 
 		return result;
 	}	
+	public String AddAsFriend(String FriendId) 
+	{			
+		String[] name = new String[2];
+		String[] value = new String[2];
+		name[0] = "r";
+		name[1] = "friendId";
 
+		value[0] = "users/AddAsFriend";
+		value[1] = FriendId;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+
+		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		String result = getString(R.string.unknown_error_occured);
+		
+		
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+			if (result.equals("1")) 
+			{			
+
+			}
+			else {
+
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}	
+	public String approveFriendShip(String friendShipId) 
+	{			
+		String[] name = new String[2];
+		String[] value = new String[2];
+		name[0] = "r";
+		name[1] = "friendShipId";
+
+		value[0] = "users/approveFriendShip";
+		value[1] = friendShipId;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+
+		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		String result = getString(R.string.unknown_error_occured);
+		
+		
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+			if (result.equals("1")) 
+			{			
+
+			}
+			else {
+
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}	
+	public JSONArray GetFriendRequestListJson() 
+	{	
+		JSONArray searchlist = null;
+		JSONObject jArray = null;
+		String[] name = new String[1];
+		String[] value = new String[1];
+		name[0] = "r";
 	
+		value[0] = "users/GetFriendRequestListJson";
 	
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);
+
+		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
+		String result = getString(R.string.unknown_error_occured);
+		
+		 try{
+			 jArray = new JSONObject(httpRes);            
+		    }catch(JSONException e){
+		            Log.e("log_tag", "Error parsing data "+e.toString());
+		    }
+	    
+	 	
+	     try{
+	    	 searchlist = jArray.getJSONArray("userSearch");		 	        
+	 	        
+	         }catch(JSONException e)        {
+	         	 Log.e("log_tag", "Error parsing data "+e.toString());
+	         }
+	         	
+
+         
+	        
+	return searchlist;
+	}	
 	public JSONObject getUserInfo(int userid){
 		JSONArray userlist = null;
 		String result = "";
@@ -965,6 +1064,45 @@ public class AppService extends Service implements IAppService{
          
 	        
 	return userwashere;
+		
+		
+	}
+	public JSONArray SearchJSON(String search) 
+	{
+		JSONArray searchlist = null;
+		JSONObject jArray = null;
+		String result = "";
+		String[] name = new String[2];
+		String[] value = new String[2];
+		name[0] = "r";
+		name[1] = "SearchForm[keyword]";
+
+		value[0] = "users/SearchJSON";
+		value[1] = search;
+		
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		
+		result = getString(R.string.unknown_error_occured);
+		
+		 try{
+			 jArray = new JSONObject(httpRes);            
+		    }catch(JSONException e){
+		            Log.e("log_tag", "Error parsing data "+e.toString());
+		    }
+	    
+	 	
+	     try{
+	    	 searchlist = jArray.getJSONArray("userSearch");		 	        
+
+	         }catch(JSONException e)        {
+	      
+	         	 Log.e("log_tag", "Error parsing data "+e.toString());
+	         }
+	         	
+
+         
+	        
+	return searchlist;
 		
 		
 	}

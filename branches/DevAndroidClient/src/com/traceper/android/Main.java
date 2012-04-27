@@ -22,6 +22,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,8 @@ public class Main extends Activity
 {
 	private static final int TAKE_PICTURE_ID = Menu.FIRST;
 	private static final int EXIT_APP_ID = Menu.FIRST + 1;
+	private static final int SEARCH_USER = Menu.FIRST + 2;
+	private static final int INVITATION = Menu.FIRST + 3;
 	private IAppService appService = null;
 	private TextView lastDataSentTimeText;
 	private Button takePhoto;
@@ -126,6 +130,8 @@ public class Main extends Activity
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
+		Session session = Session.restore(this);
+		
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 			Toast.makeText(this, R.string.gps_disabled_message, Toast.LENGTH_SHORT).show();
 		}
@@ -222,7 +228,9 @@ public class Main extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) {		
 		boolean result = super.onCreateOptionsMenu(menu);		
 
-		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);	
+		menu.add(0, EXIT_APP_ID, 0, R.string.exit_application).setIcon(R.drawable.exit);
+		menu.add(0, SEARCH_USER, 0, R.string.search_users).setIcon(R.drawable.search);
+		menu.add(0, INVITATION, 0, R.string.friendship_requests).setIcon(R.drawable.users);
 
 		return result;
 	}
@@ -241,7 +249,25 @@ public class Main extends Activity
 			Intent i = new Intent(Main.this, CameraController.class);
 			startActivity(i);
 			return true;
-		}		
+		}
+		case SEARCH_USER:
+		{
+
+			Intent i = new Intent(Main.this, SearchUsers.class);
+	 		i.setAction(IAppService.SHOW_USER_SEARCH_LIST);
+			startActivity(i);
+		
+			return true;
+		}
+		case INVITATION:
+		{
+
+			Intent i = new Intent(Main.this, SearchUsers.class);
+			i.setAction(IAppService.SHOW_USER_INVITATION_LIST);
+			startActivity(i);
+			
+			return true;
+		}
 		case EXIT_APP_ID:
 		{
 			progressDialog = ProgressDialog.show(Main.this, "", getString(R.string.signingout), true, false);	
@@ -250,6 +276,9 @@ public class Main extends Activity
 				private Handler handler = new Handler();
 				@Override
 				public void run() {
+				
+					Session.clearSavedSession(getApplicationContext());
+					
 					appService.exit();
 					
 					handler.post(new Runnable() {
