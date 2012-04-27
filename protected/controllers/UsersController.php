@@ -213,9 +213,9 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListXML()
 	{
-		if (Yii::app()->user->isGuest) {
-			return;
-		}
+		//if (Yii::app()->user->isGuest) {
+			//return;
+		//}
 		$pageNo = 1;
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int) $_REQUEST['pageNo'];
@@ -422,7 +422,7 @@ class UsersController extends Controller
 			else {
 				$friendIdList = Yii::app()->user->id;
 			}
-					
+/*					
 			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, u.gp_image, u.fb_id, u.g_id, u.account_type,
 						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
 						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
@@ -430,9 +430,17 @@ class UsersController extends Controller
 					FROM '. Users::model()->tableName() . ' u
 					WHERE u.Id IN ('. $friendIdList .')
 					LIMIT ' . $offset . ' , ' . $range;
-
+*/
+			$sql = 'SELECT u.Id as id, u.realname,u.latitude, u.longitude, u.altitude, u.gp_image, u.fb_id, u.g_id, u.account_type,
+						date_format(u.dataArrivedTime, "%H:%i %d/%m/%Y") as dataArrivedTime, 
+						date_format(u.dataCalculatedTime, "%H:%i %d/%m/%Y") as dataCalculatedTime,
+						1 isFriend
+					FROM '. Users::model()->tableName() . ' u
+					WHERE u.Id IN ('. $friendIdList .')
+					LIMIT ' . $offset . ' , ' . $range;
+			
 		$out = $this-> prepareJson($sql, "userList");
-		
+
 		echo $out;
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
@@ -556,7 +564,45 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
+	
+	public function actionSearchJSON() {
+	$model = new SearchForm();
+	$userId= Yii::app()->user->id;
+	$out = "missing parameter!";
+	$dataProvider = null;
+		if(isset($_REQUEST['SearchForm']))
+		{
+			$model->attributes = $_REQUEST['SearchForm'];
+			if ($model->validate()) {
 
+			$sqlCount = 'SELECT count(*)
+				FROM '. Users::model()->tableName() . ' u 
+				WHERE realname like "%'. $model->keyword .'%"';
+
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+/*
+* if status is 0 it means friend request made but not yet confirmed
+* if status is 1 it means friend request is confirmed.
+* if status is -1 it means there is no relation of any kind between users.
+*/
+			$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId,u.gp_image, u.fb_id, u.g_id, u.account_type,
+				IF(f.status = 0 OR f.status = 1, f.status, -1) as status,
+				IF(f.friend1 = '. Yii::app()->user->id .', true, false ) as requester
+				FROM '. Users::model()->tableName() . ' u 
+				LEFT JOIN '. Friends::model()->tableName().' f 
+				ON  (f.friend1 = '. Yii::app()->user->id .' 
+				AND f.friend2 =  u.Id)
+				OR 
+				(f.friend1 = u.Id 
+				AND f.friend2 = '. Yii::app()->user->id .' ) 
+				WHERE u.realname like "%'. $model->keyword .'%" LIMIT 0,29' ;
+
+				$out = $this-> prepareJson($sql, "userSearch" ,$userId);
+		}
+	}
+	echo $out;
+}
 	public function actionDeleteFriendShip(){
 		$result = 'Missing Data';
 		if (isset($_REQUEST['friendShipId']))
@@ -623,7 +669,33 @@ class UsersController extends Controller
 		$this->renderPartial('userListDialog',array('dataProvider'=>$dataProvider), false, true);
 
 	}
+	public function actionGetFriendRequestListJson(){
 
+		// we look at the friend2 field because requester id is stored in friend1 field
+		// and only friend who has been requested to be a friend can approve frienship
+		$sqlCount = 'SELECT count(*)
+					 FROM '. Friends::model()->tableName() . ' f 
+					 WHERE friend2 = '.Yii::app()->user->id.' 
+						   AND status= 0';
+
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		/**
+		 * because we use same view in listing users, we put requester field as false
+		 * to make view show approve link,
+		 * requester who make friend request cannot approve request
+		 */
+		$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId, f.status, u.gp_image, u.fb_id, u.g_id, u.account_type,
+					   false as requester	   
+				FROM '. Friends::model()->tableName() . ' f 
+				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = f.friend1
+				WHERE friend2='.Yii::app()->user->id.' AND status= 0'  ;
+
+		$out = $this-> prepareJson($sql, "userSearch" ,$userId);
+		echo $out;
+
+	}
 	public function actionApproveFriendShip(){
 		$result = 'Missing Data';
 		if (isset($_REQUEST['friendShipId']))
@@ -664,13 +736,29 @@ class UsersController extends Controller
 			$friend->friend2Visibility = 1; //default visibility setting is visible
 			$friend->status = 0;
 			$result = 'Error occured';
+			try
+			{
 			if ($friend->save()) {
 				$result = 1;
-			}
-		}
-		echo CJSON::encode(array(
+						echo CJSON::encode(array(
 								"result"=>$result,
-		));
+									));
+			}
+			}
+			catch (Exception $e)
+			{
+					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+						{
+				$result = 0;
+						echo CJSON::encode(array(
+								"result"=>$result,
+									));
+						}
+				Yii::app()->end();		
+			}
+			
+		}
+
 	}
 
 	private function prepareXML($sql, $pageNo, $pageCount, $type="userList", $userId=NULL)
@@ -740,12 +828,14 @@ class UsersController extends Controller
 		{
 			if ($type == "userList")
 			{
+
 				while ( $row = $dataReader->read() )
-				{
-					$row = $dataReader->read();
+				{			
+					//$row = $dataReader->read();
 					$str .= $this->getUserJsonItem($row).',';
 				}
 				$str='{"userlist":['.$str.']}';
+			
 				/*
 				$JSON["userlist"]=array();
 
@@ -753,6 +843,28 @@ class UsersController extends Controller
 
 				$str= json_encode($JSON);
 				*/
+			}
+			else if ($type == "userSearch")
+			{
+			while ( $row = $dataReader->read() )
+				{
+			$row['id'] = isset($row['id']) ? $row['id'] : null;
+			$row['Name'] = isset($row['Name']) ? $row['Name'] : null;
+				
+				$str .= CJSON::encode(array(
+							'id'=>$row['id'],
+							'Name'=>$row['Name'],
+		                   	'gp_image'=>$row['gp_image'],
+		                    'fb_id'=>$row['fb_id'],
+		                    'g_id'=>$row['g_id'],		
+                            'account_type'=>$row['account_type'],
+							'status'=>$row['status'],
+							'friendShipId'=>$row['friendShipId'],  
+                            )).',';
+				}
+		
+				$str='{"userSearch":['.$str.']}';
+				
 			}
 			else if ($type == "userInfo")
 			{
@@ -808,7 +920,6 @@ class UsersController extends Controller
 	}
 
 	private function getUserJsonItem($row){
-	
 		$row['id'] = isset($row['id']) ? $row['id'] : null;
 		//		$row->username = isset($row->username) ? $row->username : null;
 		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
@@ -823,7 +934,7 @@ class UsersController extends Controller
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
 			
 		
-		                   $str=   CJSON::encode( array(
+		                   $bsk=   CJSON::encode( array(
                             'user'=>$row['id'],
                             'isFriend'=>$row['isFriend'],
                     		'realname'=>$row['realname'],
@@ -847,7 +958,7 @@ class UsersController extends Controller
                             
 		
                                         
-		return $str;
+		return $bsk;
 	}
 	
 	private function getUserXMLItem($row)
