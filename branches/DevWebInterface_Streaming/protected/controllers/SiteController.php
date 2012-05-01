@@ -97,6 +97,8 @@ class SiteController extends Controller
 		$model = new LoginForm;
 
 		$processOutput = true;
+		//echo "in action login";
+		//Yii::app()->end();
 		// collect user input data
 		if(isset($_POST['LoginForm']))
 		{

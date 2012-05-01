@@ -444,9 +444,6 @@ class UploadController extends Controller
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL
 			&& isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
-			&& isset($_REQUEST['uniqueId']) && $_REQUEST['uniqueId'] != NULL)
-			&& isset($_REQUEST['isLive']) && $_REQUEST['isLive'] != NULL)
-			&& isset($_REQUEST['isLastPacket']) && $_REQUEST['isLastPacket'] != NULL)
 		{
 			$result = "Upload Error";
 			if ($_FILES["upload"]["error"] == UPLOAD_ERR_OK)
@@ -456,9 +453,23 @@ class UploadController extends Controller
 				$altitude = (float) $_REQUEST['altitude'];
 				$description = htmlspecialchars($_REQUEST['description']);
 				$fileType = (int) $_REQUEST['fileType'];
-				$uniqueId = (int) $_REQUEST['uniqueId'];
-				$isLive = (int) $_REQUEST['isLive'];
-				$isLastPacket = (int) $_REQUEST['isLastPacket'];
+				
+				if(0 == $fileType) //Photo
+				{
+					$uniqueId = 0;
+					$isLive = 0;
+					$isLastPacket = 0;						
+				}
+				else //Video
+				{
+// 					&& isset($_REQUEST['uniqueId']) && $_REQUEST['uniqueId'] != NULL
+// 					&& isset($_REQUEST['isLive']) && $_REQUEST['isLive'] != NULL
+// 					&& isset($_REQUEST['isLastPacket']) && $_REQUEST['isLastPacket'] != NULL
+					
+					$uniqueId = (int) $_REQUEST['uniqueId'];
+					$isLive = (int) $_REQUEST['isLive'];
+					$isLastPacket = (int) $_REQUEST['isLastPacket'];
+				}
 
 				$publicData = 0;
 				if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
@@ -467,7 +478,7 @@ class UploadController extends Controller
 						$publicData = 1;
 					}
 				}
-				
+
 				if (Yii::app()->user->id != null) 
 				{					
 					//$liveUploadRow = Upload::model()->find('userId=:userId AND live=:live', array(':userId'=>Yii::app()->user->id, ':live'=>1));
@@ -479,9 +490,10 @@ class UploadController extends Controller
 						$sql = sprintf('INSERT INTO '
 						. Upload::model()->tableName() .'
 															(uniqueId, fileType, userId, latitude, longitude, altitude, uploadtime, publicData, live, description)
-															VALUES(%d, %d, %s, %s, %s, NOW(), %d, "%s")', 
+															VALUES(%d, %d, %d, %s, %s, %s, NOW(), %d, %d, "%s")', 
 						$uniqueId, $fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $isLive, $description);
 						$result = "Unknown Error";
+						
 						$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 						if ($effectedRows == 1)
 						{
@@ -497,11 +509,17 @@ class UploadController extends Controller
 						$filename = Yii::app()->params->uploadPath .'/'.$uniqueId.'.flv';
 						if (file_exists($filename)) //If continue to form a live video which has been already started
 						{
+							$result = "1";
 							// open the file for appending the new coming packets
-							$fp = fopen($filename, "a+");
+							$fp = fopen($filename, "ab+");
+							
+							$result = "File Write Error";
 							
 							// append new packet to the file
-							fwrite($fp, $_FILES["upload"]["tmp_name"]);
+							if(fwrite($fp, file_get_contents($_FILES["upload"]["tmp_name"])) != FALSE)
+							{
+								$result = "1";
+							}
 							
 							// close the file
 							fclose($fp);
@@ -511,9 +529,10 @@ class UploadController extends Controller
 							$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
 									(uniqueId, fileType, userId, latitude, longitude, altitude, uploadtime, publicData, live, description)
-									VALUES(%d, %d, %s, %s, %s, NOW(), %d, "%s")',
+									VALUES(%d, %d, %d, %s, %s, %s, NOW(), %d, %d, "%s")', 
 									$uniqueId, $fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $isLive, $description);
-							$result = "Unknown Error";
+							$result = "Unknown Error";							
+							
 							$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 							if ($effectedRows == 1)
 							{
