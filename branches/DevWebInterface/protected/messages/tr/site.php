@@ -2,10 +2,34 @@
 /**
  * This file is the translation of files under views/site folder.
  */
+
+/*
+* Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
+Türkçe UTF-8
+Ý 	Ä°
+ý 	Ä±
+Ö 	Ã–
+ö 	Ã¶
+Ü 	Ãœ
+ü 	Ã¼
+Ç 	Ã‡
+ç 	Ã§
+Ð 	ÄŸ
+ð 	ÄŸ
+Þ 	Å
+þ 	ÅŸ
+*/
+
 return array(
 	'Login' => 'Oturum aÃ§',
 	'Register' => 'KayÄ±t olun',
 	'Save' => 'Kaydet',
+	'Register GPS Tracker' => 'GPS Takip Cihazý Kaydet',
+	'The device is registered successfully' => 'Cihaz baÅŸarÄ±yla kaydedildi',
+	'You can add only one GPS Tracker with the same id!' => 'AynÄ± Id ile yalnÄ±zca bir GPS takip cihazÄ± ekleyebilirsiniz!',
+	'You can add only one GPS Tracker with the same name!' => 'AynÄ± isim ile yalnÄ±zca bir GPS takip cihazÄ± ekleyebilirsiniz!',
+	'Device could not be registered!' => 'Cihaz kaydedilemedi!',
+	'An activation mail is sent to your e-mail address...' => 'Aktivasyon maili e-mail adresinize gönderilmiþtir...',
 );
 
 
