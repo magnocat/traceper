@@ -69,16 +69,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#groupSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("'.Yii::t('groups', 'Your settings have been saved').'");
-																					$("#messageDialog").dialog("open");																					
+																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
 																				}
 																				else if(obj.result && obj.result == "Duplicate Entry")
 																				{
 																					$("#groupSettingsWindow").html(result);
 		
 																					$("#groupSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("'.Yii::t('groups', 'Select only one privacy group!').'");
-																					$("#messageDialog").dialog("open");																			
+																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
 																				}																				
 																			}
 																			catch (error){

@@ -66,8 +66,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#registerWindow").dialog("close");
-																			$("#messageDialogText").html("An activation mail is sent to your e-mail address");
-																			$("#messageDialog").dialog("open");
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
 																		}
 																	}
 																	catch (error){

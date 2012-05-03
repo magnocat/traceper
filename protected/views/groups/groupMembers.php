@@ -30,14 +30,12 @@ if ($dataProvider != null)
 																}
 																else 
 																{
-																	$("#messageDialogText").html("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
-																	$("#messageDialog").dialog("open");
+																	TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
 																}
 
 															}
 															catch(ex) {
-																$("#messageDialogText").html("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
-																$("#messageDialog").dialog("open");
+																TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
 															}
 														}',
 										)) .

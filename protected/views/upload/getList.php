@@ -27,14 +27,12 @@ if ($dataProvider != null) {
 																		}
 																		else 
 																		{
-																			$("#messageDialogText").html("Sorry,an error occured in operation");
-																			$("#messageDialog").dialog("open");
+																			TRACKER.showMessageDialog("Sorry,an error occured in operation");
 																		}
 	
 																	}
 																	catch(ex) {
-																		$("#messageDialogText").html("Sorry,an error occured in operation");
-																		$("#messageDialog").dialog("open");
+																		TRACKER.showMessageDialog("Sorry,an error occured in operation");
 																	}
 																}',
 												)) .

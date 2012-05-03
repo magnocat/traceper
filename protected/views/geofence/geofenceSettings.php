@@ -59,16 +59,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#geofenceSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("'.Yii::t('geofence', 'Your settings have been saved').'");
-																					$("#messageDialog").dialog("open");																					
+																					TRACKER.showMessageDialog("'.Yii::t('geofence', 'Your settings have been saved').'");
 																				}
 																				else if(obj.result && obj.result == "Duplicate Entry")
 																				{
 																					$("#geofenceSettingsWindow").html(result);
 		
 																					$("#geofenceSettingsWindow").dialog("close");
-																					$("#messageDialogText").html("'.Yii::t('geofence', 'Select only one geofence!').'");
-																					$("#messageDialog").dialog("open");																			
+																					TRACKER.showMessageDialog("'.Yii::t('geofence', 'Select only one geofence!').'");
 																				}																				
 																			}
 																			catch (error){

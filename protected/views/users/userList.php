@@ -184,13 +184,11 @@ if ($dataProvider != null) {
 														}
 														else 
 														{
-															$("#messageDialogText").html("'.Yii::t('users', 'Sorry, an error occured in operation').'");
-															$("#messageDialog").dialog("open");
+															TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 														}
 													}
 													catch(ex) {
-														$("#messageDialogText").html("'.Yii::t('users', 'Sorry, an error occured in operation').'");
-														$("#messageDialog").dialog("open");
+														TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
 													}
 													
 												}\',
