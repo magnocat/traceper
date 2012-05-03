@@ -123,7 +123,7 @@ return array(
 		// this is used in contact page
 		'adminEmail'=>'contact@traceper.com',
 		'contactEmail'=>'contact@traceper.com',
-		'itemCountInOnePage'=> 11,  // this is the number of users and groups that are shown in a page
+		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
 		'uploadCountInOnePage'=> 5, // this is the number of images that are shown in a page	
 		'itemCountInDataListPage'=> 20,
 		'minDistanceInterval'=> 500,
