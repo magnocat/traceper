@@ -249,6 +249,7 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   `gp_image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `deviceId` (`deviceId`),
   KEY `dataArrivedTime` (`dataArrivedTime`),
   KEY `realname` (`realname`) USING BTREE,
   KEY `password` (`password`)
