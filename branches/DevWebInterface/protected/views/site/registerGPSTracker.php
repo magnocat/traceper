@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'registerGPSTrackerWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Register GPS Tracker'),
+	        'title'=>Yii::t('site', 'Register GPS Tracker'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -48,33 +48,29 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		var obj = jQuery.parseJSON(result);
 																		if (obj.result && obj.result == "1") 
 																		{
-																			$("#registerGPSTrackerWindow").dialog("close");
-																			$("#messageDialogText").html("The device is registered successfully");
-																			$("#messageDialog").dialog("open");	
+																			$("#registerGPSTrackerWindow").dialog("close");	
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'The device is registered successfully').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
 																		{
 																			$("#registerGPSTrackerWindow").html(result);
 
 																			$("#registerGPSTrackerWindow").dialog("close");
-																			$("#messageDialogText").html("You can add only one GPS Tracker with the same id!");
-																			$("#messageDialog").dialog("open");																			
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one GPS Tracker with the same id!').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Name")
 																		{
 																			$("#registerGPSTrackerWindow").html(result);
 
 																			$("#registerGPSTrackerWindow").dialog("close");
-																			$("#messageDialogText").html("You can add only one GPS Tracker with the same name!");
-																			$("#messageDialog").dialog("open");																			
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one GPS Tracker with the same name!').'");
 																		}																		
 																	}
 																	catch (error){
 																		$("#registerGPSTrackerWindow").html(result);	
 
 																		$("#registerGPSTrackerWindow").dialog("close");
-																		$("#messageDialogText").html("Device could not be registered!");
-																		$("#messageDialog").dialog("open");																			
+																		TRACKER.showMessageDialog("'.Yii::t('site', 'Device could not be registered!').'");
 																	}
 																 }',
 													 ),

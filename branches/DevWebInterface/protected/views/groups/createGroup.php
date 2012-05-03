@@ -49,16 +49,14 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#createGroupWindow").dialog("close");
-																			$("#messageDialogText").html("'.Yii::t('groups', 'The group is created successfully').'");
-																			$("#messageDialog").dialog("open");																			
+																			TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
 																		{
 																			$("#createGroupWindow").html(result);
 
 																			$("#createGroupWindow").dialog("close");
-																			$("#messageDialogText").html("'.Yii::t('groups', 'A group with this name already exists!').'");
-																			$("#messageDialog").dialog("open");																			
+																			TRACKER.showMessageDialog("'.Yii::t('groups', 'A group with this name already exists!').'");
 																		}
 																	}
 																	catch (error){

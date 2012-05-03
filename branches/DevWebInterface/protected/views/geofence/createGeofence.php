@@ -62,8 +62,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			$("#createGeofenceWindow").html(result);
 
 																			$("#createGeofenceWindow").dialog("close");
-																			$("#messageDialogText").html("'.Yii::t('geofence', 'A geofence with this name already exists!').'");
-																			$("#messageDialog").dialog("open");																			
+																			TRACKER.showMessageDialog("'.Yii::t('geofence', 'A geofence with this name already exists!').'");																	
 																		}
 																	}
 																	catch (error){

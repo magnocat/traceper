@@ -43,8 +43,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			if (obj.result && obj.result == "1") 
 																			{
 																				$("#groupPrivacySettingsWindow").dialog("close");
-																				$("#messageDialogText").html("'.Yii::t('groups', 'Your settings have been saved').'");
-																				$("#messageDialog").dialog("open");																					
+																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'");
 																			}
 																		}
 																		catch (error){
