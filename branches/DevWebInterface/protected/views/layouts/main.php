@@ -102,6 +102,8 @@
 	echo '<div id="registerWindow"></div>';
 ///////////////////////////// Register GPS Tracker Window ///////////////////////////
 	echo '<div id="registerGPSTrackerWindow"></div>';
+	///////////////////////////// Register GPS Tracker Window ///////////////////////////
+	echo '<div id="registerNewStaffWindow"></div>';	
 ///////////////////////////// GeoFence Window ///////////////////////////
 	echo '<div id="geoFenceWindow"></div>';	
 ///////////////////////////// Change Password Window ///////////////////////////
@@ -268,25 +270,28 @@
 										array(
 											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'))); 
 
- 									echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
-	 													<img src="images/invite.png"  /><div></div>
-	 												 </div>', $this->createUrl('site/inviteUsers'), 
- 										array(
-    										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
- 											'update'=> '#inviteUsersWindow',
-										),
-										array(
-											'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends')));										
-									
-									echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
-	 													<img src="images/friends.png"  /><div></div>
-	 												 </div>', $this->createUrl('users/GetFriendRequestList'), 
- 										array(
-    										'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
- 											'update'=> '#friendRequestsWindow',
-										),
-										array(
-											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Friendship Requests')));
+ 									if(!defined('USER_MANAGEMENT_FEATURE'))
+ 									{
+ 										echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
+ 												<img src="images/invite.png"  /><div></div>
+ 												</div>', $this->createUrl('site/inviteUsers'),
+ 												array(
+ 														'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
+ 														'update'=> '#inviteUsersWindow',
+ 												),
+ 												array(
+ 														'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends')));
+ 											
+ 										echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
+ 												<img src="images/friends.png"  /><div></div>
+ 												</div>', $this->createUrl('users/GetFriendRequestList'),
+ 												array(
+ 														'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
+ 														'update'=> '#friendRequestsWindow',
+ 												),
+ 												array(
+ 														'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Friendship Requests'))); 										
+ 									} 									
 										
 									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
 	 													<img src="images/createGroup.png"  /><div></div>
@@ -308,7 +313,21 @@
 										),
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
-										
+
+									if(defined('USER_MANAGEMENT_FEATURE'))
+									{
+										echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+												<img src="images/user_add_friend.png"  /><div></div>
+												</div>', $this->createUrl('site/registerNewStaff'),
+												array(
+														'complete'=> 'function() { $("#registerNewStaffWindow").dialog("open"); return false;}',
+														'update'=> '#registerNewStaffWindow',
+												),
+												array(
+														'id'=>'showRegisterNewStaffWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register New Staff')));
+																				
+									}	
+
 									echo CHtml::ajaxLink('<div class="userOperations" id="showGeofence">
 	 													<img src="images/userGeofences.png"  /><div></div>
 	 												 </div>', $this->createUrl('geofence/getGeofences'), 
@@ -420,7 +439,7 @@
 								    	{
 											$this->widget('zii.widgets.jui.CJuiTabs', array(
 											    'tabs' => array(
-													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
+													Yii::t('layout', defined('USER_MANAGEMENT_FEATURE')?'Staff':'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
 																	 'id'=>'users_tab'),
 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image 
 											        				  'id'=>'photos_tab'),
