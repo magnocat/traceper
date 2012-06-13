@@ -678,6 +678,111 @@ class SiteController extends Controller
 		}
 
 	}
+	
+	
+	public function actionRegisterNewStaff()
+	{
+		$model = new RegisterNewStaffForm;
+	
+		$processOutput = true;
+		$isMobileClient = false;
+		// collect user input data
+		if(isset($_POST['RegisterNewStaffForm']))
+		{
+			$isMobileClient = false;
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') {
+				$isMobileClient = true;
+			}
+			$model->attributes = $_POST['RegisterNewStaffForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {
+	
+// 				if(Users::model()->find('email=:email', array(':email'=>'email')) == null)
+// 				{
+					$users = new Users;
+					$users->realname = $model->name;
+					$users->email = $model->email;
+					$users->password = md5($model->email);
+					$users->gender = 'staff';					
+
+					try
+					{
+						if($users->save()) // save the change to database
+						{
+							$friend = new Friends();
+							$friend->friend1 = Yii::app()->user->id;
+							$friend->friend1Visibility = 1; //default visibility setting is visible
+							$friend->friend2 = $users->getPrimaryKey();
+							$friend->friend2Visibility = 1; //default visibility setting is visible
+							$friend->status = 1;
+								
+							if ($friend->save())
+							{
+								echo CJSON::encode(array("result"=> "1"));
+							}
+							else
+							{
+								echo CJSON::encode(array("result"=> "Unknown error"));
+							}
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=> "Unknown error"));
+						}
+					}
+					catch (Exception $e)
+					{
+						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+						{
+							echo CJSON::encode(array("result"=> "Duplicate Entry"));
+						}
+						Yii::app()->end();
+							
+						//					echo 'Caught exception: ',  $e->getMessage(), "\n";
+						//    				echo 'Code: ', $e->getCode(), "\n";
+					}
+// 				}
+// 				else
+// 				{
+// 					echo CJSON::encode(array("result"=> "Duplicate Name"));
+// 				}
+	
+				Yii::app()->end();
+			}
+	
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+	
+			}
+		}
+	
+		if ($isMobileClient == true)
+		{
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+			else if ($model->getError('passwordAgain') != null) {
+				$result = $model->getError('passwordAgain');
+			}
+	
+			echo CJSON::encode(array(
+					"result"=> $result,
+			));
+			Yii::app()->end();
+		}
+		else {
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			$this->renderPartial('registerNewStaff',array('model'=>$model), false, $processOutput);
+		}
+	
+	}	
 
 	public function actionInviteUsers()
 	{

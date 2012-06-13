@@ -1,9 +1,9 @@
 <?php 
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'registerGPSTrackerWindow',
+	    'id'=>'registerNewStaffWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('site', 'Register GPS Tracker'),
+	        'title'=>Yii::t('site', 'Register New Staff'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -13,7 +13,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 ?>
 	<div class="form">
 	<?php $form=$this->beginWidget('CActiveForm', array(
-		'id'=>'registerGPSTracker-form',
+		'id'=>'registerNewStaff-form',
 		'enableClientValidation'=>true,
 		'clientOptions'=> array(
 							'validateOnSubmit'=> true,
@@ -32,45 +32,38 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>
 		
 		<div class="row">
-			<?php echo $form->labelEx($model,'deviceId'); ?>
-			<?php echo $form->textField($model,'deviceId'); ?>
-			<?php $errorMessage = $form->error($model,'deviceId');  
+			<?php echo $form->labelEx($model,'email'); ?>
+			<?php echo $form->textField($model,'email'); ?>
+			<?php $errorMessage = $form->error($model,'email');  
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
 			?>	  			
 		</div>
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), $this->createUrl('site/registerGPSTracker'), 
+			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), $this->createUrl('site/registerNewStaff'), 
 												array(
 													'success'=> 'function(result){ 
 																	try {
 																		var obj = jQuery.parseJSON(result);
 																		if (obj.result && obj.result == "1") 
 																		{
-																			$("#registerGPSTrackerWindow").dialog("close");	
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'The device is registered successfully').'");
+																			$("#registerNewStaffWindow").dialog("close");	
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'The staff is registered successfully').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
 																		{
-																			$("#registerGPSTrackerWindow").html(result);
+																			$("#registerNewStaffWindow").html(result);
 
-																			$("#registerGPSTrackerWindow").dialog("close");
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one GPS Tracker with the same id!').'");
-																		}
-																		else if(obj.result && obj.result == "Duplicate Name")
-																		{
-																			$("#registerGPSTrackerWindow").html(result);
-
-																			$("#registerGPSTrackerWindow").dialog("close");
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one GPS Tracker with the same name!').'");
+																			$("#registerNewStaffWindow").dialog("close");
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one staff with the e-mail!').'");
 																		}																		
 																	}
 																	catch (error){
-																		$("#registerGPSTrackerWindow").html(result);	
+																		$("#registerNewStaffWindow").html(result);	
 
-																		$("#registerGPSTrackerWindow").dialog("close");
-																		TRACKER.showMessageDialog("'.Yii::t('site', 'Device could not be registered!').'");
+																		$("#registerNewStaffWindow").dialog("close");
+																		TRACKER.showMessageDialog("'.Yii::t('site', 'Staff could not be registered!').'");
 																	}
 																 }',
 													 ),
@@ -78,7 +71,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 												
 			<?php echo CHtml::htmlButton(Yii::t('site','Cancel'),  
 												array(
-													'onclick'=> '$("#registerGPSTrackerWindow").dialog("close"); return false;',
+													'onclick'=> '$("#registerNewStaffWindow").dialog("close"); return false;',
 													 ),
 												null); ?>												
 		</div>
