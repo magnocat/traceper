@@ -39,6 +39,24 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				  else { echo $errorMessage; }
 			?>	  			
 		</div>
+		
+		<div class="row">
+			<?php echo $form->labelEx($model,'password'); ?>
+			<?php echo $form->passwordField($model,'password'); ?>
+			<?php $errorMessage = $form->error($model,'password'); 
+				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+				  else { echo $errorMessage; }	
+			?>	  		
+		</div>
+		
+		<div class="row">
+			<?php echo $form->labelEx($model,'passwordAgain'); ?>
+			<?php echo $form->passwordField($model,'passwordAgain'); ?>
+			<?php $errorMessage = $form->error($model,'passwordAgain'); 
+				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+				  else { echo $errorMessage; }	
+			?>	  		
+		</div>		
 	
 		<div class="row buttons">
 			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), $this->createUrl('site/registerNewStaff'), 
@@ -60,10 +78,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		}																		
 																	}
 																	catch (error){
-																		$("#registerNewStaffWindow").html(result);	
-
-																		$("#registerNewStaffWindow").dialog("close");
-																		TRACKER.showMessageDialog("'.Yii::t('site', 'Staff could not be registered!').'");
+																		$("#registerNewStaffWindow").html(result);
+																		var confirmMessage = document.getElementById("messageWindow");
+																		if(confirmMessage.style.display != "block") {																		
+																			confirmMessage.style.display = "none";
+																		}
 																	}
 																 }',
 													 ),
