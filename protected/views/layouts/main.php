@@ -437,15 +437,27 @@
 									<?php										
 								    	//if (Yii::app()->user->isGuest == false)
 								    	{
-											$this->widget('zii.widgets.jui.CJuiTabs', array(
-											    'tabs' => array(
-													Yii::t('layout', defined('USER_MANAGEMENT_FEATURE')?'Staff':'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
-																	 'id'=>'users_tab'),
-											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image 
-											        				  'id'=>'photos_tab'),
-											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'), 
-											        				  'id'=>'groups_tab'),											
-											    ),
+											$tabs = array();
+											$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList'), 'id'=>'users_tab');
+											
+											if(defined('USER_MANAGEMENT_FEATURE'))
+											{
+												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList'), 'id'=>'staff_tab');
+											}
+											
+											$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
+											$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList'), 'id'=>'groups_tab');
+								    		
+								    		$this->widget('zii.widgets.jui.CJuiTabs', array(
+// 											    'tabs' => array(
+// 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'), 
+// 																	 'id'=>'users_tab'),
+// 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image 
+// 											        				  'id'=>'photos_tab'),
+// 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'), 
+// 											        				  'id'=>'groups_tab'),
+// 											    ),
+							    				'tabs' => $tabs,								    				
 											    'id'=>"tab_view",
 											    // additional javascript options for the tabs plugin
 											    'options' => array(

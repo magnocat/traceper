@@ -702,7 +702,7 @@ class SiteController extends Controller
 					$users = new Users;
 					$users->realname = $model->name;
 					$users->email = $model->email;
-					$users->password = md5($model->email);
+					$users->password = md5($model->password);
 					$users->gender = 'staff';					
 
 					try
