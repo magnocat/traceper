@@ -67,10 +67,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		}																		
 																	}
 																	catch (error){
-																		$("#registerGPSTrackerWindow").html(result);	
-
-																		$("#registerGPSTrackerWindow").dialog("close");
-																		TRACKER.showMessageDialog("'.Yii::t('site', 'Device could not be registered!').'");
+																		$("#registerGPSTrackerWindow").html(result);
+																		var confirmMessage = document.getElementById("messageWindow");
+																		if(confirmMessage.style.display != "block") {																		
+																			confirmMessage.style.display = "none";
+																		}
 																	}
 																 }',
 													 ),
