@@ -59,6 +59,7 @@ class Users extends CActiveRecord
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
 			array('email', 'length', 'max'=>100),
+			array('email', 'email'),
 			array('deviceId', 'length', 'max'=>64),
 			array('gp_image', 'length', 'max'=>255),
 			array('account_type', 'length', 'max'=>1),
@@ -148,4 +149,45 @@ class Users extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	
+	public function updateLocation($latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId){
+		
+		$sql = sprintf('UPDATE '
+				. $this->tableName() .'
+				SET
+				latitude = %f , '
+				.'	longitude = %f , '
+				.'	altitude = %f ,	'
+				.'	dataArrivedTime = NOW(), '
+				.'	deviceId = "%s"	,'
+				.'  dataCalculatedTime = "%s" '
+				.' WHERE '
+				.' 	Id = %d '
+				.' LIMIT 1;',
+				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
+		
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		return $effectedRows;
+	}
+	
+	public function saveUser($email, $password, $realname){
+		$users=new Users;
+		
+		$users->email = $email;
+		$users->realname = $realname;
+		$users->password = $password;
+		
+		return $users->save();
+	}
+	
+	public function changePassword($Id, $password) {
+		$result = false;
+		if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
+			$result = true;
+		}
+		return $result;		
+	}
+	
+	
 }

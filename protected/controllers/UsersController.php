@@ -73,22 +73,9 @@ class UsersController extends Controller
 			$result = "No valid user id";	
 			if (Yii::app()->user->id != false) 
 			{
-				$sql = sprintf('UPDATE '
-				. Users::model()->tableName() .'
-								SET
-								  	latitude = %f , '
-								  	.'	longitude = %f , '
-								  	.'	altitude = %f ,	'
-								  	.'	dataArrivedTime = NOW(), '
-								  	.'	deviceId = "%s"	,'
-								  	.'    dataCalculatedTime = "%s" '
-								  	.' WHERE '
-								  	.' Id = %d '
-								  	 .' LIMIT 1;',
-				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, Yii::app()->user->id);
-				$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 				$result = "Unknown Error";
-				if ($effectedRows == 1)
+				if (Users::model()->updateLocation($latitude, $longitude, $altitude, 
+													$deviceId, $calculatedTime, Yii::app()->user->id) == 1)
 				{
 					$sqlWasHere = sprintf('INSERT INTO '
 									. UserWasHere::model()->tableName() . '
