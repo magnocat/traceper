@@ -275,7 +275,7 @@ class SiteController extends Controller
 				//$users->password=md5($model->newPassword);
 
 				//if($users->save()) // save the change to database
-				if(Users::model()->updateByPk(Yii::app()->user->id, array("password"=>md5($model->newPassword)))) // save the change to database
+				if(Users::model()->changePassword(Yii::app()->user->id, $model->newPassword)) // save the change to database
 				{
 					echo CJSON::encode(array("result"=> "1"));
 				}
@@ -883,12 +883,8 @@ class SiteController extends Controller
 			$generatedKey =  md5($email.$userCandidate->time);
 			if ($generatedKey == $key)
 			{
-				$users = new Users;
-				$users->email = $userCandidate->email;
-				$users->realname = $userCandidate->realname;
-				$users->password = $userCandidate->password;
 				$result = "Sorry, there is a problem in activating the user";
-				if($users->save())
+				if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname))
 				{
 					$userCandidate->delete();
 					$result = "Your account has been activated successfully, you can login now";
