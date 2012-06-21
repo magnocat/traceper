@@ -6,8 +6,13 @@
 		stopOnFailure="false">
  
 	<selenium>
+	 <!--    
 		<browser name="Internet Explorer" browser="*iexplore" />
-		<browser name="Firefox" browser="*firefox" />
+		<browser name="Chrome" browser="*chrome" />		
+		
+	 -->
+
+	 	<browser name="Firefox" browser="*firefox" />
 	</selenium>
  
 </phpunit>

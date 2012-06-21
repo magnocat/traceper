@@ -17,14 +17,18 @@ class UsersTest extends CDbTestCase
 	}
 	
 	public function testSaveUser() {
-		$email = "deneme@denem.com";
+		$email = "test@test.com";
 		$password = "1231231";
-		$realname = "traceper deneme";
+		$realname = "test";
 		$this->assertTrue(Users::model()->saveUser($email, $password, $realname));
 		
 		$rows = Users::model()->findAll("email=:email", array(":email"=>$email));
 		
 		$this->assertEquals(count($rows), 1);
+		$this->assertEquals($rows[0]->email, $email);
+		$this->assertEquals($rows[0]->password, $password);
+		$this->assertEquals($rows[0]->realname, $realname);
+		
 		
 		try {
 			//try to register same e-mail address, it should throw exception
@@ -33,7 +37,6 @@ class UsersTest extends CDbTestCase
 		}
 		catch (CDbException $exp){
 			$this->assertTrue(true);
-			
 		}
 		//try to register with missing parameters 
 		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "", ""));

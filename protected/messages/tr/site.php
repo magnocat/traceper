@@ -5,19 +5,19 @@
 
 /*
 * Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
-Türkçe UTF-8
-Ý 	Ä°
-ý 	Ä±
-Ö 	Ã–
-ö 	Ã¶
-Ü 	Ãœ
-ü 	Ã¼
-Ç 	Ã‡
-ç 	Ã§
-Ð 	ÄŸ
-ð 	ÄŸ
-Þ 	Å
-þ 	ÅŸ
+Tï¿½rkï¿½e UTF-8
+ï¿½ 	Ä°
+ï¿½ 	Ä±
+ï¿½ 	Ã–
+ï¿½ 	Ã¶
+ï¿½ 	Ãœ
+ï¿½ 	Ã¼
+ï¿½ 	Ã‡
+ï¿½ 	Ã§
+ï¿½ 	ÄŸ
+ï¿½ 	ÄŸ
+ï¿½ 	ï¿½
+ï¿½ 	ÅŸ
 */
 
 return array(
@@ -33,7 +33,7 @@ return array(
 	'You can add only one staff with the e-mail!' => 'AynÄ± e-mail ile yalnÄ±zca bir personel ekleyebilirsiniz!',		
 	'Device could not be registered!' => 'Cihaz kaydedilemedi!',
 	'Staff could not be registered!' => 'Personel kaydedilemedi!',
-	'An activation mail is sent to your e-mail address...' => 'Aktivasyon maili e-mail adresinize gönderilmiþtir...',
+	'An activation mail is sent to your e-mail address...' => 'Aktivasyon maili e-mail adresinize gÃ¶nderilmiÅŸtir...',
 	'Register' => 'Kaydet',
 	'Cancel' => 'Ä°ptal',
 );
