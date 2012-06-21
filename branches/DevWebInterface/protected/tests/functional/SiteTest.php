@@ -1,47 +1,81 @@
 <?php
 
+
+require_once("bootstrap.php");
+
 class SiteTest extends WebTestCase
 {
-	public function testIndex()
+	
+	public $fixtures=array(
+			'users'=>'Users',
+			'candidates'=>'UserCandidates',
+	);	
+	
+	public function testLogin()
 	{
-		$this->open('');
-		$this->assertTextPresent('Welcome');
-	}
+		$this->open("index-test.php");
+		$this->click("id=showLoginWindow");	
 
-	public function testContact()
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=LoginForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+		
+		
+			
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		$this->assertEquals("Test User", $this->getText("id=username"));
+	}
+	
+	//TODO: aynı e-mail adresi ile iki kez giriş yapılması test edilmeli.
+	
+	public function testRegister()
 	{
-		$this->open('?r=site/contact');
-		$this->assertTextPresent('Contact Us');
-		$this->assertElementPresent('name=ContactForm[name]');
-
-		$this->type('name=ContactForm[name]','tester');
-		$this->type('name=ContactForm[email]','tester@example.com');
-		$this->type('name=ContactForm[subject]','test subject');
-		$this->click("//input[@value='Submit']");
-		$this->assertTextPresent('Body cannot be blank.');
+		$this->open('index-test.php');
+		$this->click("id=showRegisterWindow");
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=RegisterForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+		
+		$this->type("id=RegisterForm_email", "ahmetmermerkaya@gmail.com");
+		$this->type("id=RegisterForm_name", "Ahmet Oğuz Mermerkaya");
+		$this->type("id=RegisterForm_password", "123456");
+		$this->type("id=RegisterForm_passwordAgain", "123456");
+		$this->click("id=yt0");
+		$this->verifyTextPresent("Aktivasyon maili e-mail adresinize gönderilmiştir...");
+		$this->click("//button[@type='button']");
 	}
-
-	public function testLoginLogout()
+	
+	public function testActivate()
 	{
-		$this->open('');
-		// ensure the user is logged out
-		if($this->isTextPresent('Logout'))
-			$this->clickAndWait('link=Logout (demo)');
+		$this->open("index-test.php?r=site/activate");
+		
+		$this->verifyTextPresent("Sorry, you entered this page with wrong parameters");
+		
+		$key = md5($this->candidates('candidate1')->email . $this->candidates('candidate1')->time);
+		$url = 'index-test.php?r=site/activate&email='. $this->candidates('candidate1')->email. '&key='.$key;
 
-		// test login process, including validation
-		$this->clickAndWait('link=Login');
-		$this->assertElementPresent('name=LoginForm[username]');
-		$this->type('name=LoginForm[username]','demo');
-		$this->click("//input[@value='Login']");
-		$this->assertTextPresent('Password cannot be blank.');
-		$this->type('name=LoginForm[password]','demo');
-		$this->clickAndWait("//input[@value='Login']");
-		$this->assertTextNotPresent('Password cannot be blank.');
-		$this->assertTextPresent('Logout');
-
-		// test logout process
-		$this->assertTextNotPresent('Login');
-		$this->clickAndWait('link=Logout (demo)');
-		$this->assertTextPresent('Login');
+		$this->open($url);
+		
+		$this->verifyTextPresent("Your account has been activated successfully, you can login now");
+		
 	}
+	
+	
+	
+	
+
 }

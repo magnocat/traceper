@@ -24,13 +24,17 @@ class RegisterForm extends CFormModel
 	{
 		return array(
 			// username and password are required
+		/*
 			array('email, name, password, account_type, ac_id, passwordAgain', 'required',
 			'message'=>'Field cannot be blank!'),
+		*/
+			array('email, name, password, passwordAgain', 'required',
+						'message'=>'Field cannot be blank!'),
 			array('email', 'email', 'message'=>'E-mail not valid!'),			
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
 			'message'=>'Passwords not same!'),
-			array('email', 'isExists'),
+			array('email', 'isExists', 'message'=>'This e-mail is registered before'),
 			array('image', 'isExists')
 		);
 	}
