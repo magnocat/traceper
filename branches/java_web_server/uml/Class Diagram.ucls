@@ -1,0 +1,24 @@
+<class-diagram version="0.9.86" automaticImage="JPEG" icons="true" always-add-relationships="true" 
+  generalizations="true" realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
+  <class corner="BOTTOM_RIGHT" language="java" name="executables.TCPClient" project="JavaTCPChat" 
+    file="/JavaTCPChat/src/executables/TCPClient.java" binary="false">    
+    <position x="334" y="135" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="true" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class corner="BOTTOM_RIGHT" language="java" name="executables.TCPServer" project="JavaTCPChat" 
+    file="/JavaTCPChat/src/executables/TCPServer.java" binary="false">    
+    <position x="78" y="71" width="179" height="192"/>    
+    <display autosize="false" package="true" initial-value="true" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <classifier-display autosize="true" package="true" initial-value="true" signature="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
