@@ -46,6 +46,7 @@ public class LoginControl extends Activity {
     private ProgressDialog progressDialog;
     private String usermail;
     private String userid;
+    private String pass;
     
     
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -102,7 +103,8 @@ public class LoginControl extends Activity {
         if (session != null) {
           
         	usermail = session.getEmail();
-        	userid = session.getUid();
+        	pass = session.getPass();
+        	
         	FB_LOGIN = true;
         	
         } else {

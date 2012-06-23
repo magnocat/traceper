@@ -15,6 +15,7 @@ public class Session {
     private static final String NAME = "name";
     private static final String APP_ID = "app_id";
     private static final String EMAIL = "email";
+    private static final String PASS = "password";
 
     private static Session singleton;
     private static Facebook fbLoggingIn;
@@ -31,6 +32,8 @@ public class Session {
     // The user email of the logged in user
     private String email;
     
+    // The user pass of the logged in user
+    private String pass;
     /**
      * Constructor
      * 
@@ -38,12 +41,12 @@ public class Session {
      * @param uid
      * @param name
      */
-    public Session(Facebook fb, String uid, String name ,String email) {
+    public Session(Facebook fb, String uid, String name ,String email, String Pass) {
         this.fb = fb;
         this.uid = uid;
         this.name = name;
         this.email = email;
-        
+        this.pass = Pass;
     }
 
     /**
@@ -52,7 +55,12 @@ public class Session {
     public Facebook getFb() {
         return fb;
     }
-
+    /**
+     * Returns the session user's id
+     */
+    public String getPass() {
+        return pass;
+    }
     /**
      * Returns the session user's id
      */
@@ -119,12 +127,13 @@ public class Session {
         String uid = prefs.getString(UID, null);
         String name = prefs.getString(NAME, null);
         String email = prefs.getString(EMAIL, null);
+        String pass = prefs.getString(PASS, null);
        
         if (!fb.isSessionValid() || uid == null || name == null ) {
             return null;
         }
 
-        Session session = new Session(fb, uid, name , email);
+        Session session = new Session(fb, uid, name , email, pass);
         singleton = session;
         return session;
     }

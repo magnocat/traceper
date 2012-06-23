@@ -1,5 +1,7 @@
 package com.traceper.android;
 
+import java.io.IOException;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -15,6 +17,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -68,8 +71,9 @@ public class Login extends Activity {
     private static String[] PERMISSIONS = 
         new String[] { "offline_access", "read_stream", "publish_stream", "email" };
     private Handler handler = new Handler();
-    
-
+    public static  String search = "";
+    private String strPass1; 
+    private String strPass2;
    
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -328,6 +332,7 @@ public class Login extends Activity {
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
         				/* User clicked OK so do some stuff */
+        				Session.clearSavedSession(getApplicationContext());
         			}
         		})        
         		.create(); 
@@ -436,9 +441,8 @@ public class Login extends Activity {
                         String uid = obj.optString("id");
                         String name = obj.optString("name");
                         String email = obj.optString("email");
-                        new Session(fb, uid, name , email).save(Login.this);
                         fb_save_user(name,email,uid);
-                        
+                       
             
                     }
                 }, null);
@@ -453,28 +457,90 @@ public class Login extends Activity {
             }
             //save new facebook user
             public void fb_save_user(final String name,final String email,final String uid){
-            	String result; 
+            
 				if (uid.length() > 0 && 
 						uid.length() > 0 &&
 						email.length() > 0 &&
 						name.length() > 0
 						)
 					{
-					// record the information directly with facebook 
-					result = appManager.registerFBUser(uid, email, name, uid);
-					progressDialog.dismiss();
-					if (result.equals("9") == true) {
-						Intent i = new Intent(Login.this, LoginControl.class);																		
-						startActivity(i);	
-						Login.this.finish();
-						}		
-					else {
-						Login.this.dialogMessage = result;
-						Intent i = new Intent(Login.this, LoginControl.class);																		
-						startActivity(i);	
-						Login.this.finish();
-					}
-            	
+					
+				   
+					progressDialog.dismiss(); 
+					
+					LayoutInflater factory = LayoutInflater.from(Login.this);
+
+				    final View textEntryView = factory.inflate(R.layout.password_dialog, null);
+				       //text_entry is an Layout XML file containing two text field to display in alert dialog
+
+				    final EditText input1 = (EditText) textEntryView.findViewById(R.id.EditText_Pwd1);
+				    final EditText input2 = (EditText) textEntryView.findViewById(R.id.EditText_Pwd2);
+
+				
+				    final AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
+				    alert.setIcon(R.drawable.register).setTitle(
+				      "Enter the Text:").setView(
+				      textEntryView).setPositiveButton("Save",
+				      new DialogInterface.OnClickListener() {
+				       public void onClick(DialogInterface dialog,
+				         int whichButton) {
+				        
+				        Log.i("AlertDialog","TextEntry 1 Entered "+input1.getText().toString());
+				        Log.i("AlertDialog","TextEntry 2 Entered "+input2.getText().toString());
+				        strPass1 = input1.getText().toString();
+				        strPass2 = input2.getText().toString();
+				        
+				        if (strPass1.equals(strPass2)) {
+				        	Login.this.dialogMessage = "Ok";
+				        	final String result; 
+							// record the information directly with facebook 
+							result = appManager.registerFBUser(strPass1, email, name, uid);
+							
+					    	
+							progressDialog.dismiss();
+							if (result.equals("9") == true) {
+								Login.this.dialogMessage = "Ok";
+								
+								 new Session(fb, uid, name , email, strPass1).save(Login.this);
+								
+								Intent i = new Intent(Login.this, LoginControl.class);																		
+								startActivity(i);	
+								Login.this.finish();
+								}		
+							else {
+								Login.this.dialogMessage = result;
+								Intent i = new Intent(Login.this, LoginControl.class);																		
+								startActivity(i);	
+								Login.this.finish();
+							}
+				        	
+				         } else {
+				             Toast.makeText(Login.this,
+				        	            "Matching passwords="+strPass2 , Toast.LENGTH_SHORT).show();
+				         }
+				        /* User clicked OK so do some stuff */
+				       }
+				      }).setNegativeButton("Cancel",
+				      new DialogInterface.OnClickListener() {
+				       public void onClick(DialogInterface dialog,
+				         int whichButton) {
+				         /*
+				         * User clicked cancel so do some stuff
+				         */
+				       }
+				      });
+				   // alert.show();
+			    		
+			    	
+			    	Login.this.runOnUiThread(new Runnable() {
+			    	    public void run() {
+			    	        alert.show();
+			    	    }
+			    	});
+			    	
+			    
+
+
 					}
             }
             
