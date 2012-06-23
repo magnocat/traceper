@@ -2,8 +2,7 @@
 <resources>
     <string name="ApplicationName">Traceper</string>
     <string name="hello">Merhaba Dünya, Uygulamayı Başlat</string>
-    <string name="friend_list">Arkadaş Listesi</string>
-    
+    <string name="friend_list">Arkadaş Listesi</string>    
     <string name="email">E-posta:</string>
     <string name="password">Parola:</string>
     <string name="login">Oturum Aç</string>
@@ -83,4 +82,8 @@
 <string name="search_failed">adında kullanıcı mevcut değil</string>
 <string name="couldnt_find">her hangi bir kayıt bulunamadı!</string>
 <string name="turn_back">Geri</string>
+<string name="settings_password">Şifre</string>
+<string name="settings_password2">Şifre Tekrarı</string>
+<string name="settings_pwd_equal">Şifre Doğru</string>
+<string name="settings_pwd_not_equal">Not Equal to each other</string>
 </resources>

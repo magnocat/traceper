@@ -86,4 +86,8 @@
 <string name="search_failed">named user does not exist!</string>
 <string name="couldnt_find">any request could not find!</string>
 <string name="turn_back">Turn Back</string>
+<string name="settings_password">Enter Password</string>
+<string name="settings_password2">Enter Password Again</string>
+<string name="settings_pwd_equal">Password Equal</string>
+<string name="settings_pwd_not_equal">Not Equal to each other</string>
 </resources>
