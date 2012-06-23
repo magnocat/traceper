@@ -1,0 +1,33 @@
+
+---------------------------------------------------------------------------
+COMMUNICATION BETWEEN CLIENT AND SERVER
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+USAGE OF BOTH APPLICATIONS
+--------------------------------------------------------------------------------
+
+How do I create a chatroom (server)?
+
+	java -jar CreateChatroom [port]
+	
+How do I close the chatroom?
+
+	exit/quit
+
+How do I join the chatroom? 
+(How do I start the client and connect to server?)
+
+	java -jar ConnectToChatroom nickname servername[:port]
+	
+How do I leave the chatroom?
+
+	quit
+
+--------------------------------------------------------------------------------
+PROGRAMING GUIDELINES
+--------------------------------------------------------------------------------
+
+- Use System.in and System.out instead of System.Console(). 
+  System.in and System.out can be used within eclipse whereas the 
+  System.Console() can not be used within eclipse.
