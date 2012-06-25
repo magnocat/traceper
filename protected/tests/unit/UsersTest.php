@@ -108,5 +108,16 @@ class UsersTest extends CDbTestCase
 		$this->assertEquals($identity->authenticate(), CUserIdentity::ERROR_NONE);
 	}
 	
+	public function testGetUserId()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		
+		//Check whether the method returns an integer value when the queried email exits in DB
+		$this->assertInternalType('int', Users::model()->getUserId($this->users("user1")->email));
+		
+		//Check whether the method returns null value, when the queried email does not exist in DB
+		$this->assertNull(Users::model()->getUserId("invalidEmail"));
+	}
+	
 	
 }

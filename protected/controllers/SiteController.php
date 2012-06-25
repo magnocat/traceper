@@ -699,15 +699,16 @@ class SiteController extends Controller
 	
 // 				if(Users::model()->find('email=:email', array(':email'=>'email')) == null)
 // 				{
-					$users = new Users;
-					$users->realname = $model->name;
-					$users->email = $model->email;
-					$users->password = md5($model->password);
-					$users->gender = 'staff';					
+// 					$users = new Users;
+// 					$users->realname = $model->name;
+// 					$users->email = $model->email;
+// 					$users->password = md5($model->password);
+// 					$users->gender = 'staff';	
 
 					try
 					{
-						if($users->save()) // save the change to database
+						//if($users->save()) // save the change to database
+						if(Users::model()->saveUser($model->email, $model->password, $model->realname, "staff"))
 						{
 							$friend = new Friends();
 							$friend->friend1 = Yii::app()->user->id;
@@ -716,7 +717,8 @@ class SiteController extends Controller
 							$friend->friend2Visibility = 1; //default visibility setting is visible
 							$friend->status = 1;
 								
-							if ($friend->save())
+							//if ($friend->save())
+							if(Friends::model()->makeFriends(Yii::app()->user->id, Users::model()->getUserId($model->email)))
 							{
 								echo CJSON::encode(array("result"=> "1"));
 							}
