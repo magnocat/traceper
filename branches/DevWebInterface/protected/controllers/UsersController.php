@@ -105,12 +105,24 @@ class UsersController extends Controller
 
 	public function actionGetFriendList()
 	{
+		if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+		{
+			$userType = $_GET['userType'];		
+		}	
+								
 		if(Yii::app()->user->id != null)
 		{
 			$sqlCount = 'SELECT count(*)
-						 FROM '. Friends::model()->tableName() . ' f 
+						 FROM '. Friends::model()->tableName() . ' f
+						 LEFT JOIN ' . Users::model()->tableName() . ' u
+						 ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)						  
 						 WHERE (friend1 = '.Yii::app()->user->id.' 
-							OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+						 OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+			
+// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+// 			{
+// 				$sqlCount = $sqlCount.' AND u.gender = '.$userType;
+// 			}
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
@@ -120,6 +132,11 @@ class UsersController extends Controller
 						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 					WHERE (friend1 = '.Yii::app()->user->id.' 
 							OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
+			
+// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+// 			{
+// 				$sql = $sql.' AND u.gender = '.$userType;
+// 			}			
 			
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,

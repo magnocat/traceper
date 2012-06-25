@@ -171,12 +171,13 @@ class Users extends CActiveRecord
 		return $effectedRows;
 	}
 	
-	public function saveUser($email, $password, $realname){
+	public function saveUser($email, $password, $realname, $gender = "male"){
 		$users=new Users;
 		
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
+		$users->gender = $gender;
 		
 		return $users->save();
 	}
@@ -188,6 +189,17 @@ class Users extends CActiveRecord
 		}
 		return $result;		
 	}
+	
+	public function getUserId($email){
+		$users = Users::model()->find('email=:email', array(':email'=>$email));		
+		$result = null;
+		
+		if($users != null)
+		{
+			$result = $users->Id;
+		}	
+		return $result;
+	}	
 	
 	
 }

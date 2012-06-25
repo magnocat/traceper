@@ -101,4 +101,15 @@ class Friends extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	public function makeFriends($friend1, $friend2){
+		$friends = new Friends();
+		$friends->friend1 = $friend1;
+		$friends->friend1Visibility = 1; //default visibility setting is visible
+		$friends->friend2 = $friend2;
+		$friends->friend2Visibility = 1; //default visibility setting is visible
+		$friends->status = 1;		
+	
+		return $friends->save();
+	}	
 }

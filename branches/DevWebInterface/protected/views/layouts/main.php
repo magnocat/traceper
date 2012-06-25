@@ -442,7 +442,7 @@
 											
 											if(defined('USER_MANAGEMENT_FEATURE'))
 											{
-												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList'), 'id'=>'staff_tab');
+												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>'staff')), 'id'=>'staff_tab');
 											}
 											
 											$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
