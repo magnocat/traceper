@@ -678,8 +678,7 @@ class SiteController extends Controller
 		}
 
 	}
-	
-	
+		
 	public function actionRegisterNewStaff()
 	{
 		$model = new RegisterNewStaffForm;
@@ -696,58 +695,33 @@ class SiteController extends Controller
 			$model->attributes = $_POST['RegisterNewStaffForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-	
-// 				if(Users::model()->find('email=:email', array(':email'=>'email')) == null)
-// 				{
-// 					$users = new Users;
-// 					$users->realname = $model->name;
-// 					$users->email = $model->email;
-// 					$users->password = md5($model->password);
-// 					$users->gender = 'staff';	
-
-					try
+				
+				try
+				{
+					if(Users::model()->saveUser($model->email, $model->password, $model->name, "staff"))
 					{
-						//if($users->save()) // save the change to database
-						if(Users::model()->saveUser($model->email, $model->password, $model->realname, "staff"))
+						if(Friends::model()->makeFriends(Yii::app()->user->id, Users::model()->getUserId($model->email)))
 						{
-							$friend = new Friends();
-							$friend->friend1 = Yii::app()->user->id;
-							$friend->friend1Visibility = 1; //default visibility setting is visible
-							$friend->friend2 = $users->getPrimaryKey();
-							$friend->friend2Visibility = 1; //default visibility setting is visible
-							$friend->status = 1;
-								
-							//if ($friend->save())
-							if(Friends::model()->makeFriends(Yii::app()->user->id, Users::model()->getUserId($model->email)))
-							{
-								echo CJSON::encode(array("result"=> "1"));
-							}
-							else
-							{
-								echo CJSON::encode(array("result"=> "Unknown error"));
-							}
+							echo CJSON::encode(array("result"=> "1"));
 						}
 						else
 						{
 							echo CJSON::encode(array("result"=> "Unknown error"));
 						}
 					}
-					catch (Exception $e)
+					else
 					{
-						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
-						{
-							echo CJSON::encode(array("result"=> "Duplicate Entry"));
-						}
-						Yii::app()->end();
-							
-						//					echo 'Caught exception: ',  $e->getMessage(), "\n";
-						//    				echo 'Code: ', $e->getCode(), "\n";
+						echo CJSON::encode(array("result"=> "Unknown error"));
 					}
-// 				}
-// 				else
-// 				{
-// 					echo CJSON::encode(array("result"=> "Duplicate Name"));
-// 				}
+				}
+				catch (Exception $e)
+				{
+					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+					{
+						echo CJSON::encode(array("result"=> "Duplicate Entry"));
+					}
+					Yii::app()->end();
+				}
 	
 				Yii::app()->end();
 			}
