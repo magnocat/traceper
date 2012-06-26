@@ -4,20 +4,20 @@
  */
 
 /*
-* Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
-T�rk�e UTF-8
-� 	İ
-� 	ı
-� 	Ö
-� 	ö
-� 	Ü
-� 	ü
-� 	Ç
-� 	ç
-� 	ğ
-� 	ğ
-� 	�
-� 	ş
+ * Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
+T�rk�e UTF-8
+  � 	İ
+  � 	ı
+  � 	Ö
+  � 	ö
+  � 	Ü
+  � 	ü
+  � 	Ç
+  � 	ç
+  � 	ğ
+  � 	ğ
+  � 	�
+  � 	ş
 */
 
 return array(
@@ -35,7 +35,16 @@ return array(
 	'Staff could not be registered!' => 'Personel kaydedilemedi!',
 	'An activation mail is sent to your e-mail address...' => 'Aktivasyon maili e-mail adresinize gönderilmiştir...',
 	'Register' => 'Kaydet',
-	'Cancel' => 'İptal',
+	'Name' => 'İsim',
+	'E-mail' => 'E-posta',
+	'Password' => 'Parola',
+	'Password (Again)' => 'Parola (Tekrar)',
+	'E-mail not valid!' => 'E-posta geçerli değil!',
+	'Passwords not same!' => 'Parolalar aynı değil!',
+	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
+	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
+	
+	
 );
 
 
