@@ -20,9 +20,9 @@ T�rk�e UTF-8
 � 	ş
 */
 return array(
-	'Create New Geofence' => 'Yeni Jeoçit Olu�tur',
-	'A geofence with this name already exists!' => 'Ayn� isimle Jeoçit bulunmaktad�r!',	
-	'Geofence Settings' => 'Jeoçit Ayarlar�',	
+	'Create New Geofence' => 'Yeni Jeoçit Oluştur',
+	'A geofence with this name already exists!' => 'Aynı isimle Jeoçit bulunmaktadır!',	
+	'Geofence Settings' => 'Jeoçit Ayarları',	
 	'Check the geofences that you want to follow the selected user:' => 'Seçilen kullanıcı için Jeoçitleri kontrol et:',
 	'There is no geofence to show...' => 'Gösterilecek hiçbir Jeoçit bulunmamaktadır...',
 	'First create some geofence(s) please' => 'Öncelikle Jeoçit(ler) oluşturun...',
