@@ -20,14 +20,13 @@ class RegisterNewStaffForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			//name and deviceID (IMEI no) are required
 			array('name, email, password, passwordAgain', 'required',
-			'message'=>'Field cannot be blank!'),
-			array('email', 'email', 'message'=>'E-mail not valid!'),
+			'message'=>Yii::t('site', 'Field cannot be blank!')),
+			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
+			array('email', 'isExists'),
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
-			'message'=>'Passwords not same!'),
-			array('email', 'isExists'),
+			'message'=>Yii::t('site', 'Passwords not same!')),
 		);
 	}
 
@@ -37,8 +36,10 @@ class RegisterNewStaffForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'email'=>Yii::t('general', 'E-mail'),
-			'passwordAgain'=>Yii::t('general', 'Password (Again)'),
+			'name'=>Yii::t('site', 'Name'),	
+			'email'=>Yii::t('site', 'E-mail'),
+			'password'=>Yii::t('site', 'Password'),
+			'passwordAgain'=>Yii::t('site', 'Password (Again)'),
 		);
 	}
 
@@ -55,7 +56,7 @@ class RegisterNewStaffForm extends CFormModel
 				$data = UserCandidates::model()->find($criteria);
 			}
 			if ($data != null) {
-				$this->addError('email','E-mail is already registered!');
+				$this->addError('email',Yii::t('site', 'E-mail is already registered!'));
 			}
 		}
 	}	
