@@ -119,10 +119,10 @@ class UsersController extends Controller
 						 WHERE (friend1 = '.Yii::app()->user->id.' 
 						 OR friend2 ='.Yii::app()->user->id.') AND status= 1';
 			
-// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-// 			{
-// 				$sqlCount = $sqlCount.' AND u.gender = '.$userType;
-// 			}
+			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+			{
+				$sqlCount = $sqlCount.' AND u.gender = "'.$userType.'"';
+			}
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
@@ -133,10 +133,10 @@ class UsersController extends Controller
 					WHERE (friend1 = '.Yii::app()->user->id.' 
 							OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
 			
-// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-// 			{
-// 				$sql = $sql.' AND u.gender = '.$userType;
-// 			}			
+			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+			{
+				$sql = $sql.' AND u.gender = "'.$userType.'"';
+			}			
 			
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,

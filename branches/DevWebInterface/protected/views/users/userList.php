@@ -117,8 +117,8 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupSettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\'Edit Settings\')
-					  				 )',		
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Edit Settings').'\')
+					  				 )',	
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList
@@ -136,7 +136,7 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#geofenceSettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#geofenceSettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\'Edit Settings\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Edit Settings').'\')
 					  				 )',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
@@ -192,7 +192,7 @@ if ($dataProvider != null) {
 													}
 													
 												}\',
-											)),\'class\'=>\'vtip\', \'title\'=>\'Approve\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Approve').'\')
 					  				 )
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),
