@@ -22,9 +22,9 @@ T�rk�e UTF-8
 return array(
 	'Search Results' => 'Arama Sonuçları',
 	'No users found' => 'Kullanıcı bulunamadı',
-	'Do you want to delete this user from your friend list?' => 'Bu kullanıyı arkadaş listenizden silmek istiyor musunuz?',
-	'Do you want to add this user as a friend?' => 'Bu kullanıyı arkadaş olarak eklemek istiyor musunuz?',	
-	'Do you want to reject this user\'s friend request?' => 'Bu kullanının arkadaşlık isteğini reddetmek istiyor musunuz?',
+	'Do you want to delete this user from your friend list?' => 'Bu kullanıcıyı arkadaş listenizden silmek istiyor musunuz?',
+	'Do you want to add this user as a friend?' => 'Bu kullanıcıyı arkadaş olarak eklemek istiyor musunuz?',	
+	'Do you want to reject this user\'s friend request?' => 'Bu kullanıcının arkadaşlık isteğini reddetmek istiyor musunuz?',
 	'No friendship requests found' => 'Arkadaşlık isteği bulunamadı',
 	'Sorry, an error occured in operation' => 'Üzgünüz, işlem sırasında bir hata oluştu',
 	'Friend request is sent' => 'Arkadaşlık isteği gönderildi',
@@ -32,8 +32,8 @@ return array(
 	'Geofence Settings' => 'Jeoçit Ayarları',
 	'Name' => 'İsim',
 	'No users to show...' => 'Kullanıcı bilgileri mevcut değil...',
-	'Name' => 'İsim',
-	'Name' => 'İsim',
+	'Edit Settings' => 'Ayarları girin',
+	'Approve' => 'Onayla',
 	'Name' => 'İsim',
 										
 );
