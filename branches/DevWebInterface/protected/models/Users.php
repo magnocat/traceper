@@ -18,10 +18,19 @@
  * @property integer $status_source
  * @property string $status_message_time
  * @property string $dataCalculatedTime
+ * @property string $fb_id
+ * @property string $g_id
+ * @property string $gender
+ * @property string $userType
+ * @property integer $account_type
+ * @property string $gp_image
  *
  * The followings are the available model relations:
  * @property TraceperFriends[] $traceperFriends
  * @property TraceperFriends[] $traceperFriends1
+ * @property TraceperUpload[] $traceperUploads
+ * @property TraceperUserPrivacyGroupRelation[] $traceperUserPrivacyGroupRelations
+ * @property TraceperUserWasHere[] $traceperUserWasHeres
  */
 class Users extends CActiveRecord
 {
@@ -50,8 +59,8 @@ class Users extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('password, realname, email', 'required'),
-			array('status_source', 'numerical', 'integerOnly'=>true),
+			array('password, realname, email, userType, account_type', 'required'),
+			array('status_source, account_type', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group', 'length', 'max'=>10),
 			array('latitude', 'length', 'max'=>8),
@@ -59,17 +68,16 @@ class Users extends CActiveRecord
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
 			array('email', 'length', 'max'=>100),
-			array('email', 'email'),
 			array('deviceId', 'length', 'max'=>64),
-			array('gp_image', 'length', 'max'=>255),
-			array('account_type', 'length', 'max'=>1),
-			array('fb_id', 'length', 'max'=>50),
-			array('g_id', 'length', 'max'=>50),
 			array('status_message', 'length', 'max'=>128),
+			array('fb_id, g_id', 'length', 'max'=>50),
+			array('gender', 'length', 'max'=>6),
+			array('userType', 'length', 'max'=>16),
+			array('gp_image', 'length', 'max'=>255),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, gp_image, account_type, fb_id, g_id, dataCalculatedTime', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -80,12 +88,13 @@ class Users extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array();
-		
-//		return array(
-//			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
-//			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
-//		);
+		return array(
+			'traceperFriends' => array(self::HAS_MANY, 'TraceperFriends', 'friend1'),
+			'traceperFriends1' => array(self::HAS_MANY, 'TraceperFriends', 'friend2'),
+			'traceperUploads' => array(self::HAS_MANY, 'TraceperUpload', 'userId'),
+			'traceperUserPrivacyGroupRelations' => array(self::HAS_MANY, 'TraceperUserPrivacyGroupRelation', 'userId'),
+			'traceperUserWasHeres' => array(self::HAS_MANY, 'TraceperUserWasHere', 'userId'),
+		);
 	}
 
 	/**
@@ -108,10 +117,12 @@ class Users extends CActiveRecord
 			'status_source' => 'Status Source',
 			'status_message_time' => 'Status Message Time',
 			'dataCalculatedTime' => 'Data Calculated Time',
-			'gp_image' => 'Google User image',
-			'account_type' => 'User account type',
-			'fb_id' => 'Facebook user id',
-			'g_id' => 'Google plus user id',
+			'fb_id' => 'Fb',
+			'g_id' => 'G',
+			'gender' => 'Gender',
+			'userType' => 'User Type',
+			'account_type' => 'Account Type',
+			'gp_image' => 'Gp Image',
 		);
 	}
 
@@ -140,10 +151,12 @@ class Users extends CActiveRecord
 		$criteria->compare('status_source',$this->status_source);
 		$criteria->compare('status_message_time',$this->status_message_time,true);
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
-		$criteria->compare('gp_image',$this->gp_image);
-		$criteria->compare('account_type',$this->account_type,true);
-		$criteria->compare('fb_id',$this->fb_id);
-		$criteria->compare('g_id',$this->g_id);
+		$criteria->compare('fb_id',$this->fb_id,true);
+		$criteria->compare('g_id',$this->g_id,true);
+		$criteria->compare('gender',$this->gender,true);
+		$criteria->compare('userType',$this->userType,true);
+		$criteria->compare('account_type',$this->account_type);
+		$criteria->compare('gp_image',$this->gp_image,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -152,7 +165,7 @@ class Users extends CActiveRecord
 	
 	
 	public function updateLocation($latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId){
-		
+	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
 				SET
@@ -166,19 +179,20 @@ class Users extends CActiveRecord
 				.' 	Id = %d '
 				.' LIMIT 1;',
 				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
-		
+	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		return $effectedRows;
 	}
 	
-	public function saveUser($email, $password, $realname, $gender = "male"){
+	public function saveUser($email, $password, $realname, $userType, $accountType){
 		$users=new Users;
-		
+	
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
-		$users->gender = $gender;
-		
+		$users->userType = $userType;
+		$users->account_type = $accountType;
+	
 		return $users->save();
 	}
 	
@@ -187,19 +201,17 @@ class Users extends CActiveRecord
 		if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
 			$result = true;
 		}
-		return $result;		
+		return $result;
 	}
 	
 	public function getUserId($email){
-		$users = Users::model()->find('email=:email', array(':email'=>$email));		
+		$users = Users::model()->find('email=:email', array(':email'=>$email));
 		$result = null;
-		
+	
 		if($users != null)
 		{
 			$result = $users->Id;
-		}	
+		}
 		return $result;
 	}	
-	
-	
 }
