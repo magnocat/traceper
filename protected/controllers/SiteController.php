@@ -589,7 +589,7 @@ class SiteController extends Controller
 				
 				//Check whether a device exists with the same name in the Users table (Since the table 'Users' is used as common for both 
 				//real users and devices we cannot add unique index for realname, so we have to check same name existance manually)
-				if(Users::model()->find('gender=:gender AND realname=:name', array(':gender'=>'device', ':name'=>$model->name)) == null)
+				if(Users::model()->find('userType=:userType AND realname=:name', array(':userType'=>'device', ':name'=>$model->name)) == null)
 				{
 					$users = new Users;
 					$users->realname = $model->name;
@@ -598,7 +598,8 @@ class SiteController extends Controller
 					//For database recording, because of email and password are required fields
 					$users->email = $model->deviceId;
 					$users->password = md5($model->name);
-					$users->gender = 'device';
+					$users->userType = 'device';
+					$users->account_type = 0;
 					
 					try
 					{
@@ -631,10 +632,14 @@ class SiteController extends Controller
 						{
 							echo CJSON::encode(array("result"=> "Duplicate Entry"));
 						}
+						else
+						{
+							echo 'Caught exception: ',  $e->getMessage(), "\n";
+							echo 'Code: ', $e->getCode(), "\n";							
+						}
 						Yii::app()->end();
 							
-						//					echo 'Caught exception: ',  $e->getMessage(), "\n";
-						//    				echo 'Code: ', $e->getCode(), "\n";
+
 					}									
 				}
 				else
@@ -698,7 +703,7 @@ class SiteController extends Controller
 				
 				try
 				{
-					if(Users::model()->saveUser($model->email, $model->password, $model->name, "staff"))
+					if(Users::model()->saveUser($model->email, md5($model->password), $model->name, "real user"/*userType*/, 0/*accountType*/))
 					{
 						if(Friends::model()->makeFriends(Yii::app()->user->id, Users::model()->getUserId($model->email)))
 						{
@@ -706,12 +711,12 @@ class SiteController extends Controller
 						}
 						else
 						{
-							echo CJSON::encode(array("result"=> "Unknown error"));
+							echo CJSON::encode(array("result"=> "Unknown error 1"));
 						}
 					}
 					else
 					{
-						echo CJSON::encode(array("result"=> "Unknown error"));
+						echo CJSON::encode(array("result"=> "Unknown error 2"));
 					}
 				}
 				catch (Exception $e)
@@ -860,7 +865,7 @@ class SiteController extends Controller
 			if ($generatedKey == $key)
 			{
 				$result = "Sorry, there is a problem in activating the user";
-				if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname))
+				if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname, "real user"/*userType*/, 0/*accountType*/))
 				{
 					$userCandidate->delete();
 					$result = "Your account has been activated successfully, you can login now";

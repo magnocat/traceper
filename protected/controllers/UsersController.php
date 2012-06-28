@@ -121,7 +121,7 @@ class UsersController extends Controller
 			
 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 			{
-				$sqlCount = $sqlCount.' AND u.gender = "'.$userType.'"';
+				$sqlCount = $sqlCount.' AND u.userType = "'.$userType.'"';
 			}
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
@@ -135,7 +135,7 @@ class UsersController extends Controller
 			
 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 			{
-				$sql = $sql.' AND u.gender = "'.$userType.'"';
+				$sql = $sql.' AND u.userType = "'.$userType.'"';
 			}			
 			
 			$dataProvider = new CSqlDataProvider($sql, array(
