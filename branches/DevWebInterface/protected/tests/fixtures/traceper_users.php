@@ -7,9 +7,9 @@ return array(
         'email'=>'test@traceper.com',
     ),
 	'user2'=>array(
-			'Id'=>2,
-			'password'=>md5(54321),
-			'realname'=>'Test User 2',
-			'email'=>'test2@traceper.com',
+		'Id'=>2,
+		'password'=>md5(54321),
+		'realname'=>'Test User 2',
+		'email'=>'test2@traceper.com',
 	),		
 );
