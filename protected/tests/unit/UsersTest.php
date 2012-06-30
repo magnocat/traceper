@@ -1,6 +1,5 @@
 <?php
 
-
 require_once("bootstrap.php");
 
 class UsersTest extends CDbTestCase
@@ -108,16 +107,30 @@ class UsersTest extends CDbTestCase
 		$this->assertEquals($identity->authenticate(), CUserIdentity::ERROR_NONE);
 	}
 	
-	public function testGetUserId()
+	public function testGetUserIdReturnsInteger()
 	{
 		$this->assertTrue($this->users("user1")->save());
 		
 		//Check whether the method returns an integer value when the queried email exits in DB
 		$this->assertInternalType('int', Users::model()->getUserId($this->users("user1")->email));
-		
+	}
+	
+	public function testGetUserIdReturnsNullForInvalidEmail()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+
 		//Check whether the method returns null value, when the queried email does not exist in DB
 		$this->assertNull(Users::model()->getUserId("invalidEmail"));
 	}
-	
-	
+
+	public function testGetUserIdReturnsTrueIdForGivenEmail()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+
+		//Check whether the method returns the true Id for the given e-mail
+		$this->assertEquals($this->users("user1")->Id, Users::model()->getUserId($this->users("user1")->email));
+		$$this->assertEquals($this->users("user2")->Id, Users::model()->getUserId($this->users("user2")->email));
+	}		
 }
