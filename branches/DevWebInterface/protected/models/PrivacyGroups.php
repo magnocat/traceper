@@ -94,4 +94,68 @@ class PrivacyGroups extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	
+	public function saveGroup($name, $id, $description){
+		$privacyGroups = new PrivacyGroups;
+		$privacyGroups->name = $name;
+		$privacyGroups->owner = $id;
+		$privacyGroups->description = $description;
+	
+		return $privacyGroups->save();
+	}
+		
+	public function deleteGroup($groupId,$ownerId) {
+		
+		$result = PrivacyGroups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId',
+				'params'=>array(':groupId'=>$groupId,
+						':ownerId'=>$ownerId)
+		)
+		);
+		 
+		if($result != null)
+		{
+			if($result->delete()) // Delete the selected group
+			{
+				//Group deleted from the traceper_groups table
+				$returnResult=1;
+			}
+			else
+			{
+				$returnResult=0;
+			}
+		}
+		else
+		{
+			//traceper_groups table has not the selected group of the owner
+			$returnResult=-1;
+		}
+		
+		return $returnResult;
+		
+	}
+	
+	public function updatePrivacySettings($groupId,$allowToSeeMyPosition) {
+		$count= PrivacyGroups::model()->updateByPk($groupId, array("allowedToSeeOwnersPosition"=>$allowToSeeMyPosition));
+		return $count;
+	}
+	
+	public function getGroupsList($ownerId,$itemCountInOnePage) {
+		
+		$dataProvider=new CActiveDataProvider('PrivacyGroups', array(
+				'criteria'=>array(
+						'condition'=>'owner=:owner',
+						'params'=>array(':owner'=>$ownerId),
+						//'order'=>'create_time DESC',
+						//'with'=>array('author'),
+				),
+				'pagination'=>array(
+						'pageSize'=>$itemCountInOnePage,
+				),
+		));
+		
+		return $dataProvider;
+	}
+	
+	
 }
