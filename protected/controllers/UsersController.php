@@ -2,8 +2,6 @@
 
 class UsersController extends Controller
 {
-
-
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -105,6 +103,8 @@ class UsersController extends Controller
 
 	public function actionGetFriendList()
 	{
+		$userType = UserType::RealUser;
+		
 		if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 		{
 			$userType = $_GET['userType'];		
@@ -117,12 +117,12 @@ class UsersController extends Controller
 						 LEFT JOIN ' . Users::model()->tableName() . ' u
 						 ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)						  
 						 WHERE (friend1 = '.Yii::app()->user->id.' 
-						 OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+						 OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
 			
-			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-			{
-				$sqlCount = $sqlCount.' AND u.userType = "'.$userType.'"';
-			}
+// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+// 			{
+// 				$sqlCount = $sqlCount.' AND u.userType = "'.$userType.'"';
+// 			}
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
@@ -131,12 +131,12 @@ class UsersController extends Controller
 					LEFT JOIN ' . Users::model()->tableName() . ' u
 						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 					WHERE (friend1 = '.Yii::app()->user->id.' 
-							OR friend2='.Yii::app()->user->id.') AND status= 1'  ;
+							OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
 			
-			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-			{
-				$sql = $sql.' AND u.userType = "'.$userType.'"';
-			}			
+// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
+// 			{
+// 				$sql = $sql.' AND u.userType = "'.$userType.'"';
+// 			}			
 			
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,
@@ -157,7 +157,7 @@ class UsersController extends Controller
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, true);
 	}
 	
 	private function unsetFriendIdList() {
@@ -632,6 +632,26 @@ class UsersController extends Controller
 		));
 
 	}
+	
+	public function actionDeleteUser(){
+		$result = 'Missing Data';
+		if (isset($_REQUEST['userId']))
+		{
+			$userId = (int) $_REQUEST['userId'];
+			$user = Users::model()->findByPk($userId);
+
+			$result = 'Error occured';
+			if ($user != null && $user->delete()){
+				$result = 1;
+				$this->unsetFriendIdList();
+			}
+		}
+		
+		echo CJSON::encode(array(
+				"result"=>$result,
+		));
+	
+	}	
 
 	public function actionGetFriendRequestList(){
 
