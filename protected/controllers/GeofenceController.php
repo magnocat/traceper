@@ -78,33 +78,18 @@ class GeofenceController extends Controller
 
 	public function actionSendGeofenceData() {
 
-		$geofence=new Geofence;
-		$result = "Missing parameter";
-
 		if (isset($_REQUEST['name']) && isset($_REQUEST['name'])
 		&& isset($_REQUEST['point1Latitude']) && isset($_REQUEST['point1Longitude'])
 		&& isset($_REQUEST['point2Latitude']) && isset($_REQUEST['point2Longitude'])
 		&& isset($_REQUEST['point3Latitude']) && isset($_REQUEST['point3Longitude']))
 		{
-			$geofence->name = $_REQUEST['name'];
-			$geofence->point1Latitude = (float) $_REQUEST['point1Latitude'];
-			$geofence->point1Longitude = (float) $_REQUEST['point1Longitude'];
-			$geofence->point2Latitude = (float) $_REQUEST['point2Latitude'];
-			$geofence->point2Longitude = (float) $_REQUEST['point2Longitude'];
-			$geofence->point3Latitude = (float) $_REQUEST['point3Latitude'];
-			$geofence->point3Longitude = (float) $_REQUEST['point3Longitude'];
-				
-			if (isset($_REQUEST['description']) && isset($_REQUEST['description']))
-			{
-				$description = $_REQUEST['description'];
-				$geofence->description = $description;
-			}
-				
-			$geofence->userId = Yii::app()->user->id;
-				
 			try
 			{
-				if($geofence->save()) // save the change to database
+				if(Geofence::model()->saveGeofence($_REQUEST['name'],
+						(float) $_REQUEST['point1Latitude'], (float) $_REQUEST['point1Longitude'],
+						(float) $_REQUEST['point2Latitude'], (float) $_REQUEST['point2Longitude'],
+						(float) $_REQUEST['point3Latitude'], (float) $_REQUEST['point3Longitude'],
+						$_REQUEST['description'],Yii::app()->user->id))
 				{
 					echo CJSON::encode(array("result"=> "1"));
 				}
@@ -191,26 +176,19 @@ class GeofenceController extends Controller
 				//Check whether the friend belongs to the unselected group or not. If he does, delete his relation from the traceper_user_group_relation table
 				foreach($unselected_groups as $unselectedFriendGroup) //Check for all of the checked groups
 				{
-					$relationQueryResult = GeofenceUserRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId',
-					                                                     'params'=>array(':userId'=>$friendId, 
-					                                                                     ':geofenceId'=>$unselectedFriendGroup)));
-					if($relationQueryResult != null)
+					$relationQueryResult = GeofenceUserRelation::model()->deleteGeofenceMember($friendId,$unselectedFriendGroup);
+					if($relationQueryResult == 1)
 					{
-						if($relationQueryResult->delete()) // delete the undesired subscription
-						{
-							//Relation deleted from the traceper_user_group_relation table
-						}
-						else
-						{
-							echo CJSON::encode(array("result"=> "Unknown error"));
-							Yii::app()->end();
-						}
+						//Relation deleted from the traceper_user_group_relation table
+					}
+					elseif ($relationQueryResult == 0)
+					{
+						echo CJSON::encode(array("result"=> "Unknown error"));
+						Yii::app()->end();
 					}
 					else
 					{
 						//traceper_user_group_relation table has not the desired relation, so do nothing
-						
-							//echo 'Relation does not already exist for groupId '.$unselectedFriendGroup.'</br>';
 					}
 				}
 						
@@ -229,16 +207,9 @@ class GeofenceController extends Controller
 						}
 						else
 						{
-							$geofenceUserRelation = new GeofenceUserRelation;
-							$geofenceUserRelation->geofenceId = $selectedFriendGroup;
-							$geofenceUserRelation->userId = $friendId;								
-							
-							//TODO: status must be updated, firstly save not in geofence
-							$geofenceUserRelation->status = 0;
-
 							try
 							{
-								if($geofenceUserRelation->save()) // save the change to database
+								if(GeofenceUserRelation::model()->saveUserGeofenceRelation($selectedFriendGroup, $friendId)) // save the change to database
 								{
 									//Relation added to the traceper_user_group_relation table
 								}
@@ -378,42 +349,12 @@ class GeofenceController extends Controller
 	//Gets the list of the geofences
 	public function actionGetGeofences()
 	{
+		$dataProvider = null;
 		if(Yii::app()->user->id != null)
 		{
-			$sqlCount = 'SELECT count(*)
-						 FROM '. Geofence::model()->tableName() . ' f 
-						 WHERE (userId = '.Yii::app()->user->id.')';
-
-			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-			$sql = 'SELECT f.Id as id, f.name as Name, f.description as Description, 
-					f.point1Latitude as Point1Latitude, f.point1Longitude as Point1Longitude,
-					f.point2Latitude as Point2Latitude, f.point2Longitude as Point2Longitude,
-					f.point3Latitude as Point3Latitude, f.point3Longitude as Point3Longitude
-					FROM '. Geofence::model()->tableName() . ' f 					
-					WHERE (userId = '.Yii::app()->user->id.')';
-				
-			$dataProvider = new CSqlDataProvider($sql, array(
-			    											'totalItemCount'=>$count,
-														    'sort'=>array(
-							        							'attributes'=>array(
-							             									'id', 'Name',
-			),
-			),
-														    'pagination'=>array(
-														        'pageSize'=>Yii::app()->params->itemCountInOnePage,
-			),
-			));
+			$count=Geofence::model()->getGeofencesCount(Yii::app()->user->id);
+			$dataProvider = Geofence::model()->getGeofences(Yii::app()->user->id,$count,Yii::app()->params->itemCountInOnePage);
 		}
-		else
-		{
-			$dataProvider = null;
-		}
-		
-		/*
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		$this->renderPartial('userGeofences',array('dataProvider'=>$dataProvider), false, true);
-		*/
 		
 		echo CJSON::encode(array("dataProvider"=> $dataProvider->getData(),"count"=>$count));
 		Yii::app()->end();

@@ -110,4 +110,57 @@ class Geofence extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	public function saveGeofence($name,$point1Latitude, $point1Longitude, $point2Latitude, $point2Longitude, $point3Latitude, $point3Longitude,$description,$userId){
+		$geofence=new Geofence;
+	
+		$geofence->name = $name;
+		$geofence->point1Latitude = $point1Latitude;
+		$geofence->point1Longitude = $point1Longitude;
+		$geofence->point2Latitude = $point2Latitude;
+		$geofence->point2Longitude = $point2Longitude;
+		$geofence->point3Latitude = $point3Latitude;
+		$geofence->point3Longitude = $point3Longitude;
+			
+		if (isset($description))
+		{
+			$geofence->description = $description;
+		}
+			
+		$geofence->userId = $userId;
+		
+		return $geofence->save();
+	}
+	
+	public function getGeofencesCount($userId) {
+		$sql = 'SELECT count(*)
+						 FROM '. Geofence::model()->tableName() . ' f 
+						 WHERE (userId = '.$userId.')';
+
+		$count=Yii::app()->db->createCommand($sql)->queryScalar();
+		return $count;
+	}
+	
+	public function getGeofences($userId,$count,$itemCountInOnePage){
+		$sql = 'SELECT f.Id as id, f.name as Name, f.description as Description, 
+				f.point1Latitude as Point1Latitude, f.point1Longitude as Point1Longitude,
+				f.point2Latitude as Point2Latitude, f.point2Longitude as Point2Longitude,
+				f.point3Latitude as Point3Latitude, f.point3Longitude as Point3Longitude
+				FROM '. Geofence::model()->tableName() . ' f 					
+				WHERE (userId = '.$userId.')';
+			
+		$dataProvider = new CSqlDataProvider($sql, array(
+		    											'totalItemCount'=>$count,
+													    'sort'=>array(
+						        							'attributes'=>array(
+						             									'id', 'Name',
+		),
+		),
+													    'pagination'=>array(
+													        'pageSize'=>$itemCountInOnePage,
+		),
+		));
+		
+		return $dataProvider;
+	}
 }
