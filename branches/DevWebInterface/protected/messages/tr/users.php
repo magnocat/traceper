@@ -35,6 +35,13 @@ return array(
 	'Edit Settings' => 'Ayarları girin',
 	'Approve' => 'Onayla',
 	'Name' => 'İsim',
+	'Reject' => 'Reddet',
+	'Delete from your friend list' => 'Arkadaş listenden sil',	
+	'Do you want to delete the account of this staff?' => 'Bu personelin hesabını silmek istiyor musunuz?',
+	
+	
+	
+	
 										
 );
 

@@ -34,7 +34,7 @@
 <?php }?>
 <?php 
 	if (isset($dataProvider)) {
-		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true), false, true);
+		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true, 'userType'=>$userType), false, true);
 	}
 	else
 	{

@@ -20,8 +20,8 @@
  * @property string $dataCalculatedTime
  * @property string $fb_id
  * @property string $g_id
- * @property string $gender
- * @property string $userType
+ * @property integer $gender
+ * @property integer $userType
  * @property integer $account_type
  * @property string $gp_image
  *
@@ -59,8 +59,8 @@ class Users extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('password, realname, email, userType, account_type', 'required'),
-			array('status_source, account_type', 'numerical', 'integerOnly'=>true),
+			array('password, realname, email, account_type', 'required'),
+			array('status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group', 'length', 'max'=>10),
 			array('latitude', 'length', 'max'=>8),
@@ -71,8 +71,6 @@ class Users extends CActiveRecord
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
 			array('fb_id, g_id', 'length', 'max'=>50),
-			array('gender', 'length', 'max'=>6),
-			array('userType', 'length', 'max'=>16),
 			array('gp_image', 'length', 'max'=>255),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
@@ -153,8 +151,8 @@ class Users extends CActiveRecord
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
 		$criteria->compare('fb_id',$this->fb_id,true);
 		$criteria->compare('g_id',$this->g_id,true);
-		$criteria->compare('gender',$this->gender,true);
-		$criteria->compare('userType',$this->userType,true);
+		$criteria->compare('gender',$this->gender);
+		$criteria->compare('userType',$this->userType);
 		$criteria->compare('account_type',$this->account_type);
 		$criteria->compare('gp_image',$this->gp_image,true);
 

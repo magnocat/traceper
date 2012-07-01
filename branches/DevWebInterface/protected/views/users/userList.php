@@ -12,6 +12,7 @@ if ($dataProvider != null) {
 	// keyword parameter
 	$ajaxUrl = null;
 	$deleteFrienshipQuestion = Yii::t('users', 'Do you want to delete this user from your friend list?');
+	$deleteStaffQuestion = Yii::t('users', 'Do you want to delete the account of this staff?');
 	$addAsFriendQuestion = Yii::t('users', 'Do you want to add this user as a friend?');
 	if ($isFriendRequestList == true) {
 		$deleteFrienshipQuestion = Yii::t('users', 'Do you want to reject this user\'s friend request?');
@@ -56,7 +57,30 @@ if ($dataProvider != null) {
 											)).
 										"}";	
 
-		
+		$deleteUserJSFunction = "function deleteUser() { "
+									.CHtml::ajax(
+											array(
+													'url'=>Yii::app()->createUrl('users/deleteUser'),
+													'data'=> array('userId'=>"js:$('#friendId').html()"),
+													'success'=> 'function(result) {
+																	try {
+																		TRACKER.closeConfirmationDialog();
+																		var obj = jQuery.parseJSON(result);
+																		if (obj.result && obj.result == "1")
+																		{
+																			$.fn.yiiGridView.update($("#gridViewId").text());
+																		}
+																		else
+																		{
+																			TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																		}
+																	}
+																	catch(ex) {
+																		TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																	}
+												}',
+											)).
+											"}";		
 		 												
 		$addAsFriendJSFunction = "function addasFriend(){
 									". CHtml::ajax(
@@ -87,6 +111,7 @@ if ($dataProvider != null) {
 
 		Yii::app()->clientScript->registerScript('frienshipFunctions',
 														$deleteFriendshipJSFunction
+														.$deleteUserJSFunction
 														.$addAsFriendJSFunction,
 		 												CClientScript::POS_READY);									
 	}
@@ -155,14 +180,23 @@ if ($dataProvider != null) {
 		array(            // display 'create_time' using an expression
 					'type' => 'raw',
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
-										array("onclick"=>"$(\"#friendShipId\").text(".$data[\'friendShipId\'].");
+										array("onclick"=>"
+														 $(\"#friendShipId\").text(".$data[\'friendShipId\'].");
+														 $(\"#friendId\").text(".$data[\'id\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\");
-														 TRACKER.showConfirmationDialog(\"'.$deleteFrienshipQuestion.'\", deleteFriendship);
+														 if(\"'.$userType.'\" == 0)
+														 {
+															 TRACKER.showConfirmationDialog(\"'.$deleteFrienshipQuestion.'\", deleteFriendship);
+														 }
+														 else
+														 {
+															 TRACKER.showConfirmationDialog(\"'.$deleteStaffQuestion.'\", deleteUser);
+														 }				
 														 ", 									
 												"class"=>"vtip", 
-												"title"=>'.($isFriendRequestList?'"Reject"':'"Delete Friend"').
+												"title"=>'.($isFriendRequestList?"Yii::t('users', 'Reject')":"Yii::t('users', 'Delete from your friend list')").
 											')
-					  				  )',
+					  				  )', 
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isFriendList || $isFriendRequestList,
 		),

@@ -2,6 +2,22 @@
 
 define('USER_MANAGEMENT_FEATURE', 1);
 
+/*User Type Enumeration in PHP*/
+class UserType
+{
+	const RealUser  = 0;
+	const GPSDevice = 1;
+	const RealStaff = 2;
+	const GPSStaff  = 3;
+}
+
+/*Gender Enumeration in PHP*/
+class Gender
+{
+	const Male  = 0;
+	const Female = 1;
+}
+
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
