@@ -112,4 +112,37 @@ class Friends extends CActiveRecord
 	
 		return $friends->save();
 	}	
+	
+	
+	public function makeFriendsVisibilities($friend1, $friend2, $allowToSeeMyPosition){
+		
+		$errorOccured = true;
+		
+		$friendship = Friends::model()->find(array('condition'=>'(friend1=:friend1Id AND friend2=:friend2Id) OR (friend1=:friend2Id AND friend2=:friend1Id)',
+				'params'=>array(':friend1Id'=>$friend1,
+						':friend2Id'=>$friend2
+				)
+		)
+		);
+		if($friendship != null)
+		{
+			if($friendship->friend1 == $friend1)
+			{
+				$friendship->friend1Visibility = $allowToSeeMyPosition;
+			}
+			else
+			{
+				$friendship->friend2Visibility = $allowToSeeMyPosition;
+			}
+		
+			if($friendship->save())
+			{
+				//Privacy setting saved	
+				$errorOccured = false;
+			}
+		}
+
+		return $errorOccured;
+	}
+	
 }

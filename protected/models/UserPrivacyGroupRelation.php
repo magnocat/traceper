@@ -93,4 +93,58 @@ class UserPrivacyGroupRelation extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	public function saveGroupRelation($friendId, $selectedFriendGroup, $groupOwnerId){
+		$userPrivacyGroupRelation = new UserPrivacyGroupRelation;
+		$userPrivacyGroupRelation->userId = $friendId;
+		$userPrivacyGroupRelation->groupId = $selectedFriendGroup;
+		$userPrivacyGroupRelation->groupOwner = $groupOwnerId;
+	
+		return $userPrivacyGroupRelation->save();
+	}
+	
+	public function getGroupMembersCount($groupId) {
+		$sql = sprintf('SELECT count(*)
+				FROM '.$this->tableName() .' ugr
+				WHERE groupId = %d;',
+				$groupId);
+	
+		$count = Yii::app()->db->createCommand($sql)->queryScalar();
+		return $count;
+	}
+	
+	public function deleteGroup($groupId) {
+		UserPrivacyGroupRelation::model()->deleteAll('groupId=:groupId', array(':groupId'=>$groupId));	
+	}
+	
+	public function deleteGroupMember($userId,$groupId) {
+		
+		$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId',
+				'params'=>array(':userId'=>$userId,
+						':groupId'=>$groupId
+				)
+		)
+		);
+		
+		if($relationQueryResult != null)
+		{
+			if($relationQueryResult->delete()) // delete the friend from the group
+			{
+				//Relation deleted from the traceper_user_group_relation table
+				$returnResult=1;
+			}
+			else
+			{
+				$returnResult=0;
+			}
+		}
+		else
+		{
+			//traceper_user_group_relation table has not the desired relation, so do nothing
+			$returnResult=-1;
+		}
+		return $returnResult;
+	}
+	
+	
 }
