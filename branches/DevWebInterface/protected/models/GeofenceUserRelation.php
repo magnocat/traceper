@@ -89,4 +89,41 @@ class GeofenceUserRelation extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	public function saveUserGeofenceRelation($geofenceId, $userId){
+		$geofenceUserRelation = new GeofenceUserRelation;
+		$geofenceUserRelation->geofenceId = $geofenceId;
+		$geofenceUserRelation->userId = $userId;								
+		
+		//TODO: status must be updated, firstly save not in geofence
+		$geofenceUserRelation->status = 0;
+	
+		return $geofenceUserRelation->save();
+	}
+	
+	public function deleteGeofenceMember($friendId,$unselectedFriendGroup) {
+		
+		$relationQueryResult = GeofenceUserRelation::model()->find(array('condition'=>'userId=:userId AND geofenceId=:geofenceId',
+				'params'=>array(':userId'=>$friendId,
+						':geofenceId'=>$unselectedFriendGroup)));
+		
+		if($relationQueryResult != null)
+		{
+			if($relationQueryResult->delete()) // delete the friend from the group
+			{
+				//Relation deleted from the traceper_user_group_relation table
+				$returnResult=1;
+			}
+			else
+			{
+				$returnResult=0;
+			}
+		}
+		else
+		{
+			//traceper_user_group_relation table has not the desired relation, so do nothing
+			$returnResult=-1;
+		}
+		return $returnResult;
+	}
 }
