@@ -132,5 +132,25 @@ class UsersTest extends CDbTestCase
 		//Check whether the method returns the true Id for the given e-mail
 		$this->assertEquals($this->users("user1")->Id, Users::model()->getUserId($this->users("user1")->email));
 		$$this->assertEquals($this->users("user2")->Id, Users::model()->getUserId($this->users("user2")->email));
-	}		
+	}	
+
+	public function testDeleteUserReturnsNullForNonExistingId()
+	{
+		$this->assertTrue($this->users("user1")->save()); //Id:1
+		$this->assertTrue($this->users("user2")->save()); //Id:2
+	
+		//Check whether the method returns null value, when the queried Id does not exist in DB
+		$this->assertNull(Users::model()->deleteUser("0"));
+		$this->assertNull(Users::model()->deleteUser("3"));
+	}
+
+	public function testDeleteUser()
+	{
+		$this->assertTrue($this->users("user1")->save()); //Id:1
+		$this->assertTrue($this->users("user2")->save()); //Id:2
+	
+		//Check whether the method returns true, when the queried Id exists in DB
+		$this->assertTrue(Users::model()->deleteUser($this->users("user1")->Id));
+		$this->assertTrue(Users::model()->deleteUser($this->users("user2")->Id)));
+	}	
 }

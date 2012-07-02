@@ -33,8 +33,17 @@
 	</div>
 <?php }?>
 <?php 
+	if($userType == UserType::RealUser)
+	{
+		$viewId = 'userListView';
+	}	
+	else if($userType == UserType::RealStaff)
+	{
+		$viewId = 'staffListView';
+	}
+
 	if (isset($dataProvider)) {
-		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true, 'userType'=>$userType), false, true);
+		$this->renderPartial('userList', array('dataProvider'=>$dataProvider, 'friendList'=>true, 'userType'=>$userType, 'viewId'=>$viewId), false, true);
 	}
 	else
 	{
