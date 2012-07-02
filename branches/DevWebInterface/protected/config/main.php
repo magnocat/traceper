@@ -1,6 +1,7 @@
 <?php
 
 define('USER_MANAGEMENT_FEATURE', 1);
+define('FRIENDS_FEATURE', 1);
 
 /*User Type Enumeration in PHP*/
 class UserType

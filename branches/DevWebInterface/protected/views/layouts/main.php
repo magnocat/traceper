@@ -270,7 +270,7 @@
 										array(
 											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'))); 
 
- 									if(!defined('USER_MANAGEMENT_FEATURE'))
+ 									if(defined('FRIENDS_FEATURE'))
  									{
  										echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
  												<img src="images/invite.png"  /><div></div>
@@ -304,7 +304,7 @@
 											'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')));										
 									
 										
-									echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+									echo CHtml::ajaxLink('<div class="userOperations" id="registerGPSTracker">
 	 													<img src="images/registerGPSTracker.png"  /><div></div>
 	 												 </div>', $this->createUrl('site/registerGPSTracker'), 
  										array(
@@ -316,7 +316,7 @@
 
 									if(defined('USER_MANAGEMENT_FEATURE'))
 									{
-										echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+										echo CHtml::ajaxLink('<div class="userOperations" id="registerNewStaff">
 												<img src="images/user_add_friend.png"  /><div></div>
 												</div>', $this->createUrl('site/registerNewStaff'),
 												array(
@@ -438,7 +438,11 @@
 								    	//if (Yii::app()->user->isGuest == false)
 								    	{
 											$tabs = array();
-											$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealUser)), 'id'=>'users_tab');
+											
+											if(defined('FRIENDS_FEATURE'))
+											{
+												$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealUser)), 'id'=>'users_tab');
+											}	
 											
 											if(defined('USER_MANAGEMENT_FEATURE'))
 											{
