@@ -130,9 +130,7 @@ class PrivacyGroups extends CActiveRecord
 			//traceper_groups table has not the selected group of the owner
 			$returnResult=-1;
 		}
-		
 		return $returnResult;
-		
 	}
 	
 	public function updatePrivacySettings($groupId,$allowToSeeMyPosition) {
