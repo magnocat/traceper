@@ -638,10 +638,9 @@ class UsersController extends Controller
 		if (isset($_REQUEST['userId']))
 		{
 			$userId = (int) $_REQUEST['userId'];
-			$user = Users::model()->findByPk($userId);
 
 			$result = 'Error occured';
-			if ($user != null && $user->delete()){
+			if (Users::model()->deleteUser($userId)){
 				$result = 1;
 				$this->unsetFriendIdList();
 			}

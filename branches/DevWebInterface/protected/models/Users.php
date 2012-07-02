@@ -203,13 +203,26 @@ class Users extends CActiveRecord
 	}
 	
 	public function getUserId($email){
-		$users = Users::model()->find('email=:email', array(':email'=>$email));
+		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$result = null;
 	
-		if($users != null)
+		if($user != null)
 		{
-			$result = $users->Id;
+			$result = $user->Id;
 		}
+		
+		return $result;
+	}	
+	
+	public function deleteUser($userId){
+		$result = null;		
+		$user = Users::model()->findByPk($userId);
+	
+		if($user != null)
+		{
+			$result = $user->delete();
+		}
+		
 		return $result;
 	}	
 }
