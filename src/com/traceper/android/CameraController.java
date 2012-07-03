@@ -21,7 +21,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.media.CameraProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -350,8 +349,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		// Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
 		//mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
 		mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+		mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
 
 
 		// Step 4: Set output file
