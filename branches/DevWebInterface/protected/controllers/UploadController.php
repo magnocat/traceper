@@ -270,8 +270,22 @@ class UploadController extends Controller
 					{
 						
 						$result = "Error in moving uploading file";
-						if (move_uploaded_file($_FILES["upload"]["tmp_name"], Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . (($fileType == 0)?'.jpg':'.flv')))
+						
+						$extension = '.jpg';
+						if ($fileType == 1) {
+							$extension = '.mp4';
+						}
+						$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
+						
+						if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
 						{
+							if ($fileType == 1) {
+								$newFileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . '.flv';
+								$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
+								$out = shell_exec($command);
+								echo $out;
+								
+							}
 							$result = "1";
 						}
 					}
