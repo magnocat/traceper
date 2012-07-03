@@ -46,7 +46,7 @@
 	<string name="http_request_failed">Http istek hatası, lütfen internet bağlantısını ve ayarlardaki URL adresini kontrol ediniz</string>
 	<string name="take_photo">Fotoğraf Çek</string>
 	<string name="http_missing_parameter">Eksik parametre, Lütfen geliştiricilere danışın</string>
-	<string name="upload_succesfull">Yükleme başarılı olarak tamamlandı</string>
+	<string name="upload_succesfull">Yükleme başarıyla tamamlandı</string>
 	<string name="upload_failed">Yükleme hatası oluştu. Lütfen daha sonra tekrar deneyin</string>
 	<string name="make_it_public">Evet, herkes erişebilir</string>
 	<string name="make_it_private">Hayır, sadece arkadaşlarım erişebilir</string>

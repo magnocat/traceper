@@ -3,8 +3,6 @@ package com.traceper.android;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.google.api.client.auth.oauth2.draft10.AccessTokenResponse;
-
 public class Credential{
 	
 	/* 
@@ -38,7 +36,7 @@ public class Credential{
 
 		return store;
 	}
-
+/*
 	public AccessTokenResponse read() {
 		AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
 		accessTokenResponse.accessToken = prefs.getString(ACCESS_TOKEN, "");
@@ -56,7 +54,7 @@ public class Credential{
 		editor.putString(SCOPE_STRING, accessTokenResponse.scope);
 		editor.commit();
 	}
-
+*/
 	public void clearCredentials() {
 		Editor editor = prefs.edit();
 		editor.remove(ACCESS_TOKEN);
