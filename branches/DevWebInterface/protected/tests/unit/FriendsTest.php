@@ -1,14 +1,13 @@
 <?php
 
+require_once("../bootstrap.php");
 
-require_once("bootstrap.php");
-
-class FriendssTest extends CDbTestCase
+class FriendsTest extends CDbTestCase
 {
 	
  	public $fixtures=array( 
  			'users'=>'Users',
- 			//'friends'=>'Friends',
+ 			'friends'=>'Friends', //For empty friends table
  			);
 	
 	
@@ -26,10 +25,7 @@ class FriendssTest extends CDbTestCase
 
 		$this->assertTrue(Friends::model()->makeFriends($friend1Id, $friend2Id));
 		
-		$rows = Friends::model()->findAll(array('condition'=>'(friend1=:friend1 AND friend2=:friend2) OR (friend1=:friend2 AND friend2=:friend1)',
-				                                'params'=>array(':friend1'=>$friend1Id, ':friend1'=>$friend2Id)
-		                                       )
-		                                 );
+		$rows = Friends::model()->findAll('(friend1=:friend1 AND friend2=:friend2) OR (friend1=:friend2 AND friend2=:friend1)', array(':friend1'=>$friend1Id, ':friend2'=>$friend2Id));
 		
 		$this->assertEquals(count($rows), 1);
 		$this->assertEquals($rows[0]->friend1Visibility, 1);
