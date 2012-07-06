@@ -270,7 +270,7 @@
 										array(
 											'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'))); 
 
- 									if(defined('FRIENDS_FEATURE'))
+ 									if(Yii::app()->params->featureFriendManagementEnabled)
  									{
  										echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
  												<img src="images/invite.png"  /><div></div>
@@ -314,7 +314,7 @@
 										array(
 											'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
 
-									if(defined('USER_MANAGEMENT_FEATURE'))
+									if(Yii::app()->params->featureStaffManagementEnabled)
 									{
 										echo CHtml::ajaxLink('<div class="userOperations" id="registerNewStaff">
 												<img src="images/user_add_friend.png"  /><div></div>
@@ -439,12 +439,12 @@
 								    	{
 											$tabs = array();
 											
-											if(defined('FRIENDS_FEATURE'))
+											if(Yii::app()->params->featureFriendManagementEnabled)
 											{
 												$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealUser)), 'id'=>'users_tab');
 											}	
 											
-											if(defined('USER_MANAGEMENT_FEATURE'))
+											if(Yii::app()->params->featureStaffManagementEnabled)
 											{
 												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealStaff)), 'id'=>'staff_tab');
 											}
