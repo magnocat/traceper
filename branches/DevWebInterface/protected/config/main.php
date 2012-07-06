@@ -1,8 +1,5 @@
 <?php
 
-define('USER_MANAGEMENT_FEATURE', 1);
-define('FRIENDS_FEATURE', 1);
-
 /*User Type Enumeration in PHP*/
 class UserType
 {
@@ -15,7 +12,7 @@ class UserType
 /*Gender Enumeration in PHP*/
 class Gender
 {
-	const Male  = 0;
+	const Male   = 0;
 	const Female = 1;
 }
 
@@ -149,5 +146,7 @@ return array(
 		'minDataSentInterval'=> 300000,
 		'duplicateEntryDbExceptionCode' => 23000,
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
+		'featureStaffManagementEnabled' => true,
+		'featureFriendManagementEnabled' => true,
 	),
 );
