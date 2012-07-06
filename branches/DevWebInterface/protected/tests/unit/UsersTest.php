@@ -1,6 +1,6 @@
 <?php
 
-require_once("bootstrap.php");
+require_once("../bootstrap.php");
 
 class UsersTest extends CDbTestCase
 {
@@ -19,7 +19,9 @@ class UsersTest extends CDbTestCase
 		$email = "test@test.com";
 		$password = "1231231";
 		$realname = "test";
-		$this->assertTrue(Users::model()->saveUser($email, $password, $realname));
+		$userType = UserType::RealUser;
+		$accountType = 0;
+		$this->assertTrue(Users::model()->saveUser($email, $password, $realname, $userType, $accountType));
 		
 		$rows = Users::model()->findAll("email=:email", array(":email"=>$email));
 		
@@ -27,27 +29,31 @@ class UsersTest extends CDbTestCase
 		$this->assertEquals($rows[0]->email, $email);
 		$this->assertEquals($rows[0]->password, $password);
 		$this->assertEquals($rows[0]->realname, $realname);
+		$this->assertEquals($rows[0]->userType, $userType);
+		$this->assertEquals($rows[0]->account_type, $accountType);
 		
 		
 		try {
 			//try to register same e-mail address, it should throw exception
-			Users::model()->saveUser($email, "1232424", "deneme traceper");
+			Users::model()->saveUser($email, "1232424", "deneme traceper", UserType::GPSStaff, 0);
 			$this->assertTrue(false);
 		}
 		catch (CDbException $exp){
 			$this->assertTrue(true);
 		}
 		//try to register with missing parameters 
-		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "", ""));
-		$this->assertFalse(Users::model()->saveUser("", "1232424", ""));
-		$this->assertFalse(Users::model()->saveUser("", "", ""));
-		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "1232424", ""));
-		$this->assertFalse(Users::model()->saveUser("", "1232424", "deneme traceper"));
-		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "", "deneme traceper"));
-		$this->assertFalse(Users::model()->saveUser("", "", "deneme traceper"));
+		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "", "", "", ""));
+		$this->assertFalse(Users::model()->saveUser("", "1232424", "", "", ""));
+		$this->assertFalse(Users::model()->saveUser("", "", "", "", ""));
+		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "1232424", "", "", ""));
+		$this->assertFalse(Users::model()->saveUser("", "1232424", "deneme traceper", "", ""));
+		$this->assertFalse(Users::model()->saveUser("dene@deneme.com", "", "deneme traceper", "", ""));
+		$this->assertFalse(Users::model()->saveUser("", "", "deneme traceper", "", ""));
+		$this->assertFalse(Users::model()->saveUser("", "", "", UserType::GPSDevice, ""));
+		$this->assertFalse(Users::model()->saveUser("", "", "", "", 1));
 		
 		//try to register with a wrong formatted email address
-		$this->assertFalse(Users::model()->saveUser("denedeneme.com", "1232424", "deneme traceper"));
+		$this->assertFalse(Users::model()->saveUser("denedeneme.com", "1232424", "deneme traceper", UserType::RealStaff, 0));
 	}
 	
 	
@@ -112,7 +118,7 @@ class UsersTest extends CDbTestCase
 		$this->assertTrue($this->users("user1")->save());
 		
 		//Check whether the method returns an integer value when the queried email exits in DB
-		$this->assertInternalType('int', Users::model()->getUserId($this->users("user1")->email));
+		$this->assertInternalType("integer", Users::model()->getUserId($this->users("user1")->email));
 	}
 	
 	public function testGetUserIdReturnsNullForInvalidEmail()
@@ -131,7 +137,7 @@ class UsersTest extends CDbTestCase
 
 		//Check whether the method returns the true Id for the given e-mail
 		$this->assertEquals($this->users("user1")->Id, Users::model()->getUserId($this->users("user1")->email));
-		$$this->assertEquals($this->users("user2")->Id, Users::model()->getUserId($this->users("user2")->email));
+		$this->assertEquals($this->users("user2")->Id, Users::model()->getUserId($this->users("user2")->email));
 	}	
 
 	public function testDeleteUserReturnsNullForNonExistingId()
@@ -151,6 +157,6 @@ class UsersTest extends CDbTestCase
 	
 		//Check whether the method returns true, when the queried Id exists in DB
 		$this->assertTrue(Users::model()->deleteUser($this->users("user1")->Id));
-		$this->assertTrue(Users::model()->deleteUser($this->users("user2")->Id)));
+		$this->assertTrue(Users::model()->deleteUser($this->users("user2")->Id));
 	}	
 }
