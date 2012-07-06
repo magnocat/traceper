@@ -68,6 +68,7 @@ class Users extends CActiveRecord
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
 			array('email', 'length', 'max'=>100),
+			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
 			array('fb_id, g_id', 'length', 'max'=>50),
@@ -208,9 +209,9 @@ class Users extends CActiveRecord
 	
 		if($user != null)
 		{
-			$result = $user->Id;
+			$result = (int)$user->Id;
 		}
-		
+
 		return $result;
 	}	
 	
