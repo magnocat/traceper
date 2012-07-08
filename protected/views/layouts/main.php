@@ -235,7 +235,7 @@
 													));
 													$this->widget('zii.widgets.CMenu',array(
    													 'items'=>array(   											  
-        											array('label'=>'Sign in with Facebook', 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
+        											array('label'=>Yii::t('layout', 'Sign in with Facebook'), 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
        													   ),
 													));
 									?>		
@@ -450,7 +450,8 @@
 											}
 											
 											$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
-											$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList'), 'id'=>'groups_tab');
+											$tabs[Yii::t('layout', 'Friend Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
+											$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
 								    		
 								    		$this->widget('zii.widgets.jui.CJuiTabs', array(
 // 											    'tabs' => array(

@@ -60,7 +60,7 @@ if ($dataProvider != null)
 			       ),
 		    'columns'=>array(
 		array(            // display 'create_time' using an expression
-				    'name'=>'Name',
+				    'name'=>Yii::t('common', 'Name'),
 					'type' => 'raw',		
 					'sortable'=>true,	
 					'value'=>'$data["Name"]',	
@@ -73,7 +73,7 @@ if ($dataProvider != null)
 												  $(\"#groupId\").text(".$data[\'groupId\'].");
 												  $(\"#groupMemberDeleteConfirmation\").dialog(\"open\");", 
 										"class"=>"vtip", 
-										"title"=>"Delete Group Member"))',
+										"title"=>'.("Yii::t('groups', 'Delete Group Member')").'))',
 
 					'htmlOptions'=>array('width'=>'16px')
 		),

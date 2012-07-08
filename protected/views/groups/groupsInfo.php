@@ -16,7 +16,7 @@
 			<?php echo $form->textField($model,'keyword', array('class'=>'searchBox')); ?>
 			<?php 
 				
-				echo CHtml::ajaxSubmitButton('Search', $this->createUrl('groups/search'), 
+				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Search'), $this->createUrl('groups/search'), 
 												array(
 													'complete'=> 'function() { $("#groupSearchResults").dialog("open"); return false;}',
 													'update'=> '#groupSearchResults',
@@ -33,8 +33,17 @@
 	</div>
 <?php }?>
 <?php 
+	if($groupType == GroupType::FriendGroup)
+	{
+		$viewId = 'friendGroupsListView';
+	}
+	else if($groupType == GroupType::StaffGroup)
+	{
+		$viewId = 'staffGroupsListView';
+	}
+
 	if (isset($dataProvider)) {
-		$this->renderPartial('groupList', array('dataProvider'=>$dataProvider), false, true);
+		$this->renderPartial('groupList', array('dataProvider'=>$dataProvider, 'groupType'=>$groupType, 'viewId'=>$viewId), false, true);
 	}
 	else
 	{

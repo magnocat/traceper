@@ -26,7 +26,7 @@ class GroupPrivacySettingsForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'allowToSeeMyPosition'=>'Allow to see my position',
+			'allowToSeeMyPosition'=>Yii::t('groups', 'Allow to see my position'),
 		);
 	}
 }

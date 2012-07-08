@@ -67,10 +67,9 @@ class GroupsController extends Controller
 			$model->attributes = $_POST['NewGroupForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
-				
 				try
 				{
-					if(PrivacyGroups::model()->saveGroup($model->name, Yii::app()->user->id, $model->description)) // save the change to database
+					if(PrivacyGroups::model()->saveGroup($model->name, $model->groupType, Yii::app()->user->id, $model->description)) // save the change to database
 					{
 						echo CJSON::encode(array("result"=> "1"));
 					}
@@ -112,10 +111,17 @@ class GroupsController extends Controller
 	public function actionUpdateGroup()
 	{
 		$model = new GroupSettingsForm;
+		
+		$groupType = GroupType::FriendGroup;
+		
+		if (isset($_REQUEST['groupType']))
+		{
+			$groupType = (int)$_REQUEST['groupType'];
+		}
 
 		$processOutput = true;		
 		//Get all of the groups that the logged in user has created
-		$groupsOfUser = PrivacyGroups::model()->findAll('owner=:owner', array(':owner'=>Yii::app()->user->id));
+		$groupsOfUser = PrivacyGroups::model()->findAll('owner=:owner AND type=:type', array(':owner'=>Yii::app()->user->id, ':type'=>$groupType));
 		
 		$selected_groups=array(); //array to hold all the groups of the user's selected friend to be used for the checking the checkboxes in the initial dialog
 		$unselected_groups=array(); //array to hold the unselected user groups so that it can be used for user removal from unselected groups
@@ -306,11 +312,17 @@ class GroupsController extends Controller
 	//Gets the all of the groups that the logged in user owns
 	public function actionGetGroupList()
 	{
+		$groupType = GroupType::FriendGroup;
+		
+		if (isset($_GET['groupType']) && $_GET['groupType'] != NULL)
+		{
+			$groupType = $_GET['groupType'];
+		}		
+		
 		$dataProvider = null;
 		if(Yii::app()->user->id != null)
 		{			
-			$dataProvider=PrivacyGroups::model()->getGroupsList(Yii::app()->user->id,Yii::app()->params->itemCountInOnePage);
-			
+			$dataProvider=PrivacyGroups::model()->getGroupsList(Yii::app()->user->id, $groupType, Yii::app()->params->itemCountInOnePage);			
 		}
 		
 		//echo 'groupsInfo called'.date("Y-m-d H:i:s");
@@ -318,7 +330,7 @@ class GroupsController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm()), false, true);
+		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'groupType'=>$groupType), false, true);
 	}
 	
 	//Gets the list of the selected froup members
@@ -363,12 +375,10 @@ class GroupsController extends Controller
 		{
 			$groupId = (int)$_REQUEST['groupId'];
 		}	
-		
-		//First delete all of the relations those belong to the selected group
-		UserPrivacyGroupRelation::model()->deleteGroup($groupId);
-		
+
+		//Since there is a foreign constraint between PrivacyGroups and UserPrivacyGroupRelation, when the group is deleted the corresponding relation rows are also be deleted automatically
 		//Since a group can be deleted only by its owner, check also the group owner
-		$result = PrivacyGroups::model()->deleteGroup($groupId,Yii::app()->user->id);
+		$result = PrivacyGroups::model()->deleteGroup($groupId, Yii::app()->user->id);
 		if($result == 1)
 		{
 			//Group deleted from the traceper_groups table

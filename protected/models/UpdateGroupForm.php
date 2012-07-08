@@ -19,7 +19,7 @@ class UpdateGroupForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('userId, groupId', 'required','message'=>'Field cannot be blank!'),
+			array('userId, groupId', 'required','message'=>Yii::t('common', 'Field cannot be blank!')),
 		);
 	}
 
