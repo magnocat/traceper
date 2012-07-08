@@ -315,6 +315,7 @@ class SiteController extends Controller
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
 
+				/*
 				$time = date('Y-m-d h:i:s');
 
 				$userCandidates = new UserCandidates;
@@ -324,6 +325,8 @@ class SiteController extends Controller
 				$userCandidates->time = $time;
 
 				if($userCandidates->save()) // save the change to database
+				*/
+				if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
 				{
 					$key = md5($model->email.$time);
 					$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
@@ -397,15 +400,27 @@ class SiteController extends Controller
 			if($model->validate()) {
 
 				$time = date('Y-m-d h:i:s');
+				$result = "Unknown error";
 
+				if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type))
+				{
+					echo CJSON::encode(array("result"=> "9"));
+					//echo CJSON::encode(array("result"=> "1"));
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "Unknown error"));
+				}
+				
+				/*
 				$users = new Users;
 				$users->email = $model->email;
 				$users->realname = $model->name;
 				$users->password = md5($model->password);
 				$users->account_type = $model->account_type;
 				$users->fb_id = $model->ac_id;
-				$result = "Unknown error";
 				
+								
 			if($users->save())
 				{
 					
@@ -416,6 +431,7 @@ class SiteController extends Controller
 				{
 					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
+				*/
 				Yii::app()->end();
 			}
 
@@ -472,7 +488,19 @@ class SiteController extends Controller
 			if($model->validate()) {
 
 				$time = date('Y-m-d h:i:s');
-
+				$result = "Unknown error";
+				
+				if (Users::model()->saveGPUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type, substr($model->image,0,strlen($model->image)-6)))
+				{
+					echo CJSON::encode(array("result"=> "9"));
+					//echo CJSON::encode(array("result"=> "1"));
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "Unknown error"));
+				}
+				
+				/*
 				$users = new Users;
 				$users->email = $model->email;
 				$users->realname = $model->name;
@@ -492,6 +520,7 @@ class SiteController extends Controller
 				{
 					echo CJSON::encode(array("result"=> "Unknown error"));
 				}
+				*/
 				Yii::app()->end();
 			}
 
@@ -540,6 +569,8 @@ class SiteController extends Controller
 			
 			// validate user input and if ok return json data and end application.
 			if(Yii::app()->session['facebook_user']) {
+				
+				/*
 
 				$time = date('Y-m-d h:i:s');
 				$users = new Users;
@@ -558,6 +589,17 @@ class SiteController extends Controller
 				}catch (Exception $e) 
 				{
 				$result = 0; 	
+				}
+				*/
+				
+				
+				if (Users::model()->saveFacebookUser(Yii::app()->session['facebook_user']['email'], md5(Yii::app()->session['facebook_user']['id']), Yii::app()->session['facebook_user']['name'], Yii::app()->session['facebook_user']['id'], 1))
+				{
+					$result = 1;	
+				}
+				else
+				{
+					$result = 0; 
 				}
 			
 			
@@ -591,6 +633,7 @@ class SiteController extends Controller
 				//real users and devices we cannot add unique index for realname, so we have to check same name existance manually)
 				if(Users::model()->find('userType=:userType AND realname=:name', array(':userType'=>UserType::GPSDevice, ':name'=>$model->name)) == null)
 				{
+					/*
 					$users = new Users;
 					$users->realname = $model->name;
 					$users->deviceId = $model->deviceId;
@@ -600,11 +643,14 @@ class SiteController extends Controller
 					$users->password = md5($model->name);
 					$users->userType = UserType::GPSDevice;
 					$users->account_type = 0;
+					*/
 					
 					try
 					{
-						if($users->save()) // save the change to database
+						//if($users->save()) // save the change to database
+						if (Users::model()->saveGPSUser($model->deviceId, md5($model->name), $model->name, UserType::GPSDevice, 0))
 						{
+							/*
 							$friend = new Friends();
 							$friend->friend1 = Yii::app()->user->id;
 							$friend->friend1Visibility = 1; //default visibility setting is visible
@@ -613,6 +659,8 @@ class SiteController extends Controller
 							$friend->status = 1;
 					
 							if ($friend->save())
+							*/
+							if(Friends::model()->makeFriends(Yii::app()->user->id, Users::model()->getUserId($model->deviceId)))
 							{
 								echo CJSON::encode(array("result"=> "1"));
 							}
@@ -782,6 +830,7 @@ class SiteController extends Controller
 				$invitationSentCount = 0;
 				for ($i = 0; $i < $arrayLength; $i++)
 				{
+					/*
 					$dt = date("Y-m-d H:m:s");
 
 					$invitedUsers = new InvitedUsers;
@@ -789,6 +838,8 @@ class SiteController extends Controller
 					$invitedUsers->dt = $dt;
 
 					if ($invitedUsers->save())
+					*/
+					if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], date("Y-m-d H:m:s")))
 					{
 						$key = md5($emailArray[$i].$dt);
 						//send invitation mail

@@ -195,6 +195,44 @@ class Users extends CActiveRecord
 		return $users->save();
 	}
 	
+	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
+		$users=new Users;
+	
+		$users->email = $email;
+		$users->realname = $realname;
+		$users->password = $password;
+		$users->fb_id = $fb_id;
+		$users->account_type = $accountType;
+	
+		return $users->save();
+	}
+	
+	public function saveGPUser($email, $password, $realname, $g_id, $accountType, $gp_image){
+		$users=new Users;
+	
+		$users->email = $email;
+		$users->realname = $realname;
+		$users->password = $password;
+		$users->g_id = $fb_id;
+		$users->account_type = $accountType;
+		$users->gp_image = $gp_image;
+	
+		return $users->save();
+	}
+	
+	public function saveGPSUser($deviceID, $password, $realname, $userType, $accountType){
+		$users=new Users;
+	
+		$users->email = $deviceID;
+		$users->deviceId = $deviceID;
+		$users->realname = $realname;
+		$users->password = $password;
+		$users->userType = $userType;
+		$users->account_type = $accountType;
+	
+		return $users->save();
+	}
+	
 	public function changePassword($Id, $password) {
 		$result = false;
 		if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
