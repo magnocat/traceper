@@ -7,7 +7,7 @@ if ($dataProvider != null) {
 		    'id'=>'uploadDeleteConfirmation',
 			// additional javascript options for the dialog plugin
 		    'options'=>array(
-		        'title'=>Yii::t('general', 'Delete File'),
+		        'title'=>Yii::t('upload', 'Delete file'),
 		        'autoOpen'=>false,
 		        'modal'=>true, 
 				'resizable'=>false,
@@ -68,14 +68,14 @@ if ($dataProvider != null) {
 					  				  )',
 				),
 				array(            // display 'create_time' using an expression
-		            'name'=>'Description',
+		            'name'=>Yii::t('upload', 'Description'),
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["description"], "#", array(
     										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].");",
 										))',	
 				),
 				array(            // display 'create_time' using an expression
-		            'name'=>'Sender',
+		            'name'=>Yii::t('upload', 'Sender'),
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["realname"], "#", array(
     										"onclick"=>"TRACKER.trackUser(".$data["userId"].");",
@@ -89,7 +89,7 @@ if ($dataProvider != null) {
 		            			?
 		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
 		            						"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
-		            									$(\"#uploadDeleteConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>"Delete File"
+		            									$(\"#uploadDeleteConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".'
 		            						))
 		            			: ""; ',
 					'htmlOptions'=>array('width'=>'16px'),
