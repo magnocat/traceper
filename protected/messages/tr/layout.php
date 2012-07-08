@@ -43,10 +43,11 @@ return array(
 	'Users' => 'Arkadaşlar',
 	'Staff' => 'Personel',
 	'Photos' => 'Fotolar',
-	'Groups' => 'Gruplar',
+	'Friend Groups' => 'Ark. Grupları',
+	'Staff Groups'  => 'Per. Grupları',
 	'See your position on the map' => 'Konumunuzu haritada görün',
 	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',
-	'Search' => 'Ara',
+	'Sign in with Facebook' => 'Facebook ile giriş yap',
 );
 
 

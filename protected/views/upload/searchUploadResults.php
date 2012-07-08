@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'uploadSearchResults',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Search Results'),
+	        'title'=>Yii::t('common', 'Search Results'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
