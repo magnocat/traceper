@@ -101,4 +101,16 @@ class UserCandidates extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	public function saveUserCandidates($email, $password, $realname, $time){
+		$userCandidates = new UserCandidates;
+		
+		
+		$userCandidates->email = $email;
+		$userCandidates->realname = $realname;
+		$userCandidates->password = $password;
+		$userCandidates->time = $time;
+		
+		return $userCandidates->save();
+	}
 }

@@ -39,11 +39,11 @@ class InvitedUsers extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('email', 'required'),
-			array('email', 'length', 'max'=>100),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('Id, email, dt', 'safe', 'on'=>'search'),
+				array('email', 'required'),
+				array('email', 'length', 'max'=>100),
+				// The following rule is used by search().
+				// Please remove those attributes that should not be searched.
+				array('Id, email, dt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -55,11 +55,11 @@ class InvitedUsers extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array();
-		
-//		return array(
-//			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
-//			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
-//		);
+
+		//		return array(
+		//			'traceperFriends' => array(self::HAS_MANY, 'Friends', 'friend2'),
+		//			'traceperFriends1' => array(self::HAS_MANY, 'Friends', 'friend1'),
+		//		);
 	}
 
 	/**
@@ -68,9 +68,9 @@ class InvitedUsers extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'Id' => 'ID',
-			'email' => 'E-mail',
-			'dt' => 'Data Time',
+				'Id' => 'ID',
+				'email' => 'E-mail',
+				'dt' => 'Data Time',
 		);
 	}
 
@@ -90,7 +90,16 @@ class InvitedUsers extends CActiveRecord
 		$criteria->compare('dt',$this->dt,true);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
+				'criteria'=>$criteria,
 		));
+	}
+
+
+	public function saveInvitedUsers($email, $dt){
+		$invitedUsers = new InvitedUsers;
+		$invitedUsers->email = $email;
+		$invitedUsers->dt = $dt;
+
+		return $invitedUsers->save();
 	}
 }
