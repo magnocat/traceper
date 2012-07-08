@@ -45,11 +45,11 @@ if ($dataProvider != null) {
 																	}
 																	else 
 																	{
-																		TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																	}
 																}
 																catch(ex) {
-																	TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																	TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																}
 															}',
 											)).
@@ -70,11 +70,11 @@ if ($dataProvider != null) {
 																		}
 																		else
 																		{
-																			TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																			TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																		}
 																	}
 																	catch(ex) {
-																		TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																	}
 												}',
 											)).
@@ -95,11 +95,11 @@ if ($dataProvider != null) {
 															}
 															else 
 															{
-																TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+																TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 															}
 														}
 														catch(ex) {
-															TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+															TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 														}
 					  							  		
 													}'
@@ -135,12 +135,12 @@ if ($dataProvider != null) {
 		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
 										array(\'onclick\'=>CHtml::ajax(
 											array(
-												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'])),
+												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'], \'groupType\'=>'.((($userType == UserType::RealStaff) Or ($userType == UserType::GPSStaff))?GroupType::StaffGroup:GroupType::FriendGroup).')),
 												
 					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupSettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Edit Settings').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
 					  				 )',	
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
@@ -159,7 +159,7 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#geofenceSettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#geofenceSettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Edit Settings').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
 					  				 )',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
@@ -168,7 +168,7 @@ if ($dataProvider != null) {
 		       
 
 		array(            // display 'create_time' using an expression
-				    'name'=>Yii::t('users', 'Name'),
+				    'name'=>Yii::t('common', 'Name'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
 		            'value'=>'CHtml::link($data["Name"], "#", array(
@@ -216,15 +216,15 @@ if ($dataProvider != null) {
 														}
 														else 
 														{
-															TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+															TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 														}
 													}
 													catch(ex) {
-														TRACKER.showMessageDialog("'.Yii::t('users', 'Sorry, an error occured in operation').'");
+														TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 													}
 													
 												}\',
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Approve').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Approve').'\')
 					  				 )
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),

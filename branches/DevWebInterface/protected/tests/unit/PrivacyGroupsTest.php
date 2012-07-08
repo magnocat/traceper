@@ -17,20 +17,22 @@ class PrivacyGroupsTest extends CDbTestCase
 	
 	public function testSaveGroup() {
 		$name = "testSaveGroup";
-		$id = "1234";
+		$type = GroupType::FriendGroup;
+		$ownerId = "1234";
 		$description = "Testing SaveGroup() in PrivacyGroups.php";
 		
-		$this->assertTrue(PrivacyGroups::model()->saveGroup($name, $id, $description));
+		$this->assertTrue(PrivacyGroups::model()->saveGroup($name, $type, $ownerId, $description));
 	
-		$rows = PrivacyGroups::model()->findAll("name=:name", array(":name"=>$name));
+		$rows = PrivacyGroups::model()->findAll("name=:name AND ownerId=:ownerId AND type=:type", array(":name"=>$name, "ownerId"=>$ownerId, "type"=>$type));
 	
 		$this->assertEquals($rows[0]->name, $name);
-		$this->assertEquals($rows[0]->owner, $id);
+		$this->assertEquals($rows[0]->type, $type);
+		$this->assertEquals($rows[0]->owner, $ownerId);
 		$this->assertEquals($rows[0]->description, $description);
 	
 		try {
 			//try to register same owner and group name, it should throw exception
-			PrivacyGroups::model()->saveGroup($name, $id, "deneme traceper");
+			PrivacyGroups::model()->saveGroup($name, $type, $ownerId, "deneme traceper");
 			$this->assertTrue(false);
 		}
 		catch (CDbException $exp){

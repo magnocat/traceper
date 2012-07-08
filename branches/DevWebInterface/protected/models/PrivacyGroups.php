@@ -6,6 +6,7 @@
  * The followings are the available columns in table 'traceper_privacy_groups':
  * @property string $id
  * @property string $name
+ * @property integer $type
  * @property string $owner
  * @property string $description
  * @property integer $allowedToSeeOwnersPosition
@@ -37,14 +38,14 @@ class PrivacyGroups extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, owner', 'required'),
-			array('allowedToSeeOwnersPosition', 'numerical', 'integerOnly'=>true),
+			array('name, type, owner', 'required'),
+			array('type, allowedToSeeOwnersPosition', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>45),
 			array('owner', 'length', 'max'=>10),
 			array('description', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, name, owner, description, allowedToSeeOwnersPosition', 'safe', 'on'=>'search'),
+			array('id, name, type, owner, description, allowedToSeeOwnersPosition', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,6 +68,7 @@ class PrivacyGroups extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'name' => 'Name',
+			'type' => 'Type',
 			'owner' => 'Owner',
 			'description' => 'Description',
 			'allowedToSeeOwnersPosition' => 'Allowed To See Owners Position',
@@ -86,6 +88,7 @@ class PrivacyGroups extends CActiveRecord
 
 		$criteria->compare('id',$this->id,true);
 		$criteria->compare('name',$this->name,true);
+		$criteria->compare('type',$this->type);
 		$criteria->compare('owner',$this->owner,true);
 		$criteria->compare('description',$this->description,true);
 		$criteria->compare('allowedToSeeOwnersPosition',$this->allowedToSeeOwnersPosition);
@@ -95,24 +98,41 @@ class PrivacyGroups extends CActiveRecord
 		));
 	}
 	
-	
-	public function saveGroup($name, $id, $description){
+	public function saveGroup($name, $type, $ownerId, $description){
 		$privacyGroups = new PrivacyGroups;
 		$privacyGroups->name = $name;
-		$privacyGroups->owner = $id;
+		$privacyGroups->type = $type;
+		$privacyGroups->owner = $ownerId;
 		$privacyGroups->description = $description;
 	
 		return $privacyGroups->save();
+	}	
+
+	public function getGroupsList($ownerId, $type, $itemCountInOnePage) {
+	
+		$dataProvider=new CActiveDataProvider('PrivacyGroups', array(
+				'criteria'=>array(
+						'condition'=>'owner=:owner AND type=:type',
+						'params'=>array(':owner'=>$ownerId, ':type'=>$type),
+						//'order'=>'create_time DESC',
+						//'with'=>array('author'),
+				),
+				'pagination'=>array(
+						'pageSize'=>$itemCountInOnePage,
+				),
+		));
+	
+		return $dataProvider;
 	}
-		
+
 	public function deleteGroup($groupId,$ownerId) {
-		
+	
 		$result = PrivacyGroups::model()->find(array('condition'=>'id=:groupId AND owner=:ownerId',
 				'params'=>array(':groupId'=>$groupId,
 						':ownerId'=>$ownerId)
 		)
 		);
-		 
+			
 		if($result != null)
 		{
 			if($result->delete()) // Delete the selected group
@@ -131,29 +151,10 @@ class PrivacyGroups extends CActiveRecord
 			$returnResult=-1;
 		}
 		return $returnResult;
-	}
+	}	
 	
-	public function updatePrivacySettings($groupId,$allowToSeeMyPosition) {
+	public function updatePrivacySettings($groupId, $allowToSeeMyPosition) {
 		$count= PrivacyGroups::model()->updateByPk($groupId, array("allowedToSeeOwnersPosition"=>$allowToSeeMyPosition));
 		return $count;
-	}
-	
-	public function getGroupsList($ownerId,$itemCountInOnePage) {
-		
-		$dataProvider=new CActiveDataProvider('PrivacyGroups', array(
-				'criteria'=>array(
-						'condition'=>'owner=:owner',
-						'params'=>array(':owner'=>$ownerId),
-						//'order'=>'create_time DESC',
-						//'with'=>array('author'),
-				),
-				'pagination'=>array(
-						'pageSize'=>$itemCountInOnePage,
-				),
-		));
-		
-		return $dataProvider;
-	}
-	
-	
+	}	
 }

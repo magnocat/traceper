@@ -114,12 +114,13 @@ INSERT INTO `traceper_invitedusers` (`Id`, `email`, `dt`) VALUES
 CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
+  `type` tinyint(4) NOT NULL,
   `owner` int(10) unsigned NOT NULL,
   `description` varchar(500) DEFAULT NULL,
   `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=58 ;
 
 -- --------------------------------------------------------
 
@@ -525,9 +526,10 @@ ALTER TABLE `traceper_upload`
 
 --
 -- Constraints for table `traceper_user_privacy_group_relation`
---
+-- 
 ALTER TABLE `traceper_user_privacy_group_relation`
-  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `traceper_privacy_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;  
 
 --
 -- Constraints for table `traceper_user_was_here`

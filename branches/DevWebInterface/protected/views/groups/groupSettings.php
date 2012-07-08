@@ -61,7 +61,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/updateGroup', array('friendId'=>$friendId)), 
+					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId)), 
 														array(
 															'success'=> 'function(result){ 
 																			try {
@@ -89,7 +89,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				else
 				{
 					
-					echo CHtml::htmlButton('OK',  
+					echo CHtml::htmlButton(Yii::t('common', 'OK'),  
 														array(
 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
 															'style'=>'text-align:center'
@@ -101,7 +101,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::htmlButton('Cancel',  
+					echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
 														array(
 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
 															 ),

@@ -35,7 +35,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
-				echo CHtml::ajaxSubmitButton('Save', $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)), 
+				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)), 
 													array(
 														'success'=> 'function(result){ 
 																		try {
@@ -52,7 +52,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																	 }',														
 														 ),
 													null);					
-				echo CHtml::htmlButton('Cancel',  
+				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
 													array(
 														'onclick'=> '$("#groupPrivacySettingsWindow").dialog("close"); return false;',
 														 ),

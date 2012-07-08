@@ -16,6 +16,13 @@ class Gender
 	const Female = 1;
 }
 
+/*Group Type Enumeration in PHP*/
+class GroupType
+{
+	const FriendGroup = 0;
+	const StaffGroup  = 1;
+}
+
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 

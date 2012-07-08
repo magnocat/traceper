@@ -1,56 +1,55 @@
 <?php
 
 if ($dataProvider != null) {
+	$emptyText = Yii::t('groups', 'No groups found');
+	$ajaxUrl = null;
+	$isSearchResult = isset($searchResult) ? true : false;
+	$deleteGroupQuestion = Yii::t('groups', 'Do you want to delete this group?');
+	
+	if ($isSearchResult == true){
+		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
+	}
+	
 	//TODO: Refactor make common confirmation dialog 	
 	/** This is the friend ship id holder, when user clicks delete, its content is filled***/
 	echo "<div id='groupId' style='display:none'></div>";
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-	    'id'=>'groupDeleteConfirmation',
-		// additional javascript options for the dialog plugin
-	    'options'=>array(
-	        'title'=>Yii::t('groups', 'Delete Group'),
-	        'autoOpen'=>false,
-	        'modal'=>true, 
-			'resizable'=>false,
-			'buttons' =>array (
-				"OK"=>"js:function(){
-							". CHtml::ajax(
-									array(
-											'url'=>Yii::app()->createUrl('groups/deleteGroup'),
-											'data'=> array('groupId'=>"js:$('#groupId').html()"),
-											'success'=> 'function(result) { 	
-														 	try {
-														 		$("#groupDeleteConfirmation").dialog("close");
-																var obj = jQuery.parseJSON(result);
-																if (obj.result && obj.result == "1") 
-																{
-																	$.fn.yiiGridView.update($("groupListView").text());
-																}
-																else 
-																{
-																	TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
-																}
-
-															}
-															catch(ex) {
-																TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
-															}
-														}',
-										)) .
-						"}",
-			"Cancel"=>"js:function() {
-				$( this ).dialog( \"close\" );
-			}" 
-			)),
-		));	
-	echo Yii::t('groups', 'Do you want to delete this group?').'<br/> <br/>';
-	$this->endWidget('zii.widgets.jui.CJuiDialog');	
+	echo "<div id='gridViewId' style='display:none'></div>";
 	
-
+	$deleteGroupJSFunction = "function deleteGroup() { "
+									.CHtml::ajax(
+											array(
+													'url'=>Yii::app()->createUrl('groups/deleteGroup'),
+													'data'=> array('groupId'=>"js:$('#groupId').html()"),
+													'success'=> 'function(result) { 	
+																 	try {
+																 		TRACKER.closeConfirmationDialog();
+																		var obj = jQuery.parseJSON(result);
+																		if (obj.result && obj.result == "1") 
+																		{																			
+																			$.fn.yiiGridView.update($("#gridViewId").text());
+																		}
+																		else 
+																		{
+																			TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
+																		}
+		
+																	}
+																	catch(ex) {
+																		TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
+																	}
+																}',
+												)).
+									"}";	
+	Yii::app()->clientScript->registerScript('groupFunctions',
+			$deleteGroupJSFunction,
+			CClientScript::POS_READY);
+		
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
-	 		'id'=>'groupListView',
+	 		'id'=>$viewId,
+			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
+			'emptyText'=>$emptyText,
 			'pager'=>array( 
 				 'header'=>'',
 		         'firstPageLabel'=>'',
@@ -58,7 +57,7 @@ if ($dataProvider != null) {
 			       ),
 		    'columns'=>array(
 		array(            // display 'create_time' using an expression
-					'name'=>'Privacy Settings',
+					'name'=>Yii::t('groups', 'Privacy Settings'),
 					'type' => 'raw',
 
 		            'value'=>'CHtml::link(\'<img src="images/PrivacySettings.png"  />\', \'#\',
@@ -69,7 +68,7 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupPrivacySettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupPrivacySettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\'Edit Settings\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
 					  				 )',		
 		
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;')
@@ -77,7 +76,7 @@ if ($dataProvider != null) {
 		       
 
 		array(            // display 'create_time' using an expression
-				    'name'=>'Name',
+				    'name'=>Yii::t('common', 'Name'),
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["name"], "#", array())',
 
@@ -96,12 +95,17 @@ if ($dataProvider != null) {
 		),
 		array(            // display 'create_time' using an expression
 	//    'name'=>'realname',
-					'type' => 'raw',
-		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
-										array("onclick"=>"$(\"#groupId\").text(".$data[\'id\'].");
-														 $(\"#groupDeleteConfirmation\").dialog(\"open\");", 
-												"class"=>"vtip", 
-												"title"=>"Delete Group"))',
+					'type' => 'raw',				
+					'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
+										array("onclick"=>"
+												$(\"#groupId\").text(".$data[\'id\'].");
+												$(\"#gridViewId\").text(\"'.$viewId.'\");
+												TRACKER.showConfirmationDialog(\"'.$deleteGroupQuestion.'\", deleteGroup);
+												",
+												"class"=>"vtip",
+												"title"=>'.("Yii::t('groups', 'Delete Group')").
+												')
+										)',				
 
 					'htmlOptions'=>array('width'=>'16px')
 		),

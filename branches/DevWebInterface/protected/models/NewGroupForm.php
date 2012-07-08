@@ -9,6 +9,7 @@ class NewGroupForm extends CFormModel
 {
 	public $name;
 	public $description;
+	public $groupType;
 
 	/**
 	 * Declares the validation rules.
@@ -19,8 +20,10 @@ class NewGroupForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('name', 'required','message'=>'Field cannot be blank!'),
+			array('name', 'required','message'=>Yii::t('common', 'Field cannot be blank!')),
+			array('groupType', 'required','message'=>Yii::t('groups', 'Please select a group type')),
 			array('description', 'length', 'max'=>500),
+			array('groupType', 'safe') //marks the associated attributes to be safe for massive assignments
 		);
 	}
 
@@ -30,8 +33,9 @@ class NewGroupForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'name'=>Yii::t('general', 'Group Name'),
-			'description'=>Yii::t('general', 'Group Description'),
+			'name'=>Yii::t('groups', 'Group Name'),
+			'description'=>Yii::t('groups', 'Group Description'),
+			'groupType'=>Yii::t('groups', 'Group Type'),
 		);
 	}
 }
