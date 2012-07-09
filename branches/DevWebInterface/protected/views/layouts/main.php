@@ -441,12 +441,13 @@
 											
 											if(Yii::app()->params->featureFriendManagementEnabled)
 											{
-												$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealUser)), 'id'=>'users_tab');
+												$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))), 'id'=>'users_tab');
+												//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
 											}	
 											
 											if(Yii::app()->params->featureStaffManagementEnabled)
 											{
-												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>UserType::RealStaff)), 'id'=>'staff_tab');
+												$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 'id'=>'staff_tab'); 
 											}
 											
 											$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');

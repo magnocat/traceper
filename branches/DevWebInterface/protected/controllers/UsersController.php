@@ -103,7 +103,7 @@ class UsersController extends Controller
 
 	public function actionGetFriendList()
 	{
-		$userType = UserType::RealUser;
+		$userType = array();
 		
 		if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 		{
@@ -117,7 +117,22 @@ class UsersController extends Controller
 						 LEFT JOIN ' . Users::model()->tableName() . ' u
 						 ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)						  
 						 WHERE (friend1 = '.Yii::app()->user->id.' 
-						 OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
+						 OR friend2 ='.Yii::app()->user->id.') AND status= 1';
+			
+			$userTypeCount = count($userType);
+			
+			if($userTypeCount > 0)
+			{
+				$sqlCount = $sqlCount. ' AND u.userType = "'.$userType[0].'"';
+			}
+			
+			for ($i = 1; $i < $userTypeCount; $i++) {
+				$sqlCount = $sqlCount.' OR u.userType = "'.$userType[$i].'"';
+			}
+			
+			//OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
+			
+			//OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType[0].'" OR u.userType = "'.$userType[1].'"';
 			
 // 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 // 			{
@@ -126,12 +141,25 @@ class UsersController extends Controller
 	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
-			$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+			$sql = 'SELECT u.Id as id, u.realname as Name, u.userType, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 					FROM '. Friends::model()->tableName() . ' f 
 					LEFT JOIN ' . Users::model()->tableName() . ' u
 						ON u.Id = IF(f.friend1 != '.Yii::app()->user->id.', f.friend1, f.friend2)
 					WHERE (friend1 = '.Yii::app()->user->id.' 
-							OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
+							OR friend2='.Yii::app()->user->id.') AND status= 1';
+
+			if($userTypeCount > 0)
+			{
+				$sql = $sql. ' AND u.userType = "'.$userType[0].'"';
+			}
+				
+			for ($i = 1; $i < $userTypeCount; $i++) {
+				$sql = $sql.' OR u.userType = "'.$userType[$i].'"';
+			}			
+			
+			//OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
+			
+			//OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType[0].'" OR u.userType = "'.$userType[1].'"';
 			
 // 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
 // 			{
