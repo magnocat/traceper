@@ -69,6 +69,7 @@ class UploadController extends Controller
 			{
 				$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 				
+				/*
 				$sqlCount = 'SELECT count(*)
 							 FROM '. Upload::model()->tableName() . ' u 
 							 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
@@ -97,6 +98,8 @@ class UploadController extends Controller
 															        'pageSize'=>Yii::app()->params->uploadCountInOnePage,
 																),
 														));		
+				*/
+				$dataProvider = Upload::model()->getRecordList($fileType,Yii::app()->user->id,$friendList);
 			}
 			else
 			{
@@ -130,6 +133,7 @@ class UploadController extends Controller
 				{
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					
+					/*
 					$sqlCount = 'SELECT count(*)
 						 FROM '. Upload::model()->tableName() . ' u
 						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
@@ -169,7 +173,10 @@ class UploadController extends Controller
 														        'pageSize'=>Yii::app()->params->uploadCountInOnePage,
 																'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
 															),
-									));									
+									));	
+
+					*/
+					$dataProvider=Upload::model()->getSearchResult($fileType,Yii::app()->user->id,$friendList,$model->keyword,$model->attributes['keyword']);
 				}				
 			}
 			else
@@ -258,14 +265,19 @@ class UploadController extends Controller
 				}
 
 				if (Yii::app()->user->id != null) 
-				{					
+				{
+					/*					
 					$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
 									(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
 									VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s")', 
 									$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
-					$result = "Unknown Error";
+					
 					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+					*/
+					
+					$result = "Unknown Error";
+					$effectedRows= Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
 					if ($effectedRows == 1)
 					{
 						
@@ -358,6 +370,9 @@ class UploadController extends Controller
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 		$out = '';
 		$dataFetchedTimeKey = "uploadController.dataFetchedTime";
+		
+		$dataReader = NULL;
+		
 		if (isset($_REQUEST['list'])) {
 			if ($_REQUEST['list'] == "onlyUpdated")
 			{
@@ -365,6 +380,8 @@ class UploadController extends Controller
 				if ($time !== false && $time != "")
 				{
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+					
+					/*
 					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 								 FROM '. Upload::model()->tableName() . ' u 
 								 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
@@ -383,14 +400,20 @@ class UploadController extends Controller
 								 		AND unix_timestamp(u.uploadTime) >= '. $time . '
 								 ORDER BY u.Id DESC
 								 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
-						
-					$out = $this->prepareXML($sql, $pageNo, $pageCount, "userList");
+					*/
+					$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,$time);
+					if ($pageCount >= $pageNo && $pageCount != 0) {
+						$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
+					}
+					
+					$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "userList");
 				}
 			}
 		}
 		else {
 
 			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+			/*
 			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
 					 FROM '. Upload::model()->tableName() . ' u 
 					 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR 
@@ -407,22 +430,29 @@ class UploadController extends Controller
 					 	   publicData = 1)
 					 ORDER BY u.Id DESC
 					 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
-
-			$out = $this->prepareXML($sql, $pageNo, $pageCount, "uploadList");
+			*/
+			$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,NULL);
+			if ($pageCount >= $pageNo && $pageCount != 0) {
+				$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
+			}
+			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "uploadList");
 		}
 		echo $out;
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
 
-	private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
+	//private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
+	private function prepareXML($dataReader, $pageNo, $pageCount, $type="userList")
 	{
+		/*
 		$dataReader = NULL;
 		// if page count equal to 0 then there is no need to run query
 		//		echo $sql;
 		if ($pageCount >= $pageNo && $pageCount != 0) {
 			$dataReader = Yii::app()->db->createCommand($sql)->query();
 		}
+		*/
 
 		$str = NULL;
 		$userId = NULL;
