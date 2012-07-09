@@ -135,7 +135,7 @@ if ($dataProvider != null) {
 		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
 										array(\'onclick\'=>CHtml::ajax(
 											array(
-												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'], \'groupType\'=>'.((($userType == UserType::RealStaff) Or ($userType == UserType::GPSStaff))?GroupType::StaffGroup:GroupType::FriendGroup).')),
+												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'], \'groupType\'=>'.$groupType.')),
 												
 					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupSettingsWindow\',	
@@ -182,7 +182,7 @@ if ($dataProvider != null) {
 														 $(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 														 $(\"#friendId\").text(".$data[\'id\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\");
-														 if(\"'.$userType.'\" == 0)
+														 if((".$data[\'userType\']." == \"'.UserType::RealUser.'\") || (".$data[\'userType\']." == \"'.UserType::GPSDevice.'\"))
 														 {
 															 TRACKER.showConfirmationDialog(\"'.$deleteFrienshipQuestion.'\", deleteFriendship);
 														 }

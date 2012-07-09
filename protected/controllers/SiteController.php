@@ -666,12 +666,12 @@ class SiteController extends Controller
 							}
 							else
 							{
-								echo CJSON::encode(array("result"=> "Unknown error"));
+								echo CJSON::encode(array("result"=> "Unknown error 1"));
 							}
 						}
 						else
 						{
-							echo CJSON::encode(array("result"=> "Unknown error"));
+							echo CJSON::encode(array("result"=> "Unknown error 2"));
 						}
 					}
 					catch (Exception $e)
