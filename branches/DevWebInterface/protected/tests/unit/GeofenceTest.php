@@ -26,7 +26,7 @@ class GeofenceTest extends CDbTestCase
 		$description = "test";
 		$userId = 5;
 		
-		
+		Geofence::model()->deleteAll();
 		$this->assertTrue(Geofence::model()->saveGeofence($name,$point1Latitude, $point1Longitude, $point2Latitude, $point2Longitude, $point3Latitude, $point3Longitude,$description,$userId));
 	
 		$rows = Geofence::model()->findAll("name=:name", array(":name"=>$name));

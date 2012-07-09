@@ -21,9 +21,10 @@ class PrivacyGroupsTest extends CDbTestCase
 		$ownerId = "1234";
 		$description = "Testing SaveGroup() in PrivacyGroups.php";
 		
+		PrivacyGroups::model()->deleteAll();
 		$this->assertTrue(PrivacyGroups::model()->saveGroup($name, $type, $ownerId, $description));
 	
-		$rows = PrivacyGroups::model()->findAll("name=:name AND ownerId=:ownerId AND type=:type", array(":name"=>$name, "ownerId"=>$ownerId, "type"=>$type));
+		$rows = PrivacyGroups::model()->findAll("name=:name AND owner=:owner AND type=:type", array(":name"=>$name, "owner"=>$ownerId, "type"=>$type));
 	
 		$this->assertEquals($rows[0]->name, $name);
 		$this->assertEquals($rows[0]->type, $type);
