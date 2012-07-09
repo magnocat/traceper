@@ -44,16 +44,16 @@ class Upload extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('fileType, userId, latitude, longitude, altitude, uploadTime', 'required'),
-			array('fileType, publicData', 'numerical', 'integerOnly'=>true),
-			array('userId', 'length', 'max'=>11),
-			array('latitude', 'length', 'max'=>8),
-			array('longitude', 'length', 'max'=>9),
-			array('altitude', 'length', 'max'=>15),
-			array('description', 'length', 'max'=>255),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('Id, fileType, userId, latitude, longitude, altitude, uploadTime, publicData, description', 'safe', 'on'=>'search'),
+				array('fileType, userId, latitude, longitude, altitude, uploadTime', 'required'),
+				array('fileType, publicData', 'numerical', 'integerOnly'=>true),
+				array('userId', 'length', 'max'=>11),
+				array('latitude', 'length', 'max'=>8),
+				array('longitude', 'length', 'max'=>9),
+				array('altitude', 'length', 'max'=>15),
+				array('description', 'length', 'max'=>255),
+				// The following rule is used by search().
+				// Please remove those attributes that should not be searched.
+				array('Id, fileType, userId, latitude, longitude, altitude, uploadTime, publicData, description', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -65,7 +65,7 @@ class Upload extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'user' => array(self::BELONGS_TO, 'Users', 'userId'),
+				'user' => array(self::BELONGS_TO, 'Users', 'userId'),
 		);
 	}
 
@@ -75,15 +75,15 @@ class Upload extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'Id' => 'ID',
-			'fileType' => 'File Type',
-			'userId' => 'User',
-			'latitude' => 'Latitude',
-			'longitude' => 'Longitude',
-			'altitude' => 'Altitude',
-			'uploadTime' => 'Upload Time',
-			'publicData' => 'Public Data',
-			'description' => 'Description',
+				'Id' => 'ID',
+				'fileType' => 'File Type',
+				'userId' => 'User',
+				'latitude' => 'Latitude',
+				'longitude' => 'Longitude',
+				'altitude' => 'Altitude',
+				'uploadTime' => 'Upload Time',
+				'publicData' => 'Public Data',
+				'description' => 'Description',
 		);
 	}
 
@@ -109,7 +109,158 @@ class Upload extends CActiveRecord
 		$criteria->compare('description',$this->description,true);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
+				'criteria'=>$criteria,
 		));
+	}
+
+
+	public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $publicData, $description) {
+
+		$sql = sprintf('INSERT INTO '
+				. Upload::model()->tableName() .'
+				(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
+				VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s")',
+				$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
+		$result = "Unknown Error";
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+
+		return $effectedRows;
+	}
+
+
+	public function getRecordList($fileType,$userID,$friendList) {
+
+		$sqlCount = 'SELECT count(*)
+		FROM '. Upload::model()->tableName() . ' u
+		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
+		OR userId = '. $userID .' OR
+		publicData = 1)';
+
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
+		FROM '. Upload::model()->tableName() . ' u
+		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
+		userId = '. $userID .' OR
+		publicData = 1)
+		ORDER BY u.Id DESC';
+
+
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id',
+						),
+				),
+				'pagination'=>array(
+						'pageSize'=>Yii::app()->params->uploadCountInOnePage,
+				),
+		));
+
+		return $dataProvider;
+	}
+
+
+	public function getSearchResult($fileType,$userID,$friendList,$keyword,$keywordAttributes) {
+
+		$sqlCount = 'SELECT count(*)
+		FROM '. Upload::model()->tableName() . ' u
+		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+		WHERE (fileType = '.$fileType.') AND (u.userId in ('. $friendList .')
+		OR
+		u.userId = '. $userID .'
+		OR
+		u.publicData = 1 )
+		AND
+		(s.realname like "%'. $keyword .'%"
+		OR
+		u.description like "%'. $keyword.'%")';
+
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		$sql ='SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
+		FROM '. Upload::model()->tableName() . ' u
+		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+		WHERE (fileType = '.$fileType.') AND (u.userId in ('. $friendList .')
+		OR
+		u.userId = '. $userID .'
+		OR
+		u.publicData = 1)
+		AND
+		(s.realname like "%'. $keyword .'%"
+		OR
+		u.description like "%'. $keyword.'%")';
+
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id', 'realname',
+						),
+				),
+				'pagination'=>array(
+						'pageSize'=>Yii::app()->params->uploadCountInOnePage,
+						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$keywordAttributes),
+				),
+		));
+
+		return $dataProvider;
+	}
+
+	public function getUploadCount($fileType,$userID,$friendList,$time) {
+
+		if ($time != NULL)
+		{
+			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+			FROM '. Upload::model()->tableName() . ' u
+			WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
+			OR userId = '. $userID .'
+			OR publicData = 1)
+			AND unix_timestamp(u.uploadTime) >= '. $time;
+		}
+		else
+		{
+			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+			FROM '. Upload::model()->tableName() . ' u
+			WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
+			userId = '. $userID .' OR
+			publicData = 1)';
+		}
+
+		$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		return $pageCount;
+	}
+
+	public function getUploadList($fileType,$userID,$friendList,$time,$offset) {
+		if ($time != NULL)
+		{
+			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+			FROM '. Upload::model()->tableName() . ' u
+			LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+			WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
+			OR userId = '. $userID .'
+			OR publicData = 1)
+			AND unix_timestamp(u.uploadTime) >= '. $time . '
+			ORDER BY u.Id DESC
+			LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+		}
+		else
+		{
+			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+			FROM '. Upload::model()->tableName() . ' u
+			LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+			WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
+			userId = '. $userID .' OR
+			publicData = 1)
+			ORDER BY u.Id DESC
+			LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+		}
+
+		$dataReader = Yii::app()->db->createCommand($sql)->query();
+
+		return $dataReader;
 	}
 }
