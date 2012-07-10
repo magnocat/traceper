@@ -67,10 +67,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private Button recordLiveVideoButton;
 	private MediaRecorder mMediaRecorder;
 	private String videoDirPath = "/sdcard/traceper";
-	private byte[] sps;
-	private byte[] pps;
-	private int startOfDataFrame;
-	
+	private Timer timer;
+
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
 			Log.e(getClass().getSimpleName(), "PICTURE CALLBACK RAW: " + data);  
@@ -156,126 +154,36 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					}
 					recording = false;
 					recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record, 0, 0, 0);
-					appService.stopLiveVideoUploading();
+					//livePartsCount++;
+					appService.addLiveVideoPartsQeue(getLiveVideoPath(), livePartsCount, true);
 					wl.release();
+					timer.cancel();
+					timer.purge();
 				}
 				else{
-					SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-					String sps = preferences.getString(Configuration.PREFERENCE_SPS, null);
-					boolean videoParamsReady = false;
-					String pps = null;
-					int dataPos = 0;
-					if (sps != null) {
-						pps = preferences.getString(Configuration.PREFERENCE_PPS, null);
-						if (pps != null) {
-							dataPos = preferences.getInt(Configuration.PREFERENCE_DATA_POSITION, 0);
-							if (dataPos != 0) {
-								videoParamsReady = true;
-							}
-						}
-					}
-					if (videoParamsReady == true) {
-						
-						if (prepareVideoRecorder(false)) {
-							// Camera is available and unlocked, MediaRecorder is prepared,
-							// now you can start recording
-							mMediaRecorder.start();
-							// inform the user that recording has started
-							recording = true;
-							//      new FileListener(videoPath);
-							//logFileLength();
-							appService.startLiveVideoUploading(getVideoPath(), CameraController.this.sps, CameraController.this.pps, CameraController.this.startOfDataFrame);
-							wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-							wl.acquire();
-							recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record_stop, 0, 0, 0);
-						} else {
-							// prepare didn't work, release the camera
-							releaseMediaRecorder();
-							// inform user
-						}
-					}
-					else {
-						startRecordSampleVideo();				        
+
+					livePartsCount = 0;
+					if (prepareVideoRecorder(getLiveVideoPath())) {
+						// Camera is available and unlocked, MediaRecorder is prepared,
+						// now you can start recording
+						mMediaRecorder.start();
+						// inform the user that recording has started
+						recording = true;
+						//      new FileListener(videoPath);
+						//logFileLength();
+						wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+						wl.acquire();
+						recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record_stop, 0, 0, 0);
+						setUpTimer();				
+
+					} else {
+						// prepare didn't work, release the camera
+						releaseMediaRecorder();
+						// inform user
 					}
 
-				}
-			}
 
-			private void startRecordSampleVideo() {
-				if (prepareVideoRecorder(true)) {
-					// Camera is available and unlocked, MediaRecorder is prepared,
-					// now you can start recording
-					mMediaRecorder.start();
-					// inform the user that recording has started
-					//recording = true;
-					//      new FileListener(videoPath);
-					//logFileLength();
-					wl = pw.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-					wl.acquire();
-				} else {
-					// prepare didn't work, release the camera
-					releaseMediaRecorder();
-					// inform user
 				}
-				
-				TimerTask task = new TimerTask() {
-					Handler handler = new Handler();
-					@Override
-					public void run() {
-						mMediaRecorder.stop();  // stop the recording
-						releaseMediaRecorder(); // release the MediaRecorder object
-						mCamera.lock();
-						try {
-							mCamera.reconnect();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						wl.release();
-						
-						File f = new File(getSampleVideoPath());
-						byte[] buffer = new byte[(int)f.length()];
-						FileInputStream fileInputStream;
-						try {
-							fileInputStream = new FileInputStream(f);
-							fileInputStream.read(buffer);
-							fileInputStream.close();
-							FLVCreator flvCreator = new FLVCreator();
-							flvCreator.prepareVideoParams(buffer);
-							byte[] sps = flvCreator.getSps();
-							byte[] pps = flvCreator.getPps();
-							int startOfDataFrame = flvCreator.getStartOfDataFrame();
-							CameraController.this.sps = sps;
-							CameraController.this.pps = pps;
-							CameraController.this.startOfDataFrame = startOfDataFrame;
-							SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-							editor.putString(Configuration.PREFERENCE_SPS, new String(sps));
-							editor.putString(Configuration.PREFERENCE_PPS, new String(pps));
-							editor.putInt(Configuration.PREFERENCE_DATA_POSITION, startOfDataFrame);
-							editor.commit();
-							
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									recordLiveVideoButton.performClick();
-									
-								}
-							});							
-							
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						
-						
-						
-					}
-				}; 
-				
-				Timer timer = new Timer();
-				timer.schedule(task, 1000);
-				
 			}
 		});
 
@@ -302,7 +210,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					showDialog(DIALOG_ASK_TO_MAKE_VIDEO_PUBLIC);
 				}
 				else {
-					if (prepareVideoRecorder(false)) {
+					if (prepareVideoRecorder(getVideoPath())) {
 						// Camera is available and unlocked, MediaRecorder is prepared,
 						// now you can start recording
 						mMediaRecorder.start();
@@ -318,6 +226,27 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			}
 		});
 
+	}
+
+	private int livePartsCount = 0;
+	private void setUpTimer(){
+		
+		timer = new Timer();
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				String recordedVideo = getLiveVideoPath();
+				livePartsCount++;
+				mMediaRecorder.stop();
+				releaseMediaRecorder();
+				prepareVideoRecorder(getLiveVideoPath());
+				mMediaRecorder.start();
+				appService.addLiveVideoPartsQeue(recordedVideo, livePartsCount, false);
+				
+			}
+		};
+
+		timer.schedule(task, 10000, 10000);
 	}
 
 
@@ -519,7 +448,7 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		uploadThread.start();
 	}
 
-	private boolean prepareVideoRecorder(boolean sample){
+	private boolean prepareVideoRecorder(String videoPath){
 
 		mMediaRecorder = new MediaRecorder();
 
@@ -555,11 +484,9 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 
 		// Step 4: Set output file
-		String videoPath = getVideoPath();
-		if (sample == true) {
-			videoPath = getSampleVideoPath();
-		}
-		
+//		String videoPath = getVideoPath();
+
+
 		mMediaRecorder.setOutputFile(videoPath);
 
 		// Step 5: Set the preview output
@@ -579,15 +506,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	}
 
 
-	private String getSampleVideoPath() {
-		File videoDir = new File(videoDirPath);
-		if (videoDir.exists() == false) {
-			videoDir.mkdir();
-		}
-		return videoDir + "/SampleVideo.mp4";
-	}
-
-
 	private void releaseMediaRecorder(){
 		if (mMediaRecorder != null) {
 			mMediaRecorder.reset();   // clear recorder configuration
@@ -602,6 +520,14 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			mCamera.release();        // release the camera for other applications
 			mCamera = null;
 		}
+	}
+
+	private String getLiveVideoPath(){
+		File videoDir = new File(videoDirPath);
+		if (videoDir.exists() == false) {
+			videoDir.mkdir();
+		}
+		return videoDir + "/liveVideoPath"+livePartsCount+".mp4";
 	}
 
 	private String getVideoPath() 

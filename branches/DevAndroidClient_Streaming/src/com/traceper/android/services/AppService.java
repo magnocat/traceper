@@ -70,6 +70,7 @@ public class AppService extends Service implements IAppService{
 	private boolean isUserAuthenticated = false;
 	private NotificationManager mManager;
 	private static int NOTIFICATION_ID = 0;
+	private ArrayList<UploadFile> pendingLiveVideoParts = new ArrayList<UploadFile>();
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
@@ -79,62 +80,28 @@ public class AppService extends Service implements IAppService{
 		public byte[] image;
 		public boolean isPublic;
 		public String description;
+		private boolean isLastPart = false;
+		private int partIndex = 0;
+		public UploadFile(byte[] data, boolean isPublic, String description, boolean isLastPart, int partIndex) {
+			super();
+			this.image = data;
+			this.isPublic = isPublic;
+			this.description = description;
+			this.isLastPart = isLastPart;
+			this.partIndex = partIndex;
+		}
 		public UploadFile(byte[] data, boolean isPublic, String description) {
 			super();
 			this.image = data;
 			this.isPublic = isPublic;
 			this.description = description;
 		}
-	}
-
-	private class UploadLiveVideo {
-		public String path;
-		public boolean isPublic;
-		public String description;
-		public UploadLiveVideo(String path, boolean isPublic, String description) {
-			super();
-			this.path = path;
-			this.isPublic = isPublic;
-			this.description = description;
-		}
 
 	}
 
-	private class FileListener {
-		private Timer timer;
-		private int offset = 0;
-		private boolean isSyncPacketSent = false;
-		private int uploadKey = 0;
-
-
-		public FileListener(final String fileName, final boolean isPublic, final String description, final Location loc) {
-			timer = new Timer();
-
-			flvCreator.setFile(fileName);
-
-			uploadKey = (int)(System.currentTimeMillis() * Math.random() * 10000);
-
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					boolean isLastPacket = false;
-					if (liveVideoActive == false) 
-					{
-						timer.cancel();
-						isLastPacket = true;
-					}
-					byte[] data = flvCreator.parse();
-					if (data != null) {
-						uploadVideo(data, false, "description", uploadKey, true, isLastPacket);	
-					}
-				}}, 15000, 15000);
-		}
-
-	}
 
 	private UploadFile pendingImage = null;
 	private UploadFile pendingVideo = null;
-	private UploadLiveVideo pendingLiveVideo = null;
 	private final IBinder mBinder = new IMBinder();
 
 	//	private NotificationManager mNM;
@@ -161,6 +128,8 @@ public class AppService extends Service implements IAppService{
 	private Location lastSentLocation;
 	private boolean liveVideoActive;
 	private FLVCreator flvCreator;
+	private Thread uploadLiveVideoThread;
+	private int liveVideoId;
 
 
 	public class IMBinder extends Binder {
@@ -931,14 +900,10 @@ public class AppService extends Service implements IAppService{
 				uploadVideo(pendingVideo.image, pendingVideo.isPublic, pendingVideo.description);
 				pendingVideo = null;
 			}
-			if (pendingLiveVideo != null) {
-				new Thread(){
-					public void run() {
-						new FileListener(pendingLiveVideo.path, pendingLiveVideo.isPublic, pendingLiveVideo.description, lastSentLocation);
-						pendingLiveVideo = null;
-					}
-				}.start();
-
+			if (pendingLiveVideoParts.size() >= 0) {
+				//	uploadVideo(video, publicData, description)
+				uploadLiveVideoParts();
+				
 			}
 		}
 		if (connected == false || result.equals("1") == false){
@@ -947,34 +912,71 @@ public class AppService extends Service implements IAppService{
 	}
 
 
-	public void startLiveVideoUploading(final String videoPath, byte[] sps, byte[] pps, int startOfDataFrame) {
-		this.liveVideoActive = true;
+	public void addLiveVideoPartsQeue(final String videoPath, int partIndex, boolean isLastPart) {
 
-		flvCreator = new FLVCreator();
-		flvCreator.setVideoParams(sps, pps, startOfDataFrame);
+		if (partIndex == 0) {
+			liveVideoId = (int) (System.currentTimeMillis() * Math.random()); 
+		}
+		
+		this.pendingLiveVideoParts.add(new UploadFile(getFileContent(videoPath), false, "LiveVideo", isLastPart, partIndex));
 
-		if (lastSentLocation == null || 
-				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
-			sendLocationNow();
-			pendingLiveVideo = new UploadLiveVideo(videoPath, false, "Live Video");
-			return;
-		}	
-
-		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-
-		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
-
-		notification.setLatestEventInfo(this,
-				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
-
-		mManager.notify(NOTIFICATION_ID , notification);
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				new FileListener(videoPath, false, "Live Video", lastSentLocation);
+		if (pendingLiveVideoParts.size() == 1) {
+			if (lastSentLocation == null || 
+					lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
+				sendLocationNow();
+				return;
 			}
-		};
-		thread.start();
+			uploadLiveVideoParts();
+
+		}
+	}
+
+	private void uploadLiveVideoParts(){
+		
+		if (uploadLiveVideoThread == null || uploadLiveVideoThread.isAlive() == false) 
+		{
+			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+
+			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+
+			notification.setLatestEventInfo(this,
+					getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
+
+			mManager.notify(NOTIFICATION_ID , notification);
+			
+			uploadLiveVideoThread = new Thread() {
+				@Override
+				public void run() {
+					Iterator<UploadFile> videoPartsIterator = pendingLiveVideoParts.iterator();
+					while (videoPartsIterator.hasNext()) {
+						UploadFile file = videoPartsIterator.next();
+						uploadVideo(file.image, file.isPublic, file.description, liveVideoId, true, file.isLastPart, file.partIndex);
+						videoPartsIterator.remove();
+					}
+					
+				}
+			};
+			uploadLiveVideoThread.start();
+		}
+
+	}
+
+	public byte[] getFileContent(String path){
+		File f = new File(path);
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(f);
+			int length = (int)f.length();
+			byte[] buffer = new byte[length];
+			fileInputStream.read(buffer);
+			fileInputStream.close();
+			return buffer;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;				
 	}
 
 	@Override
@@ -984,11 +986,12 @@ public class AppService extends Service implements IAppService{
 
 	@Override
 	public boolean uploadVideo(byte[] video, boolean publicData, String description) {
-		return uploadVideo(video, publicData, description, 0, false, false);
+		return uploadVideo(video, publicData, description, 0, false, false, 0);
 	}
 
 
-	public boolean uploadVideo(byte[] video, boolean publicData, String description, int uniqueId, boolean isLive, boolean isLastPacket) {
+	private boolean uploadVideo(byte[] video, boolean publicData, String description, int uniqueId, boolean isLive, boolean isLastPacket, int partIndex) {
+		//TODO: burası hem canlı video gönderirken hem de çevrimdışı video gönderirken kontrol ediliyor.
 		if (lastSentLocation == null || 
 				lastSentLocation.getTime() + Configuration.LOCATION_TIMEOUT_BEFORE_UPLOADING < System.currentTimeMillis() ){
 			sendLocationNow();
@@ -1004,7 +1007,7 @@ public class AppService extends Service implements IAppService{
 				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
 
 		mManager.notify(NOTIFICATION_ID , notification);
-		String result = sendVideo(video, publicData, description, lastSentLocation, uniqueId, isLive, isLastPacket);
+		String result = sendVideo(video, publicData, description, lastSentLocation, uniqueId, isLive, isLastPacket, partIndex);
 		String notificationText = getString(R.string.upload_failed);
 		boolean operationResult = false;
 		if (result.equals("1")) {
@@ -1018,10 +1021,10 @@ public class AppService extends Service implements IAppService{
 
 	private String sendVideo(byte[] video, boolean publicData, String description, Location loc) {
 
-		return sendVideo(video, publicData, description, loc, 0, false, false);
+		return sendVideo(video, publicData, description, loc, 0, false, false, 0);
 	}
 
-	private String sendVideo(byte[] video, boolean publicData, String description, Location loc, int uniqueId, boolean isLive, boolean isLastPacket) {
+	private String sendVideo(byte[] video, boolean publicData, String description, Location loc, int uniqueId, boolean isLive, boolean isLastPacket, int partIndex) {
 		double latitude = 0;
 		double longitude = 0;
 		double altitude = 0;
@@ -1032,8 +1035,8 @@ public class AppService extends Service implements IAppService{
 		}
 		String params;
 		//		try {
-		String[] name = new String[10];
-		String[] value = new String[10];
+		String[] name = new String[11];
+		String[] value = new String[11];
 		name[0] = "r";
 		name[1] = "latitude";
 		name[2] = "longitude";
@@ -1044,6 +1047,7 @@ public class AppService extends Service implements IAppService{
 		name[7] = "uniqueId";
 		name[8] = "isLive";
 		name[9] = "isLastPacket";
+		name[10] = "partIndex";
 
 		value[0] = "upload/upload";
 		value[1] = String.valueOf(latitude);
@@ -1056,13 +1060,14 @@ public class AppService extends Service implements IAppService{
 		value[4] = String.valueOf(publicDataInt);
 		value[5] = description;
 		value[6] = "1";
-		value[7] = String.valueOf(uniqueId);
+		value[7] = String.format("%11d", uniqueId);
 		if (isLive == true)  value[8] = "1";
 		else value[8] = "0";
 
 		if (isLastPacket == true) value[9] = "1";
 		else value[9] = "0";
-
+		
+		value[10] = String.valueOf(partIndex);
 
 		String httpRes = this.sendHttpRequest(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
