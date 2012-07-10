@@ -50,7 +50,7 @@ public interface IAppService {
 	
 	public JSONObject getUserList();
 	
-	public void startLiveVideoUploading(String videoPath, byte[] sps, byte[] pps, int dataPos);
+	public void addLiveVideoPartsQeue(final String videoPath, int partIndex, boolean isLastPart);
 	
 	public void stopLiveVideoUploading();
 
