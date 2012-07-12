@@ -154,8 +154,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					}
 					recording = false;
 					recordLiveVideoButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_ic_video_record, 0, 0, 0);
-					//livePartsCount++;
-					appService.addLiveVideoPartsQeue(getLiveVideoPath(), livePartsCount, true);
+					livePartsCount++;
+					appService.addLiveVideoPartsQeue(getLiveVideoPath(), livePartsCount-1, true);
 					wl.release();
 					timer.cancel();
 					timer.purge();
@@ -241,11 +241,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 				releaseMediaRecorder();
 				prepareVideoRecorder(getLiveVideoPath());
 				mMediaRecorder.start();
-				appService.addLiveVideoPartsQeue(recordedVideo, livePartsCount, false);
+				appService.addLiveVideoPartsQeue(recordedVideo, livePartsCount-1, false);
 				
 			}
 		};
-
 		timer.schedule(task, 10000, 10000);
 	}
 
