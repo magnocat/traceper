@@ -245,7 +245,14 @@ class UploadController extends Controller
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL
-			&& isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)			
+			&& isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL
+			&& ($_REQUEST['fileType'] == "0" ||
+						($_REQUEST['fileType'] == "1"
+								&& isset($_REQUEST['isLive']) && $_REQUEST['isLive'] != NULL
+								&& isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] != NULL
+								&& isset($_REQUEST['uniqueId']) && $_REQUEST['uniqueId'] != NULL
+								&& isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] != NULL))
+								)
 		{
 			$result = "Upload Error";
 			if ($_FILES["upload"]["error"] == UPLOAD_ERR_OK )
@@ -263,9 +270,28 @@ class UploadController extends Controller
 						$publicData = 1;
 					}
 				}
+				
+				$isLive = 0;
+				$insertToDB = true;
+				$liveKey = 0;
+				
+				if (isset($_REQUEST['isLive']) && $_REQUEST['isLive'] == "1"){
+				
+					$isLive = 1;
+					$insertToDB = false;
+					if (isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] == "0") {
+						$insertToDB = true;
+					}
+					$liveKey = trim($_REQUEST['uniqueId']);
+				}
+				
+				$extension = '.jpg';
+				if ($fileType == 1) {
+					$extension = '.mp4';
+				}
 
-				if (Yii::app()->user->id != null) 
-				{
+				if ($insertToDB == true) {
+				
 					/*					
 					$sql = sprintf('INSERT INTO '
 									. Upload::model()->tableName() .'
@@ -283,10 +309,6 @@ class UploadController extends Controller
 						
 						$result = "Error in moving uploading file";
 						
-						$extension = '.jpg';
-						if ($fileType == 1) {
-							$extension = '.mp4';
-						}
 						$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
 						
 						if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
@@ -301,12 +323,57 @@ class UploadController extends Controller
 							$result = "1";
 						}
 					}
+				}
+				else if ($isLive == 1)
+				{
+					$partIndex = $_REQUEST['partIndex'];
+					if ($_REQUEST['isLastPacket'] == "1"){
+				
+					}
+				
+					$fileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . $extension;
+					if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
+					{
+						$newFileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . '.flv';
+						$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
+						$out = shell_exec($command);
+						$videoId = Upload::model()->getId($liveKey);
+						$previousVideoFileName = Yii::app()->params->uploadPath .'/' . $videoId .'.flv';
+						$this->getCombineFlvVideosCommand($previousVideoFileName, $newFileName);
+				
+						$result = "1";
+					}
 				}		
 			}
 		}
 		echo CJSON::encode(array("result"=> $result));
 		Yii::app()->end();
 
+	}
+	
+	private function getCombineFlvVideosCommand($file1, $file2)
+	{
+		$command = 'yes | ffmpeg -i '.$file1.' -sameq intermediate1.mpg &';
+		$result = shell_exec($command);
+		if ($result == null) {
+			echo $command;
+			echo "result null";
+		}
+		$command = 'yes | ffmpeg -i '. $file2 . ' -sameq intermediate2.mpg &';
+		$result = shell_exec($command);
+		if ($result == null) {
+			echo "result null";
+		}
+		$command = 'yes | cat intermediate1.mpg intermediate2.mpg > intermediate_all.mpg &';
+		$result = shell_exec($command);
+		if ($result == null) {
+			echo "result null";
+		}
+		$command = 'yes | ffmpeg -i intermediate_all.mpg -sameq '. $file1.' &';
+		$result = shell_exec($command);
+		if ($result == null) {
+			echo "result null";
+		}
 	}
 
 	private function getFileName($uploadId, $fileType, $thumb = false)
