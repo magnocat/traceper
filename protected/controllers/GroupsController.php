@@ -91,17 +91,26 @@ class GroupsController extends Controller
 //    				echo 'Code: ', $e->getCode(), "\n";
 				}
 			}
+			else
+			{
+				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;				
+				
+				$this->renderPartial('createGroup',array('model'=>$model, 'groupType'=>$model->groupType), false, $processOutput);
+			}
 			
 			if(Yii::app()->request->isAjaxRequest) 
 			{
 				$processOutput = false;
 			}			
-		}	
+		}
+		else
+		{
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 			
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
-		
-		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);
+			$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);
+		}		
 	}
 	
 	/**
