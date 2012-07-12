@@ -1,4 +1,21 @@
 <?php 
+
+if (isset($groupType)) {
+	if($groupType == GroupType::FriendGroup)
+	{
+		$viewId = 'friendGroupsListView';
+	}
+	else if($groupType == GroupType::StaffGroup)
+	{
+		$viewId = 'staffGroupsListView';
+	}	
+}
+else {
+	$viewId = 'friendGroupsListView';	
+}
+
+
+
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'createGroupWindow',
 	    // additional javascript options for the dialog plugin
@@ -57,6 +74,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#createGroupWindow").dialog("close");
+																			$.fn.yiiGridView.update("'.$viewId.'");
 																			TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")

@@ -10,8 +10,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			'width'=> '280px'      
 	    ),
 	));
-
-	echo "<div id='gridViewId' style='display:none'></div>";
 ?>
 	<div class="form">
 	<?php $form=$this->beginWidget('CActiveForm', array(
@@ -69,7 +67,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#registerNewStaffWindow").dialog("close");
-																			$.fn.yiiGridView.update($("#gridViewId").text());	
+																			$.fn.yiiGridView.update("staffListView");
 																			TRACKER.showMessageDialog("'.Yii::t('site', 'The staff is registered successfully').'");
 																		}
 																		else if(obj.result && obj.result == "Duplicate Entry")
