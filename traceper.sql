@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
   `description` varchar(500) DEFAULT NULL,
   `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`)
+  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`,`type`) 
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=58 ;
 
 -- --------------------------------------------------------
