@@ -915,7 +915,7 @@ public class AppService extends Service implements IAppService{
 	public void addLiveVideoPartsQeue(final String videoPath, int partIndex, boolean isLastPart) {
 
 		if (partIndex == 0) {
-			liveVideoId = (int) (System.currentTimeMillis() * Math.random()); 
+			liveVideoId = (int) ((System.currentTimeMillis()/10000) * Math.random()); 
 		}
 		
 		this.pendingLiveVideoParts.add(new UploadFile(getFileContent(videoPath), false, "LiveVideo", isLastPart, partIndex));
