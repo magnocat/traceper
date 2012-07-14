@@ -67,17 +67,19 @@ class GroupsController extends Controller
 			$model->attributes = $_POST['NewGroupForm'];
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
+				
 				try
 				{
 					if(PrivacyGroups::model()->saveGroup($model->name, $model->groupType, Yii::app()->user->id, $model->description)) // save the change to database
 					{
-						echo CJSON::encode(array("result"=> "1"));
+						echo CJSON::encode(array("result"=> "1", "groupType"=> $model->groupType));
 					}
 					else
 					{
 						echo CJSON::encode(array("result"=> "Unknown error"));
 					}
-					Yii::app()->end();				
+					
+					Yii::app()->end();
 				}
 				catch (Exception $e) 
 				{
@@ -91,26 +93,17 @@ class GroupsController extends Controller
 //    				echo 'Code: ', $e->getCode(), "\n";
 				}
 			}
-			else
-			{
-				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;				
-				
-				$this->renderPartial('createGroup',array('model'=>$model, 'groupType'=>$model->groupType), false, $processOutput);
-			}
-			
+
 			if(Yii::app()->request->isAjaxRequest) 
 			{
 				$processOutput = false;
 			}			
 		}
-		else
-		{
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 			
-			$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);
-		}		
+		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);			
 	}
 	
 	/**
