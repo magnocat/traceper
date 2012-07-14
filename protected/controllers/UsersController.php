@@ -130,15 +130,6 @@ class UsersController extends Controller
 				$sqlCount = $sqlCount.' OR u.userType = "'.$userType[$i].'"';
 			}
 			
-			//OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
-			
-			//OR friend2 ='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType[0].'" OR u.userType = "'.$userType[1].'"';
-			
-// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-// 			{
-// 				$sqlCount = $sqlCount.' AND u.userType = "'.$userType.'"';
-// 			}
-	
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 			$sql = 'SELECT u.Id as id, u.realname as Name, u.userType, f.Id as friendShipId, date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
@@ -156,15 +147,6 @@ class UsersController extends Controller
 			for ($i = 1; $i < $userTypeCount; $i++) {
 				$sql = $sql.' OR u.userType = "'.$userType[$i].'"';
 			}			
-			
-			//OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType.'"';
-			
-			//OR friend2='.Yii::app()->user->id.') AND status= 1 AND u.userType = "'.$userType[0].'" OR u.userType = "'.$userType[1].'"';
-			
-// 			if (isset($_GET['userType']) && $_GET['userType'] != NULL)
-// 			{
-// 				$sql = $sql.' AND u.userType = "'.$userType.'"';
-// 			}			
 			
 			$dataProvider = new CSqlDataProvider($sql, array(
 			    											'totalItemCount'=>$count,
@@ -184,7 +166,12 @@ class UsersController extends Controller
 		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-	//	Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		
+		if(($userType == UserType::RealStaff) || ($userType == UserType::GPSStaff))
+		{
+			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		}
+		
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, true);
 	}
 	
