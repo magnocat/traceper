@@ -30,6 +30,7 @@ return array(
 	'Delete Group Member'=> 'Grup üyeliğini sil',
 	'Do you want to delete this group member?'=> 'Bu üyeyi gruptan silmek istiyor musunuz?',
 	'Group Members' => 'Grup Üyeleri',
+	'View Group Members' => 'Grup Üyelerini Görüntüleyin',
 	'Group Privacy Settings' => 'Grup Gizlilik Ayarları',
 	'Your settings have been saved' => 'Ayarlarınız kaydedilmiştir',
 	'Group Settings' => 'Grup Ayarları',

@@ -61,7 +61,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId)), 
+					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)), 
 														array(
 															'success'=> 'function(result){ 
 																			try {

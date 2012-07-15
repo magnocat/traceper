@@ -120,11 +120,10 @@ class UserPrivacyGroupRelation extends CActiveRecord
 	public function deleteGroupMember($userId,$groupId) {
 		
 		$relationQueryResult = UserPrivacyGroupRelation::model()->find(array('condition'=>'userId=:userId AND groupId=:groupId',
-				'params'=>array(':userId'=>$userId,
-						':groupId'=>$groupId
-				)
-		)
-		);
+																			 'params'=>array(':userId'=>$userId, ':groupId'=>$groupId
+																				)
+																		)
+																		);
 		
 		if($relationQueryResult != null)
 		{
