@@ -38,7 +38,7 @@
 		$viewId = 'userListView';
 		$groupType = GroupType::FriendGroup;
 	}	
-	else if(in_array(UserType::RealStaff, $userType) Or in_array(UserType::GPSUser, $userType))
+	else if(in_array(UserType::RealStaff, $userType) Or in_array(UserType::GPSDevice, $userType))
 	{
 		$viewId = 'staffListView';
 		$groupType = GroupType::StaffGroup;
