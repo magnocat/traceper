@@ -56,25 +56,38 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			$("#lists").show();
 																			$("#tab_view").tabs("select",0);
 																		'.
-
 																		CHtml::ajax(
 																			array(
-																			'url'=>$this->createUrl('users/getFriendList'),
+																			'url'=>$this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))),
 																			'update'=>'#users_tab',
 																			)
 																		)
 																		. '  '.
 																		CHtml::ajax(
 																			array(
-																			'url'=> $this->createUrl('image/getList'),
+																			'url'=>$this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
+																			'update'=>'#staff_tab',
+																			)
+																		)
+																		. '  '.														
+																		CHtml::ajax(
+																			array(
+																			'url'=> $this->createUrl('upload/getList', array('fileType'=>0)),
 																			'update'=>'#photos_tab',
 																			)
 																		)
 																		. '  '.
 																		CHtml::ajax(
 																			array(
-																			'url'=> $this->createUrl('groups/getGroupList'),
+																			'url'=> $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
 																			'update'=>'#groups_tab',
+																			)
+																		)
+																		. '  '.														
+																		CHtml::ajax(
+																			array(
+																			'url'=> $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
+																			'update'=>'#staff_groups_tab',
 																			)
 																		)																	
 																		 .'	
@@ -83,7 +96,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			$("#userLoginWindow").dialog("close");
 																			TRACKER.getFriendList(1);	
 		  																	TRACKER.getImageList();
-																		 
 																		}
 																	}
 																	catch (error){
