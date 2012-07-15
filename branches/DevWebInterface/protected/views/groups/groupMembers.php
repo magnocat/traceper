@@ -26,7 +26,7 @@ if ($dataProvider != null)
 																var obj = jQuery.parseJSON(result);
 																if (obj.result && obj.result == "1") 
 																{
-																	$.fn.yiiGridView.update($("groupMembersListView").text());
+																	$.fn.yiiGridView.update("groupMembersListView");
 																}
 																else 
 																{

@@ -88,7 +88,7 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupMembersWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupMembersWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\'Group Members\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'View Group Members').'\')
 					  				 )',		
 		
 		

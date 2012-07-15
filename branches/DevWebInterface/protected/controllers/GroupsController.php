@@ -218,6 +218,9 @@ class GroupsController extends Controller
 					foreach($unselected_groups as $unselectedFriendGroup) //Check for all of the checked groups
 					{
 						$relationQueryResult = UserPrivacyGroupRelation::model()->deleteGroupMember($friendId,$unselectedFriendGroup);
+						
+						//echo $unselectedFriendGroup.' Id group rel deleted </br>';
+						
 						if($relationQueryResult == 1)
 						{
 							//Relation deleted from the traceper_user_group_relation table
@@ -307,7 +310,7 @@ class GroupsController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 		
 		//$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'relationRowsSelectedFriendBelongsTo'=>$relationRowsSelectedFriendBelongsTo, 'friendId'=>$friendId), false, $processOutput);
-		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'friendId'=>$friendId), false, $processOutput);
+		$this->renderPartial('groupSettings',array('model'=>$model, 'groupsOfUser'=>$groupsOfUser, 'friendId'=>$friendId, 'groupType'=>$groupType), false, $processOutput);
 	}	
 	
 	
