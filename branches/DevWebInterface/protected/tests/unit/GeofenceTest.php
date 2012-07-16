@@ -6,7 +6,7 @@ class GeofenceTest extends CDbTestCase
 {
 	
  	public $fixtures=array( 			
- 			'users'=>'Users',
+ 			'geofence'=>'Geofence',
  			);
 	
 	
@@ -49,6 +49,58 @@ class GeofenceTest extends CDbTestCase
 		catch (CDbException $exp){
 			$this->assertTrue(true);
 		}		
+	}
+	
+	public function testGetGeofencesCount()
+	{
+		//save geofences for testing...
+		$this->assertTrue($this->geofence("geofence1")->save());
+		$this->assertTrue($this->geofence("geofence2")->save());
+		$this->assertTrue($this->geofence("geofence3")->save());
+	
+		$this->assertEquals(3, Geofence::model()->getGeofencesCount($this->geofence("geofence1")->userId));
+	}
+	
+	public function testGetGeofences()
+	{
+		//save geofences for testing...
+		$this->assertTrue($this->geofence("geofence1")->save());
+		$this->assertTrue($this->geofence("geofence2")->save());
+		$this->assertTrue($this->geofence("geofence3")->save());
+	
+		$dataProvider = Geofence::model()->getGeofences($this->geofence("geofence1")->userId,3,5);
+		$result=$dataProvider->getData();
+
+		//For first geofence
+		$this->assertEquals($result[0]["Name"], $this->geofence("geofence1")->name);
+		$this->assertEquals($result[0]["Description"], $this->geofence("geofence1")->description);
+		$this->assertEquals($result[0]["Point1Latitude"], $this->geofence("geofence1")->point1Latitude);
+		$this->assertEquals($result[0]["Point1Longitude"], $this->geofence("geofence1")->point1Longitude);
+		$this->assertEquals($result[0]["Point2Latitude"], $this->geofence("geofence1")->point2Latitude);
+		$this->assertEquals($result[0]["Point2Longitude"], $this->geofence("geofence1")->point2Longitude);
+		$this->assertEquals($result[0]["Point3Latitude"], $this->geofence("geofence1")->point3Latitude);
+		$this->assertEquals($result[0]["Point3Longitude"], $this->geofence("geofence1")->point3Longitude);
+		
+		
+		//For second geofence
+		$this->assertEquals($result[1]["Name"], $this->geofence("geofence2")->name);
+		$this->assertEquals($result[1]["Description"], $this->geofence("geofence2")->description);
+		$this->assertEquals($result[1]["Point1Latitude"], $this->geofence("geofence2")->point1Latitude);
+		$this->assertEquals($result[1]["Point1Longitude"], $this->geofence("geofence2")->point1Longitude);
+		$this->assertEquals($result[1]["Point2Latitude"], $this->geofence("geofence2")->point2Latitude);
+		$this->assertEquals($result[1]["Point2Longitude"], $this->geofence("geofence2")->point2Longitude);
+		$this->assertEquals($result[1]["Point3Latitude"], $this->geofence("geofence2")->point3Latitude);
+		$this->assertEquals($result[1]["Point3Longitude"], $this->geofence("geofence2")->point3Longitude);
+		
+		//For third geofence
+		$this->assertEquals($result[2]["Name"], $this->geofence("geofence3")->name);
+		$this->assertEquals($result[2]["Description"], $this->geofence("geofence3")->description);
+		$this->assertEquals($result[2]["Point1Latitude"], $this->geofence("geofence3")->point1Latitude);
+		$this->assertEquals($result[2]["Point1Longitude"], $this->geofence("geofence3")->point1Longitude);
+		$this->assertEquals($result[2]["Point2Latitude"], $this->geofence("geofence3")->point2Latitude);
+		$this->assertEquals($result[2]["Point2Longitude"], $this->geofence("geofence3")->point2Longitude);
+		$this->assertEquals($result[2]["Point3Latitude"], $this->geofence("geofence3")->point3Latitude);
+		$this->assertEquals($result[2]["Point3Longitude"], $this->geofence("geofence3")->point3Longitude);
 	}
 	
 			
