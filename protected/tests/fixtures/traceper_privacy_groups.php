@@ -21,4 +21,11 @@ return array(
 				'name'=>'test3',
 				'description'=>'deneme3',
 		),
+		'user_privacy_group_test'=>array(
+				'Id'=>4,
+				'owner'=>3,
+				'type'=>0,
+				'name'=>'User privacy group test1',
+				'description'=>'User privacy group test',
+		),
 );
