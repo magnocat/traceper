@@ -40,6 +40,7 @@ class GeofenceTest extends WebTestCase
 
 		$this->click("css=#geoFence > img");
 		$this->verifyTextPresent("Geofence points selection disabled");
+
 	}
 
 	public function testSendGeofenceData()
@@ -62,7 +63,7 @@ class GeofenceTest extends WebTestCase
 		$this->click("id=yt0");
 
 		$this->click("css=#geoFence > img");
-		
+
 		sleep(1);
 		$this->click("//div[@id='map']/div/div/div/div[4]/div/div/div[5]");
 		sleep(1);
@@ -79,13 +80,46 @@ class GeofenceTest extends WebTestCase
 			}
 			sleep(1);
 		}
-		
+
 		sleep(1);
 		$this->type("id=NewGeofenceForm_name", "deneme");
 		$this->type("id=NewGeofenceForm_description", "deneme");
 		$this->click("id=yt0");
+
+		/*
+		 //Create geofence with previous name
+		sleep(10);
+		$this->click("css=#geoFence > img");
+		sleep(3);
+		$this->click("css=#geoFence > img");
+		$this->click("//div[@id='map']/div/div/div/div[4]/div/div/div[5]");
+		sleep(1);
+		$this->click("//div[@id='map']/div/div/div/div[4]/div/div/div[9]");
+		sleep(1);
+		$this->click("//div[@id='map']/div/div/div/div[4]/div/div/div[4]");
+		sleep(1);
+
+		for ($second = 0; ; $second++) {
+		if ($second >= 60) $this->fail("timeout");
+		try {
+		if ($this->isElementPresent("id=createGeofenceWindow")) break;
+		} catch (Exception $e) {
+		}
+		sleep(1);
+		}
+
+		sleep(1);
+		$this->type("id=NewGeofenceForm_name", "deneme");
+		$this->type("id=NewGeofenceForm_description", "deneme");
+		$this->click("id=yt0");
+
+		$this->waitForElementPresent("id=ui-dialog-title-messageDialog");
+		$this->verifyTextPresent("A geofence with this name already exists!");
+		$this->click("//button[@type='button']");
+		*/
 	}
-	
+
+
 	public function testUpdateGeofencePrivacy()
 	{
 		$this->open("index-test.php");
@@ -104,6 +138,8 @@ class GeofenceTest extends WebTestCase
 		$this->type("id=LoginForm_email", "test@traceper.com");
 		$this->type("id=LoginForm_password", "12345");
 		$this->click("id=yt0");
+		
+		$this->click("id=geofenceSettingsWindow");
 
 		for ($second = 0; ; $second++) {
 			if ($second >= 60) $this->fail("timeout");
