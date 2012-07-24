@@ -105,4 +105,63 @@ class UserWasHere extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+	
+	
+	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime){
+		$sql = sprintf('INSERT INTO '
+				. $this->tableName() . '
+				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime)
+				VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s")
+				',
+				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime);
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		
+		$result = false;
+		if ($effectedRows == 1) {
+			$result = true;
+		}
+		return $result;		
+	}
+	
+	
+	public function getPastPointsDataProvider($userId, $offset, $itemCount)
+	{
+		$sql = 'SELECT
+					longitude, latitude, deviceId,
+					date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime, 
+					date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+				FROM ' . UserWasHere::model()->tableName() .' u
+				WHERE
+					userId = '. $userId . '
+				ORDER BY
+					Id DESC
+				LIMIT '. $offset . ',' . $itemCount ;
+		
+		// subtract 1 to not get the last location into consideration
+		$sqlPageCount = 'SELECT
+				count(*)
+				FROM '. UserWasHere::model()->tableName() .'
+				WHERE
+				userId = '. $userId;
+		
+		
+		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		
+		
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id', 'Name',
+						),
+				),
+				'pagination'=>array(
+						'pageSize'=>Yii::app()->params->itemCountInOnePage,
+				),
+		));
+		
+		return $dataProvider;
+		
+		
+	}
 }

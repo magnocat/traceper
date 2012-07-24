@@ -54,7 +54,8 @@ class UsersTest extends CDbTestCase
 		
 		//try to register with a wrong formatted email address
 		$this->assertFalse(Users::model()->saveUser("denedeneme.com", "1232424", "deneme traceper", UserType::RealStaff, 0));
-	}
+
+		}
 	
 	
 	public function testUpdateLocation(){
@@ -146,8 +147,8 @@ class UsersTest extends CDbTestCase
 		$this->assertTrue($this->users("user2")->save()); //Id:2
 	
 		//Check whether the method returns null value, when the queried Id does not exist in DB
-		$this->assertNull(Users::model()->deleteUser("0"));
-		$this->assertNull(Users::model()->deleteUser("3"));
+		$this->assertNull(Users::model()->deleteUser("1231310"));
+		$this->assertNull(Users::model()->deleteUser("12323"));
 	}
 
 	public function testDeleteUser()
@@ -158,5 +159,138 @@ class UsersTest extends CDbTestCase
 		//Check whether the method returns true, when the queried Id exists in DB
 		$this->assertTrue(Users::model()->deleteUser($this->users("user1")->Id));
 		$this->assertTrue(Users::model()->deleteUser($this->users("user2")->Id));
+		//TODO: how we can be sure that whether these users are deleted.
 	}	
+	
+	
+	public function testSaveFacebookUser() {
+		$email = "test@test.com";
+		$password = "1231231";
+		$realname = "test";
+		$fbId = "1212121";
+		$accountType = 0;
+		$this->assertTrue(Users::model()->saveFacebookUser($email, $password, $realname, $fbId, $accountType));
+	
+		$rows = Users::model()->findAll("email=:email", array(":email"=>$email));
+	
+		$this->assertEquals(count($rows), 1);
+		$this->assertEquals($rows[0]->email, $email);
+		$this->assertEquals($rows[0]->password, $password);
+		$this->assertEquals($rows[0]->realname, $realname);
+		$this->assertEquals($rows[0]->fb_id, $fbId);
+		$this->assertEquals($rows[0]->account_type, $accountType);
+	
+	
+		try {
+			//try to register same facaebook id and same email address
+			$this->assertFalse(Users::model()->saveFacebookUser($email, "1232424", "deneme traceper", $fbId, 0));
+			$this->assertTrue(false);
+		}
+		catch (CDbException $exp){
+			$this->assertTrue(true);
+		}
+		
+		//try to register same facaebook id differen mail address
+		$this->assertFalse(Users::model()->saveFacebookUser("qerqr@safdsf.com", "1232424", "deneme traceper", $fbId, 0));
+	
+	}
+	//TODO: testSaveGPSUser and testSaveGPUser functions should be written
+	public function testSaveFacebookUserMissingParams(){
+		//try to register with missing parameters
+		$this->assertFalse(Users::model()->saveFacebookUser("", "1232424", "deneme traceper", 123123189, 0));
+		$this->assertFalse(Users::model()->saveFacebookUser("asdf@safdsf.com", "", "deneme traceper", 123123189, 0));
+		$this->assertFalse(Users::model()->saveFacebookUser("asdf@safdsf.com", "1232424", "", 123123189, 0));
+		$this->assertFalse(Users::model()->saveFacebookUser("asdf@safdsf.com", "1232424", "deneme traceper", null, 0));
+		$this->assertFalse(Users::model()->saveFacebookUser("", "", "deneme traceper", 123123189, 0));
+		$this->assertFalse(Users::model()->saveFacebookUser("asdf@safdsf.com", "1232424", "deneme traceper", "", 0));
+		
+		//try to register with a wrong formatted email address
+		$this->assertFalse(Users::model()->saveFacebookUser("asd534fsafdsf.com", "1232424", "deneme traceper", 123123189, 0));
+	}
+	
+	
+	public function testGetListDataProvider(){
+		
+		$id = array(1,3,5,7,8,15,18);
+		
+		$dataProvider = Users::model()->getListDataProvider(implode(",", $id));
+		
+		$this->assertEquals($dataProvider->getTotalItemCount(), count($id));
+		
+		$rows = $dataProvider->getData();
+		for ($i = 0; $i < count($id); $i++) {
+			$this->assertEquals($rows[$i]['id'], $id[$i]);
+		}
+	}
+	
+	public function testGetListDataProvider_userType() {
+		$id = array(1,3,5,7,8,15,18);
+		
+		$userType = array(UserType::RealUser);
+		$dataProvider = Users::model()->getListDataProvider(implode(",", $id), $userType);
+		
+		$rows = $dataProvider->getData();
+		for ($i = 0; $i < count($rows); $i++) {
+			$this->assertEquals($rows[$i]['userType'], UserType::RealUser);
+		}
+		
+		$userType = array(UserType::GPSDevice);
+		$dataProvider = Users::model()->getListDataProvider(implode(",", $id), $userType);
+		
+		$rows = $dataProvider->getData();
+		for ($i = 0; $i < count($rows); $i++) {
+			$this->assertEquals($rows[$i]['userType'], UserType::GPSDevice);
+		}
+		
+		$userType = array(UserType::GPSDevice, UserType::RealUser);
+		$dataProvider = Users::model()->getListDataProvider(implode(",", $id), $userType);
+		
+		$rows = $dataProvider->getData();
+		for ($i = 0; $i < count($rows); $i++) {
+			if ($rows[$i]['userType'] == UserType::GPSDevice ||
+				$rows[$i]['userType'] == UserType::RealUser) {
+				$this->assertTrue(true);
+			}
+			else {
+				$this->assertTrue(false);
+			}
+		}
+		
+	}
+	
+	
+	public function testGetListDataProvider_time() {
+		$id = array(1,3,5,7,8,15,18);
+		$time = time();
+		$date = date('Y-m-d H:i:s', $time);
+ 		$idList = implode(',', $id);
+		$limit = 5;
+ 		
+		$sql = 'UPDATE ' .Users::model()->tableName() . '
+				SET dataArrivedTime = "'. $date.'" 
+				WHERE Id in ('.$idList.')
+				LIMIT '. $limit;
+
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		
+		$time = $time-10;
+		$dataProvider = Users::model()->getListDataProvider(implode(",", $id), null, $time);
+		
+		
+		$this->assertEquals($dataProvider->getTotalItemCount(), $limit); 
+	}
+	
+	
+	//TODO: Problem in offset and limit parameters
+// 	public function testGetListDataProvider_offset_limit(){
+// 		$id = array(1,3,5,7,8,15,18);
+// 		$idList = implode(',', $id);
+// 		$limit = 5;
+// 		$dataProvider = Users::model()->getListDataProvider(implode(",", $id), null, null, null, null);
+// 		$rows = $dataProvider->getData();
+// 		$this->assertEquals(count($rows), $limit);
+// 	}
+	
+	
+	
 }

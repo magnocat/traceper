@@ -6,8 +6,8 @@ class FriendsTest extends CDbTestCase
 {
 	
  	public $fixtures=array( 
- 			'users'=>'Users',
  			'friends'=>'Friends', //For empty friends table
+ 			'users'=>'Users', 			
  			);
 	
 	
@@ -31,6 +31,32 @@ class FriendsTest extends CDbTestCase
 		$this->assertEquals($rows[0]->friend1Visibility, 1);
 		$this->assertEquals($rows[0]->friend2Visibility, 1);
 		$this->assertEquals($rows[0]->status, 1);
+	}
+	
+	public function testDeleteFriendship(){
+		$this->assertTrue(Friends::model()->deleteFriendShip($this->friends['friendship2']['Id'], $this->friends['friendship2']['friend1']));
+		
+		$this->assertFalse(Friends::model()->deleteFriendShip($this->friends['friendship2']['Id'], $this->friends['friendship2']['friend1']));
+	}
+	
+	public function testGetFriendRequestDataProvider(){
+		
+		$dataProvider = Friends::model()->getFriendRequestDataProvider(6, 5);
+		$rows = $dataProvider->getData();
+		
+		for ($i = 0; $i < count($rows); $i++) {
+			$this->assertEquals($rows[$i]['status'], 0);
+		}
+		
+	}
+	
+	public function testApproveFrienship(){
+		$dataProvider = Friends::model()->getFriendRequestDataProvider(6, 5);
+		$rows = $dataProvider->getData();
+		
+		for ($i = 0; $i < count($rows); $i++) {
+			  $this->assertFalse(Friends::model()->approveFriendship($rows[$i]['Id'], $rows[$i]['friend2']));
+		}
 	}
 
 	
