@@ -175,11 +175,13 @@ if ($dataProvider != null) {
     										"onclick"=>"TRACKER.trackUser(".$data["id"].");",
 										))',	
 		),
+		//below line is the first line of onClick...
+		//it is deleted due to refactoring on model and controller side
+		// $(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 		array(            // display 'create_time' using an expression
 					'type' => 'raw',
 		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
 										array("onclick"=>"
-														 $(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 														 $(\"#friendId\").text(".$data[\'id\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\");
 														 if((".$data[\'userType\']." == \"'.UserType::RealUser.'\") || (".$data[\'userType\']." == \"'.UserType::GPSDevice.'\"))
@@ -198,6 +200,10 @@ if ($dataProvider != null) {
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isFriendList || $isFriendRequestList,
 		),
+		    		
+		   //below line is a parameter of Yii::app()->createUrl(\'users/approveFriendShip...
+		   //it is deleted due to refactoring on model and controller side				
+		    		/*, array(\'friendShipId\'=>$data[\'friendShipId\'])*/
 		array(            // display 'create_time' using an expression
 					'type' => 'raw',
 		            'value'=>'(isset($data[\'status\']) && $data[\'status\'] == 0 
@@ -205,7 +211,7 @@ if ($dataProvider != null) {
 									CHtml::link(\'<img src="images/approve.png"  />\', \'#\',
 										array(\'onclick\'=>CHtml::ajax(
 											array(
-												\'url\'=>Yii::app()->createUrl(\'users/approveFriendShip\', array(\'friendShipId\'=>$data[\'friendShipId\'])),
+												\'url\'=>Yii::app()->createUrl(\'users/approveFriendShip\'),
 												\'success\'=> \'function(result) { 
 													try {
 														$("#confirmation").dialog("close");

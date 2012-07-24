@@ -303,7 +303,7 @@ class UploadController extends Controller
 					*/
 					
 					$result = "Unknown Error";
-					$effectedRows= Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
+					$effectedRows= Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
 					if ($effectedRows == 1)
 					{
 						
@@ -317,7 +317,7 @@ class UploadController extends Controller
 								$newFileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . '.flv';
 								$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
 								$out = shell_exec($command);
-								echo $out;
+								//echo $out;
 								
 							}
 							$result = "1";

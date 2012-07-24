@@ -145,4 +145,106 @@ class Friends extends CActiveRecord
 		return $errorOccured;
 	}
 	
+	public function deleteFriendShip($friendShipId, $id) 
+	{
+		//TODO: use delete function not findByPk and then delete
+		$friendShip = Friends::model()->findByPk($friendShipId, array('condition'=>'friend1=:friend1 OR
+				friend2=:friend2',
+				'params'=>array(':friend1'=>$id,
+						':friend2'=>$id,
+				),
+		)
+		);
+		$result = false;
+		if ($friendShip != null && $friendShip->delete()){
+			$result = true;
+		}
+		return $result;
+	}
+	
+	
+	public function getFriendRequestDataProvider($userId, $pageSize) {
+		// we look at the friend2 field because requester id is stored in friend1 field
+		// and only friend who has been requested to be a friend can approve frienship
+		$sqlCount = 'SELECT count(*)
+		FROM '. Friends::model()->tableName() . ' f
+		WHERE friend2 = '.$userId.'
+		AND status= 0';
+		
+		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		
+		/**
+		 * because we use same view in listing users, we put requester field as false
+		 * to make view show approve link,
+		 * requester who make friend request cannot approve request
+		 */
+		$sql = 'SELECT u.Id as id, u.realname as Name, f.Id as friendShipId, f.status,
+					false as requester
+				FROM '. Friends::model()->tableName() . ' f
+				LEFT JOIN ' . Users::model()->tableName() . ' u
+					ON u.Id = f.friend1
+				WHERE friend2='. $userId .' AND status= 0'  ;
+		
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id', 'Name',
+						),
+				),
+				'pagination'=>array(
+						'pageSize'=>$pageSize,
+				),
+		));
+		
+		return $dataProvider;
+	}
+	
+	public function approveFriendShip($friendShipId, $userId) 
+	{
+		// only friend2 can approve friendship because friend1 makes the request
+		$friendShip = $this->findByPk($friendShipId, 
+								array( 'condition'=>'friend2=:friend2 AND status=0',
+										'params'=>array(':friend2'=>$userId,
+												),
+								)
+							);
+		$result = false;
+		if ($friendShip != null)
+		{
+			$friendShip->status = 1;
+			if ($friendShip->save()) {
+				$result = true;
+			}
+		}
+		
+		return $result;
+	}
+	
+	public function addAsFriend($requesterId, $partnerId)
+	{
+		$friend = new Friends();
+		$friend->friend1 = $requesterId;
+		$friend->friend1Visibility = 1; //default visibility setting is visible
+		$friend->friend2 = $partnerId;
+		$friend->friend2Visibility = 1; //default visibility setting is visible
+		$friend->status = 0;
+		$result = false;
+		try
+		{
+			if ($friend->save()) {
+				$result = true;
+			}
+		}
+		catch (Exception $e)
+		{
+			if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+			{
+				$result = null;
+
+			}
+		}
+		return $result;
+	}
+	
 }

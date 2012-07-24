@@ -134,13 +134,13 @@ class Upload extends CActiveRecord
     }
     
     
-    public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $publicData, $description) {
+    public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey) {
     
     	$sql = sprintf('INSERT INTO '
     			. Upload::model()->tableName() .'
-    			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
-    			VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s")',
-    			$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
+    			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description, isLive, liveKey)
+    			VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s", %d, %d)',
+    			$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
     	$result = "Unknown Error";
     	$effectedRows = Yii::app()->db->createCommand($sql)->execute();
     
