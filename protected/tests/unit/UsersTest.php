@@ -280,7 +280,35 @@ class UsersTest extends CDbTestCase
 		$this->assertEquals($dataProvider->getTotalItemCount(), $limit); 
 	}
 	
+	public function testSetUserPositionPublicity()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+		
+		Users::model()->setUserPositionPublicity($this->users("user1")->Id, false);
+		$user=Users::model()->findByPk($this->users("user1")->Id);
+		$this->assertEquals($user->publicPosition, 0);
 	
+		Users::model()->setUserPositionPublicity($this->users("user2")->Id, true);
+		$user=Users::model()->findByPk($this->users("user2")->Id);
+		$this->assertEquals($user->publicPosition, 1);
+	}
+	
+	public function testIsUserPositionPublic()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+
+		$this->assertTrue(Users::model()->isUserPositionPublic($this->users("user1")->Id));
+		$this->assertFalse(Users::model()->isUserPositionPublic($this->users("user2")->Id));		
+		
+		Users::model()->setUserPositionPublicity($this->users("user1")->Id, false);
+		$this->assertFalse(Users::model()->isUserPositionPublic($this->users("user1")->Id));
+		
+		Users::model()->setUserPositionPublicity($this->users("user2")->Id, true);
+		$this->assertTrue(Users::model()->isUserPositionPublic($this->users("user2")->Id));
+	}	
+		
 	//TODO: Problem in offset and limit parameters
 // 	public function testGetListDataProvider_offset_limit(){
 // 		$id = array(1,3,5,7,8,15,18);
