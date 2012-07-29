@@ -10,6 +10,7 @@
  * @property string $latitude
  * @property string $longitude
  * @property string $altitude
+ * @property integer $publicPosition
  * @property string $realname
  * @property string $email
  * @property string $dataArrivedTime
@@ -59,24 +60,24 @@ class Users extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-				array('password, realname, email, account_type', 'required'),
-				array('status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
-				array('password', 'length', 'max'=>32),
-				array('group', 'length', 'max'=>10),
-				array('latitude', 'length', 'max'=>8),
-				array('longitude', 'length', 'max'=>9),
-				array('altitude', 'length', 'max'=>15),
-				array('realname', 'length', 'max'=>80),
-				array('email', 'length', 'max'=>100),
-				//array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
-				array('deviceId', 'length', 'max'=>64),
-				array('status_message', 'length', 'max'=>128),
-				array('fb_id, g_id', 'length', 'max'=>50),
-				array('gp_image', 'length', 'max'=>255),
-				array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
-				// The following rule is used by search().
-				// Please remove those attributes that should not be searched.
-				array('Id, password, group, latitude, longitude, altitude, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
+			array('password, realname, email, account_type', 'required'),
+			array('publicPosition, status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
+			array('password', 'length', 'max'=>32),
+			array('group', 'length', 'max'=>10),
+			array('latitude', 'length', 'max'=>8),
+			array('longitude', 'length', 'max'=>9),
+			array('altitude', 'length', 'max'=>15),
+			array('realname', 'length', 'max'=>80),
+			array('email', 'length', 'max'=>100),
+			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
+			array('deviceId', 'length', 'max'=>64),
+			array('status_message', 'length', 'max'=>128),
+			array('fb_id, g_id', 'length', 'max'=>50),
+			array('gp_image', 'length', 'max'=>255),
+			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -88,11 +89,11 @@ class Users extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-				'traceperFriends' => array(self::HAS_MANY, 'TraceperFriends', 'friend1'),
-				'traceperFriends1' => array(self::HAS_MANY, 'TraceperFriends', 'friend2'),
-				'traceperUploads' => array(self::HAS_MANY, 'TraceperUpload', 'userId'),
-				'traceperUserPrivacyGroupRelations' => array(self::HAS_MANY, 'TraceperUserPrivacyGroupRelation', 'userId'),
-				'traceperUserWasHeres' => array(self::HAS_MANY, 'TraceperUserWasHere', 'userId'),
+			'traceperFriends' => array(self::HAS_MANY, 'TraceperFriends', 'friend1'),
+			'traceperFriends1' => array(self::HAS_MANY, 'TraceperFriends', 'friend2'),
+			'traceperUploads' => array(self::HAS_MANY, 'TraceperUpload', 'userId'),
+			'traceperUserPrivacyGroupRelations' => array(self::HAS_MANY, 'TraceperUserPrivacyGroupRelation', 'userId'),
+			'traceperUserWasHeres' => array(self::HAS_MANY, 'TraceperUserWasHere', 'userId'),
 		);
 	}
 
@@ -102,26 +103,27 @@ class Users extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-				'Id' => 'ID',
-				'password' => 'Password',
-				'group' => 'Group',
-				'latitude' => 'Latitude',
-				'longitude' => 'Longitude',
-				'altitude' => 'Altitude',
-				'realname' => 'Realname',
-				'email' => 'Email',
-				'dataArrivedTime' => 'Data Arrived Time',
-				'deviceId' => 'Device',
-				'status_message' => 'Status Message',
-				'status_source' => 'Status Source',
-				'status_message_time' => 'Status Message Time',
-				'dataCalculatedTime' => 'Data Calculated Time',
-				'fb_id' => 'Fb',
-				'g_id' => 'G',
-				'gender' => 'Gender',
-				'userType' => 'User Type',
-				'account_type' => 'Account Type',
-				'gp_image' => 'Gp Image',
+			'Id' => 'ID',
+			'password' => 'Password',
+			'group' => 'Group',
+			'latitude' => 'Latitude',
+			'longitude' => 'Longitude',
+			'altitude' => 'Altitude',
+			'publicPosition' => 'Public Position',
+			'realname' => 'Realname',
+			'email' => 'Email',
+			'dataArrivedTime' => 'Data Arrived Time',
+			'deviceId' => 'Device',
+			'status_message' => 'Status Message',
+			'status_source' => 'Status Source',
+			'status_message_time' => 'Status Message Time',
+			'dataCalculatedTime' => 'Data Calculated Time',
+			'fb_id' => 'Fb',
+			'g_id' => 'G',
+			'gender' => 'Gender',
+			'userType' => 'User Type',
+			'account_type' => 'Account Type',
+			'gp_image' => 'Gp Image',
 		);
 	}
 
@@ -142,6 +144,7 @@ class Users extends CActiveRecord
 		$criteria->compare('latitude',$this->latitude,true);
 		$criteria->compare('longitude',$this->longitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
+		$criteria->compare('publicPosition',$this->publicPosition);
 		$criteria->compare('realname',$this->realname,true);
 		$criteria->compare('email',$this->email,true);
 		$criteria->compare('dataArrivedTime',$this->dataArrivedTime,true);
@@ -158,13 +161,12 @@ class Users extends CActiveRecord
 		$criteria->compare('gp_image',$this->gp_image,true);
 
 		return new CActiveDataProvider($this, array(
-				'criteria'=>$criteria,
+			'criteria'=>$criteria,
 		));
 	}
-
-
+	
 	public function updateLocation($latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId){
-
+	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
 				SET
@@ -178,61 +180,61 @@ class Users extends CActiveRecord
 				.' 	Id = %d '
 				.' LIMIT 1;',
 				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
-
+	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		return $effectedRows;
 	}
-
+	
 	public function saveUser($email, $password, $realname, $userType, $accountType){
 		$users=new Users;
-
+	
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
 		$users->userType = $userType;
 		$users->account_type = $accountType;
-
+	
 		return $users->save();
 	}
-
+	
 	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
 		$users=new Users;
-
+	
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
 		$users->fb_id = $fb_id;
 		$users->account_type = $accountType;
-
+	
 		return $users->save();
 	}
-
+	
 	public function saveGPUser($email, $password, $realname, $g_id, $accountType, $gp_image){
 		$users=new Users;
-
+	
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
 		$users->g_id = $fb_id;
 		$users->account_type = $accountType;
 		$users->gp_image = $gp_image;
-
+	
 		return $users->save();
 	}
-
+	
 	public function saveGPSUser($deviceID, $password, $realname, $userType, $accountType){
 		$users=new Users;
-
+	
 		$users->email = $deviceID;
 		$users->deviceId = $deviceID;
 		$users->realname = $realname;
 		$users->password = $password;
 		$users->userType = $userType;
 		$users->account_type = $accountType;
-
+	
 		return $users->save();
 	}
-
+	
 	public function changePassword($Id, $password) {
 		$result = false;
 		if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
@@ -240,35 +242,35 @@ class Users extends CActiveRecord
 		}
 		return $result;
 	}
-
+	
 	public function getUserId($email){
 		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$result = null;
-
+	
 		if($user != null)
 		{
 			$result = (int)$user->Id;
 		}
-
+	
 		return $result;
 	}
-
+	
 	public function deleteUser($userId){
 		//TODO: why we dont use deleteByPk
 		$result = null;
 		$user = Users::model()->findByPk($userId);
-
+	
 		if($user != null)
 		{
 			$result = $user->delete();
 		}
-
+	
 		return $result;
 	}
-
+	
 	public function getListDataProvider($IdList, $userType=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
 	{
-		
+	
 		$userTypeSqlPart = '';
 		if ($userType != null) {
 			$userTypeCount = count($userType);
@@ -280,39 +282,39 @@ class Users extends CActiveRecord
 				$userTypeSqlPart .= ' u.userType = "'.$userType[$i].'" ';
 			}
 		}
-
+	
 		$sqlCount = 'SELECT count(*)
-			FROM '.  Users::model()->tableName() . ' u
-			WHERE Id in ('. $IdList.')';
-
+		FROM '.  Users::model()->tableName() . ' u
+		WHERE Id in ('. $IdList.')';
+	
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
-				u.userType, u.deviceId,
-				date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-				date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
-			FROM '.  Users::model()->tableName() . ' u
-			WHERE Id in ('. $IdList.')';
-		
-		
+		u.userType, u.deviceId,
+		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+		FROM '.  Users::model()->tableName() . ' u
+		WHERE Id in ('. $IdList.')';
+	
+	
 		if ($time != null) {
 			$timeSql = ' AND unix_timestamp(u.dataArrivedTime) >= '. $time;
 			$sqlCount .= $timeSql;
 			$sql .= $timeSql;
 		}
-
+	
 		if ($userTypeSqlPart != '') {
 			$sqlCount .= ' AND '. $userTypeSqlPart;
 			$sql .= ' AND ' . $userTypeSqlPart;
 		}
-
-	//	if ($offset !== null && $itemCount !== null) {
-	//		$sql .= ' LIMIT ' . $offset . ' , ' . $itemCount; 
-	//	}
-		
+	
+		//	if ($offset !== null && $itemCount !== null) {
+		//		$sql .= ' LIMIT ' . $offset . ' , ' . $itemCount;
+		//	}
+	
 		$count = $totalItemCount;
 		if ($count == null) {
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		}
-		
+	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -324,26 +326,26 @@ class Users extends CActiveRecord
 						'pageSize'=>$itemCount,
 				),
 		));
-
+	
 		return $dataProvider;
 	}
-
+	
 	
 	public function getSearchUserDataProvider($IdList, $text, $searchIndex, $itemCount)
 	{
 		$sqlCount = 'SELECT count(*)
-					FROM '.  Users::model()->tableName() . ' u
-					WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"' ;
-		
+		FROM '.  Users::model()->tableName() . ' u
+		WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"' ;
+	
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
-				u.userType, u.deviceId,
-				date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-				date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
-				FROM '.  Users::model()->tableName() . ' u
-				WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"';
-		
+		u.userType, u.deviceId,
+		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+		FROM '.  Users::model()->tableName() . ' u
+		WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"';
+	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
-		
+	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -357,13 +359,13 @@ class Users extends CActiveRecord
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
 				),
 		));
-		
+	
 		return $dataProvider;
 	}
-
+	
 	public function getFriendList($Id)
 	{
-
+	
 		//TODO: this function should be moved to Friends model
 		$sql = 'SELECT IF( friend1 != '. $Id.', friend1, friend2 ) as friend '
 		.' FROM ' .  Friends::model()->tableName()
@@ -377,7 +379,18 @@ class Users extends CActiveRecord
 		return $friendsResult;
 	}
 
-
-
-
+	public function setUserPositionPublicity($userId, $isPublic)
+	{
+		$user=Users::model()->findByPk($userId);
+		$user->publicPosition = ($isPublic == true)?1:0;
+	
+		return $user->save();
+	}	
+	
+	public function isUserPositionPublic($userId)
+	{
+		$user=Users::model()->findByPk($userId);
+	
+		return ($user->publicPosition == 1)?true:false;
+	}	
 }
