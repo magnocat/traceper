@@ -2,6 +2,8 @@
 
 class UsersController extends Controller
 {
+	
+	private $dataFetchedTimeKey = "UsersController.dataFetchedTime";
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -183,11 +185,11 @@ class UsersController extends Controller
 		}
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 		$out = '';
-		$dataFetchedTimeKey = "UsersController.dataFetchedTime";
+		
 		if (isset($_REQUEST['list'])) {
 			if ($_REQUEST['list'] == "onlyUpdated")
 			{
-				$time = Yii::app()->session[$dataFetchedTimeKey];
+				$time = Yii::app()->session[$this->dataFetchedTimeKey];
 				if ($time !== null && $time !== false)
 				{
 
@@ -226,7 +228,7 @@ class UsersController extends Controller
 			$out = $this->prepareXML2($dataProvider);
 		}
 		echo $out;
-		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->session[$this->dataFetchedTimeKey] = time();
 		Yii::app()->end();
 	}
 
@@ -276,8 +278,6 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListJson()
 	{
-		$email = $_REQUEST['email'];
-		$password = $_REQUEST['password'];
 		if (!empty($_REQUEST['offset'])){
 			$offset = (int) $_REQUEST['offset'];
 		}else{
@@ -307,7 +307,7 @@ class UsersController extends Controller
 		$out = $this->prepareJson2($dataProvider);	
 
 		echo $out;
-		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->session[$this->dataFetchedTimeKey] = time();
 		Yii::app()->end();
 
 	}
@@ -595,8 +595,15 @@ class UsersController extends Controller
 
 		$str = '';
 		for ($i = 0; $i < $itemCount; $i++) {
+			if ($i > 0)  {
+				$str .= ",";
+			}
 			$str .= $this->getUserJsonItem2($rows[$i]);
+			
 		}
+		$pagination = $dataProvider->getPagination();
+		$currentPage = $pagination->currentPage + 1;
+		$str = '{"users": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
 
 		return $str;
 	}
@@ -798,20 +805,23 @@ class UsersController extends Controller
 	}
 
 	private function getUserJsonItem2($row){
-		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		$row['id'] = isset($row['id']) ? $row['id'] : "";
 		//		$row->username = isset($row->username) ? $row->username : null;
 		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
-		$row['realname'] = isset($row['Name']) ? $row['Name'] : null;
-		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-		$row['message'] = isset($row['message']) ? $row['message'] : null;
-		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
-		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-			
-
+		$row['realname'] = isset($row['Name']) ? $row['Name'] : "";
+		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : "";
+		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : "";
+		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : "";
+		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : "";
+		$row['message'] = isset($row['message']) ? $row['message'] : "";
+		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : "";
+		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : "";
+		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : "";
+		$row['gp_image'] = "";
+		$row['fb_id'] = "";
+		$row['g_id'] = "";
+		$row['account_type'] = "";
+		
 		$bsk=   CJSON::encode( array(
 				'user'=>$row['id'],
 				'isFriend'=>$row['isFriend'],
@@ -829,9 +839,6 @@ class UsersController extends Controller
 				'g_id'=>$row['g_id'],
 				'account_type'=>$row['account_type'],
 		));
-		// '{"userlist":[{"user":"18","isFriend":"g","realname":"17","latitude":"17.000000","longitude":"0.000000","altitude":"0.000000","calculatedTime":"0000-00-00 00:00:00","time":"0000-00-00 00:00:00","message":null,"status_message":null,"deviceId":null}]}';
-
-
 
 		return $bsk;
 	}

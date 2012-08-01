@@ -94,13 +94,42 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.getFriendList = function(pageNo){
 
 		var params = "r=users/getUserListXML&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
+		var jsonparams = "r=users/getUserListJson&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
 		{
 			params += "list=onlyUpdated";
 		}
 
+		
+		TRACKER.ajaxReq(jsonparams, function(result){
+			
+			var obj = $.parseJSON(result);
+			processUsers(MAP, obj.users);
+			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
+			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
+			// to fetched all data reguarly updateFriendListPageNo must be resetted.
+			var updateInt = TRACKER.updateInterval;
+
+			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
+				TRACKER.updateFriendListPageNo = 1;
+				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
+				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;			
+			}
+			else{
+				TRACKER.updateFriendListPageNo++;
+				TRACKER.updateInterval = TRACKER.getUserListInterval;
+			}
+		
+			TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
+  
+			  
+		}, true);
+		
+		
+/*		
 		TRACKER.ajaxReq(params, function(result){
+			
 			if (result != "") {
 				TRACKER.updateFriendListPageNo = TRACKER.getPageNo(result);
 				TRACKER.updateFriendListPageCount = TRACKER.getPageCount(result);
@@ -122,6 +151,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 
 		}, true);
+*/
 	};
 
 	this.getImageList = function(callback){
