@@ -93,14 +93,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.getFriendList = function(pageNo){
 
-		var params = "r=users/getUserListXML&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
+//		var params = "r=users/getUserListXML&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
 		var jsonparams = "r=users/getUserListJson&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
 		{
-			params += "list=onlyUpdated";
+//			params += "list=onlyUpdated";
+			jsonparams += "list=onlyUpdated";
 		}
-
 		
 		TRACKER.ajaxReq(jsonparams, function(result){
 			
@@ -126,32 +126,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			  
 		}, true);
 		
-		
-/*		
-		TRACKER.ajaxReq(params, function(result){
-			
-			if (result != "") {
-				TRACKER.updateFriendListPageNo = TRACKER.getPageNo(result);
-				TRACKER.updateFriendListPageCount = TRACKER.getPageCount(result);
-				processXML(MAP, result);
-				// to fetched all data reguarly updateFriendListPageNo must be resetted.
-				var updateInt = TRACKER.updateInterval;
-
-				if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
-					TRACKER.updateFriendListPageNo = 1;
-					TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-					TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;			
-				}
-				else{
-					TRACKER.updateFriendListPageNo++;
-					TRACKER.updateInterval = TRACKER.getUserListInterval;
-				}
-			
-				TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
-			}
-
-		}, true);
-*/
 	};
 
 	this.getImageList = function(callback){
@@ -223,10 +197,30 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{			
 			TRACKER.clearTraceLines(TRACKER.traceLineDrawedUserId);
 		}		
+//		alert(pageNo + " " + TRACKER.pastPointsPageNo );
 		if (typeof TRACKER.users[userId].polyline == "undefined" ||
 				pageNo > TRACKER.pastPointsPageNo ) 
 		{
-			var params = "r=users/getUserPastPointsXML&userId=" + userId + "&pageNo=" + pageNo;
+//			var params = "r=users/getUserPastPointsXML&userId=" + userId + "&pageNo=" + pageNo;
+		
+			if (pageNo > TRACKER.pastPointsPageCount) {
+				
+			}
+			var jsonparams = "r=users/getUserPastPointsJSON&userId=" + userId + "&page=" + pageNo;
+			
+			TRACKER.ajaxReq(jsonparams, function(result){
+				var obj = $.parseJSON(result);
+
+				TRACKER.pastPointsPageNo =  obj.pageNo;
+				TRACKER.pastPointsPageCount =  obj.pageCount;
+				
+				var str = processUserPastLocations(MAP, obj.userwashere, userId);
+
+				if (typeof callback == "function") {
+					callback();
+				}
+			});
+/*			
 			TRACKER.ajaxReq(params, function(result){
 				TRACKER.pastPointsPageNo =  Number(TRACKER.getPageNo(result));
 				TRACKER.pastPointsPageCount =  Number(TRACKER.getPageCount(result));
@@ -236,8 +230,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (typeof callback == "function") {
 					callback();
 				}
-
 			});
+*/			
 		}
 		else {			
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
@@ -337,7 +331,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			if (nextMarkerIndex == "1") {
 				TRACKER.pastPointsPageNo = 0;
 			}
-			var reqPageNo = TRACKER.pastPointsPageNo + 1;
+			var reqPageNo = Number(TRACKER.pastPointsPageNo) + 1;
 			TRACKER.drawTraceLine(userId, reqPageNo, function(){
 				// if it goes into this if statement it means that there is no available
 				// past point in database

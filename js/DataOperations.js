@@ -98,6 +98,101 @@ function processUserPastLocationsXML (MAP, xml) {
 	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
 }
 
+function processUserPastLocations(MAP, locations, userId){
+	var pastPoints = []; 
+	var mapMarker = [];
+//	var index = TRACKER.users[userId].mapMarker.length;
+
+	$.each(locations, function(key, value){
+		//var location = $(this);
+		var latitude = value.latitude;
+		var longitude = value.longitude;
+		var altitude = value.altitude;
+		var time = value.time;
+		var deviceId = value.deviceId;
+
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		pastPoints.push(point);
+
+		var gmarker = MAP.putMarker(point);
+		var iWindow = MAP.initializeInfoWindow();
+		var markerInfoWindow = new MapStruct.MapMarker({marker:gmarker, infoWindow:iWindow});
+
+
+		MAP.setMarkerClickListener(gmarker,function (){
+
+			var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
+			var previousGMarkerIndex = tr + 1; // it is reverse because 
+			var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+			// attention similar function is used in 
+			// processXML function				
+			var content =
+				"<div>" 
+				+ "<b>" + TRACKER.users[userId].realname + "</b> " 
+				+ TRACKER.langOperator.wasHere 
+				+ '<br/>' + TRACKER.langOperator.time + ": " + time
+				+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
+				+ "</div>"
+				+ '<ul class="sf-menu"> '
+				+ "<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +','+ previousGMarkerIndex +','+ userId +')">'
+				+ TRACKER.langOperator.previousPoint 
+				+'</a>'
+				+ "</li>"
+				+ "<li>"
+				+"<a href='#' class='infoWinOperations'>" 
+				+ TRACKER.langOperator.operations
+				+"</a>"
+				+"<ul>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoom 
+				+'</a>' 		
+				+"</li>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoomMax
+				+'</a>'
+				+"</li>"
+				+"<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.clearTraceLines('+ userId +')">'
+				+ TRACKER.langOperator.clearTraceLines
+				+'</a>'
+				+"</li>"
+				+"</ul>"
+				+ "</li>"
+				+ "<li>"
+				+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +',' + nextGMarkerIndex +','+ userId +')">'
+				+ TRACKER.langOperator.nextPoint 
+				+'</a>'
+				+ "</li>"
+				+"</ul>";
+			MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow,content);			
+			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
+		});
+
+//		index++;
+		mapMarker.push(markerInfoWindow)
+	});
+
+	if (typeof TRACKER.users[userId].polyline == "undefined") 
+	{
+		var firstPoint = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
+		TRACKER.users[userId].polyline = MAP.initializePolyline();
+		MAP.addPointToPolyline(TRACKER.users[userId].polyline,firstPoint);
+	}
+	
+	var len = pastPoints.length;
+	var i;
+	for (i = 0; i < len; i++){
+		MAP.addPointToPolyline(TRACKER.users[userId].polyline,pastPoints[i]);
+	}
+	
+	var tmp = TRACKER.users[userId].mapMarker;		
+	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
+	
+}
+
 /**
  * this function process users arrayy returned when actions are search user, get user list, update list,
  * updated list...

@@ -124,7 +124,7 @@ class UserWasHere extends CActiveRecord
 	}
 	
 	
-	public function getPastPointsDataProvider($userId, $offset, $itemCount)
+	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)
 	{
 		$sql = 'SELECT
 					longitude, latitude, deviceId,
@@ -134,11 +134,10 @@ class UserWasHere extends CActiveRecord
 				WHERE
 					userId = '. $userId . '
 				ORDER BY
-					Id DESC
-				LIMIT '. $offset . ',' . $itemCount ;
+					Id DESC';
 		
 		// subtract 1 to not get the last location into consideration
-		$sqlPageCount = 'SELECT
+		$sqlCount = 'SELECT
 				count(*)
 				FROM '. UserWasHere::model()->tableName() .'
 				WHERE
@@ -147,7 +146,7 @@ class UserWasHere extends CActiveRecord
 		
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		
-		
+		$pageNo = $pageNo - 1;
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -156,7 +155,7 @@ class UserWasHere extends CActiveRecord
 						),
 				),
 				'pagination'=>array(
-						'pageSize'=>Yii::app()->params->itemCountInOnePage,
+						'pageSize'=>$itemCount,
 				),
 		));
 		
