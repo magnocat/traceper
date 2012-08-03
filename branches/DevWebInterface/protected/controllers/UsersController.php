@@ -170,68 +170,6 @@ class UsersController extends Controller
 	}
 
 
-
-	/**
-	 * this function returns users and images in xml format
-	 */
-	public function actionGetUserListXML()
-	{
-		//if (Yii::app()->user->isGuest) {
-		//return;
-		//}
-		$pageNo = 1;
-		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
-			$pageNo = (int) $_REQUEST['pageNo'];
-		}
-		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
-		$out = '';
-		
-		if (isset($_REQUEST['list'])) {
-			if ($_REQUEST['list'] == "onlyUpdated")
-			{
-				$time = Yii::app()->session[$this->dataFetchedTimeKey];
-				if ($time !== null && $time !== false)
-				{
-
-					$friendCount = $this->getFriendCount() + 1; // +1 is for herself
-					$friendIdList = $this->getFriendIdList();
-
-					if ($friendIdList != -1) {
-						$friendIdList .= ',' . Yii::app()->user->id;
-					}
-					else {
-						$friendIdList = Yii::app()->user->id;
-					}
-
-					$dataProvider = Users::model()->getListDataProvider($this->getFriendIdList(), null, $time, $offset, Yii::app()->params->itemCountInDataListPage);
-					$out = $this->prepareXML2($dataProvider);
-				}
-
-			}
-		}
-		else {
-
-			$friendCount = $this->getFriendCount() + 1; // +1 is for herself
-			$pageCount = ceil($friendCount / Yii::app()->params->itemCountInDataListPage);
-
-			$friendIdList = $this->getFriendIdList();
-
-			if ($friendIdList != -1) {
-				$friendIdList .= ',' . Yii::app()->user->id;
-			}
-			else {
-				$friendIdList = Yii::app()->user->id;
-			}
-
-			$dataProvider = Users::model()->getListDataProvider($friendIdList, null, null, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
-			//$out = $this-> prepareXML($sql, $pageNo, $pageCount, "userList");
-			$out = $this->prepareXML2($dataProvider);
-		}
-		echo $out;
-		Yii::app()->session[$this->dataFetchedTimeKey] = time();
-		Yii::app()->end();
-	}
-
 	public function actionGetUserInfo()
 	{
 		$out = "Missing parameter";
@@ -246,7 +184,6 @@ class UsersController extends Controller
 				$dataProvider = Users::model()->getListDataProvider(array($userId), null, null, 0, 1, 1);
 				$out = $this->prepareXML2($dataProvider);
 			}
-
 		}
 
 		echo $out;
@@ -277,32 +214,32 @@ class UsersController extends Controller
 	 * Enter description here ...
 	 */
 	public function actionGetUserListJson()
-	{
-		if (!empty($_REQUEST['offset'])){
-			$offset = (int) $_REQUEST['offset'];
-		}else{
-			$offset = 0;
+	{	
+		$pageNo = 1;
+		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+			$pageNo = (int) $_REQUEST['pageNo'];
 		}
-		if(!empty($_REQUEST['range'])){
-			$range= (int) $_REQUEST['range'];
-		}else{
-			$range=29;
-		}
+		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 
-			
+		
 		$friendCount = $this->getFriendCount() + 1; // +1 is for herself
-
+		
 			
 		$friendIdList = $this->getFriendIdList();
-
+		
 		if ($friendIdList != -1) {
 			$friendIdList .= ',' . Yii::app()->user->id;
 		}
 		else {
 			$friendIdList = Yii::app()->user->id;
 		}
+		
+		$time = null;
+		if (isset($_REQUEST['list']) && $_REQUEST['list'] == "onlyUpdated") {
+			$time = Yii::app()->session[$this->dataFetchedTimeKey];
+		}	
 
-		$dataProvider = Users::model()->getListDataProvider($friendIdList, null, null, $offset, $range, $friendCount);
+		$dataProvider = Users::model()->getListDataProvider($friendIdList, null, $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
 		
 		$out = $this->prepareJson2($dataProvider);	
 
@@ -312,7 +249,7 @@ class UsersController extends Controller
 
 	}
 
-	public function actionGetUserPastPointsXML(){
+	public function actionGetUserPastPointsJSON(){
 
 		if (isset($_REQUEST['userId']))
 		{
@@ -321,32 +258,11 @@ class UsersController extends Controller
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int) $_REQUEST['pageNo'];
 			}
+			
 			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 			$offset++;  // to not get the last location
 
-			$dataProvider = UserWasHere::model()->getPastPointsDataProvider($userId, $offset, Yii::app()->params->itemCountInDataListPage);	
-
-			$out = $this->preparePastPointsXML($dataProvider, $userId);
-		}
-		echo $out;
-	}
-	public function actionGetUserPastPointsJSON(){
-
-		if (isset($_REQUEST['userId']))
-		{
-			$userId = (int) $_REQUEST['userId'];
-			if (!empty($_REQUEST['offset'])){
-				$offset = (int) $_REQUEST['offset'];
-			}else{
-				$offset = 0;
-			}
-			if(!empty($_REQUEST['range'])){
-				$range= (int) $_REQUEST['range'];
-			}else{
-				$range=29;
-			}
-
-			$dataProvider = UserWasHere::model()->getPastPointsDataProvider($userId, $offset, $range);
+			$dataProvider = UserWasHere::model()->getPastPointsDataProvider($userId, $pageNo, Yii::app()->params->itemCountInDataListPage);
 				
 			$out = $this->preparePastPointsJson($dataProvider);
 		}
@@ -507,87 +423,6 @@ class UsersController extends Controller
 		return $this->addXMLEnvelope($pagination->currentPage+1, $pagination->pageCount, $str, "");
 	}
 	
-	private function preparePastPointsXML($dataProvider, $userId) {
-		$rows = $dataProvider->getData();
-		$itemCount = count($rows);
-		
-		$str = '';
-		for ($i = 0; $i < $itemCount; $i++) {
-			$rows[$i]['latitude'] = isset($rows[$i]['latitude']) ? $rows[$i]['latitude'] : null;
-			$rows[$i]['longitude'] = isset($rows[$i]['longitude']) ? $rows[$i]['longitude'] : null;
-			$rows[$i]['altitude'] = isset($rows[$i]['altitude']) ? $rows[$i]['altitude'] : null;
-			$rows[$i]['dataArrivedTime'] = isset($rows[$i]['dataArrivedTime']) ? $rows[$i]['dataArrivedTime'] : null;
-			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
-			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
-			
-			$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" calculatedTime="' . $row['dataCalculatedTime'] . '" >'
-			.'<time>'. $row['dataArrivedTime'] .'</time>'
-			.'<deviceId>'. $row['deviceId'] .'</deviceId>'
-			.'</location>';
-		}
-		$extra = "";
-		if ($userId != NULL) {
-			$extra = ' userId="' . $userId .'"';
-		}
-		$pagination = $dataProvider->getPagination();
-		return $this->addXMLEnvelope($pagination->currentPage+1, $pagination->pageCount, $str, $extra);
-	}
-
-	private function prepareXML($sql, $pageNo, $pageCount, $type="userList", $userId=NULL, $dataProvider = null)
-	{
-		$dataReader = NULL;
-		// if page count equal to 0 then there is no need to run query
-		//		echo $sql;
-		if ($pageCount >= $pageNo && $pageCount != 0) {
-			$dataReader = Yii::app()->db->createCommand($sql)->query();
-		}
-
-
-		$str = NULL;
-		if ($dataReader != NULL )
-		{
-			if ($type == "userList")
-			{
-				while ( $row = $dataReader->read() )
-				{
-					$str .= $this->getUserXMLItem($row);
-				}
-			}
-			else if ($type == "userPastLocations")
-			{
-				while ( $row = $dataReader->read() )
-				{
-					$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-					$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-
-
-					$str .= '<location latitude="'.$row['latitude'].'"  longitude="'. $row['longitude'] .'" altitude="'.$row['altitude'].'" calculatedTime="' . $row['dataCalculatedTime'] . '" >'
-					.'<time>'. $row['dataArrivedTime'] .'</time>'
-					.'<deviceId>'. $row['deviceId'] .'</deviceId>'
-					.'</location>';
-				}
-			}
-		}
-
-
-		$extra = "";
-		if ($type == "userPastLocations" && $userId != NULL) {
-			$extra = ' userId="' . $userId .'"';
-		}
-		$pageNo = $pageCount == 0 ? 0 : $pageNo;
-		/*		$out = '<?xml version="1.0" encoding="UTF-8"?>'
-		 //				.'<page '. $pageStr . ' >'
-		//					. $str
-		//			   .'</page>';
-		*/
-		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
-	}
-
-
 	private function prepareJson2($dataProvider){
 
 		$rows = $dataProvider->getData();
@@ -646,6 +481,9 @@ class UsersController extends Controller
 			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
 			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
 			
+			if ($i > 0) {
+				$str .= ',';
+			}
 			
 			$str .= CJSON::encode(array(
 						'latitude'=>$rows[$i]['latitude'],
@@ -654,9 +492,12 @@ class UsersController extends Controller
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
 						'time'=>$rows[$i]['dataArrivedTime'],
 						'deviceId'=>$rows[$i]['deviceId'],
-				)).',';
+				));
 		}
-		$str='{"userwashere":['.$str.']}';
+		
+		$pagination = $dataProvider->getPagination();
+		$currentPage = $pagination->currentPage + 1;
+		$str='{"userwashere":['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
 		return $str;
 		
 	}
@@ -843,37 +684,6 @@ class UsersController extends Controller
 		return $bsk;
 	}
 
-	private function getUserXMLItem($row)
-	{
-		$row['id'] = isset($row['id']) ? $row['id'] : null;
-		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : null;
-		//		$row->username = isset($row->username) ? $row->username : null;
-		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
-		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
-		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-		$row['message'] = isset($row['message']) ? $row['message'] : null;
-		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
-		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-			
-
-		$str = '<user>'
-		. '<Id isFriend="'.$row['isFriend'].'">'. $row['id'] .'</Id>'
-		//		. '<username>' . $row->username . '</username>'
-		. '<fb_id>' . $row['fb_id'] . '</fb_id>'
-		. '<realname>' . $row['realname'] . '</realname>'
-		. '<location latitude="' . $row['latitude'] . '"  longitude="' . $row['longitude'] . '" altitude="' . $row['altitude'] . '" calculatedTime="' . $row['dataCalculatedTime'] . '"/>'
-		. '<time>' . $row['dataArrivedTime'] . '</time>'
-		. '<message>' . $row['message'] . '</message>'
-		. '<status_message>' . $row['status_message'] . '</status_message>'
-		. '<deviceId>' . $row['deviceId'] . '</deviceId>'
-		.'</user>';
-
-		return $str;
-	}
 
 	private function getUserXMLItem2($row)
 	{
