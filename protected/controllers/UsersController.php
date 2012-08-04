@@ -169,26 +169,6 @@ class UsersController extends Controller
 		return Yii::app()->session['friendList'];
 	}
 
-
-	public function actionGetUserInfo()
-	{
-		$out = "Missing parameter";
-		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
-
-			$userId = (int) $_REQUEST['userId'];
-
-			$friendArray = $this->getFriendArray();
-			$out = "No permission to get this user location";
-			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
-			{
-				$dataProvider = Users::model()->getListDataProvider(array($userId), null, null, 0, 1, 1);
-				$out = $this->prepareXML2($dataProvider);
-			}
-		}
-
-		echo $out;
-		Yii::app()->end();
-	}
 	public function actionGetUserInfoJSON()
 	{
 		$out = "Missing parameter";
@@ -201,7 +181,7 @@ class UsersController extends Controller
 			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
 			{
 				$dataProvider = Users::model()->getListDataProvider(array($userId), null, null, 0, 1, 1);
-				$out = $this->prepareJson2($dataProvider);
+				$out = $this->prepareJson($dataProvider);
 			}
 
 		}
@@ -220,10 +200,8 @@ class UsersController extends Controller
 			$pageNo = (int) $_REQUEST['pageNo'];
 		}
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
-
 		
 		$friendCount = $this->getFriendCount() + 1; // +1 is for herself
-		
 			
 		$friendIdList = $this->getFriendIdList();
 		
@@ -241,7 +219,7 @@ class UsersController extends Controller
 
 		$dataProvider = Users::model()->getListDataProvider($friendIdList, null, $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
 		
-		$out = $this->prepareJson2($dataProvider);	
+		$out = $this->prepareJson($dataProvider);	
 
 		echo $out;
 		Yii::app()->session[$this->dataFetchedTimeKey] = time();
@@ -351,6 +329,8 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('userListDialog',array('dataProvider'=>$dataProvider), false, true);
 	}
+	
+	
 	public function actionGetFriendRequestListJson(){		
 		
 		$dataProvider = Friends::model()->getFriendRequestDataProvider(Yii::app()->user->id, Yii::app()->params->itemCountInOnePage);
@@ -408,22 +388,8 @@ class UsersController extends Controller
 		));
 		Yii::app()->end();
 	}
-
-	private function prepareXML2($dataProvider) {
-
-		$rows = $dataProvider->getData();
-		$itemCount = count($rows);
-
-		$str = '';
-		for ($i = 0; $i < $itemCount; $i++) {
-			$str .= $this->getUserXMLItem2($rows[$i]);
-		}
-
-		$pagination = $dataProvider->getPagination();
-		return $this->addXMLEnvelope($pagination->currentPage+1, $pagination->pageCount, $str, "");
-	}
 	
-	private function prepareJson2($dataProvider){
+	private function prepareJson($dataProvider){
 
 		$rows = $dataProvider->getData();
 		$itemCount = count($rows);
@@ -433,17 +399,17 @@ class UsersController extends Controller
 			if ($i > 0)  {
 				$str .= ",";
 			}
-			$str .= $this->getUserJsonItem2($rows[$i]);
+			$str .= $this->getUserJsonItem($rows[$i]);
 			
 		}
 		$pagination = $dataProvider->getPagination();
 		$currentPage = $pagination->currentPage + 1;
-		$str = '{"users": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
+		$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
 
 		return $str;
 	}
 	
-	private function prepareSearchUserResultJson($dataProvider){
+	private function prepareSearchUserResultJson($dataProvider) {
 		$rows = $dataProvider->getData();
 		$itemCount = count($rows);
 		
@@ -502,150 +468,7 @@ class UsersController extends Controller
 		
 	}
 
-	public function PrepareJson($sql, $type, $userId=NULL)
-	{
-
-
-		$dataReader = Yii::app()->db->createCommand($sql)->query();
-
-
-
-		$str = NULL;
-		if ($dataReader != NULL )
-		{
-			if ($type == "userList")
-			{
-
-				while ( $row = $dataReader->read() )
-				{
-					//$row = $dataReader->read();
-					$str .= $this->getUserJsonItem($row).',';
-				}
-				$str='{"userlist":['.$str.']}';
-					
-				/*
-				 $JSON["userlist"]=array();
-
-				array_push($JSON["userlist"],$str);
-
-				$str= json_encode($JSON);
-				*/
-			}
-			else if ($type == "userSearch")
-			{
-				while ( $row = $dataReader->read() )
-				{
-					$row['id'] = isset($row['id']) ? $row['id'] : null;
-					$row['Name'] = isset($row['Name']) ? $row['Name'] : null;
-
-					$str .= CJSON::encode(array(
-							'id'=>$row['id'],
-							'Name'=>$row['Name'],
-							'gp_image'=>$row['gp_image'],
-							'fb_id'=>$row['fb_id'],
-							'g_id'=>$row['g_id'],
-							'account_type'=>$row['account_type'],
-							'status'=>$row['status'],
-							'friendShipId'=>$row['friendShipId'],
-					)).',';
-				}
-
-				$str='{"userSearch":['.$str.']}';
-
-			}
-			else if ($type == "userInfo")
-			{
-
-				$row = $dataReader->read();
-				$str .= $this->getUserJsonItem($row);
-					
-
-			}
-			else if ($type == "userPastLocations")
-			{
-				while ( $row = $dataReader->read() )
-				{
-					$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-					$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-					$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-					$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-					$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-					$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-
-
-					$str .= CJSON::encode(array(
-							'latitude'=>$row['latitude'],
-							'longitude'=>$row['longitude'],
-							'altitude'=>$row['altitude'],
-							'calculatedTime'=>$row['dataCalculatedTime'],
-							'time'=>$row['dataArrivedTime'],
-							'deviceId'=>$row['deviceId'],
-					)).',';
-
-				}
-				$str='{"userwashere":['.$str.']}';
-			}
-		}
-
-
-		$out =$str;
-		return $out;
-
-	}
-
-	private function addXMLEnvelope($pageNo, $pageCount, $str, $extra = ""){
-			
-		$pageStr = 'pageNo="'.$pageNo.'" pageCount="' . $pageCount .'"' ;
-
-		header("Content-type: application/xml; charset=utf-8");
-		$out = '<?xml version="1.0" encoding="UTF-8"?>'
-		.'<page '. $pageStr . '  '. $extra .' >'
-		. $str
-		.'</page>';
-
-		return $out;
-	}
-
-	private function getUserJsonItem($row){
-		$row['id'] = isset($row['id']) ? $row['id'] : null;
-		//		$row->username = isset($row->username) ? $row->username : null;
-		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
-		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
-		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-		$row['message'] = isset($row['message']) ? $row['message'] : null;
-		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
-		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-			
-
-		$bsk=   CJSON::encode( array(
-				'user'=>$row['id'],
-				'isFriend'=>$row['isFriend'],
-				'realname'=>$row['realname'],
-				'latitude'=>$row['latitude'],
-				'longitude'=>$row['longitude'],
-				'altitude'=>$row['altitude'],
-				'calculatedTime'=>$row['dataCalculatedTime'],
-				'time'=>$row['dataArrivedTime'],
-				'message'=>$row['message'],
-				'status_message'=>$row['status_message'],
-				'deviceId'=>$row['deviceId'],
-				'gp_image'=>$row['gp_image'],
-				'fb_id'=>$row['fb_id'],
-				'g_id'=>$row['g_id'],
-				'account_type'=>$row['account_type'],
-		));
-		// '{"userlist":[{"user":"18","isFriend":"g","realname":"17","latitude":"17.000000","longitude":"0.000000","altitude":"0.000000","calculatedTime":"0000-00-00 00:00:00","time":"0000-00-00 00:00:00","message":null,"status_message":null,"deviceId":null}]}';
-
-
-
-		return $bsk;
-	}
-
-	private function getUserJsonItem2($row){
+	private function getUserJsonItem($row) {
 		$row['id'] = isset($row['id']) ? $row['id'] : "";
 		//		$row->username = isset($row->username) ? $row->username : null;
 		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
@@ -683,40 +506,4 @@ class UsersController extends Controller
 
 		return $bsk;
 	}
-
-
-	private function getUserXMLItem2($row)
-	{
-		$row['id'] = isset($row['id']) ? $row['id'] : null;
-		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : null;
-		//		$row->username = isset($row->username) ? $row->username : null;
-		$row['isFriend'] = isset($row['isFriend']) ? $row['isFriend'] : 0;
-		$row['realname'] = isset($row['Name']) ? $row['Name'] : null;
-		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
-		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
-		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
-		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : null;
-		$row['message'] = isset($row['message']) ? $row['message'] : null;
-		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : null;
-		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : null;
-		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : null;
-			
-
-		$str = '<user>'
-		. '<Id isFriend="'.$row['isFriend'].'">'. $row['id'] .'</Id>'
-		//		. '<username>' . $row->username . '</username>'
-		. '<fb_id>' . $row['fb_id'] . '</fb_id>'
-		. '<realname>' . $row['realname'] . '</realname>'
-		. '<location latitude="' . $row['latitude'] . '"  longitude="' . $row['longitude'] . '" altitude="' . $row['altitude'] . '" calculatedTime="' . $row['dataCalculatedTime'] . '"/>'
-		. '<time>' . $row['dataArrivedTime'] . '</time>'
-		. '<message>' . $row['message'] . '</message>'
-		. '<status_message>' . $row['status_message'] . '</status_message>'
-		. '<deviceId>' . $row['deviceId'] . '</deviceId>'
-		.'</user>';
-
-		return $str;
-	}
-
-
-
 }
