@@ -16,7 +16,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	//page no initial value is important
 	this.bgImageListPageNo = 1;
 	this.bgImageListPageCount = 0;
-	this.pastPointsPageCount = 0;
+	this.pastPointsPageCount = null;
 	this.updateInterval = interval;
 	this.timer;
 	this.traceLineDrawedUserId = null;
@@ -93,19 +93,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.getFriendList = function(pageNo){
 
-//		var params = "r=users/getUserListXML&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
-		var jsonparams = "r=users/getUserListJson&pageNo="+ TRACKER.updateFriendListPageNo +"&"; 
+		var jsonparams = "r=users/getUserListJson&page="+ TRACKER.updateFriendListPageNo +"&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
 		{
-//			params += "list=onlyUpdated";
 			jsonparams += "list=onlyUpdated";
 		}
 		
 		TRACKER.ajaxReq(jsonparams, function(result){
 			
 			var obj = $.parseJSON(result);
-			processUsers(MAP, obj.users);
+			processUsers(MAP, obj.userlist);
 			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
 			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
 			// to fetched all data reguarly updateFriendListPageNo must be resetted.
@@ -161,9 +159,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.trackUser = function(userId){
 		
 		if (typeof TRACKER.users[userId] === "undefined") {
-			var params = "r=users/getUserInfo&userId="+ userId +"&"; 
+			var params = "r=users/getUserInfoJSON&userId="+ userId +"&"; 
 			TRACKER.ajaxReq(params, function(result){
-				processXML(MAP, result);
+				processUsers(MAP, result);
 				if (typeof TRACKER.users[userId]  !== "undefined") {
 					TRACKER.trackUser(userId);
 				}
@@ -197,12 +195,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{			
 			TRACKER.clearTraceLines(TRACKER.traceLineDrawedUserId);
 		}		
-//		alert(pageNo + " " + TRACKER.pastPointsPageNo );
 		if (typeof TRACKER.users[userId].polyline == "undefined" ||
 				pageNo > TRACKER.pastPointsPageNo ) 
 		{
-//			var params = "r=users/getUserPastPointsXML&userId=" + userId + "&pageNo=" + pageNo;
-		
 			if (pageNo > TRACKER.pastPointsPageCount) {
 				
 			}
@@ -219,19 +214,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (typeof callback == "function") {
 					callback();
 				}
-			});
-/*			
-			TRACKER.ajaxReq(params, function(result){
-				TRACKER.pastPointsPageNo =  Number(TRACKER.getPageNo(result));
-				TRACKER.pastPointsPageCount =  Number(TRACKER.getPageCount(result));
-
-				var str = processUserPastLocationsXML(MAP, result);
-
-				if (typeof callback == "function") {
-					callback();
-				}
-			});
-*/			
+			});			
 		}
 		else {			
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
@@ -265,14 +248,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	/*
 	 * sending GeoFence points to the server
 	 */
-	/*
-	this.sendGeoFencePoints = function(geoFence,name) {
-				
-		loc1=MAP.getPointOfGeoFencePath(geoFence,0);
-		loc2=MAP.getPointOfGeoFencePath(geoFence,1);
-		loc3=MAP.getPointOfGeoFencePath(geoFence,2);
-		var params = "r=geofence/createGeofence&name="+name+"&point1Latitude="+ loc1.latitude.toFixed(6) +"&point1Longitude="+ loc1.longitude.toFixed(6)+"&point2Latitude="+ loc2.latitude.toFixed(6) +"&point2Longitude="+ loc2.longitude.toFixed(6)+"&point3Latitude="+ loc3.latitude.toFixed(6) +"&point3Longitude="+ loc3.longitude.toFixed(6);
-		*/
 	this.sendGeoFencePoints = function(name,desc,lat1,long1,lat2,long2,lat3,long3) {
 		
 			var processOutput = true;
@@ -307,7 +282,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 
 	this.zoomPoint = function (latitude, longitude) {
-
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		MAP.zoomPoint(point);
 	}
@@ -332,23 +306,29 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.pastPointsPageNo = 0;
 			}
 			var reqPageNo = Number(TRACKER.pastPointsPageNo) + 1;
-			TRACKER.drawTraceLine(userId, reqPageNo, function(){
-				// if it goes into this if statement it means that there is no available
-				// past point in database
-				if (typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") {
-					// the statement below add a new element to array with null value
-					// it is useful when understanding no previous point exists
-					// but it is required to check value if it is null when hiding or
-					// showing markers...
-					TRACKER.users[userId].mapMarker[nextMarkerIndex] = null;
-					TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
-				}
-				else {
-					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
-					MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
-				}			
+			
+			if (TRACKER.pastPointsPageCount == null || reqPageNo <= TRACKER.pastPointsPageCount) {
+				TRACKER.drawTraceLine(userId, reqPageNo, function(){
+					// if it goes into this if statement it means that there is no available
+					// past point in database
+					if (typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") {
+						// the statement below add a new element to array with null value
+						// it is useful when understanding no previous point exists
+						// but it is required to check value if it is null when hiding or
+						// showing markers...
+						TRACKER.users[userId].mapMarker[nextMarkerIndex] = null;
+					}
+					else {
+						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+						MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
+					}			
 
-			});
+				});
+			}
+			else {
+				TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+				
+			}
 		}
 		else if (TRACKER.users[userId].mapMarker[nextMarkerIndex] == null){
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
