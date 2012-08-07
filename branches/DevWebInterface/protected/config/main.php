@@ -23,6 +23,15 @@ class GroupType
 	const StaffGroup  = 1;
 }
 
+/*User Authority Level Enumeration in PHP*/
+class AuthorityLevel
+{
+	const UnauthorizedUser = 0;
+	const StandardUser     = 1;
+	const AuthorizedUser   = 2;
+	const SuperUser        = 3;
+}
+
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 

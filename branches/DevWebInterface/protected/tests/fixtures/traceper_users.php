@@ -6,7 +6,8 @@ return array(
 				'realname'=>'Test User',
 				'email'=>'test@traceper.com',
 				'userType' => UserType::RealUser,
-				'publicPosition'=>1
+				'publicPosition'=>1,
+				'authorityLevel'=>AuthorityLevel::UnauthorizedUser
 		),
 		'user2'=>array(
 				'Id'=>2,
@@ -14,7 +15,8 @@ return array(
 				'realname'=>'Test User 2',
 				'email'=>'test2@traceper.com',
 				'userType' => UserType::GPSDevice,
-				'publicPosition'=>0
+				'publicPosition'=>0,
+				'authorityLevel'=>AuthorityLevel::StandardUser
 		),
 		'user_privacy_group_test'=>array(
 				'Id'=>3,
