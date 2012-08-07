@@ -307,6 +307,35 @@ class UsersTest extends CDbTestCase
 		
 		Users::model()->setUserPositionPublicity($this->users("user2")->Id, true);
 		$this->assertTrue(Users::model()->isUserPositionPublic($this->users("user2")->Id));
+	}
+
+	public function testSetAuthorityLevel()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+	
+		Users::model()->setAuthorityLevel($this->users("user1")->Id, AuthorityLevel::AuthorizedUser);
+		$user=Users::model()->findByPk($this->users("user1")->Id);
+		$this->assertEquals($user->authorityLevel, AuthorityLevel::AuthorizedUser);
+	
+		Users::model()->setAuthorityLevel($this->users("user2")->Id, AuthorityLevel::SuperUser);
+		$user=Users::model()->findByPk($this->users("user2")->Id);
+		$this->assertEquals($user->authorityLevel, AuthorityLevel::SuperUser);
+	}
+
+	public function testGetAuthorityLevel()
+	{
+		$this->assertTrue($this->users("user1")->save());
+		$this->assertTrue($this->users("user2")->save());
+	
+		$this->assertEquals(Users::model()->getAuthorityLevel($this->users("user1")->Id), AuthorityLevel::UnauthorizedUser);
+		$this->assertEquals(Users::model()->getAuthorityLevel($this->users("user2")->Id), AuthorityLevel::StandardUser);
+	
+		Users::model()->setAuthorityLevel($this->users("user1")->Id, AuthorityLevel::StandardUser);
+		$this->assertEquals(Users::model()->getAuthorityLevel($this->users("user1")->Id), AuthorityLevel::StandardUser);
+	
+		Users::model()->setAuthorityLevel($this->users("user2")->Id, AuthorityLevel::UnauthorizedUser);
+		$this->assertEquals(Users::model()->getAuthorityLevel($this->users("user2")->Id), AuthorityLevel::UnauthorizedUser);
 	}	
 		
 	//TODO: Problem in offset and limit parameters

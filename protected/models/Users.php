@@ -11,6 +11,7 @@
  * @property string $longitude
  * @property string $altitude
  * @property integer $publicPosition
+ * @property integer $authorityLevel
  * @property string $realname
  * @property string $email
  * @property string $dataArrivedTime
@@ -61,7 +62,7 @@ class Users extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('password, realname, email, account_type', 'required'),
-			array('publicPosition, status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
+			array('publicPosition, authorityLevel, status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group', 'length', 'max'=>10),
 			array('latitude', 'length', 'max'=>8),
@@ -77,7 +78,7 @@ class Users extends CActiveRecord
 			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -110,6 +111,7 @@ class Users extends CActiveRecord
 			'longitude' => 'Longitude',
 			'altitude' => 'Altitude',
 			'publicPosition' => 'Public Position',
+			'authorityLevel' => 'Authority Level',
 			'realname' => 'Realname',
 			'email' => 'Email',
 			'dataArrivedTime' => 'Data Arrived Time',
@@ -145,6 +147,7 @@ class Users extends CActiveRecord
 		$criteria->compare('longitude',$this->longitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
 		$criteria->compare('publicPosition',$this->publicPosition);
+		$criteria->compare('authorityLevel',$this->authorityLevel);
 		$criteria->compare('realname',$this->realname,true);
 		$criteria->compare('email',$this->email,true);
 		$criteria->compare('dataArrivedTime',$this->dataArrivedTime,true);
@@ -378,19 +381,35 @@ class Users extends CActiveRecord
 	
 		return $friendsResult;
 	}
-
+	
 	public function setUserPositionPublicity($userId, $isPublic)
 	{
 		$user=Users::model()->findByPk($userId);
 		$user->publicPosition = ($isPublic == true)?1:0;
 	
 		return $user->save();
-	}	
+	}
 	
 	public function isUserPositionPublic($userId)
 	{
 		$user=Users::model()->findByPk($userId);
 	
 		return ($user->publicPosition == 1)?true:false;
-	}	
+	}
+	
+	public function setAuthorityLevel($userId, $level)
+	{
+		$user=Users::model()->findByPk($userId);
+		$user->authorityLevel = $level;
+	
+		return $user->save();
+	}
+	
+	public function getAuthorityLevel($userId)
+	{
+		$user=Users::model()->findByPk($userId);
+	
+		return $user->authorityLevel;
+	}
+	
 }
