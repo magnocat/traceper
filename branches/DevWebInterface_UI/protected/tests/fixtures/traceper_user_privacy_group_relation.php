@@ -1,0 +1,21 @@
+<?php
+return array(
+		'user_privacy_group_relation1'=>array(
+				'Id'=>1,
+				'groupOwner'=>5,
+				'userId'=>3,
+				'groupId'=>1,
+		),
+		'user_privacy_group_relation2'=>array(
+				'Id'=>2,
+				'groupOwner'=>5,
+				'userId'=>4,
+				'groupId'=>1,
+		),
+		'user_privacy_group_relation3'=>array(
+				'Id'=>3,
+				'groupOwner'=>5,
+				'userId'=>1,
+				'groupId'=>3,
+		),
+);
