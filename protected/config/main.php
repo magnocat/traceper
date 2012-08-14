@@ -97,6 +97,10 @@ return array(
                 	'themeUrl' => 'css/jqueryui',
                     'theme' => 'cupertino',
                 ),
+                'CJuiAccordion' =>array(
+                	'themeUrl' => 'css/jqueryui',
+                    'theme' => 'cupertino',
+                ),
             ),
        ),
 		// uncomment the following to enable URLs in path-format
