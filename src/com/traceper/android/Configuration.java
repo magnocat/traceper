@@ -22,6 +22,8 @@ public class Configuration {
 	public static final String PREFRENCES_AUTO_SEND_CHECKBOX = "PREFRENCES_AUTO_SEND_CHECKBOX";
 	
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
+	public static final String ACCESS_TOKEN = "access_token";
+	public static final String ACCESS_EXPIRES = "access_expires";
 	
 
 	

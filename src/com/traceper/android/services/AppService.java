@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -17,15 +16,11 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -45,6 +40,7 @@ import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -53,6 +49,7 @@ import com.traceper.R;
 import com.traceper.android.Configuration;
 import com.traceper.android.interfaces.IAppService;
 
+@SuppressLint("NewApi")
 public class AppService extends Service implements IAppService{
 
 	private static final String REQUEST_LOCATION = "com.traceper.android.services.GET_LOCATION";
@@ -120,8 +117,7 @@ public class AppService extends Service implements IAppService{
 	}
 
 	public void onCreate() 
-	{   	
-		startForeground(0, null);
+	{   		
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
@@ -536,11 +532,13 @@ public class AppService extends Service implements IAppService{
 		final String boundary = "*****++++++************++++++++++++";
 		URL url;
 		String result = new String();
+		
+		HttpURLConnection conn = null;
 		try {
 			url = new URL(this.authenticationServerAddress);
-			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			
+			conn = (HttpURLConnection)url.openConnection();
 			conn.setDoOutput(true);
+			conn.setChunkedStreamingMode(0);
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+ boundary);
 			if (cookieName != null && cookieValue != null) {
 				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
@@ -565,9 +563,9 @@ public class AppService extends Service implements IAppService{
 			}			
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			ds.flush();
-			ds.close();
-			writer.close();
-			
+		//	ds.close();
+		//	writer.close();
+			writer.flush();
 			getCookie(conn);
 			
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
@@ -594,6 +592,11 @@ public class AppService extends Service implements IAppService{
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		finally{
+			if (conn != null) {
+				conn.disconnect();
+			}
 		}
 
 		if (result.length() >= 0){
@@ -727,10 +730,10 @@ public class AppService extends Service implements IAppService{
 		return this.isUserAuthenticated;
 	}
 
-	public String registerUser(String password, String email, String realname) 
+	public String registerUser(String password, String email, String realname, String facebookId) 
 	{
-		String[] name = new String[7];
-		String[] value = new String[7];
+		String[] name = new String[8];
+		String[] value = new String[8];
 		name[0] = "r";
 		name[1] = "RegisterForm[email]";
 		name[2] = "RegisterForm[password]";
@@ -738,14 +741,24 @@ public class AppService extends Service implements IAppService{
 		name[4] = "RegisterForm[name]";
 		name[5] = "RegisterForm[account_type]";
 		name[6] = "client";
+		name[7] = "RegisterForm[ac_id]";
 
+		String accountType = DEFAULT_ACCOUNT;
+		if (facebookId == null) {
+			facebookId = "0";
+		}
+		else {
+			accountType = FACEBOOK_ACCOUNT;
+		}
+		
 		value[0] = "site/register";
 		value[1] = email;
 		value[2] = password;
 		value[3] = password;
-		value[4] = realname;
-		value[5] = DEFAULT_ACCOUNT;
-		value[6] = "mobile";
+		value[4] = realname;		
+		value[5] = accountType;
+		value[6] = "mobile";		
+		value[7] = facebookId;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
@@ -838,26 +851,34 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}
 
-	public String authenticateUser(String email, String password) 
+	public String authenticateUser(String email, String password, String facebookId) 
 	{			
 		this.password = password;
 		this.email = email;
 
-		String[] name = new String[6];
-		String[] value = new String[6];
+		String[] name = new String[7];
+		String[] value = new String[7];
 		name[0] = "r";
 		name[1] = "LoginForm[email]";
 		name[2] = "LoginForm[password]";
 		name[3] = "deviceId";
 		name[4] = "LoginForm[rememberMe]";
 		name[5] = "client";
+		name[6] = "LoginForm[facebookId]";
 
 		value[0] = "site/login";
 		value[1] = this.email;
+		if (this.password == null) {
+			this.password = "0";
+		}
 		value[2] = this.password;
 		value[3] = this.deviceId;
 		value[4] = "1";
 		value[5] = "mobile";
+		if (facebookId == null) {
+			facebookId = "0";
+		}
+		value[6] = facebookId;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 

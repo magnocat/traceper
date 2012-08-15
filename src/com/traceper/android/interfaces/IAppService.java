@@ -57,7 +57,7 @@ public interface IAppService {
 	
 	public JSONObject getUserInfo(int userid);
 	
-	public String registerUser(String password, String email, String realname);
+	public String registerUser(String password, String email, String realname, String facebookId);
 	
 	public JSONArray SearchJSON(String search);
 	
@@ -65,7 +65,7 @@ public interface IAppService {
 	
 	public String registerGPUser(String password, String email, String realname, String image, String gp_id);
 	
-	public String authenticateUser(String username, String password);
+	public String authenticateUser(String username, String password, String facebookId);
 	
 	public String AddAsFriend(String FriendId);
 	
