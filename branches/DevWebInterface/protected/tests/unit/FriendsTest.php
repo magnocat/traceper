@@ -54,8 +54,9 @@ class FriendsTest extends CDbTestCase
 		$dataProvider = Friends::model()->getFriendRequestDataProvider(6, 5);
 		$rows = $dataProvider->getData();
 		
-		for ($i = 0; $i < count($rows); $i++) {
-			  $this->assertFalse(Friends::model()->approveFriendship($rows[$i]['Id'], $rows[$i]['friend2']));
+		for ($i = 0; $i < count($rows); $i++) 
+		{
+			  $this->assertTrue(Friends::model()->approveFriendship($rows[$i]['friendShipId'], 6));
 		}
 	}
 

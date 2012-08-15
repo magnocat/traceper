@@ -5,19 +5,19 @@
 
 /*
  * Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
-T�rk�e UTF-8
-  � 	İ
-  � 	ı
-  � 	Ö
-  � 	ö
-  � 	Ü
-  � 	ü
-  � 	Ç
-  � 	ç
-  � 	ğ
-  � 	ğ
-  � 	�
-  � 	ş
+T�rk�e UTF-8
+  � 	İ
+  � 	ı
+  � 	Ö
+  � 	ö
+  � 	Ü
+  � 	ü
+  � 	Ç
+  � 	ç
+  � 	ğ
+  � 	ğ
+  � 	�
+  � 	ş
 */
 
 return array(
@@ -43,8 +43,7 @@ return array(
 	'Passwords not same!' => 'Parolalar aynı değil!',
 	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
 	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
-	
-	
+	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',	
 );
 
 

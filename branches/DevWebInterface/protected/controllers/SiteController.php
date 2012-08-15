@@ -159,6 +159,7 @@ class SiteController extends Controller
 		if(isset($_REQUEST['LoginForm']))
 		{
 			$model->attributes = $_REQUEST['LoginForm'];
+			
 			// validate user input and if ok return json data and end application.
 			
 			if($model->validate() && $model->login()) {
@@ -307,26 +308,22 @@ class SiteController extends Controller
 		// collect user input data
 		if(isset($_POST['RegisterForm']))
 		{
+			
 			$isMobileClient = false;
 			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile') {
 				$isMobileClient = true;
 			}
 			$model->attributes = $_POST['RegisterForm'];
 			// validate user input and if ok return json data and end application.
+			
 			if($model->validate()) {
-
-				/*
-				$time = date('Y-m-d h:i:s');
-
-				$userCandidates = new UserCandidates;
-				$userCandidates->email = $model->email;
-				$userCandidates->realname = $model->name;
-				$userCandidates->password = md5($model->password);
-				$userCandidates->time = $time;
-
-				if($userCandidates->save()) // save the change to database
-				*/
-				if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
+				
+				if (isset($model->ac_id) && $model->ac_id != "0") {
+					if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type)) {
+						echo CJSON::encode(array("result"=> "Registration is completed successfully.\n Click Facebook button to login"));
+					}
+				}
+				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
 				{
 					$key = md5($model->email.$time);
 					$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
@@ -337,7 +334,7 @@ class SiteController extends Controller
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 					$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
 					//echo $message;
-					mail($model->email, "Traceper Activation", $message, $headers);
+					@mail($model->email, "Traceper Activation", $message, $headers);
 					echo CJSON::encode(array("result"=> "1"));
 				}
 				else
