@@ -63,13 +63,13 @@ class Users extends CActiveRecord
 		return array(
 			array('password, realname, email, account_type', 'required'),
 			array('publicPosition, authorityLevel, status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
-			array('password', 'length', 'max'=>32),
+			array('password', 'length', 'min'=>5, 'max'=>32),
 			array('group', 'length', 'max'=>10),
 			array('latitude', 'length', 'max'=>8),
 			array('longitude', 'length', 'max'=>9),
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
-			array('email', 'length', 'max'=>100),
+			array('email', 'length', 'min'=>5,'max'=>100),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
@@ -201,15 +201,19 @@ class Users extends CActiveRecord
 	}
 	
 	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
+		if ($fb_id == null || $fb_id == 0) {
+			return false;
+		}
 		$users=new Users;
-	
+		
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
 		$users->fb_id = $fb_id;
 		$users->account_type = $accountType;
 	
-		return $users->save();
+		$result = $users->save();
+		return $result;
 	}
 	
 	public function saveGPUser($email, $password, $realname, $g_id, $accountType, $gp_image){

@@ -34,7 +34,13 @@ class RegisterForm extends CFormModel
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
 			'message'=>'Passwords not same!'),
+			
+			array('ac_id', 'safe'),
+				
+			array('account_type', 'safe'),
+			
 			array('email', 'isExists', 'message'=>'This e-mail is registered before'),
+			
 			array('image', 'isExists')
 		);
 	}
