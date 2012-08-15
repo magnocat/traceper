@@ -1,4 +1,4 @@
-package com.traceper.android;
+package com.traceper.android.tools.facebook;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +23,10 @@ import android.widget.Toast;
 import com.facebook.android.Facebook;
 
 import com.traceper.R;
+import com.traceper.android.Configuration;
+import com.traceper.android.Login;
+import com.traceper.android.Main;
+import com.traceper.android.Session;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
 
@@ -261,10 +265,10 @@ public class LoginControl extends Activity {
 		
 		Thread loginThread = new Thread(){
 			private Handler handler = new Handler();
-			String result;
+			String result = new String();
 			@Override
 			public void run() {
-				result = appManager.authenticateUser(usermail , userid);
+			//	result = appManager.authenticateUser(usermail , userid);
 				
 				handler.post(new Runnable(){
 					public void run() {										

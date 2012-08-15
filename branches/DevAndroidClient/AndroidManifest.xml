@@ -13,7 +13,7 @@
 			</intent-filter>
 		</activity>
 		<service android:name=".android.services.AppService"></service>
-		<activity android:name=".android.LoginControl">
+		<activity android:name=".android.tools.facebook.LoginControl">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
 				<category android:name="android.intent.category.LAUNCHER">

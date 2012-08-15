@@ -1,8 +1,5 @@
 package com.traceper.android;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,19 +21,21 @@ import android.widget.Toast;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
-import com.traceper.android.tools.AeSimpleMD5;
 
 public class Register extends Activity {
 	
 	private static final int FILL_ALL_FIELDS = 0;
 	protected static final int TYPE_SAME_PASSWORD_IN_PASSWORD_FIELDS = 1;
-	private static final int SIGN_UP_FAILED = 2;
-	private static final int SIGN_UP_EMAIL_CRASHED = 3;
-	private static final int SIGN_UP_SUCCESSFULL = 4;
-	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 5;
-	protected static final int SIGN_UP_EMAIL_NOT_VALID = 6;
-	protected static final int CUSTOM_MESSAGE_DIALOG = 7;
-	private static final int NOT_CONNECTED_TO_NETWORK = 8;
+	private static final int SIGN_UP_SUCCESSFULL = 2;
+	protected static final int EMAIL_AND_PASSWORD_LENGTH_SHORT = 3;
+	protected static final int CUSTOM_MESSAGE_DIALOG = 4;
+	private static final int NOT_CONNECTED_TO_NETWORK = 5;
+	
+	public static final String EXTRA_NAME = "INTENT_NAME_KEY";
+	public static final String EXTRA_EMAIL = "INTENT_EMAIL_KEY";
+	public static final String EXTRA_FACEBOOK_ID = "INTENT_FACEBOOK_ID_KEY";
+	public static final String ACTION_REGISTER_FACEBOOK_USER = "com.traceper.android.Register.FacebookUser";
+	
 	private EditText passwordText;
 	private EditText eMailText;
 	private EditText passwordAgainText;
@@ -44,6 +43,8 @@ public class Register extends Activity {
 	private IAppService appService;
 	private ProgressDialog progressDialog;
 	private Handler handler = new Handler();
+	
+	private String serverResponse;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
         
@@ -76,6 +77,7 @@ public class Register extends Activity {
         }
     };
 	protected String dialogMessage;
+	private String facebookId = null;
 
 	public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);    
@@ -92,6 +94,21 @@ public class Register extends Activity {
 	        passwordAgainText = (EditText) findViewById(R.id.passwordAgain);  
 	        eMailText = (EditText) findViewById(R.id.email);
 	        realnameText = (EditText) findViewById(R.id.realname);
+	        
+	        Intent i = getIntent();
+	        String action = i.getAction();
+	        if (action != null && action.equals(ACTION_REGISTER_FACEBOOK_USER)) {
+	        	Bundle extras = i.getExtras();
+	        	String email =  extras.getString(EXTRA_EMAIL);
+	        	eMailText.setText(email);
+	        	eMailText.setEnabled(false);
+	        	
+	        	String name = extras.getString(EXTRA_NAME);
+	        	realnameText.setText(name);
+	        	realnameText.setEnabled(false);
+	        	
+	        	facebookId  = extras.getString(EXTRA_FACEBOOK_ID);
+	        }
 	        
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
@@ -112,40 +129,33 @@ public class Register extends Activity {
 									progressDialog = ProgressDialog.show(Register.this, "", getString(R.string.saving));
 								
 									Thread thread = new Thread(){
-										String result;
+										
+										
+
 										public void run() {
 											String password = null;
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
 											password = passwordText.getText().toString();
 											
-											result = appService.registerUser(password, 
+											serverResponse = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
-																			 realnameText.getText().toString());
+																			 realnameText.getText().toString(),
+																			 facebookId);
 											
 		
 											handler.post(new Runnable(){
 
 												public void run() {
 													progressDialog.dismiss();
-													if (result.equals("1") == true) {
+													System.out
+															.println("Server response "  + serverResponse);
+													if (serverResponse.equals("1") == true) {
 														showDialog(SIGN_UP_SUCCESSFULL);
 													}
 													else {
-														Register.this.dialogMessage = result;
+														Register.this.dialogMessage = serverResponse;
 														showDialog(CUSTOM_MESSAGE_DIALOG);
 													}
-													/*
-													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_EXISTS){
-														showDialog(SIGN_UP_EMAIL_CRASHED);
-													}
-													else if (result == IAppService.HTTP_RESPONSE_ERROR_EMAIL_NOT_VALID){
-														showDialog(SIGN_UP_EMAIL_NOT_VALID);
-													}
-													else  //if (result.equals(SERVER_RES_SIGN_UP_FAILED)) 
-													{
-														showDialog(SIGN_UP_FAILED);
-													}
-													*/			
 												}
 		
 											});
@@ -179,6 +189,15 @@ public class Register extends Activity {
 	        
 	    }
 	
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		
+		if (id == CUSTOM_MESSAGE_DIALOG) {
+			((AlertDialog)dialog).setMessage(this.dialogMessage);
+		}
+		
+		super.onPrepareDialog(id, dialog);
+	}
 	
 	protected Dialog onCreateDialog(int id) 
 	{    	
@@ -203,24 +222,6 @@ public class Register extends Activity {
 					}
 				})        
 				.create();
-			case SIGN_UP_FAILED:
-				return new AlertDialog.Builder(Register.this)       
-				.setMessage(R.string.signup_failed)
-				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						/* User clicked OK so do some stuff */
-					}
-				})        
-				.create();
-			case SIGN_UP_EMAIL_CRASHED:
-				return new AlertDialog.Builder(Register.this)       
-				.setMessage(R.string.signup_email_crashed)
-				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						/* User clicked OK so do some stuff */
-					}
-				})        
-				.create();
 			case SIGN_UP_SUCCESSFULL:
 				return new AlertDialog.Builder(Register.this)       
 				.setMessage(R.string.signup_successfull)
@@ -239,21 +240,12 @@ public class Register extends Activity {
 					}
 				})        
 				.create();
-			case SIGN_UP_EMAIL_NOT_VALID:
-				return new AlertDialog.Builder(Register.this)       
-				.setMessage(R.string.email_not_valid)
-				.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						/* User clicked OK so do some stuff */
-					}
-				})        
-				.create();
 			case CUSTOM_MESSAGE_DIALOG:
     			return new AlertDialog.Builder(Register.this)       
         		.setMessage(this.dialogMessage)
         		.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
         			public void onClick(DialogInterface dialog, int whichButton) {
-        				/* User clicked OK so do some stuff */
+        				Register.this.finish();
         			}
         		})        
         		.create(); 
