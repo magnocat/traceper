@@ -1,5 +1,10 @@
 package com.traceper.android;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -27,8 +32,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
+import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.FacebookError;
 import com.traceper.R;
@@ -250,68 +257,90 @@ public class Login extends Activity {
 			editor.putLong(Configuration.ACCESS_EXPIRES, fb.getAccessExpires());
 			editor.commit();
 			
-	//		progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
+			progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
 			
 			new AsyncFacebookRunner(fb).request("/me", 
-					new AsyncRequestListener() {
-				public void onComplete(JSONObject obj, final Object state) {
-					// save the session data
-					final String uid = obj.optString("id");
-					final String name = obj.optString("name");
-					final String email = obj.optString("email");
-					if (uid.length() > 0 &&         						
-							email.length() > 0 &&
-							name.length() > 0
-							)					
-					{
-						Login.this.runOnUiThread(new Runnable() {
-							
-							@Override
-							public void run() {
-								Thread loginThread = new Thread(){
-									
-									String result;
-									@Override
-									public void run() {
-										result = appManager.authenticateUser(email, null, uid);
+					new RequestListener() {
+				public void onComplete(String response, Object state) {
+					JSONObject obj;
+					try {
+						obj = Util.parseJson(response);
+						// save the session data
+						final String uid = obj.optString("id");
+						final String name = obj.optString("name");
+						final String email = obj.optString("email");
+						if (uid.length() > 0 &&         						
+								email.length() > 0 &&
+								name.length() > 0
+								)					
+						{
+							Login.this.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									Thread loginThread = new Thread(){
 										
-										handler.post(new Runnable(){
-											public void run() {										
-									//			progressDialog.dismiss();
+										String result;
+										@Override
+										public void run() {
+											result = appManager.authenticateUser(email, null, uid);
+											
+											handler.post(new Runnable(){
+												public void run() {										
+													progressDialog.dismiss();
 
-												if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
-												{
-													Intent i = new Intent(Login.this, Main.class);																		
-													startActivity(i);	
-													Login.this.finish();										
-												}
-												else if (result.equals("UnknownFacebookUser")) {
-													Intent i = new Intent(Login.this, Register.class);
-													i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
-													i.putExtra(Register.EXTRA_EMAIL, email);
-													i.putExtra(Register.EXTRA_FACEBOOK_ID, uid);
-													i.putExtra(Register.EXTRA_NAME, name);
-													startActivity(i); 
-												}
-												else{
-													Login.this.dialogMessage = result;
-													showDialog(CUSTOM_MESSAGE_DIALOG);
-												}
-											}									
-										});
+													if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
+													{
+														Intent i = new Intent(Login.this, Main.class);																		
+														startActivity(i);	
+														Login.this.finish();										
+													}
+													else if (result.equals("UnknownFacebookUser")) {
+														Intent i = new Intent(Login.this, Register.class);
+														i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
+														i.putExtra(Register.EXTRA_EMAIL, email);
+														i.putExtra(Register.EXTRA_FACEBOOK_ID, uid);
+														i.putExtra(Register.EXTRA_NAME, name);
+														startActivity(i); 
+													}
+													else{
+														Login.this.dialogMessage = result;
+														showDialog(CUSTOM_MESSAGE_DIALOG);
+													}
+												}									
+											});
 
-									}
-								};
-
-								loginThread.start();
-								
-							}
-						});
+										}
+									};
+									loginThread.start();
+								}
+							});
+						}
+						
+					} catch (FacebookError e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
+					
+				}
+				@Override
+				public void onFacebookError(FacebookError arg0, Object arg1) {
+				}
 
-					//fb_save_user(name,email,uid);
+				@Override
+				public void onFileNotFoundException(FileNotFoundException arg0,
+						Object arg1) {
+				}
 
+				@Override
+				public void onIOException(IOException arg0, Object arg1) {
+				}
 
+				@Override
+				public void onMalformedURLException(MalformedURLException arg0,
+						Object arg1) {
 				}
 			}, null);
 		}
@@ -322,90 +351,6 @@ public class Login extends Activity {
 
 		public void onFacebookError(FacebookError e) {
 			Log.d("app", "facebook error: " + e);
-		}
-		//save new facebook user
-		public void fb_save_user(final String name,final String email,final String uid){
-
-			if (uid.length() > 0 && 
-					uid.length() > 0 &&
-					email.length() > 0 &&
-					name.length() > 0
-					)
-			{
-
-
-				progressDialog.dismiss(); 
-
-				LayoutInflater factory = LayoutInflater.from(Login.this);
-
-				final View textEntryView = factory.inflate(R.layout.password_dialog, null);
-				//text_entry is an Layout XML file containing two text field to display in alert dialog
-
-				final EditText input1 = (EditText) textEntryView.findViewById(R.id.EditText_Pwd1);
-				final EditText input2 = (EditText) textEntryView.findViewById(R.id.EditText_Pwd2);
-
-
-				final AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
-				alert.setIcon(R.drawable.register).setTitle(
-						"Enter the Text:").setView(
-								textEntryView).setPositiveButton("Save",
-										new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int whichButton) {
-
-										Log.i("AlertDialog","TextEntry 1 Entered "+input1.getText().toString());
-										Log.i("AlertDialog","TextEntry 2 Entered "+input2.getText().toString());
-										strPass1 = input1.getText().toString();
-										strPass2 = input2.getText().toString();
-
-										if (strPass1.equals(strPass2)) {
-											Login.this.dialogMessage = "Ok";
-											final String result; 
-											// record the information directly with facebook 
-											result = appManager.registerFBUser(strPass1, email, name, uid);
-
-
-											progressDialog.dismiss();
-											if (result.equals("9") == true) {
-												Login.this.dialogMessage = "Ok";
-
-												new Session(fb, uid, name , email, strPass1).save(Login.this);
-
-												Intent i = new Intent(Login.this, LoginControl.class);																		
-												startActivity(i);	
-												Login.this.finish();
-											}		
-											else {
-												Login.this.dialogMessage = result;
-												Intent i = new Intent(Login.this, LoginControl.class);																		
-												startActivity(i);	
-												Login.this.finish();
-											}
-
-										} else {
-											Toast.makeText(Login.this,
-													"Matching passwords="+strPass2 , Toast.LENGTH_SHORT).show();
-										}
-										/* User clicked OK so do some stuff */
-									}
-								}).setNegativeButton("Cancel",
-										new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int whichButton) {
-										/*
-										 * User clicked cancel so do some stuff
-										 */
-									}
-								});
-				// alert.show();
-
-
-				Login.this.runOnUiThread(new Runnable() {
-					public void run() {
-						alert.show();
-					}
-				});
-			}
 		}
 	}
 	
