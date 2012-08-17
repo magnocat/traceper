@@ -20,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -40,16 +39,16 @@ import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.StrictMode;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.traceper.R;
 import com.traceper.android.Configuration;
+import com.traceper.android.Main;
 import com.traceper.android.interfaces.IAppService;
 
-@SuppressLint("NewApi")
+
 public class AppService extends Service implements IAppService{
 
 	private static final String REQUEST_LOCATION = "com.traceper.android.services.GET_LOCATION";
@@ -108,7 +107,7 @@ public class AppService extends Service implements IAppService{
 	private Location gpsLocation;
 	private Location networkLocation;
 	private Location lastSentLocation;
-	private JSONObject json;
+	private Intent mainActivityIntent;
 
 	public class IMBinder extends Binder {
 		public IAppService getService() {
@@ -118,6 +117,7 @@ public class AppService extends Service implements IAppService{
 
 	public void onCreate() 
 	{   		
+		mainActivityIntent = new Intent(AppService.this, Main.class);
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
@@ -150,9 +150,11 @@ public class AppService extends Service implements IAppService{
 				}
 			}
 		};
+		System.out.println("AppService is created...");
 
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
 		registerReceiver(networkStateReceiver, filter);
+		startForeground(0, null);
 	}
 
 	@Override
@@ -166,6 +168,7 @@ public class AppService extends Service implements IAppService{
 					networkLocation = null;
 					gpsLocation = null;
 					boolean requestStarted = false;
+					
 					if (network_enabled == true) {
 						locationManager.removeUpdates(networkLocationIntent);
 						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationIntent);
@@ -176,12 +179,13 @@ public class AppService extends Service implements IAppService{
 						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsLocationIntent);
 						requestStarted = true;
 					}
+					
 
 
 					if (requestStarted == true) 
 					{
 						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 
 						notification.setLatestEventInfo(AppService.this,
 								getString(R.string.ApplicationName), getString(R.string.waiting_location), contentIntent);	
@@ -206,7 +210,7 @@ public class AppService extends Service implements IAppService{
 						gpsLocation = null;
 						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
-						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+						PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 
 						notification.setLatestEventInfo(AppService.this,
 								getString(R.string.ApplicationName), getString(R.string.location_fix_problem), contentIntent);	
@@ -306,7 +310,7 @@ public class AppService extends Service implements IAppService{
 
 		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
-		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 
 		notification.setLatestEventInfo(this,
 				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
@@ -360,7 +364,7 @@ public class AppService extends Service implements IAppService{
 		}
 
 		if (network_enabled == false && gps_enabled == false){
-			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
 			notification.setLatestEventInfo(AppService.this,
@@ -368,11 +372,7 @@ public class AppService extends Service implements IAppService{
 
 			mManager.notify(NOTIFICATION_ID , notification);
 		}
-
-
 	}
-
-
 
 	private void sendPendingLocations(){
 		Iterator<Location> iterator = pendingLocations.iterator();
@@ -453,7 +453,7 @@ public class AppService extends Service implements IAppService{
 
 	public void notifyNoProviderEnabled(){
 		Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
-		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 		notification.setLatestEventInfo(AppService.this,
 				getString(R.string.ApplicationName), getString(R.string.no_location_provider), contentIntent);	
 
@@ -470,7 +470,6 @@ public class AppService extends Service implements IAppService{
 			longitude = loc.getLongitude();
 			altitude = loc.getAltitude();
 		}
-		String params;
 		//		try {
 		String[] name = new String[7];
 		String[] value = new String[7];
@@ -532,7 +531,7 @@ public class AppService extends Service implements IAppService{
 		final String boundary = "*****++++++************++++++++++++";
 		URL url;
 		String result = new String();
-		
+
 		HttpURLConnection conn = null;
 		try {
 			url = new URL(this.authenticationServerAddress);
@@ -543,7 +542,7 @@ public class AppService extends Service implements IAppService{
 			if (cookieName != null && cookieValue != null) {
 				conn.setRequestProperty("Cookie", cookieName + "=" + cookieValue);
 			}
-			
+
 			OutputStream output = conn.getOutputStream();
 			DataOutputStream ds = new DataOutputStream(output);
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(output), true);
@@ -553,8 +552,8 @@ public class AppService extends Service implements IAppService{
 				writer.append("Content-Disposition: form-data; name=\""+ name[i] +"\""+end+end+ value[i] +end);
 				writer.flush();
 			}
-			
-			
+
+
 			if (filename != null && file != null){
 				ds.writeBytes(twoHyphens + boundary + end);
 				ds.writeBytes("Content-Disposition: form-data; name=\""+ filename +"\";filename=\"" + filename +"\"" + end + end);
@@ -563,11 +562,11 @@ public class AppService extends Service implements IAppService{
 			}			
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			ds.flush();
-		//	ds.close();
-		//	writer.close();
+			//	ds.close();
+			//	writer.close();
 			writer.flush();
 			getCookie(conn);
-			
+
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM ||
 					conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
 			{
@@ -585,7 +584,6 @@ public class AppService extends Service implements IAppService{
 					result = result.concat(inputLine);				
 				}
 				in.close();	
-
 			}
 
 		} catch (MalformedURLException e) {
@@ -661,7 +659,7 @@ public class AppService extends Service implements IAppService{
 			value[0] = "site/logout";
 			value[1] = "mobile";
 
-			String httpRes = sendHttpRequest(name, value, null, null);
+			sendHttpRequest(name, value, null, null);
 		}
 		this.stopSelf();	
 	}
@@ -671,61 +669,36 @@ public class AppService extends Service implements IAppService{
 	}
 
 
-	
+
 	public JSONArray getUserList() {		
-		
+
 		JSONArray userlist = null;
-	
-		String result = "";
 		JSONObject jArray = null;
-	 		
-			String[] name = new String[3];
-			String[] value = new String[3];
-			name[0] = "r";
-			name[1] = "email";
-			name[2] = "password";
-	
 
-			value[0] = "users/GetUserListJson";
-			value[1] = AppService.this.email;
-			value[2] = AppService.this.password;
-		
+		String[] name = new String[3];
+		String[] value = new String[3];
+		name[0] = "r";
+		name[1] = "email";
+		name[2] = "password";
 
-			String httpRes = this.sendHttpRequest(name, value, null, null);	
-			
-			result = getString(R.string.unknown_error_occured);
-			
-			 try{
-				 jArray = new JSONObject(httpRes);            
-			    }catch(JSONException e){
-			            Log.e("log_tag", "Error parsing data "+e.toString());
-			    }
-		    
-		 	
-		     try{
-		         	
-		         	 userlist = jArray.getJSONArray("userlist");		 	        
-		 	        
-		         }catch(JSONException e)        {
-		         	 Log.e("log_tag", "Error parsing data "+e.toString());
-		         }
-		         	
+		value[0] = "users/GetUserListJson";
+		value[1] = AppService.this.email;
+		value[2] = AppService.this.password;
 
-	         
-		        
-		return userlist;
-		
-		
-	/*	
-        JSONObject json = getJSONfromURL(authenticationServerAddress+"?r=users/GetUserListJson&email="+ AppService.this.email +"&password="+ AppService.this.password);
-        
-     
-        return json;
-	*/
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+
+		try{
+			jArray = new JSONObject(httpRes);   
+			userlist = jArray.getJSONArray("userlist");
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
+
+		return userlist;	
 	}
-	
 
-	
+
+
 	public boolean isUserAuthenticated() {
 		return this.isUserAuthenticated;
 	}
@@ -750,7 +723,7 @@ public class AppService extends Service implements IAppService{
 		else {
 			accountType = FACEBOOK_ACCOUNT;
 		}
-		
+
 		value[0] = "site/register";
 		value[1] = email;
 		value[2] = password;
@@ -775,43 +748,6 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}
 
-	public String registerFBUser(String password, String email, String realname, String fb_id) 
-	{ // register facebook user
-		String[] name = new String[8];
-		String[] value = new String[8];
-		name[0] = "r";
-		name[1] = "RegisterForm[email]";
-		name[2] = "RegisterForm[password]";
-		name[3] = "RegisterForm[passwordAgain]";
-		name[4] = "RegisterForm[name]";
-		name[5] = "RegisterForm[account_type]";
-		name[6] = "RegisterForm[ac_id]";	
-		name[7] = "client";
-
-		value[0] = "site/FB_M_register";
-		value[1] = email;
-		value[2] = password;
-		value[3] = password;
-		value[4] = realname;
-		value[5] = FACEBOOK_ACCOUNT;
-		value[6] = fb_id;
-		value[7] = "mobile";
-
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
-
-		String result = getString(R.string.unknown_error_occured);
-
-		try {
-			JSONObject jsonObject = new JSONObject(httpRes);
-			result = jsonObject.getString("result");
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-	
 	public String registerGPUser(String password, String email, String realname ,String image, String gp_id) 
 	{ // register google user
 		String[] name = new String[9];
@@ -884,8 +820,8 @@ public class AppService extends Service implements IAppService{
 
 		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
-		
-		
+
+
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
@@ -899,7 +835,6 @@ public class AppService extends Service implements IAppService{
 				this.isUserAuthenticated = false;
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -919,8 +854,8 @@ public class AppService extends Service implements IAppService{
 
 		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
-		
-		
+
+
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
@@ -932,7 +867,6 @@ public class AppService extends Service implements IAppService{
 
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -952,8 +886,8 @@ public class AppService extends Service implements IAppService{
 
 		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
-		
-		
+
+
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
 			result = jsonObject.getString("result");
@@ -965,7 +899,6 @@ public class AppService extends Service implements IAppService{
 
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -978,74 +911,57 @@ public class AppService extends Service implements IAppService{
 		String[] name = new String[1];
 		String[] value = new String[1];
 		name[0] = "r";
-	
+
 		value[0] = "users/GetFriendRequestListJson";
-	
+
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
-		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
-		String result = getString(R.string.unknown_error_occured);
-		
-		 try{
-			 jArray = new JSONObject(httpRes);            
-		    }catch(JSONException e){
-		            Log.e("log_tag", "Error parsing data "+e.toString());
-		    }
-	    
-	 	
-	     try{
-	    	 searchlist = jArray.getJSONArray("userSearch");		 	        
-	 	        
-	         }catch(JSONException e)        {
-	         	 Log.e("log_tag", "Error parsing data "+e.toString());
-	         }
-	         	
+		try{
+			jArray = new JSONObject(httpRes);  
+			searchlist = jArray.getJSONArray("userSearch");	
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
 
-         
-	        
-	return searchlist;
+		return searchlist;
 	}	
+	
 	public JSONObject getUserInfo(int userid){
-		JSONArray userlist = null;
-		String result = "";
 		JSONObject jArray = null;
 		String uId = String.valueOf(userid);
-		
-	 		
-			String[] name = new String[4];
-			String[] value = new String[4];
-			name[0] = "r";
-			name[1] = "email";
-			name[2] = "password";
-			name[3] = "userId";
-	
-
-			value[0] = "users/GetUserInfoJSON";
-			value[1] = AppService.this.email;
-			value[2] = AppService.this.password;
-			value[3] = uId;
-
-			String httpRes = this.sendHttpRequest(name, value, null, null);	
-			
-			result = getString(R.string.unknown_error_occured);
-			 try{
-				 jArray = new JSONObject(httpRes);            
-			    }catch(JSONException e){
-			            Log.e("log_tag", "Error parsing data "+e.toString());
-			    }
-		    
 
 
-			return  jArray;
+		String[] name = new String[4];
+		String[] value = new String[4];
+		name[0] = "r";
+		name[1] = "email";
+		name[2] = "password";
+		name[3] = "userId";
+
+
+		value[0] = "users/GetUserInfoJSON";
+		value[1] = AppService.this.email;
+		value[2] = AppService.this.password;
+		value[3] = uId;
+
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+
+		try{
+			jArray = new JSONObject(httpRes);            
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
+
+		return  jArray;
 
 	}
+
 	public JSONArray getUserPlaces(int userid){
 		String uId = String.valueOf(userid);
 		JSONArray userwashere = null;
-		String result = "";
 		JSONObject jArray = null;
-		
+
 		String[] name = new String[6];
 		String[] value = new String[6];
 		name[0] = "r";
@@ -1062,37 +978,26 @@ public class AppService extends Service implements IAppService{
 		value[3] = uId;
 		value[4] = "";
 		value[5] = "";
-		
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
-		
-		result = getString(R.string.unknown_error_occured);
-		
-		 try{
-			 jArray = new JSONObject(httpRes);            
-		    }catch(JSONException e){
-		            Log.e("log_tag", "Error parsing data "+e.toString());
-		    }
-	    
-	 	
-	     try{
-	    	 	userwashere = jArray.getJSONArray("userwashere");		 	        
-	 	        
-	         }catch(JSONException e)        {
-	         	 Log.e("log_tag", "Error parsing data "+e.toString());
-	         }
-	         	
 
-         
-	        
-	return userwashere;
+		String httpRes = this.sendHttpRequest(name, value, null, null);	
+
 		
-		
+
+		try{
+			jArray = new JSONObject(httpRes);     
+			userwashere = jArray.getJSONArray("userwashere");
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
+
+
+		return userwashere;
 	}
+
 	public JSONArray SearchJSON(String search) 
 	{
 		JSONArray searchlist = null;
 		JSONObject jArray = null;
-		String result = "";
 		String[] name = new String[2];
 		String[] value = new String[2];
 		name[0] = "r";
@@ -1100,37 +1005,18 @@ public class AppService extends Service implements IAppService{
 
 		value[0] = "users/SearchJSON";
 		value[1] = search;
-		
+
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
-		
-		result = getString(R.string.unknown_error_occured);
-		
-		 try{
-			 jArray = new JSONObject(httpRes);            
-		    }catch(JSONException e){
-		            Log.e("log_tag", "Error parsing data "+e.toString());
-		    }
-	    
-	 	
-	     try{
-	    	 searchlist = jArray.getJSONArray("userSearch");		 	        
 
-	         }catch(JSONException e)        {
-	      
-	         	 Log.e("log_tag", "Error parsing data "+e.toString());
-	         }
-	         	
+		try{
+			jArray = new JSONObject(httpRes);      
+			searchlist = jArray.getJSONArray("userSearch");	
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
 
-         
-	        
-	return searchlist;
-		
-		
-	}
-	
-	private String getString(String string) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return searchlist;
 	}
 
 	public void setAuthenticationServerAddress(String address) {
@@ -1268,7 +1154,6 @@ public class AppService extends Service implements IAppService{
 			longitude = loc.getLongitude();
 			altitude = loc.getAltitude();
 		}
-		String params;
 		//		try {
 		String[] name = new String[7];
 		String[] value = new String[7];
@@ -1291,7 +1176,7 @@ public class AppService extends Service implements IAppService{
 		value[4] = String.valueOf(publicDataInt);
 		value[5] = description;
 		value[6] = "1";
-		
+
 		String httpRes = this.sendHttpRequest(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
 		try {
