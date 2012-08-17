@@ -22,8 +22,14 @@ public class Configuration {
 	public static final String PREFRENCES_AUTO_SEND_CHECKBOX = "PREFRENCES_AUTO_SEND_CHECKBOX";
 	
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
-	public static final String ACCESS_TOKEN = "access_token";
-	public static final String ACCESS_EXPIRES = "access_expires";
+
+	
+	public static final String FB_APP_ID = "370934372924974";
+	public static final String FB_ACCESS_TOKEN = "facebook_access_token";
+	public static final String FB_ACCESS_EXPIRES = "facebook_access_expires";
+	public static final String FB_NAME = "facebook_name";
+	public static final String FB_EMAIL = "facebook_email";
+	public static final String FB_ID = "facebook_fb_id";
 	
 
 	

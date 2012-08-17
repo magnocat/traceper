@@ -130,8 +130,6 @@ public class Main extends Activity
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		autoSendLocationCheckbox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX, false));
 
-		Session session = Session.restore(this);
-		
 		if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 			Toast.makeText(this, R.string.gps_disabled_message, Toast.LENGTH_SHORT).show();
 		}
@@ -277,8 +275,6 @@ public class Main extends Activity
 				@Override
 				public void run() {
 				
-					Session.clearSavedSession(getApplicationContext());
-					
 					appService.exit();
 					
 					handler.post(new Runnable() {

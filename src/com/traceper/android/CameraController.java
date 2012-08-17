@@ -51,7 +51,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private boolean isPreviewRunning;
-	private ProgressDialog pdialog = null; 
 	private static final int UPLOAD_PHOTO = Menu.FIRST;
 	private static final int TAKE_ANOTHER_PHOTO = Menu.FIRST + 1;
 	private static final int BACK = Menu.FIRST + 2;
@@ -59,8 +58,6 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private IAppService appService = null;
 	private boolean pictureTaken = false;
 	private Button takePictureButton = null;
-	private NotificationManager mManager;
-	private static int NOTIFICATION_ID = 0;
 	private static final int DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC = 0;
 	private Button recordVideoButton;
 	private MediaRecorder mMediaRecorder;

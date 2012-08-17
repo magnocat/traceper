@@ -61,8 +61,6 @@ public interface IAppService {
 	
 	public JSONArray SearchJSON(String search);
 	
-	public String registerFBUser(String password, String email, String realname, String fb_id);
-	
 	public String registerGPUser(String password, String email, String realname, String image, String gp_id);
 	
 	public String authenticateUser(String username, String password, String facebookId);

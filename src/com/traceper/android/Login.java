@@ -35,13 +35,12 @@ import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
-import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.FacebookError;
+import com.facebook.android.Util;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
-import com.traceper.android.tools.facebook.LoginControl;
 
 public class Login extends Activity {	
 
@@ -60,7 +59,6 @@ public class Login extends Activity {
 	private EditText passwordText;
 	private Button cancelButton;
 	private Button fbconnect;
-	private Button gpconnect;
 	private CheckBox rememberMeCheckBox;
 	private String dialogMessage;
 	private IAppService appManager;
@@ -72,8 +70,6 @@ public class Login extends Activity {
 			new String[] { "offline_access", "read_stream", "publish_stream", "email" };
 	private Handler handler = new Handler();
 	public static  String search = "";
-	private String strPass1; 
-	private String strPass2;
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -98,6 +94,7 @@ public class Login extends Activity {
 					Toast.LENGTH_SHORT).show();
 		}
 	};
+	protected Facebook facebook;
 
 	/** Called when the activity is first created. */	
 	public void onCreate(Bundle savedInstanceState) {
@@ -112,7 +109,6 @@ public class Login extends Activity {
 		passwordText = (EditText) findViewById(R.id.password);   
 		rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
 		fbconnect = (Button) findViewById(R.id.fbconnect);
-		gpconnect = (Button) findViewById(R.id.gpbutton);
 
 		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
 		emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
@@ -201,39 +197,79 @@ public class Login extends Activity {
 		fbconnect.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
 			{			
-				final Facebook faceb = new Facebook(LoginControl.FB_APP_ID);
-				Session.waitForAuthCallback(faceb);
+				facebook = new Facebook(Configuration.FB_APP_ID);
 				SharedPreferences prefs = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-				String access_token = prefs.getString(Configuration.ACCESS_TOKEN, null);
-				long expires = prefs.getLong(Configuration.ACCESS_EXPIRES, 0);
+				String access_token = prefs.getString(Configuration.FB_ACCESS_TOKEN, null);
+				long expires = prefs.getLong(Configuration.FB_ACCESS_EXPIRES, 0);
 				if (access_token != null) {
-			//		faceb.setAccessToken(access_token);
+				//	facebook.setAccessToken(access_token);
 				}
+				
 				if (expires != 0) {
-			//		faceb.setAccessExpires(expires);
+					facebook.setAccessExpires(expires);
 				}
-				if (faceb.isSessionValid() == false) {
-					faceb.authorize(Login.this, PERMISSIONS, new AppLoginListener(faceb));	
+				if (facebook.isSessionValid() == false) {
+					facebook.authorize(Login.this, PERMISSIONS, new AppLoginListener(facebook));	
 				}
 				else {
-					// user should login directly...
+					String email = prefs.getString(Configuration.FB_EMAIL, "");
+					String name = prefs.getString(Configuration.FB_NAME, "");
+					String fbId = prefs.getString(Configuration.FB_ID, "");
+					authenticateFacebookUser(email, name, fbId);
 					System.out.println("Facebook session is valid..");
 				}
 
 			}        	
 		}); 
-		gpconnect.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-
-				Intent i = new Intent(Login.this, OAuth.class);																		
-				startActivity(i);	
-				Login.this.finish();
-
-			}
-		});
 	}
 	
+	private void authenticateFacebookUser(final String email, final String name, final String fbId){
+		
+		progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
+
+		Thread loginThread = new Thread(){
+
+			String result;
+			@Override
+			public void run() {
+				result = appManager.authenticateUser(email, null, fbId);
+
+				handler.post(new Runnable(){
+					public void run() {										
+						progressDialog.dismiss();
+
+						if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
+						{
+							SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+							editor.putString(Configuration.FB_NAME, name);
+							editor.putString(Configuration.FB_EMAIL, email);
+							editor.putString(Configuration.FB_ID, fbId);
+							editor.commit();
+							
+							Intent i = new Intent(Login.this, Main.class);																		
+							startActivity(i);	
+							Login.this.finish();										
+						}
+						else if (result.equals("UnknownFacebookUser")) {
+							Intent i = new Intent(Login.this, Register.class);
+							i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
+							i.putExtra(Register.EXTRA_EMAIL, email);
+							i.putExtra(Register.EXTRA_FACEBOOK_ID, fbId);
+							i.putExtra(Register.EXTRA_NAME, name);
+							startActivity(i); 
+						}
+						else{
+							Login.this.dialogMessage = result;
+							showDialog(CUSTOM_MESSAGE_DIALOG);
+						}
+					}									
+				});
+
+			}
+		};
+		loginThread.start();
+	}
+
 	private class AppLoginListener implements DialogListener {
 
 		private Facebook fb;
@@ -247,23 +283,19 @@ public class Login extends Activity {
 		}
 
 		public void onComplete(Bundle values) {
-			/**
-			 * We request the user's info so we can cache it locally and
-			 * use it to render the new html snippets
-			 * when the user updates her status or comments on a post. 
-			 */
 			SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-			editor.putString(Configuration.ACCESS_TOKEN, fb.getAccessToken());
-			editor.putLong(Configuration.ACCESS_EXPIRES, fb.getAccessExpires());
+			editor.putString(Configuration.FB_ACCESS_TOKEN, fb.getAccessToken());
+			editor.putLong(Configuration.FB_ACCESS_EXPIRES, fb.getAccessExpires());
 			editor.commit();
-			
+
 			progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
-			
+
 			new AsyncFacebookRunner(fb).request("/me", 
 					new RequestListener() {
 				public void onComplete(String response, Object state) {
 					JSONObject obj;
 					try {
+						progressDialog.dismiss();
 						obj = Util.parseJson(response);
 						// save the session data
 						final String uid = obj.optString("id");
@@ -274,56 +306,21 @@ public class Login extends Activity {
 								name.length() > 0
 								)					
 						{
-							Login.this.runOnUiThread(new Runnable() {
+							handler.post(new Runnable() {
 								@Override
 								public void run() {
-									Thread loginThread = new Thread(){
-										
-										String result;
-										@Override
-										public void run() {
-											result = appManager.authenticateUser(email, null, uid);
-											
-											handler.post(new Runnable(){
-												public void run() {										
-													progressDialog.dismiss();
-
-													if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
-													{
-														Intent i = new Intent(Login.this, Main.class);																		
-														startActivity(i);	
-														Login.this.finish();										
-													}
-													else if (result.equals("UnknownFacebookUser")) {
-														Intent i = new Intent(Login.this, Register.class);
-														i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
-														i.putExtra(Register.EXTRA_EMAIL, email);
-														i.putExtra(Register.EXTRA_FACEBOOK_ID, uid);
-														i.putExtra(Register.EXTRA_NAME, name);
-														startActivity(i); 
-													}
-													else{
-														Login.this.dialogMessage = result;
-														showDialog(CUSTOM_MESSAGE_DIALOG);
-													}
-												}									
-											});
-
-										}
-									};
-									loginThread.start();
+									authenticateFacebookUser(email, name, uid);
 								}
 							});
+							
 						}
-						
+
 					} catch (FacebookError e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 				}
 				@Override
 				public void onFacebookError(FacebookError arg0, Object arg1) {
@@ -353,7 +350,7 @@ public class Login extends Activity {
 			Log.d("app", "facebook error: " + e);
 		}
 	}
-	
+
 
 
 	@Override
@@ -453,7 +450,6 @@ public class Login extends Activity {
 			.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					/* User clicked OK so do some stuff */
-					Session.clearSavedSession(getApplicationContext());
 				}
 			})        
 			.create(); 
@@ -490,6 +486,7 @@ public class Login extends Activity {
 	@Override
 	protected void onResume() 
 	{		
+		startService(new Intent(Login.this, AppService.class));
 		bindService(new Intent(Login.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
 		super.onResume();
 	}
@@ -512,8 +509,7 @@ public class Login extends Activity {
 
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent data) {
-		Facebook fb = Session.wakeupForAuthCallback();
-		fb.authorizeCallback(requestCode, resultCode, data);
+		facebook.authorizeCallback(requestCode, resultCode, data);
 	}
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
