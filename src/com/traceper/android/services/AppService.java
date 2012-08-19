@@ -29,6 +29,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -659,6 +660,11 @@ public class AppService extends Service implements IAppService{
 			value[0] = "site/logout";
 			value[1] = "mobile";
 
+			SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+			editor.putString(Configuration.PREFERENCES_USEREMAIL, "");
+			editor.putString(Configuration.PREFERENCES_PASSWORD, "");
+			editor.commit();
+
 			sendHttpRequest(name, value, null, null);
 		}
 		this.stopSelf();	
@@ -748,59 +754,19 @@ public class AppService extends Service implements IAppService{
 		return result;
 	}
 
-	public String registerGPUser(String password, String email, String realname ,String image, String gp_id) 
-	{ // register google user
-		String[] name = new String[9];
-		String[] value = new String[9];
-		name[0] = "r";
-		name[1] = "RegisterForm[email]";
-		name[2] = "RegisterForm[password]";
-		name[3] = "RegisterForm[passwordAgain]";
-		name[4] = "RegisterForm[name]";
-		name[5] = "RegisterForm[image]";
-		name[6] = "RegisterForm[account_type]";
-		name[7] = "RegisterForm[ac_id]";
-		name[8] = "client";
-
-		value[0] = "site/GP_M_Register";
-		value[1] = email;
-		value[2] = password;
-		value[3] = password;
-		value[4] = realname;
-		value[5] = image;
-		value[6] = GOOGLE_ACCOUNT;
-		value[7] = gp_id;
-		value[8] = "mobile";
-
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
-
-		String result = getString(R.string.unknown_error_occured);
-
-		try {
-			JSONObject jsonObject = new JSONObject(httpRes);
-			result = jsonObject.getString("result");
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-
-	public String authenticateUser(String email, String password, String facebookId) 
+	public String authenticateUser(String email, String password) 
 	{			
 		this.password = password;
 		this.email = email;
 
-		String[] name = new String[7];
-		String[] value = new String[7];
+		String[] name = new String[6];
+		String[] value = new String[6];
 		name[0] = "r";
 		name[1] = "LoginForm[email]";
 		name[2] = "LoginForm[password]";
 		name[3] = "deviceId";
 		name[4] = "LoginForm[rememberMe]";
 		name[5] = "client";
-		name[6] = "LoginForm[facebookId]";
 
 		value[0] = "site/login";
 		value[1] = this.email;
@@ -811,16 +777,11 @@ public class AppService extends Service implements IAppService{
 		value[3] = this.deviceId;
 		value[4] = "1";
 		value[5] = "mobile";
-		if (facebookId == null) {
-			facebookId = "0";
-		}
-		value[6] = facebookId;
+	
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
 
-		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
-
 
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
@@ -1188,6 +1149,34 @@ public class AppService extends Service implements IAppService{
 		//		int result = this.evaluateResult(httpRes);
 
 		return result;
+	}
+
+	@Override
+	public boolean isFacebookUserRegistered(String email, String facebookId) {
+		String[] name = new String[3];
+		String[] value = new String[3];
+		name[0] = "r";
+		name[1] = "email";
+		name[2] = "facebookId";
+
+		value[0] = "site/isFacebookUserRegistered";
+		value[1] = email;
+		value[2] = facebookId;
+		
+		boolean isRegistered = false;
+		String httpRes = sendHttpRequest(name, value, null, null);
+		String result = getString(R.string.unknown_error_occured);
+		try {
+			JSONObject jsonObject = new JSONObject(httpRes);
+			result = jsonObject.getString("result");
+			if (result.equals("1")) {
+				isRegistered = true;
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return isRegistered;
 	}
 
 }

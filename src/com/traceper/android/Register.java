@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -150,14 +151,28 @@ public class Register extends Activity {
 													System.out
 															.println("Server response "  + serverResponse);
 													if (serverResponse.equals("1") == true) {
-														showDialog(SIGN_UP_SUCCESSFULL);
+														if (facebookId != null && facebookId.equals("") == false) {
+															Toast.makeText(Register.this, getString(R.string.signup_not_required_activation_successfull), Toast.LENGTH_LONG).show();
+															SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME,0).edit();
+															editor.putString(Configuration.PREFERENCES_USEREMAIL, eMailText.getText().toString());
+															editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());
+															editor.putString(Configuration.FB_EMAIL, eMailText.getText().toString());
+															editor.putString(Configuration.FB_NAME, realnameText.getText().toString());
+															editor.putString(Configuration.FB_ID, facebookId);
+															
+															editor.commit();
+															finish();
+														}
+														else {
+															showDialog(SIGN_UP_SUCCESSFULL);														
+														}
 													}
 													else {
 														Register.this.dialogMessage = serverResponse;
 														showDialog(CUSTOM_MESSAGE_DIALOG);
 													}
 												}
-		
+	
 											});
 										}
 		

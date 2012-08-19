@@ -24,6 +24,7 @@
 	<string name="signup_failed">Bilinmeyen bir nedenden dolayı kayıt işlemi iptal edildi</string>
 	<string name="signup_email_crashed">Girilen E-posta adresi kullanılmaktadır</string>
 	<string name="signup_successfull">Kayıt işlemi başarılı bir şekilde sonlandı.Hesabınızı aktive etmek için e-postalarınızı kontrol ediniz</string>
+	<string name="signup_not_required_activation_successfull">Kayıt işlemi başarıyla tamalandı. Giriş yapılıyor...</string>
 	<string name="email_not_valid">Geçersiz E-posta adresi</string>
 	<string name="email_and_password_length_short">E-posta ve parolanın uzunluğu en az 5 karakter olmalı</string>
 	<string name="add_new_friend">Yeni arkadaş ekle</string>
@@ -71,7 +72,7 @@
 	<string name="upload_photo">Fotoğraf Yükle</string>
 	<string name="please_enter_description">Lütfen tanım giriniz</string>
 	<string name="location_fix_problem">Konum bilgilerindeki düzeltme henüz alınamadı</string>
-	<string name="signingout">Oturumu kapat...</string>
+	<string name="signingout">Oturum kapatılıyor...</string>
 	<string name="show_all_user_location_on_map">Show all us. l. o. m.</string>
 <string name="list_refresh">Arkadaş listesini yenile</string>
 <string name="map_refresh">Kullanıcı konumunu yenile</string>
@@ -82,8 +83,6 @@
 <string name="search_failed">adında kullanıcı mevcut değil</string>
 <string name="couldnt_find">her hangi bir kayıt bulunamadı!</string>
 <string name="turn_back">Geri</string>
-<string name="settings_password">Şifre</string>
-<string name="settings_password2">Şifre Tekrarı</string>
-<string name="settings_pwd_equal">Şifre Doğru</string>
-<string name="settings_pwd_not_equal">Not Equal to each other</string>
+<string name="enterPassword">Lütfen kayıtta belirlediğiniz şifrenizi giriniz.</string>
+
 </resources>
