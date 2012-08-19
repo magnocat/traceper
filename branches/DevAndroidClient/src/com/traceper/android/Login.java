@@ -59,7 +59,6 @@ public class Login extends Activity {
 	private EditText passwordText;
 	private Button cancelButton;
 	private Button fbconnect;
-	private CheckBox rememberMeCheckBox;
 	private String dialogMessage;
 	private IAppService appManager;
 	private ProgressDialog progressDialog;
@@ -76,6 +75,9 @@ public class Login extends Activity {
 			appManager = ((AppService.IMBinder)service).getService();  
 			appManager.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
 
+			String prefEmail = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
+			String prefPassword = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
+			
 			if (appManager.isNetworkConnected() == false)
 			{
 				showDialog(NOT_CONNECTED_TO_NETWORK);					
@@ -86,6 +88,13 @@ public class Login extends Activity {
 				startActivity(i);
 				Login.this.finish();
 			}
+			else if (prefEmail != null && prefEmail.equals("") == false 
+					&& prefPassword != null && prefPassword.equals("") == false) {
+				emailText.setText(prefEmail);
+				passwordText.setText(prefPassword);
+				loginButton.performClick();
+				
+			}
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -95,6 +104,8 @@ public class Login extends Activity {
 		}
 	};
 	protected Facebook facebook;
+	private Button loginButton;
+	private SharedPreferences preferences;
 
 	/** Called when the activity is first created. */	
 	public void onCreate(Bundle savedInstanceState) {
@@ -103,24 +114,17 @@ public class Login extends Activity {
 		setContentView(R.layout.login_screen);
 		setTitle("Login - " + Configuration.APPLICATION_NAME);
 
-		Button loginButton = (Button) findViewById(R.id.login);
+		loginButton = (Button) findViewById(R.id.login);
 		cancelButton = (Button) findViewById(R.id.cancel_login);
 		emailText = (EditText) findViewById(R.id.email);
 		passwordText = (EditText) findViewById(R.id.password);   
-		rememberMeCheckBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
 		fbconnect = (Button) findViewById(R.id.fbconnect);
 
-		SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-		emailText.setText(preferences.getString(Configuration.PREFERENCES_USEREMAIL, ""));
-		passwordText.setText(preferences.getString(Configuration.PREFERENCES_PASSWORD, ""));
-		rememberMeCheckBox.setChecked(preferences.getBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, false));
-
+		preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
+		
 		loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
 			{	
-				SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-				editor.putBoolean(Configuration.PREFRENCES_REMEMBER_ME_CHECKBOX, rememberMeCheckBox.isChecked());
-				editor.commit();
 				// Start and bind the  imService 
 				startService(new Intent(Login.this,  AppService.class));
 
@@ -142,7 +146,7 @@ public class Login extends Activity {
 						String result;
 						@Override
 						public void run() {
-							result = appManager.authenticateUser(emailText.getText().toString(), passwordText.getText().toString(), null);
+							result = appManager.authenticateUser(emailText.getText().toString(), passwordText.getText().toString());
 
 							handler.post(new Runnable(){
 								public void run() {										
@@ -150,17 +154,16 @@ public class Login extends Activity {
 
 									if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
 									{
-										SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-
-										if (rememberMeCheckBox.isChecked() == true) {									
+										String prefEmail = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
+										String prefPassword = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
+										if (prefEmail == null || prefEmail.equals("") 
+											|| prefPassword == null || prefPassword.equals("")) 
+										{
+											SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
 											editor.putString(Configuration.PREFERENCES_USEREMAIL, emailText.getText().toString());
 											editor.putString(Configuration.PREFERENCES_PASSWORD, passwordText.getText().toString());		                        									
+											editor.commit();	
 										}
-										else {
-											editor.remove(Configuration.PREFERENCES_USEREMAIL);
-											editor.remove(Configuration.PREFERENCES_PASSWORD);
-										}
-										editor.commit();	
 
 										Intent i = new Intent(Login.this, Main.class);																		
 										startActivity(i);	
@@ -198,78 +201,27 @@ public class Login extends Activity {
 			public void onClick(View arg0) 
 			{			
 				facebook = new Facebook(Configuration.FB_APP_ID);
-				SharedPreferences prefs = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
-				String access_token = prefs.getString(Configuration.FB_ACCESS_TOKEN, null);
-				long expires = prefs.getLong(Configuration.FB_ACCESS_EXPIRES, 0);
+				String access_token = preferences.getString(Configuration.FB_ACCESS_TOKEN, null);
+				long expires = preferences.getLong(Configuration.FB_ACCESS_EXPIRES, 0);
 				if (access_token != null) {
-				//	facebook.setAccessToken(access_token);
+					facebook.setAccessToken(access_token);
 				}
 				
 				if (expires != 0) {
 					facebook.setAccessExpires(expires);
 				}
-				if (facebook.isSessionValid() == false) {
-					facebook.authorize(Login.this, PERMISSIONS, new AppLoginListener(facebook));	
+				if (facebook.isSessionValid() == true) {
+					emailText.setText(preferences.getString(Configuration.FB_EMAIL, ""));
+					Toast.makeText(Login.this, getString(R.string.enterPassword), Toast.LENGTH_LONG).show();
 				}
 				else {
-					String email = prefs.getString(Configuration.FB_EMAIL, "");
-					String name = prefs.getString(Configuration.FB_NAME, "");
-					String fbId = prefs.getString(Configuration.FB_ID, "");
-					authenticateFacebookUser(email, name, fbId);
-					System.out.println("Facebook session is valid..");
+					facebook.authorize(Login.this, PERMISSIONS, new AppLoginListener(facebook));	
 				}
 
 			}        	
 		}); 
 	}
 	
-	private void authenticateFacebookUser(final String email, final String name, final String fbId){
-		
-		progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
-
-		Thread loginThread = new Thread(){
-
-			String result;
-			@Override
-			public void run() {
-				result = appManager.authenticateUser(email, null, fbId);
-
-				handler.post(new Runnable(){
-					public void run() {										
-						progressDialog.dismiss();
-
-						if (result.equals("1")) // == IAppService.HTTP_RESPONSE_SUCCESS)
-						{
-							SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-							editor.putString(Configuration.FB_NAME, name);
-							editor.putString(Configuration.FB_EMAIL, email);
-							editor.putString(Configuration.FB_ID, fbId);
-							editor.commit();
-							
-							Intent i = new Intent(Login.this, Main.class);																		
-							startActivity(i);	
-							Login.this.finish();										
-						}
-						else if (result.equals("UnknownFacebookUser")) {
-							Intent i = new Intent(Login.this, Register.class);
-							i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
-							i.putExtra(Register.EXTRA_EMAIL, email);
-							i.putExtra(Register.EXTRA_FACEBOOK_ID, fbId);
-							i.putExtra(Register.EXTRA_NAME, name);
-							startActivity(i); 
-						}
-						else{
-							Login.this.dialogMessage = result;
-							showDialog(CUSTOM_MESSAGE_DIALOG);
-						}
-					}									
-				});
-
-			}
-		};
-		loginThread.start();
-	}
-
 	private class AppLoginListener implements DialogListener {
 
 		private Facebook fb;
@@ -309,7 +261,7 @@ public class Login extends Activity {
 							handler.post(new Runnable() {
 								@Override
 								public void run() {
-									authenticateFacebookUser(email, name, uid);
+									isFacebookUserRegistered(email, uid, name);
 								}
 							});
 							
@@ -349,6 +301,42 @@ public class Login extends Activity {
 		public void onFacebookError(FacebookError e) {
 			Log.d("app", "facebook error: " + e);
 		}
+	}
+
+	
+	private void isFacebookUserRegistered(final String email, final String facebookId, final String name) {
+		progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);
+
+		
+		Thread facebookUserCheckThread = new Thread(){
+			@Override
+			public void run() {
+				final boolean result = appManager.isFacebookUserRegistered(email, facebookId);
+				
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						progressDialog.dismiss();
+						
+						if (result == true){
+							emailText.setText(email);
+							Toast.makeText(Login.this, getString(R.string.enterPassword), Toast.LENGTH_LONG).show();
+							passwordText.setText("");
+						}
+						else {
+							Intent i = new Intent(Login.this, Register.class);
+							i.setAction(Register.ACTION_REGISTER_FACEBOOK_USER);
+							i.putExtra(Register.EXTRA_EMAIL, email);
+							i.putExtra(Register.EXTRA_FACEBOOK_ID, facebookId);
+							i.putExtra(Register.EXTRA_NAME, name);
+							startActivity(i); 
+						}
+					}
+				});
+				
+			}
+		};
+		facebookUserCheckThread.start();
 	}
 
 

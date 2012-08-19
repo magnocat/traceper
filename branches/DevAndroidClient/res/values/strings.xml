@@ -28,6 +28,7 @@
 	<string name="signup_failed">Sign up failed because of unknown reason</string>
 	<string name="signup_email_crashed">Your email have been already used</string>
 	<string name="signup_successfull">Your data is recorded successfully, check your email to activate your account</string>
+	<string name="signup_not_required_activation_successfull">Registration is successfull. Logining...</string>
 	<string name="email_not_valid">Email is not valid!</string>
 	<string name="email_and_password_length_short">Email and password length must be at least 5</string>
 	<string name="add_new_friend">Add new friend</string>
@@ -86,8 +87,5 @@
 <string name="search_failed">named user does not exist!</string>
 <string name="couldnt_find">any request could not find!</string>
 <string name="turn_back">Turn Back</string>
-<string name="settings_password">Enter Password</string>
-<string name="settings_password2">Enter Password Again</string>
-<string name="settings_pwd_equal">Password Equal</string>
-<string name="settings_pwd_not_equal">Not Equal to each other</string>
+<string name="enterPassword">Please enter password you specified in registration</string>
 </resources>
