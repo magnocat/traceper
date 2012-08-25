@@ -204,7 +204,7 @@ public class Login extends Activity {
 				String access_token = preferences.getString(Configuration.FB_ACCESS_TOKEN, null);
 				long expires = preferences.getLong(Configuration.FB_ACCESS_EXPIRES, 0);
 				if (access_token != null) {
-					facebook.setAccessToken(access_token);
+			//		facebook.setAccessToken(access_token);
 				}
 				
 				if (expires != 0) {
