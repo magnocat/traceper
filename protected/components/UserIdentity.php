@@ -9,7 +9,7 @@ class UserIdentity extends CUserIdentity
 {
 	private $realname;
 	private $userId;
-	private $facebookId;
+
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -21,7 +21,7 @@ class UserIdentity extends CUserIdentity
 	public function authenticate()
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select='Id,realname,password, fb_id';  
+		$criteria->select='Id,realname,password';  
 		$criteria->condition='email=:email';
 		$criteria->params=array(':email'=>$this->username);
 		$user = Users::model()->find($criteria); // $params is not needed
@@ -34,8 +34,7 @@ class UserIdentity extends CUserIdentity
  				$this->errorCode = self::ERROR_USERNAME_INVALID;
  			}
 		}
-		else if ($user->password == md5($this->password) || 
-				  $user->fb_id == $this->facebookId) {
+		else if ($user->password == md5($this->password)) {
 			$this->errorCode = self::ERROR_NONE;
 			$this->realname = $user->realname;
 			$this->userId = $user->Id;
@@ -44,10 +43,6 @@ class UserIdentity extends CUserIdentity
 			$this->errorCode = self::ERROR_PASSWORD_INVALID;				
 		}
 		return $this->errorCode;
-	}
-	
-	public function setFacebookId($facebookId) {
-		$this->facebookId = $facebookId;
 	}
 	
 	public function getName() {

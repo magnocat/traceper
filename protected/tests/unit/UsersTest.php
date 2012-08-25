@@ -337,6 +337,17 @@ class UsersTest extends CDbTestCase
 		Users::model()->setAuthorityLevel($this->users("user2")->Id, AuthorityLevel::UnauthorizedUser);
 		$this->assertEquals(Users::model()->getAuthorityLevel($this->users("user2")->Id), AuthorityLevel::UnauthorizedUser);
 	}	
+	
+	public function testIsFacebookUserRegistered(){
+		
+		$this->assertTrue(Users::model()->isFacebookUserRegistered($this->users('user1')->email, $this->users('user1')->fb_id));
+		$this->assertTrue(Users::model()->isFacebookUserRegistered($this->users('user2')->email, $this->users('user2')->fb_id));
+		$this->assertFalse(Users::model()->isFacebookUserRegistered($this->users('user2')->email, 23232323));
+		
+		$this->assertFalse(Users::model()->isFacebookUserRegistered("some@email.com", $this->users('user2')->fb_id));
+		$this->assertFalse(Users::model()->isFacebookUserRegistered("another@email.adress.com", "1212"));
+		
+	}
 		
 	//TODO: Problem in offset and limit parameters
 // 	public function testGetListDataProvider_offset_limit(){

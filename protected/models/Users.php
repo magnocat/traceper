@@ -200,6 +200,15 @@ class Users extends CActiveRecord
 		return $users->save();
 	}
 	
+	public function isFacebookUserRegistered($email, $facebookId) {
+		$user = Users::model()->find('email=:email AND fb_id=:facebookId', array(':email'=>$email, ':facebookId'=>$facebookId));
+		$result = false;
+		if ($user != null) {
+			$result = true;
+		}
+		return $result;
+	}
+	
 	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
 		if ($fb_id == null || $fb_id == 0) {
 			return false;
