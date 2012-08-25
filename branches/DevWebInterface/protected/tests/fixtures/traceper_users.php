@@ -7,7 +7,8 @@ return array(
 				'email'=>'test@traceper.com',
 				'userType' => UserType::RealUser,
 				'publicPosition'=>1,
-				'authorityLevel'=>AuthorityLevel::UnauthorizedUser
+				'authorityLevel'=>AuthorityLevel::UnauthorizedUser,
+				'fb_id'=>123456789,
 		),
 		'user2'=>array(
 				'Id'=>2,
@@ -16,7 +17,8 @@ return array(
 				'email'=>'test2@traceper.com',
 				'userType' => UserType::GPSDevice,
 				'publicPosition'=>0,
-				'authorityLevel'=>AuthorityLevel::StandardUser
+				'authorityLevel'=>AuthorityLevel::StandardUser,
+				'fb_id'=>123456789,
 		),
 		'user_privacy_group_test'=>array(
 				'Id'=>3,

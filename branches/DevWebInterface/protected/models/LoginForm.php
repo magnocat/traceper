@@ -9,7 +9,6 @@ class LoginForm extends CFormModel
 {
 	public $email;
 	public $password;
-	public $facebookId;
 	public $rememberMe;
 	
 
@@ -25,8 +24,6 @@ class LoginForm extends CFormModel
 		return array(
 			// username and password are required
 			array('email, password', 'required','message'=>'Field cannot be blank!'),
-
-			array('facebookId', 'safe'),
 			
 			array('email', 'email', 'message'=>'E-mail not valid!'),
 			// rememberMe needs to be a boolean
@@ -44,7 +41,6 @@ class LoginForm extends CFormModel
 		return array(
 			'rememberMe'=>'Remember me next time',
 			'email'=>Yii::t('general', 'E-mail'),
-			'facebookId'=>'Facebook Id',
 		);
 	}
 
@@ -57,15 +53,11 @@ class LoginForm extends CFormModel
 		if(!$this->hasErrors())
 		{
 			$this->_identity=new UserIdentity($this->email, $this->password);
-			$this->_identity->setFacebookId($this->facebookId);
 			switch($this->_identity->authenticate())
 			{
 				case CUserIdentity::ERROR_USERNAME_INVALID:					
 				case CUserIdentity::ERROR_PASSWORD_INVALID:
 					$this->addError('password','Incorrect password or e-mail!');
-					break;
-				case CUserIdentity::ERROR_UNKNOWN_IDENTITY:
-					$this->addError('password', 'UnknownFacebookUser');
 					break;
 				case CUserIdentity::ERROR_NONE:
 					break;					
@@ -83,7 +75,6 @@ class LoginForm extends CFormModel
 		if($this->_identity===null)
 		{
 			$this->_identity=new UserIdentity($this->email, $this->password);
-			$this->_identity->setFacebookId($this->facebookId);
 			$this->_identity->authenticate();
 		}
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
