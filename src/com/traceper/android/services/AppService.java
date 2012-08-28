@@ -201,10 +201,10 @@ public class AppService extends Service implements IAppService{
 					locationManager.removeUpdates(gpsLocationIntent);
 					locationManager.removeUpdates(networkLocationIntent);
 					if (networkLocation != null) {
-						sendLocation(networkLocation);
+						sendLocationToServer(networkLocation);
 					}
 					else if(gpsLocation != null){
-						sendLocation(gpsLocation);
+						sendLocationToServer(gpsLocation);
 					}
 					else {
 						networkLocation = null;
@@ -269,7 +269,7 @@ public class AppService extends Service implements IAppService{
 						float accuracy =  networkLocation.getAccuracy();
 						Log.i("network location accuracy", " " + accuracy);
 						if (gps_enabled == false) {
-							sendLocation(networkLocation);
+							sendLocationToServer(networkLocation);
 						}
 						else 
 						{
@@ -1007,10 +1007,10 @@ public class AppService extends Service implements IAppService{
 				locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == false)
 		{
 			if (gpsLocation != null) {
-				sendLocation(gpsLocation);
+				sendLocationToServer(gpsLocation);
 			}
 			else if (networkLocation != null) {
-				sendLocation(networkLocation);
+				sendLocationToServer(networkLocation);
 			}
 		}
 		else {
@@ -1018,62 +1018,72 @@ public class AppService extends Service implements IAppService{
 			{
 				if (gpsLocation.hasAccuracy() == true && networkLocation.hasAccuracy() == true) {
 					if (gpsLocation.getAccuracy() < networkLocation.getAccuracy()) {
-						sendLocation(gpsLocation);
+						sendLocationToServer(gpsLocation);
 					}
 					else {
-						sendLocation(networkLocation);
+						sendLocationToServer(networkLocation);
 					}
 				} 
 				else {
-					sendLocation(gpsLocation);
+					sendLocationToServer(gpsLocation);
 				}
 			}	
 		}	
 	}
 
 
-	private void sendLocation(Location loc) {
+	private void sendLocationToServer(final Location loc) {
 		locationManager.removeUpdates(networkLocationIntent);
 		locationManager.removeUpdates(gpsLocationIntent);
 		am.cancel(sendLocation);
 		networkLocation = null;
 		gpsLocation = null;
 		lastSentLocation = loc;
-		boolean connected = isNetworkConnected();
-		String result = null;
+		final boolean connected = isNetworkConnected();
+		
 		if (connected == true) {
 			mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-			Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
+			final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
-			PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+			final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 
 			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), getString(R.string.sending_location_data), contentIntent);
 			mManager.notify(NOTIFICATION_ID, notification);
-			// send pending locations if any...
-			sendPendingLocations();
-			// send last location data
-			result = sendLocationDataAndParseResult(loc);	
-			String processResult = getString(R.string.sending_location_data_failed);
-			if (result.equals("1")) {
-				processResult = getString(R.string.sending_location_data_successfull);
-			}
-			notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
-			mManager.notify(NOTIFICATION_ID, notification);
+			
+			Thread sendThread = new Thread(){ 
+				@Override
+				public void run() {
+					// send pending locations if any...
+					sendPendingLocations();
+					// send last location data
+					String result = sendLocationDataAndParseResult(loc);	
+					String processResult = getString(R.string.sending_location_data_failed);
+					if (result.equals("1")) {
+						processResult = getString(R.string.sending_location_data_successfull);
+					}
+					notification.setLatestEventInfo(getApplicationContext(), getString(R.string.ApplicationName), processResult, contentIntent);
+					mManager.notify(NOTIFICATION_ID, notification);
 
-			// upload pending image if any...
-			if (pendingImage != null) {
-				uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
-				pendingImage = null;
-			}
-			if (pendingVideo != null){
-				uploadVideo(pendingVideo.image, pendingVideo.isPublic, pendingVideo.description);
-				pendingVideo = null;
-			}
+					// upload pending image if any...
+					if (pendingImage != null) {
+						uploadImage(pendingImage.image, pendingImage.isPublic, pendingImage.description);
+						pendingImage = null;
+					}
+					if (pendingVideo != null){
+						uploadVideo(pendingVideo.image, pendingVideo.isPublic, pendingVideo.description);
+						pendingVideo = null;
+					}
+					if (connected == false || result.equals("1") == false){
+						pendingLocations.add(loc);
+					}
+
+				}
+			};
+			sendThread.start();
+			
 		}
-		if (connected == false || result.equals("1") == false){
-			pendingLocations.add(loc);
-		}
+	
 
 	}
 
@@ -1088,7 +1098,7 @@ public class AppService extends Service implements IAppService{
 
 		final Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
 
-		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, null, 0);
+		final PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, mainActivityIntent, 0);
 
 		notification.setLatestEventInfo(this,
 				getString(R.string.ApplicationName), getString(R.string.uploading), contentIntent);
