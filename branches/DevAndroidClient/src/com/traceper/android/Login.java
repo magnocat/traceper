@@ -139,7 +139,7 @@ public class Login extends Activity {
 				//TODO: check whether email format is valid.
 				else if (emailText.length() > 0 && passwordText.length() > 0)
 				{					
-					progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, false);	
+					progressDialog = ProgressDialog.show(Login.this, "", getString(R.string.loading), true, true);	
 
 					Thread loginThread = new Thread(){
 						private Handler handler = new Handler();
@@ -204,7 +204,7 @@ public class Login extends Activity {
 				String access_token = preferences.getString(Configuration.FB_ACCESS_TOKEN, null);
 				long expires = preferences.getLong(Configuration.FB_ACCESS_EXPIRES, 0);
 				if (access_token != null) {
-			//		facebook.setAccessToken(access_token);
+					facebook.setAccessToken(access_token);
 				}
 				
 				if (expires != 0) {
