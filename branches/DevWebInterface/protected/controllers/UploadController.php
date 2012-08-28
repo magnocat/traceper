@@ -291,24 +291,12 @@ class UploadController extends Controller
 				}
 
 				if ($insertToDB == true) {
-				
-					/*					
-					$sql = sprintf('INSERT INTO '
-									. Upload::model()->tableName() .'
-									(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description)
-									VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s")', 
-									$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description);
-					
-					$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-					*/
-					
+									
 					$result = "Unknown Error";
-					$effectedRows= Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
+					$effectedRows = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
 					if ($effectedRows == 1)
 					{
-						
 						$result = "Error in moving uploading file";
-						
 						$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
 						
 						if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
