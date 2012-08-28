@@ -1,4 +1,4 @@
-d<?php
+<?php
 
 /**
  * This is the model class for table "traceper_upload".
@@ -135,15 +135,14 @@ class Upload extends CActiveRecord
     
     
     public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey) {
-    
     	$sql = sprintf('INSERT INTO '
     			. Upload::model()->tableName() .'
     			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description, isLive, liveKey)
-    			VALUES(%d, %s, %s, %s, %s, NOW(), %d, "%s", %d, %d)',
+    			VALUES(%d, %d, %s, %s, %s, NOW(), %d, "%s", %d, %d)',
     			$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
-    	$result = "Unknown Error";
+		
     	$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-    
+    	
     	return $effectedRows;
     }
     

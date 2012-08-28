@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.4
+-- version 3.4.10.1deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 10, 2012 at 01:33 AM
--- Server version: 5.1.58
--- PHP Version: 5.3.6-13ubuntu3.3
+-- Generation Time: Aug 28, 2012 at 08:12 PM
+-- Server version: 5.5.22
+-- PHP Version: 5.3.10-1ubuntu3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -23,7 +23,21 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `traceper_friends` 
+-- Table structure for table `traceper_facebookUser`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_facebookUser` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `facebookId` int(11) NOT NULL,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `facebookId` (`facebookId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `traceper_friends`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_friends` (
@@ -38,41 +52,18 @@ CREATE TABLE IF NOT EXISTS `traceper_friends` (
   KEY `friend1` (`friend1`),
   KEY `friend2` (`friend2`),
   KEY `status` (`status`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=73 ;
-
---
--- Dumping data for table `traceper_friends`
---
-
-INSERT INTO `traceper_friends` (`Id`, `friend1`, `friend1Visibility`, `friend2`, `friend2Visibility`, `status`) VALUES
-(38, 1, 1, 2, 1, 1),
-(39, 1, 1, 3, 1, 1),
-(40, 1, 1, 4, 1, 1),
-(41, 1, 1, 5, 0, 1),
-(42, 1, 0, 6, 1, 1),
-(43, 1, 0, 8, 0, 1),
-(44, 1, 1, 9, 0, 1),
-(63, 1, 0, 11, 0, 0),
-(64, 15, 0, 18, 0, 0),
-(65, 12, 0, 13, 0, 0),
-(66, 12, 0, 14, 0, 0),
-(67, 12, 0, 15, 0, 0),
-(68, 12, 0, 16, 0, 0),
-(69, 12, 0, 17, 0, 0),
-(70, 12, 0, 18, 0, 0),
-(71, 12, 0, 19, 0, 0),
-(72, 12, 0, 20, 0, 0);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Tablo yap?s?: `traceper_geofence`
+-- Table structure for table `traceper_geofence`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_geofence` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
-  `name` varchar(45) NOT NULL,  
+  `name` varchar(45) NOT NULL,
   `description` varchar(500) NOT NULL DEFAULT '',
   `point1Latitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
   `point1Longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
@@ -83,6 +74,22 @@ CREATE TABLE IF NOT EXISTS `traceper_geofence` (
   PRIMARY KEY (`Id`),
   UNIQUE KEY `ownerHasUniqueGeofenceName` (`name`,`userId`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `traceper_geofence_user_relation`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_geofence_user_relation` (
+  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `geofenceId` int(11) unsigned NOT NULL,
+  `userId` int(11) unsigned NOT NULL,
+  `status` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `geofenceUserId` (`geofenceId`,`userId`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -119,8 +126,8 @@ CREATE TABLE IF NOT EXISTS `traceper_privacy_groups` (
   `description` varchar(500) DEFAULT NULL,
   `allowedToSeeOwnersPosition` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`,`type`) 
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=58 ;
+  UNIQUE KEY `ownerHasUniqueGroupName` (`name`,`owner`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -154,24 +161,32 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `uploadTime` datetime NOT NULL,
   `publicData` tinyint(4) NOT NULL DEFAULT '0',
   `description` varchar(255) NOT NULL,
+  `isLive` tinyint(4) NOT NULL DEFAULT '0',
+  `liveKey` varchar(128) NOT NULL,
   PRIMARY KEY (`Id`) USING BTREE,
   KEY `index2` (`uploadTime`),
   KEY `publicData` (`publicData`),
   KEY `userId` (`userId`),
   KEY `descriptioon` (`description`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 ;
 
 --
 -- Dumping data for table `traceper_upload`
 --
 
-INSERT INTO `traceper_upload` (`Id`, `fileType`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`) VALUES
-(7, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, ''),
-(10, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, ''),
-(11, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, ''),
-(12, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, ''),
-(13, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, ''),
-(14, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj');
+INSERT INTO `traceper_upload` (`Id`, `fileType`, `userId`, `latitude`, `longitude`, `altitude`, `uploadTime`, `publicData`, `description`, `isLive`, `liveKey`) VALUES
+(7, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-03 18:35:01', 1, '', 0, ''),
+(10, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:20:31', 1, '', 0, ''),
+(11, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 00:22:09', 1, '', 0, ''),
+(12, 0, 1, 0.000000, 0.000000, 0.000000, '2011-12-04 16:23:40', 1, '', 0, ''),
+(13, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 05:56:24', 1, '', 0, ''),
+(14, 0, 1, 0.000000, 0.000000, 0.000000, '2012-01-01 07:34:35', 0, 'ghj', 0, ''),
+(15, 0, 1, 39.759800, 39.467087, 0.000000, '2012-08-26 09:11:55', 0, 'jfjf', 0, '0'),
+(16, 0, 1, 39.759800, 39.467087, 0.000000, '2012-08-26 09:13:41', 0, 'hdhd', 0, '0'),
+(17, 0, 1, 39.737456, 39.412809, 0.000000, '2012-08-26 09:16:07', 0, 'hdjd', 0, '0'),
+(18, 0, 1, 39.759800, 39.467087, 0.000000, '2012-08-26 09:25:28', 0, 'hhhh', 0, '0'),
+(19, 0, 1, 39.759800, 39.467087, 0.000000, '2012-08-26 09:32:28', 0, 'tür', 0, '0'),
+(20, 0, 1, 39.922642, 32.867466, 1330.000000, '2012-08-28 20:10:39', 0, 'bi', 0, '0');
 
 -- --------------------------------------------------------
 
@@ -256,43 +271,15 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   KEY `dataArrivedTime` (`dataArrivedTime`),
   KEY `realname` (`realname`) USING BTREE,
   KEY `password` (`password`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=69 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=87 ;
 
 --
 -- Dumping data for table `traceper_users`
 --
 
 INSERT INTO `traceper_users` (`Id`, `password`, `group`, `latitude`, `longitude`, `altitude`, `publicPosition`, `authorityLevel`, `realname`, `email`, `dataArrivedTime`, `deviceId`, `status_message`, `status_source`, `status_message_time`, `dataCalculatedTime`, `fb_id`, `g_id`, `gender`, `userType`, `account_type`, `gp_image`) VALUES
-(1, '202cb962ac59075b964b07152d234b70', 0, '39.927638', '32.886838', '115.000000', 0, 1, 'Test', 'test@traceper.com', '2011-12-25 14:56:22', '351751049911319', '', 1, '2010-10-31 20:10:09', '2011-12-14 18:49:15', '0', '0', 0, 0, 0, NULL),
-(2, '', 0, '12.234567', '122.345677', '0.000000', 0, 1, 'test2', 'test2@traceper.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(3, '', 0, '1.000000', '0.000000', '0.000000', 0, 1, '1', '2', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(4, '', 0, '2.000000', '0.000000', '0.000000', 0, 1, '2', '3', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(5, '', 0, '3.000000', '0.000000', '0.000000', 0, 1, '4', '4', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(6, '', 0, '4.000000', '0.000000', '0.000000', 0, 1, '5', '5', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(7, '', 0, '5.000000', '0.000000', '0.000000', 0, 1, '6', '6', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(8, '', 0, '6.000000', '0.000000', '0.000000', 0, 1, '7', '7', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(9, '', 0, '7.000000', '0.000000', '0.000000', 0, 1, '8', '8', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(10, '', 0, '8.000000', '0.000000', '0.000000', 0, 1, '9', '9', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(11, '', 0, '0.000000', '0.000000', '0.000000', 0, 1, '10', '10', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(12, '', 0, '90.000000', '0.000000', '0.000000', 0, 1, '11', '11', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(13, '', 0, '10.000000', '0.000000', '0.000000', 0, 1, '12', '12', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(14, '', 0, '11.000000', '0.000000', '0.000000', 0, 1, '13', '13', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(15, '', 0, '13.000000', '0.000000', '0.000000', 0, 1, '14', '14', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(16, '', 0, '14.000000', '0.000000', '0.000000', 0, 1, '15', '15', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(17, '', 0, '16.000000', '0.000000', '0.000000', 0, 1, '16', '16', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(18, '', 0, '17.000000', '0.000000', '0.000000', 0, 1, '17', '17', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(19, '', 0, '18.000000', '0.000000', '0.000000', 0, 1, '18', '18', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(20, '', 0, '19.000000', '0.000000', '0.000000', 0, 1, '19', '19', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(21, '', 0, '20.000000', '0.000000', '0.000000', 0, 1, '20', '20', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(22, '', 0, '21.000000', '0.000000', '0.000000', 0, 1, '21', '21', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(23, '', 0, '22.000000', '0.000000', '0.000000', 0, 1, '22', '22', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(24, '', 0, '23.000000', '0.000000', '0.000000', 0, 1, '23', '23', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(30, 'e0a6c20903266d8457eb62504efc889c', 0, '10.000000', '20.000000', '1000.000000', 0, 1, 'Adnan', 'adnan3@traceper.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(31, '395063ccee7ebd4022bf1f5f3ca8c2ce', 0, '0.000000', '0.000000', '0.000000', 0, 1, 'Adnan', 'adnan@traceper.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(32, '06b9281e396db002010bde1de57262eb', 0, '0.000000', '0.000000', '0.000000', 0, 1, 'Auto', '12345', '0000-00-00 00:00:00', '12345', NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(34, '0ec3aaa8e5284ed11959e6bab6a2831e', 0, '0.000000', '0.000000', '0.000000', 0, 1, 'Cihazzzz', '1256', '0000-00-00 00:00:00', '1256', NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(35, '9355ea41e08806bbb6bb9862a4e7a197', 0, '0.000000', '0.000000', '0.000000', 0, 1, 'Cihaz2', '222', '0000-00-00 00:00:00', '222', NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL),
-(43, '934b535800b1cba8f96a5d72f72f1611', 0, '0.000000', '0.000000', '0.000000', 0, 1, 'Dylan', 'dylan@yahoo.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 2, 0, NULL);
+(1, '827ccb0eea8a706c4c34a16891f84e7b', 0, 39.922642, 32.867466, 1330.000000, 0, 1, 'Test', 'test@traceper.com', '2012-08-28 20:10:03', '353043053846625', '', 1, '2010-10-31 20:10:09', '2012-08-28 20:10:04', '0', '0', 0, 0, 0, NULL),
+(86, 'a384b6463fc216a5f8ecb6670f86456a', 0, 0.000000, 0.000000, 0.000000, 0, 1, 'Ahmet Oğuz Mermerkaya', 'ahmetmermerkaya@hotmail.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '711388294', '0', 0, 0, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -308,7 +295,7 @@ CREATE TABLE IF NOT EXISTS `traceper_user_candidates` (
   `time` datetime NOT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `index_name` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=6 ;
 
 --
 -- Dumping data for table `traceper_user_candidates`
@@ -319,8 +306,7 @@ INSERT INTO `traceper_user_candidates` (`Id`, `email`, `realname`, `password`, `
 (2, 'qwe@qwe.com', 'kdfkjdlf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:36:46'),
 (3, 'qwer@qer.com', 'dlfkdf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:38:56'),
 (4, 'deneme@deneme.com', 'deneme', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 03:02:02'),
-(5, 'contact@mekya.com', 'mekya', 'e10adc3949ba59abbe56e057f20f883e', '2011-12-03 06:06:58'),
-(6, 'ahmetmermerkaya@hotmail.com', 'Ouz', 'e10adc3949ba59abbe56e057f20f883e', '2011-12-12 05:06:51');
+(5, 'contact@mekya.com', 'mekya', 'e10adc3949ba59abbe56e057f20f883e', '2011-12-03 06:06:58');
 
 -- --------------------------------------------------------
 
@@ -336,26 +322,9 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
   PRIMARY KEY (`Id`),
   UNIQUE KEY `userIdGroupId` (`userId`,`groupId`),
   UNIQUE KEY `groupOwnerUserId` (`groupOwner`,`userId`),
-  KEY `userId` (`userId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
-
-
--- --------------------------------------------------------
-
---
--- Tablo i\E7in tablo yap\FDs\FD `traceper_geofence_user_relation`
---
-
-CREATE TABLE IF NOT EXISTS `traceper_geofence_user_relation` (
-  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `geofenceId` int(11) unsigned NOT NULL,
-  `userId` int(11) unsigned NOT NULL,  
-  `status` tinyint(4) DEFAULT '0',
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `geofenceUserId` (`geofenceId`,`userId`),  
-  KEY `userId` (`userId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
-
+  KEY `userId` (`userId`),
+  KEY `traceper_user_privacy_group_relation_ibfk_2` (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -375,15 +344,13 @@ CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
   PRIMARY KEY (`Id`),
   KEY `time` (`dataArrivedTime`),
   KEY `userId` (`userId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=130 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=153 ;
 
 --
 -- Dumping data for table `traceper_user_was_here`
 --
 
 INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitude`, `altitude`, `longitude`, `deviceId`, `dataCalculatedTime`) VALUES
-(1, 21, '2011-10-22 23:18:44', 37.422005, -122.084095, -122.084095, '000000000000000', '2011-10-21 21:00:00'),
-(2, 21, '0000-00-00 00:00:00', 30.000000, 2.000000, 0.000000, '0', '0000-00-00 00:00:00'),
 (3, 1, '2011-11-24 21:37:18', 37.422005, 22.084095, 22.084095, '000000000000000', '2011-11-23 22:00:00'),
 (4, 1, '2011-11-24 21:43:00', 7.422005, 2.084095, 2.084095, '000000000000000', '2011-11-23 22:00:02'),
 (5, 1, '2011-11-24 21:44:11', 7.422005, 2.084095, 2.084095, '000000000000000', '2011-11-23 22:00:02'),
@@ -507,7 +474,30 @@ INSERT INTO `traceper_user_was_here` (`Id`, `userId`, `dataArrivedTime`, `latitu
 (126, 1, '2011-12-22 03:24:25', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:24:17'),
 (127, 1, '2011-12-22 03:25:19', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:24:17'),
 (128, 1, '2011-12-22 03:29:20', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17'),
-(129, 1, '2011-12-22 03:30:19', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17');
+(129, 1, '2011-12-22 03:30:19', 39.920875, 32.868639, 32.868639, '351751049911319', '2011-12-22 03:29:17'),
+(130, 1, '2012-08-25 22:30:01', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-25 22:30:23'),
+(131, 1, '2012-08-25 22:30:33', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-25 22:31:03'),
+(132, 1, '2012-08-25 22:32:13', 39.788101, 1316.000000, 39.468555, '353043053846625', '2012-08-25 22:32:02'),
+(133, 1, '2012-08-26 08:44:40', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 08:45:11'),
+(134, 1, '2012-08-26 08:51:04', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 08:51:38'),
+(135, 1, '2012-08-26 08:54:56', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 08:55:29'),
+(136, 1, '2012-08-26 08:54:56', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 08:55:29'),
+(137, 1, '2012-08-26 08:59:52', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:00:26'),
+(138, 1, '2012-08-26 09:12:31', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:13:05'),
+(139, 1, '2012-08-26 09:15:55', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:13:05'),
+(140, 1, '2012-08-26 09:15:56', 39.737456, 0.000000, 39.412809, '353043053846625', '2012-08-26 09:16:30'),
+(141, 1, '2012-08-26 09:25:18', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:25:52'),
+(142, 1, '2012-08-26 09:27:14', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:27:48'),
+(143, 1, '2012-08-26 09:28:25', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:28:59'),
+(144, 1, '2012-08-26 09:31:13', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:31:47'),
+(145, 1, '2012-08-26 09:33:00', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:33:34'),
+(146, 1, '2012-08-26 09:33:37', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:34:11'),
+(147, 1, '2012-08-26 09:34:20', 39.759800, 0.000000, 39.467087, '353043053846625', '2012-08-26 09:34:54'),
+(148, 1, '2012-08-26 09:35:28', 39.737456, 0.000000, 39.412809, '353043053846625', '2012-08-26 09:36:02'),
+(149, 1, '2012-08-28 20:04:26', 39.921074, 960.000000, 32.868755, '353043053846625', '2012-08-28 20:04:28'),
+(150, 1, '2012-08-28 20:06:02', 39.922298, 904.000000, 32.868797, '353043053846625', '2012-08-28 20:06:03'),
+(151, 1, '2012-08-28 20:07:52', 39.919422, 1125.000000, 32.871437, '353043053846625', '2012-08-28 20:07:53'),
+(152, 1, '2012-08-28 20:10:03', 39.922642, 1330.000000, 32.867466, '353043053846625', '2012-08-28 20:10:04');
 
 --
 -- Constraints for dumped tables
@@ -528,10 +518,10 @@ ALTER TABLE `traceper_upload`
 
 --
 -- Constraints for table `traceper_user_privacy_group_relation`
--- 
+--
 ALTER TABLE `traceper_user_privacy_group_relation`
-  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `traceper_privacy_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;  
+  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `traceper_users` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `traceper_user_privacy_group_relation_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `traceper_privacy_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `traceper_user_was_here`
