@@ -139,4 +139,18 @@ return array(
 				'email'=>'test194@traceper.com',
 				'userType' => UserType::GPSStaff
 		),
+		'user_upload_test1'=>array(
+				'Id'=>100,
+				'password'=>md5(12321),
+				'realname'=>'User Upload Test1',
+				'email'=>'user_upload_test1@traceper.com',
+				'userType' => UserType::GPSStaff
+		),
+		'user_upload_test2'=>array(
+				'Id'=>101,
+				'password'=>md5(12321),
+				'realname'=>'UserUploadTest2',
+				'email'=>'user_upload_test2@traceper.com',
+				'userType' => UserType::GPSStaff
+		),
 );
