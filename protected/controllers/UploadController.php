@@ -69,36 +69,6 @@ class UploadController extends Controller
 			{
 				$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 				
-				/*
-				$sqlCount = 'SELECT count(*)
-							 FROM '. Upload::model()->tableName() . ' u 
-							 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
-							 		OR userId = '. Yii::app()->user->id .' OR 
-							 		publicData = 1)';
-		
-				$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-		
-				$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
-							 FROM '. Upload::model()->tableName() . ' u 
-							 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-							 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR 
-							 	   userId = '. Yii::app()->user->id .' OR 
-							 	   publicData = 1)
-							  ORDER BY u.Id DESC';
-	
-		
-				$dataProvider = new CSqlDataProvider($sql, array(
-				    											'totalItemCount'=>$count,
-															    'sort'=>array(
-								        							'attributes'=>array(
-								             									'id',
-																				),
-																),
-															    'pagination'=>array(
-															        'pageSize'=>Yii::app()->params->uploadCountInOnePage,
-																),
-														));		
-				*/
 				$dataProvider = Upload::model()->getRecordList($fileType,Yii::app()->user->id,$friendList);
 			}
 			else
@@ -119,7 +89,6 @@ class UploadController extends Controller
 
 	public function actionSearch() {
 		$model = new SearchForm();
-
 		$dataProvider = null;
 		if(isset($_REQUEST['SearchForm']))
 		{
@@ -133,49 +102,6 @@ class UploadController extends Controller
 				{
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					
-					/*
-					$sqlCount = 'SELECT count(*)
-						 FROM '. Upload::model()->tableName() . ' u
-						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-						 WHERE (fileType = '.$fileType.') AND (u.userId in ('. $friendList .') 
-						 			OR 
-							 		u.userId = '. Yii::app()->user->id .'
-							 		OR
-							 		u.publicData = 1 )
-						 	   AND	
-						 	   (s.realname like "%'. $model->keyword .'%"
-							   		OR
-							   		u.description like "%'. $model->keyword.'%")';
-	
-					$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-	
-					$sql ='SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
-						 FROM '. Upload::model()->tableName() . ' u
-						 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId 
-						 WHERE (fileType = '.$fileType.') AND (u.userId in ('. $friendList .') 
-						 			OR 
-							 		u.userId = '. Yii::app()->user->id .' 
-							 		OR
-							 		u.publicData = 1)
-						 	   AND
-						 	   (s.realname like "%'. $model->keyword .'%"
-						 			OR
-						 	   		u.description like "%'. $model->keyword.'%")';
-
-					$dataProvider = new CSqlDataProvider($sql, array(
-			    											'totalItemCount'=>$count,
-														    'sort'=>array(
-							        							'attributes'=>array(
-							             									'id', 'realname',
-																),
-															),
-														    'pagination'=>array(
-														        'pageSize'=>Yii::app()->params->uploadCountInOnePage,
-																'params'=>array(CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']),
-															),
-									));	
-
-					*/
 					$dataProvider=Upload::model()->getSearchResult($fileType,Yii::app()->user->id,$friendList,$model->keyword,$model->attributes['keyword']);
 				}				
 			}
@@ -436,27 +362,8 @@ class UploadController extends Controller
 				{
 					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 					
-					/*
-					$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
-								 FROM '. Upload::model()->tableName() . ' u 
-								 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
-								        OR userId = '. Yii::app()->user->id .'
-								        OR publicData = 1)
-								        AND unix_timestamp(u.uploadTime) >= '. $time;
-						
-					$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-						
-					$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
-								 FROM '. Upload::model()->tableName() . ' u 
-								 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-								 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') 
-								 		OR userId = '. Yii::app()->user->id .'
-								 		OR publicData = 1)
-								 		AND unix_timestamp(u.uploadTime) >= '. $time . '
-								 ORDER BY u.Id DESC
-								 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
-					*/
 					$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,$time);
+					
 					if ($pageCount >= $pageNo && $pageCount != 0) {
 						$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
 					}
@@ -468,24 +375,6 @@ class UploadController extends Controller
 		else {
 
 			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-			/*
-			$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
-					 FROM '. Upload::model()->tableName() . ' u 
-					 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .' OR
-					 	   publicData = 1)';
-
-			$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
-
-			$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
-					 FROM '. Upload::model()->tableName() . ' u 
-					 LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
-					 WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR 
-					 	   userId = '. Yii::app()->user->id .' OR
-					 	   publicData = 1)
-					 ORDER BY u.Id DESC
-					 LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
-			*/
 			$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,NULL);
 			if ($pageCount >= $pageNo && $pageCount != 0) {
 				$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
@@ -500,14 +389,6 @@ class UploadController extends Controller
 	//private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
 	private function prepareXML($dataReader, $pageNo, $pageCount, $type="userList")
 	{
-		/*
-		$dataReader = NULL;
-		// if page count equal to 0 then there is no need to run query
-		//		echo $sql;
-		if ($pageCount >= $pageNo && $pageCount != 0) {
-			$dataReader = Yii::app()->db->createCommand($sql)->query();
-		}
-		*/
 
 		$str = NULL;
 		$userId = NULL;

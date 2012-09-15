@@ -139,7 +139,7 @@ class Upload extends CActiveRecord
     			. Upload::model()->tableName() .'
     			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description, isLive, liveKey)
     			VALUES(%d, %d, %s, %s, %s, NOW(), %d, "%s", %d, %d)',
-    			$fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
+    			$fileType, $userID, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
 		
     	$effectedRows = Yii::app()->db->createCommand($sql)->execute();
     	
@@ -149,6 +149,7 @@ class Upload extends CActiveRecord
     
     public function getRecordList($fileType,$userID,$friendList) {
     
+    	//if the upload is mine or my friends's upload or public.
     	$sqlCount = 'SELECT count(*)
     	FROM '. Upload::model()->tableName() . ' u
     	WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
@@ -184,6 +185,8 @@ class Upload extends CActiveRecord
     
     public function getSearchResult($fileType,$userID,$friendList,$keyword,$keywordAttributes) {
     
+    	//if the upload is mine (user upload) or my friends's upload or public.
+    	//search criterias are the upload description or the upload owner's realname.
     	$sqlCount = 'SELECT count(*)
     	FROM '. Upload::model()->tableName() . ' u
     	LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
@@ -249,6 +252,7 @@ class Upload extends CActiveRecord
     	}
     
     	$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+    	
     
     	return $pageCount;
     }
