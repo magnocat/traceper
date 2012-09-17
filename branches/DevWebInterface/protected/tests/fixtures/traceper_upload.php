@@ -78,4 +78,43 @@ return array(
 				//'isLive'=>0,
 				'liveKey'=>'test6'
 		),
+		'upload7'=>array(
+				//'Id'=>1,
+				'fileType'=>0,
+				'userId'=>1,
+				//'latitude'=>11.111111,
+				//'longitude' =>11.111111,
+				//'altitude'=>0,
+				//'uploadTime'=>date('Y-m-d'),
+				'publicData'=>0,
+				'description'=>'test7',
+				//'isLive'=>0,
+				'liveKey'=>'test7'
+		),
+		'upload8'=>array(
+				//'Id'=>1,
+				'fileType'=>0,
+				'userId'=>1,
+				//'latitude'=>11.111111,
+				//'longitude' =>11.111111,
+				//'altitude'=>0,
+				//'uploadTime'=>date('Y-m-d'),
+				'publicData'=>0,
+				'description'=>'test8',
+				//'isLive'=>0,
+				'liveKey'=>'test8'
+		),
+		'upload9'=>array(
+				//'Id'=>1,
+				'fileType'=>0,
+				'userId'=>1,
+				//'latitude'=>11.111111,
+				//'longitude' =>11.111111,
+				//'altitude'=>0,
+				//'uploadTime'=>date('Y-m-d'),
+				'publicData'=>0,
+				'description'=>'test9',
+				//'isLive'=>0,
+				'liveKey'=>'test9'
+		),
 );
