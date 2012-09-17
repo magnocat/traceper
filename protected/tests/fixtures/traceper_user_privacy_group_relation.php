@@ -18,4 +18,10 @@ return array(
 				'userId'=>1,
 				'groupId'=>3,
 		),
+		'user_privacy_group_relation4'=>array(
+				'Id'=>4,
+				'groupOwner'=>1,
+				'userId'=>2,
+				'groupId'=>5,
+		),
 );
