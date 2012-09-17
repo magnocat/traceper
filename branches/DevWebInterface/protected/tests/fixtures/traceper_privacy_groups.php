@@ -28,4 +28,18 @@ return array(
 				'name'=>'User privacy group test1',
 				'description'=>'User privacy group test',
 		),
+		'privacyGroup4'=>array(
+				'Id'=>5,
+				'owner'=>1,
+				'type'=>0,
+				'name'=>'test4',
+				'description'=>'deneme4',
+		),
+		'privacyGroup5'=>array(
+				'Id'=>6,
+				'owner'=>1,
+				'type'=>0,
+				'name'=>'test5',
+				'description'=>'deneme5',
+		),
 );

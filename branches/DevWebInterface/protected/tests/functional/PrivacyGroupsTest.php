@@ -119,11 +119,127 @@ class PrivacyGroupsTest extends WebTestCase
 
 		$this->click("link=".Yii::t('layout', 'Friend Groups'));
 		$this->waitForElementPresent("id=friendGroupsListView");
-		$this->verifyTextPresent("Hiçbir grup bulunamadı");
+		$this->verifyTextPresent("test4");
 
 		$this->click("link=".Yii::t('layout', 'Staff Groups'));
 		$this->waitForElementPresent("id=staffGroupsListView");
-		$this->verifyTextPresent("Hiçbir grup bulunamadı");
+		$this->verifyTextPresent("Test");
 
 	}
+	
+	
+	public function testGetGroupMembers()
+	{
+		$this->open("index-test.php");
+		$this->click("id=showLoginWindow");
+	
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=LoginForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+	
+		sleep(5);
+		$this->click("link=Ark. Gruplar�");
+		sleep(5);
+    	$this->click("link=test4");
+    	sleep(5);
+    	$this->verifyTextPresent("Kay�t bulunamad");
+	
+	}
+	
+	public function testDeleteGroup()
+	{
+		$this->open("index-test.php");
+		$this->click("id=showLoginWindow");
+	
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=LoginForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+	
+		$this->click("link=".Yii::t('layout', 'Friend Groups'));
+		$this->waitForElementPresent("id=friendGroupsListView");
+		$this->click("//div[@id='friendGroupsListView']/table/tbody/tr/td[3]/a/img");
+		$this->assertTrue($this->isElementPresent("//div[@id='friendGroupsListView']/table/tbody/tr/td[3]/a/img"));
+		$this->click("//div[@id='friendGroupsListView']/table/tbody/tr/td[3]/a/img");
+		sleep(5);
+		$this->verifyTextPresent("Bu grubu silmek istiyor musunuz");
+	
+	}
+	
+	public function testDeleteGroupMember()
+	{
+		$this->open("index-test.php");
+		$this->click("id=showLoginWindow");
+	
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=LoginForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+	
+		$this->click("link=".Yii::t('layout', 'Friend Groups'));
+		$this->waitForElementPresent("id=friendGroupsListView");
+		$this->click("link=test4");
+		sleep(5);
+		$this->assertTrue($this->isElementPresent("//div[@id='groupMembersListView']/table/tbody/tr/td[2]/a/img"));
+		$this->click("//div[@id='groupMembersListView']/table/tbody/tr/td[2]/a/img");
+		sleep(5);
+		$this->assertTrue($this->isElementPresent("id=groupMemberDeleteConfirmation"));
+	
+	}
+	
+	public function testSetPrivacyRights()
+	{
+		$this->open("index-test.php");
+		$this->click("id=showLoginWindow");
+	
+		// after click the window it loads windows so we need to wait a little
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isElementPresent("id=LoginForm_email")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+	
+		$this->click("link=".Yii::t('layout', 'Friend Groups'));
+		$this->waitForElementPresent("id=friendGroupsListView");
+    	$this->click("css=#friendGroupsListView > table.items > tbody > tr.odd > td > a.vtip > img");
+    	sleep(5);
+    	$this->verifyTextPresent("Grup üyelerine haklar verin");
+	
+	}
+	
 }
