@@ -59,11 +59,11 @@ public class FriendsListAdapter extends BaseAdapter {
         userlist = data.get(position);
         
         // Setting all values in listview
-        username.setText(userlist.get(friends.KEY_USERNAME));
-        time.setText(userlist.get(friends.KEY_DURATIONTIME));
-        location.setText(userlist.get(friends.KEY_LOCATION));
-        userlistno.setText(userlist.get(friends.KEY_USERLISTNO));
-        imageLoader.DisplayImage(userlist.get(friends.KEY_THUMB_URL), thumb_image);
+        username.setText(userlist.get(FriendList.KEY_USERNAME));
+        time.setText(userlist.get(FriendList.KEY_DURATIONTIME));
+        location.setText(userlist.get(FriendList.KEY_LOCATION));
+        userlistno.setText(userlist.get(FriendList.KEY_USERLISTNO));
+        imageLoader.DisplayImage(userlist.get(FriendList.KEY_THUMB_URL), thumb_image);
         return vi;
     }
     }
