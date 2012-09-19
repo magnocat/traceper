@@ -306,7 +306,8 @@ class Users extends CActiveRecord
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
+		u.account_type
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE Id in ('. $IdList.')';
 	
@@ -347,18 +348,25 @@ class Users extends CActiveRecord
 	}
 	
 	
-	public function getSearchUserDataProvider($IdList, $text, $searchIndex, $itemCount)
+	public function getSearchUserDataProvider($IdList, $text, $searchIndex)
 	{
+		$IdListSql = ' ';
+		if ($IdList != null){
+			$IdListSql = ' Id in ('. $IdList.') AND ';
+		}
+		
+		
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"' ;
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"' ;
 	
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
+		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
+		u.account_type, "0" as status
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE Id in ('. $IdList.') AND u.realname like "%'. $text .'%"';
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"';
 	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
@@ -369,7 +377,7 @@ class Users extends CActiveRecord
 								'id', 'Name',
 						),
 				),
-				'params'=>array($searchIndex=>$text),
+			//	'params'=>array($searchIndex=>$text),
 				'pagination'=>array(
 						'pageSize'=>Yii::app()->params->itemCountInOnePage,
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
