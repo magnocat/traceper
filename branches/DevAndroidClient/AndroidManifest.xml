@@ -36,7 +36,7 @@
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
-		<activity android:name=".android.friends"  >
+		<activity android:name=".android.FriendList"  >
 			<intent-filter>
 				<action android:name="com.traceper.FRIENDS"></action>
 				<category android:name="android.intent.category.DEFAULT"></category>

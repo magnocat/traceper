@@ -687,7 +687,7 @@ public class AppService extends Service implements IAppService{
 		name[1] = "email";
 		name[2] = "password";
 
-		value[0] = "users/GetUserListJson";
+		value[0] = "users/getUserListJson";
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 
@@ -801,7 +801,7 @@ public class AppService extends Service implements IAppService{
 
 		return result;
 	}	
-	public String AddAsFriend(String FriendId) 
+	public boolean addAsFriend(String FriendId) 
 	{			
 		String[] name = new String[2];
 		String[] value = new String[2];
@@ -812,20 +812,12 @@ public class AppService extends Service implements IAppService{
 		value[1] = FriendId;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);
-
-		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
-		String result = getString(R.string.unknown_error_occured);
-
-
+		boolean result = false;
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
-			result = jsonObject.getString("result");
-			if (result.equals("1")) 
+			if (jsonObject.getString("result").equals("1")) 
 			{			
-
-			}
-			else {
-
+				result = true;
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -901,21 +893,21 @@ public class AppService extends Service implements IAppService{
 		name[3] = "userId";
 
 
-		value[0] = "users/GetUserInfoJSON";
+		value[0] = "users/getUserInfoJSON";
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 		value[3] = uId;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
-
+		JSONObject userList = null;
 		try{
-			jArray = new JSONObject(httpRes);            
+			jArray = new JSONObject(httpRes);   
+			userList = jArray.getJSONArray("userlist").getJSONObject(0);
 		}catch(JSONException e){
 			Log.e("log_tag", "Error parsing data "+e.toString());
 		}
 
-		return  jArray;
-
+		return  userList;
 	}
 
 	public JSONArray getUserPlaces(int userid){
@@ -955,7 +947,7 @@ public class AppService extends Service implements IAppService{
 		return userwashere;
 	}
 
-	public JSONArray SearchJSON(String search) 
+	public JSONArray searchUser(String search) 
 	{
 		JSONArray searchlist = null;
 		JSONObject jArray = null;
@@ -964,14 +956,14 @@ public class AppService extends Service implements IAppService{
 		name[0] = "r";
 		name[1] = "SearchForm[keyword]";
 
-		value[0] = "users/SearchJSON";
+		value[0] = "users/searchJSON";
 		value[1] = search;
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
 
 		try{
 			jArray = new JSONObject(httpRes);      
-			searchlist = jArray.getJSONArray("userSearch");	
+			searchlist = jArray.getJSONArray("userlist");	
 		}catch(JSONException e){
 			Log.e("log_tag", "Error parsing data "+e.toString());
 		}

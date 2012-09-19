@@ -59,11 +59,11 @@ public interface IAppService {
 	
 	public String registerUser(String password, String email, String realname, String facebookId);
 	
-	public JSONArray SearchJSON(String search);
+	public JSONArray searchUser(String search);
 	
 	public String authenticateUser(String username, String password);
 	
-	public String AddAsFriend(String FriendId);
+	public boolean addAsFriend(String FriendId);
 	
 	public String approveFriendShip(String friendShipId);
 	
