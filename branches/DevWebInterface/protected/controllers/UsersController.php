@@ -175,15 +175,14 @@ class UsersController extends Controller
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 
 			$userId = (int) $_REQUEST['userId'];
-
 			$friendArray = $this->getFriendArray();
 			$out = "No permission to get this user location";
+			
 			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
 			{
-				$dataProvider = Users::model()->getListDataProvider(array($userId), null, null, 0, 1, 1);
+				$dataProvider = Users::model()->getListDataProvider($userId, null, null, 0, 1, 1);
 				$out = $this->prepareJson($dataProvider);
 			}
-
 		}
 
 		echo $out;
@@ -254,7 +253,7 @@ class UsersController extends Controller
 		{
 			$model->attributes = $_REQUEST['SearchForm'];
 			if ($model->validate()) {
-				$dataProvider = Users::model()->getSearchUserDataProvider($this->getFriendIdList());
+				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");
 					
 			}
 		}
@@ -273,11 +272,12 @@ class UsersController extends Controller
 			$model->attributes = $_REQUEST['SearchForm'];
 			if ($model->validate()) {
 
-				$dataProvider = Users::model()->getSearchUserDataProvider($this->getFriendIdList());
+				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");
 				$out = $this->prepareSearchUserResultJson($dataProvider);
 			}
 		}
 		echo $out;
+		Yii::app()->end();
 	}
 	public function actionDeleteFriendShip(){
 		$result = 'Missing Data';
@@ -410,13 +410,18 @@ class UsersController extends Controller
 	}
 	
 	private function prepareSearchUserResultJson($dataProvider) {
-		$rows = $dataProvider->getData();
-		$itemCount = count($rows);
-		
+		$row = $dataProvider->getData();
+		$itemCount = count($row);
 		$str = '';
 		for ($i = 0; $i < $itemCount; $i++) {
 			$row[$i]['id'] = isset($row[$i]['id']) ? $row[$i]['id'] : null;
 			$row[$i]['Name'] = isset($row[$i]['Name']) ? $row[$i]['Name'] : null;
+			$row[$i]['gp_image'] = isset($row[$i]['gp_image']) ? $row[$i]['gp_image'] : null;
+			$row[$i]['fb_id']= isset($row[$i]['fb_id']) ? $row[$i]['fb_id'] : null;
+			$row[$i]['g_id'] = isset($row[$i]['g_id']) ? $row[$i]['g_id'] : null;
+			$row[$i]['account_type'] = isset($row[$i]['account_type']) ? $row[$i]['account_type'] : null;
+			$row[$i]['status'] = isset($row[$i]['status']) ? $row[$i]['status'] : null;
+			$row[$i]['friendShipId'] = isset($row[$i]['friendShipId']) ? $row[$i]['friendShipId'] : null;
 			
 			$str .= CJSON::encode(array(
 					'id'=>$row[$i]['id'],
@@ -429,6 +434,10 @@ class UsersController extends Controller
 					'friendShipId'=>$row[$i]['friendShipId'],
 			)).',';
 		}
+		
+		$pagination = $dataProvider->getPagination();
+		$currentPage = $pagination->currentPage + 1;
+		$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
 		
 		return $str;
 	}
@@ -484,7 +493,7 @@ class UsersController extends Controller
 		$row['gp_image'] = "";
 		$row['fb_id'] = "";
 		$row['g_id'] = "";
-		$row['account_type'] = "";
+		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";;
 		
 		$bsk=   CJSON::encode( array(
 				'user'=>$row['id'],

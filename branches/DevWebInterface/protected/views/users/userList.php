@@ -4,6 +4,8 @@ if ($dataProvider != null) {
 	$isFriendRequestList = isset($friendRequestList) ? true : false;
 	$isSearchResult = isset($searchResult) ? true : false;
 	$isFriendList = isset($friendList) ? true : false;
+	
+	$groupType = ""; // TODO: this is added just to pass undefined error. I dont know its functionality. 
 
 	$emptyText = Yii::t('users', 'No users found');
 	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
