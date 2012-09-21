@@ -59,6 +59,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		if (obj.result && obj.result == "1") 
 																		{
 																			$("#changePasswordWindow").dialog("close");
+																			TRACKER.showMessageDialog("'.Yii::t('site', 'Password has been changed...').'");
 																		}
 																	}
 																	catch (error){
