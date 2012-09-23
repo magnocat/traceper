@@ -84,5 +84,5 @@
 <string name="couldnt_find">her hangi bir kayıt bulunamadı!</string>
 <string name="turn_back">Geri</string>
 <string name="enterPassword">Lütfen kayıtta belirlediğiniz şifrenizi giriniz.</string>
-
+<string name="camera_resolution">Kamera çözünürlüğünü seç</string>
 </resources>

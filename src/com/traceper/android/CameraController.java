@@ -6,8 +6,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
+
+
+
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -15,12 +20,15 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,7 +54,8 @@ import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
 
 public class CameraController extends Activity implements SurfaceHolder.Callback{
-
+    
+	
 	private Camera mCamera;
 	private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
@@ -54,15 +63,21 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 	private static final int UPLOAD_PHOTO = Menu.FIRST;
 	private static final int TAKE_ANOTHER_PHOTO = Menu.FIRST + 1;
 	private static final int BACK = Menu.FIRST + 2;
+	private static final int CHOOSE_RESOLUTION = Menu.FIRST + 3;
 	private byte[] picture;
 	private IAppService appService = null;
 	private boolean pictureTaken = false;
 	private Button takePictureButton = null;
 	private static final int DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC = 0;
+	private static final int DIALOG_CHOOSE_RESOLUTION = 1;
 	private Button recordVideoButton;
 	private MediaRecorder mMediaRecorder;
 	private String videoPath = "/sdcard/myvideo.mp4";
-
+	private Size mSize;
+	private int[] csize = new int[2];
+	private SharedPreferences preferences;
+	
+	
 	private Camera.PictureCallback mPictureCallbackRaw = new Camera.PictureCallback() {  
 		public void onPictureTaken(byte[] data, Camera c) {  
 			Log.e(getClass().getSimpleName(), "PICTURE CALLBACK RAW: " + data);  
@@ -84,7 +99,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {          
-			appService = ((AppService.IMBinder)service).getService();    
+			appService = ((AppService.IMBinder)service).getService();
+			
+
+			
 		}
 		public void onServiceDisconnected(ComponentName className) {          
 			appService = null;
@@ -94,10 +112,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-
+		
 		this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN );
-
+		preferences = getSharedPreferences(Configuration.CAMERA_PREFERENCES_NAME, 0);
 
 		setContentView(R.layout.camera_view);
 
@@ -109,7 +127,26 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		
 		mCamera = Camera.open();
-
+		
+		Camera.Parameters params = mCamera.getParameters();
+				
+		
+		csize[0] = preferences.getInt(Configuration.CAMERA_WIDTH, 0);
+        csize[1] = preferences.getInt(Configuration.CAMERA_HEIGHT, 0);
+	
+		params.setPictureSize(csize[0], csize[1]);
+		
+        if ((csize[0]==0) &&  (csize[1]==0)){
+        	// See which sizes the camera supports and choose one of those
+        	List<Size> sizes = params.getSupportedPictureSizes();
+        	mSize = sizes.get(2);
+        	params.setPictureSize(mSize.width, mSize.height);
+        }
+        
+		
+		mCamera.setParameters(params);
+		
+        
 		takePictureButton = (Button) findViewById(R.id.takePictureButton);
 		takePictureButton.bringToFront();
 		takePictureButton.setOnClickListener(new View.OnClickListener() {			
@@ -209,7 +246,8 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			menu.add(0, UPLOAD_PHOTO, 0, "Upload photo").setIcon(android.R.drawable.ic_menu_upload);
 			menu.add(0, TAKE_ANOTHER_PHOTO, 1, "Take another photo").setIcon(android.R.drawable.ic_menu_camera);
 		}
-		menu.add(0, BACK, 2, "Back").setIcon(android.R.drawable.ic_menu_revert);
+		menu.add(0, CHOOSE_RESOLUTION, 2, R.string.camera_resolution).setIcon(android.R.drawable.ic_menu_edit);
+		menu.add(0, BACK, 3, "Back").setIcon(android.R.drawable.ic_menu_revert);
 
 		return result;		
 	}
@@ -243,6 +281,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 			pictureTaken = false;
 			mCamera.startPreview();  
 			break;
+		case CHOOSE_RESOLUTION:
+			showDialog(DIALOG_CHOOSE_RESOLUTION);
+			break;
+			
 		case BACK:
 			CameraController.this.finish();
 			break;
@@ -280,9 +322,10 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
+		final Dialog dialog = new Dialog(this);
 		switch (id) {
 		case DIALOG_ASK_TO_MAKE_IMAGE_PUBLIC:
-			final Dialog dialog = new Dialog(this);
+			
 
 			dialog.setContentView(R.layout.photo_description);
 			dialog.setTitle(R.string.upload_photo);
@@ -313,13 +356,55 @@ public class CameraController extends Activity implements SurfaceHolder.Callback
 					
 				}
 			});
-			
 			return dialog;
+		case DIALOG_CHOOSE_RESOLUTION:
+			
+	        final Dialog dialog2;
+	        AlertDialog.Builder builder;
+			
+			Camera.Parameters params = mCamera.getParameters();
+			 
+			final List<Camera.Size> supportedSizesList = params.getSupportedPictureSizes();
+            
+            // convert supported sizes into a width x height string array
+            CharSequence[] supportedSizes = new String[supportedSizesList.size()];
+            for (int i = 0; i < supportedSizesList.size(); i++) {
+                supportedSizes[i] = String.format("%dx%d", 
+                        supportedSizesList.get(i).width,
+                        supportedSizesList.get(i).height);
+            }
+            builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.camera_resolution);
+            builder.setSingleChoiceItems(supportedSizes, 0 , new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface arg0, int position) {
+
+                    setCameraSize(supportedSizesList.get(position));
+                    dismissDialog(DIALOG_CHOOSE_RESOLUTION);
+                }
+            });
+            dialog2 = builder.create();
+            
+            return dialog2;
+            //break;
+        default:
+            dialog2 = null;
+            break;
+			
 		}
 
 		return super.onCreateDialog(id);
 	}
 
+
+    private void setCameraSize(Camera.Size size) {
+    	SharedPreferences.Editor editor = getSharedPreferences(Configuration.CAMERA_PREFERENCES_NAME, 0).edit();
+        editor.putInt(Configuration.CAMERA_WIDTH, size.width);
+        editor.putInt(Configuration.CAMERA_HEIGHT, size.height);
+        editor.commit();
+    }
+	
 	private void uploadImage(final boolean publicImage, final String description){
 
 		Thread uploadThread = new Thread(){
