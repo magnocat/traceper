@@ -88,4 +88,5 @@
 <string name="couldnt_find">any request could not find!</string>
 <string name="turn_back">Turn Back</string>
 <string name="enterPassword">Please enter password you specified in registration</string>
+<string name="camera_resolution">Choose camera resolution</string>
 </resources>
