@@ -910,7 +910,7 @@ public class AppService extends Service implements IAppService{
 		return  userList;
 	}
 
-	public JSONArray getUserPlaces(int userid){
+	public JSONArray getUserPastPoints(int userid){
 		String uId = String.valueOf(userid);
 		JSONArray userwashere = null;
 		JSONObject jArray = null;
@@ -925,7 +925,7 @@ public class AppService extends Service implements IAppService{
 		name[5] = "range";
 
 
-		value[0] = "users/GetUserPastPointsJSON";
+		value[0] = "users/getUserPastPointsJSON";
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 		value[3] = uId;
@@ -933,9 +933,7 @@ public class AppService extends Service implements IAppService{
 		value[5] = "";
 
 		String httpRes = this.sendHttpRequest(name, value, null, null);	
-
 		
-
 		try{
 			jArray = new JSONObject(httpRes);     
 			userwashere = jArray.getJSONArray("userwashere");
