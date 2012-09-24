@@ -69,8 +69,11 @@ class Users extends CActiveRecord
 			array('longitude', 'length', 'max'=>9),
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
+			array('email', 'length', 'max'=>100),
+			/*
 			array('email', 'length', 'min'=>5,'max'=>100),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
+			*/
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
 			array('fb_id, g_id', 'length', 'max'=>50),
