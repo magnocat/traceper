@@ -77,7 +77,7 @@ public interface IAppService {
 	
 	public JSONArray getUserList();
 	
-	public JSONArray getUserPlaces(int userid);
+	public JSONArray getUserPastPoints(int userid);
 
 	public boolean isFacebookUserRegistered(String email, String facebookId);
 

@@ -295,7 +295,7 @@ public class MapViewController extends MapActivity {
 
 					try{
 
-						JSONArray  userlist =  appService.getUserPlaces(userid);
+						JSONArray  userlist =  appService.getUserPastPoints(userid);
 
 						for(int i=0;i<userlist.length();i++){						
 
