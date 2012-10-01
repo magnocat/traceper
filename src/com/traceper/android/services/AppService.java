@@ -155,9 +155,9 @@ public class AppService extends Service implements IAppService{
 
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
 		registerReceiver(networkStateReceiver, filter);
-		startForeground(0, null);
 	}
 
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent != null) {
@@ -181,8 +181,6 @@ public class AppService extends Service implements IAppService{
 						requestStarted = true;
 					}
 					
-
-
 					if (requestStarted == true) 
 					{
 						Notification notification = new Notification(R.drawable.icon, getString(R.string.ApplicationName), System.currentTimeMillis());
@@ -417,7 +415,7 @@ public class AppService extends Service implements IAppService{
 		value[4] = this.deviceId;
 		value[5] = String.valueOf((int)(loc.getTime()/1000)); // convert milliseconds to seconds
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);
 
 		String result = getString(R.string.unknown_error_occured);
 
@@ -495,7 +493,7 @@ public class AppService extends Service implements IAppService{
 		value[6] = "0";
 
 		String img = new String(image);
-		String httpRes = this.sendHttpRequest(name, value, "upload", image);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, "upload", image);
 		Log.i("img length: ", String.valueOf(img.length()) );
 		String result = getString(R.string.unknown_error_occured);
 
@@ -521,12 +519,42 @@ public class AppService extends Service implements IAppService{
 
 	public void onDestroy() {
 		Log.i("Traceper-AppService is being destroyed", "...");
-		am.cancel(getLocationIntent);
 		unregisterReceiver(networkStateReceiver);
 		super.onDestroy();
 	}
 
+	private String sendHttpRequestWithAuthPacket(String[] name, String[] value, String filename, byte[] file){
+		
+		if (this.isUserAuthenticated() == false){
+			SharedPreferences preferences = getSharedPreferences(Configuration.PREFERENCES_NAME, 0);
+			String prefEmail = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
+			String prefPassword = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
+			//TODO: if service is woken up, we need to set server address too.
+			String serverAddress = preferences.getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS);
+			this.setAuthenticationServerAddress(serverAddress);
+		
+			if (prefEmail.equals("") == false && prefPassword.equals("") == false) {
+				this.authenticateUser(prefEmail, prefPassword);
+			}
+		}
+		
+		String operationResult = new String();
+		//if authenticateUser function is called and successfull then isUserAuthenticated returns true
+		//if authenticateUser funciton is not called, it behaves normally...
+		if (this.isUserAuthenticated() == true)  
+		{
+			operationResult = this.sendHttpRequest(name, value, filename, file);
+		}
+		return operationResult;		
+	}
+	
+	private String sendHttpRequest(String[] name, String[] value) {
+		return this.sendHttpRequest(name, value, null, null);
+	}
+	
+	
 	private String sendHttpRequest(String[] name, String[] value, String filename, byte[] file){
+		
 		final String end = "\r\n";
 		final String twoHyphens = "--";
 		final String boundary = "*****++++++************++++++++++++";
@@ -573,7 +601,7 @@ public class AppService extends Service implements IAppService{
 			{
 				conn.disconnect();
 				this.authenticationServerAddress += "/";
-				return sendHttpRequest(name, value, null, null);				
+				return sendHttpRequestWithAuthPacket(name, value, null, null);				
 			}
 			else
 			{
@@ -659,14 +687,18 @@ public class AppService extends Service implements IAppService{
 			name[1] = "client";
 			value[0] = "site/logout";
 			value[1] = "mobile";
-
-			SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
-			editor.putString(Configuration.PREFERENCES_USEREMAIL, "");
-			editor.putString(Configuration.PREFERENCES_PASSWORD, "");
-			editor.commit();
-
-			sendHttpRequest(name, value, null, null);
+			sendHttpRequestWithAuthPacket(name, value, null, null);
 		}
+		//remove the alarm manager
+		am.cancel(getLocationIntent);
+		am.cancel(sendLocation);
+		locationManager.removeUpdates(networkLocationIntent);
+		locationManager.removeUpdates(gpsLocationIntent);
+		
+		SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME, 0).edit();
+		editor.putString(Configuration.PREFERENCES_USEREMAIL, "");
+		editor.putString(Configuration.PREFERENCES_PASSWORD, "");
+		editor.commit();
 		this.stopSelf();	
 	}
 
@@ -691,7 +723,7 @@ public class AppService extends Service implements IAppService{
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 
 		try{
 			jArray = new JSONObject(httpRes);   
@@ -739,7 +771,7 @@ public class AppService extends Service implements IAppService{
 		value[6] = "mobile";		
 		value[7] = facebookId;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 
 		String result = getString(R.string.unknown_error_occured);
 
@@ -779,8 +811,7 @@ public class AppService extends Service implements IAppService{
 		value[5] = "mobile";
 	
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);
-
+		String httpRes = this.sendHttpRequest(name, value);
 		String result = getString(R.string.unknown_error_occured);
 
 		try {
@@ -811,7 +842,7 @@ public class AppService extends Service implements IAppService{
 		value[0] = "users/AddAsFriend";
 		value[1] = FriendId;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);
 		boolean result = false;
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
@@ -835,7 +866,7 @@ public class AppService extends Service implements IAppService{
 		value[0] = "users/approveFriendShip";
 		value[1] = friendShipId;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);
 
 		//		String result = this.evaluateResult(httpRes); // this.sendLocationData(this.email, this.password, locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));	
 		String result = getString(R.string.unknown_error_occured);
@@ -868,7 +899,7 @@ public class AppService extends Service implements IAppService{
 		value[0] = "users/GetFriendRequestListJson";
 
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);
 
 		try{
 			jArray = new JSONObject(httpRes);  
@@ -898,7 +929,7 @@ public class AppService extends Service implements IAppService{
 		value[2] = AppService.this.password;
 		value[3] = uId;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 		JSONObject userList = null;
 		try{
 			jArray = new JSONObject(httpRes);   
@@ -932,7 +963,7 @@ public class AppService extends Service implements IAppService{
 		value[4] = "";
 		value[5] = "";
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 		
 		try{
 			jArray = new JSONObject(httpRes);     
@@ -957,7 +988,7 @@ public class AppService extends Service implements IAppService{
 		value[0] = "users/searchJSON";
 		value[1] = search;
 
-		String httpRes = this.sendHttpRequest(name, value, null, null);	
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 
 		try{
 			jArray = new JSONObject(httpRes);      
@@ -1138,7 +1169,7 @@ public class AppService extends Service implements IAppService{
 		value[5] = description;
 		value[6] = "1";
 
-		String httpRes = this.sendHttpRequest(name, value, "upload", video);
+		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, "upload", video);
 		String result = getString(R.string.unknown_error_occured);
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
@@ -1164,7 +1195,7 @@ public class AppService extends Service implements IAppService{
 		value[2] = facebookId;
 		
 		boolean isRegistered = false;
-		String httpRes = sendHttpRequest(name, value, null, null);
+		String httpRes = sendHttpRequestWithAuthPacket(name, value, null, null);
 		String result = getString(R.string.unknown_error_occured);
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
