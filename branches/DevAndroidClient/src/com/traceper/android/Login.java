@@ -73,7 +73,7 @@ public class Login extends Activity {
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			appManager = ((AppService.IMBinder)service).getService();  
-			appManager.setAuthenticationServerAddress(getSharedPreferences(Configuration.PREFERENCES_NAME, 0).getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
+			appManager.setAuthenticationServerAddress(preferences.getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
 
 			String prefEmail = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
 			String prefPassword = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
