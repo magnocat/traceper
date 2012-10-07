@@ -41,6 +41,7 @@ return array(
 	'Password (Again)' => 'Parola (Tekrar)',
 	'E-mail not valid!' => 'E-posta geçerli değil!',
 	'Passwords not same!' => 'Parolalar aynı değil!',
+	'Password has been changed...' => 'Parola değiştirildi...',
 	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
 	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',	
