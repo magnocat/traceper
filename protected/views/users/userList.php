@@ -38,7 +38,8 @@ if ($dataProvider != null) {
 										.CHtml::ajax(
 											array(
 												'url'=>Yii::app()->createUrl('users/deleteFriendShip'),
-												'data'=> array('friendShipId'=>"js:$('#friendShipId').html()"),
+												//'data'=> array('friendShipId'=>"js:$('#friendShipId').html()"),
+												'data'=> array('friendId'=>"js:$('#friendId').html()"),
 												'success'=> 'function(result) { 	
 															 	try {
 															 		TRACKER.closeConfirmationDialog();
@@ -49,11 +50,11 @@ if ($dataProvider != null) {
 																	}
 																	else 
 																	{
-																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																		TRACKER.showMessageDialog("Error 1");
 																	}
 																}
 																catch(ex) {
-																	TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																	TRACKER.showMessageDialog("Error 2");
 																}
 															}',
 											)).

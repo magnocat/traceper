@@ -145,13 +145,11 @@ class Friends extends CActiveRecord
 		return $errorOccured;
 	}
 	
-	public function deleteFriendShip($friendShipId, $id) 
+	public function deleteFriendShip($friendId) 
 	{
 		//TODO: use delete function not findByPk and then delete
-		$friendShip = Friends::model()->findByPk($friendShipId, array('condition'=>'friend1=:friend1 OR
-				friend2=:friend2',
-				'params'=>array(':friend1'=>$id,
-						':friend2'=>$id,
+		$friendShip = Friends::model()->find(array('condition'=>'(friend1=:friend1 AND friend2=:friend2) OR (friend1=:friend2 AND friend2=:friend1)',
+				'params'=>array(':friend1'=>Yii::app()->user->id, ':friend2'=>$friendId,
 				),
 		)
 		);

@@ -148,9 +148,8 @@ class UsersController extends Controller
 
 
 	private function getFriendIdList() {
-
-		if (isset(Yii::app()->session['friendList']) == false) {
-
+		//if (isset(Yii::app()->session['friendList']) == false) {
+		if (true) {
 			$friendsResult = Users::model()->getFriendList(Yii::app()->user->id);
 			$length = count($friendsResult);
 			Yii::app()->session['friendCount'] = $length;
@@ -164,8 +163,8 @@ class UsersController extends Controller
 			}
 			Yii::app()->session['friendArray'] = $friends;
 			Yii::app()->session['friendList'] = $result;
-		}
-
+		}		
+		 
 		return Yii::app()->session['friendList'];
 	}
 
@@ -281,11 +280,11 @@ class UsersController extends Controller
 	}
 	public function actionDeleteFriendShip(){
 		$result = 'Missing Data';
-		if (isset($_REQUEST['friendShipId']))
+		if (isset($_REQUEST['friendId']))
 		{
-			$friendShipId = (int) $_REQUEST['friendShipId'];
-			
-			$done = Friends::model()->deleteFriendShip($friendShipId, Yii::app()->user->id);
+			$friendId = (int) $_REQUEST['friendId'];
+
+			$done = Friends::model()->deleteFriendShip($friendId);
 			
 			if ($done == true) {
 				$result = 1;
