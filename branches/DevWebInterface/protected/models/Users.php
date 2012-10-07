@@ -289,7 +289,6 @@ class Users extends CActiveRecord
 	
 	public function getListDataProvider($IdList, $userType=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
 	{
-	
 		$userTypeSqlPart = '';
 		if ($userType != null) {
 			$userTypeCount = count($userType);
@@ -302,10 +301,13 @@ class Users extends CActiveRecord
 			}
 		}
 	
+		//echo $IdList;
+	
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE Id in ('. $IdList.')';
 	
+				
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
@@ -313,8 +315,8 @@ class Users extends CActiveRecord
 		u.account_type
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE Id in ('. $IdList.')';
-	
-	
+		
+			
 		if ($time != null) {
 			$timeSql = ' AND unix_timestamp(u.dataArrivedTime) >= '. $time;
 			$sqlCount .= $timeSql;
@@ -322,19 +324,22 @@ class Users extends CActiveRecord
 		}
 	
 		if ($userTypeSqlPart != '') {
-			$sqlCount .= ' AND '. $userTypeSqlPart;
-			$sql .= ' AND ' . $userTypeSqlPart;
+			$sqlCount .= ' AND ('. $userTypeSqlPart. ')';
+			$sql .= ' AND (' . $userTypeSqlPart. ')';
 		}
+		
+		//echo '</br>$sqlCount: '.$sqlCount.'</br>';
 	
 		//	if ($offset !== null && $itemCount !== null) {
 		//		$sql .= ' LIMIT ' . $offset . ' , ' . $itemCount;
 		//	}
 	
 		$count = $totalItemCount;
+						
 		if ($count == null) {
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		}
-	
+		
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -392,7 +397,6 @@ class Users extends CActiveRecord
 	
 	public function getFriendList($Id)
 	{
-	
 		//TODO: this function should be moved to Friends model
 		$sql = 'SELECT IF( friend1 != '. $Id.', friend1, friend2 ) as friend '
 		.' FROM ' .  Friends::model()->tableName()
@@ -402,6 +406,8 @@ class Users extends CActiveRecord
 		.' ) '
 		.' AND STATUS = 1';
 		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
+		
+		//echo "Friend Count: ".count($friendsResult);
 	
 		return $friendsResult;
 	}
