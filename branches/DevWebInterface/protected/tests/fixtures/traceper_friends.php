@@ -1,12 +1,14 @@
 <?php
 //For empty friends table
 return array(	
-// 		'friendship1'=>array(
-// 				'Id'=>1,
-// 				'friend1'=>1,
-// 				'friend2'=>2,
-// 				'status'=>1,
-// 		),	
+		'friendship1'=>array(
+				'Id'=>1,
+				'friend1'=>1,
+				'friend2'=>2,
+				'friend1Visibility'=>1,
+				'friend2Visibility'=>1,				
+				'status'=>1,
+		),	
 
 		'friendship2'=>array(
 				'Id'=>2,
@@ -14,7 +16,7 @@ return array(
 				'friend2'=>3,
 				'friend1Visibility'=>1,
 				'friend2Visibility'=>1,
-				'status'=>1,
+				'status'=>0,
 		),
 
 		'friendship3'=>array(
@@ -39,7 +41,7 @@ return array(
 				'friend2'=>6,
 				'friend1Visibility'=>1,
 				'friend2Visibility'=>1,
-				'status'=>0,
+				'status'=>1,
 		),
 		'friendship6'=>array(
 				'Id'=>6,

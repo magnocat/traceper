@@ -15,7 +15,7 @@ return array(
 				'password'=>md5(54321),
 				'realname'=>'Test User 2',
 				'email'=>'test2@traceper.com',
-				'userType' => UserType::GPSDevice,
+				'userType' => UserType::RealUser,
 				'publicPosition'=>0,
 				'authorityLevel'=>AuthorityLevel::StandardUser,
 				'fb_id'=>123456789,
@@ -25,28 +25,28 @@ return array(
 				'password'=>md5(54321),
 				'realname'=>'User privacy group test 3',
 				'email'=>'user_privacy_group_test@traceper.com',
-				'userType' => UserType::RealStaff
+				'userType' => UserType::RealStaff 
 		),
 		'user4'=>array(
 				'Id'=>4,
 				'password'=>md5(12321),
 				'realname'=>'Test User 4',
 				'email'=>'test4@traceper.com',
-				'userType' => UserType::GPSStaff
+				'userType' => UserType::GPSDevice
 		),	
 		'user5'=>array(
 				'Id'=>5,
 				'password'=>md5(1234321),
 				'realname'=>'Test User 5',
 				'email'=>'test5@traceper.com',
-				'userType' => UserType::RealUser
+				'userType' => UserType::RealStaff 
 		),		
 		'user6'=>array(
 				'Id'=>6,
 				'password'=>md5(12345),
-				'realname'=>'Test User 1',
+				'realname'=>'Test User 6',
 				'email'=>'test6@traceper.com',
-				'userType' => UserType::RealUser
+				'userType' => UserType::GPSStaff
 		),
 		'user7'=>array(
 				'Id'=>7,
