@@ -372,8 +372,11 @@ class Users extends CActiveRecord
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type, "0" as status
+		u.account_type, IFNULL(f.status, -1) as status
 		FROM '.  Users::model()->tableName() . ' u
+		LEFT JOIN ' . Friends::model()->tableName() . ' f 
+		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
+		   (f.friend2 = u.Id AND f.friend1 = '. Yii::app()->user->id .')
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"';
 	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
