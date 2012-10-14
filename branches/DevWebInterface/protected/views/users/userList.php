@@ -1,5 +1,9 @@
 <?php
 
+//testDeleteFriendShip() testinde grid view güncellenirken "TypeError: settings is undefined" exception'ý almamak için
+Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
+Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
+
 if ($dataProvider != null) {
 	$isFriendRequestList = isset($friendRequestList) ? true : false;
 	$isSearchResult = isset($searchResult) ? true : false;
@@ -53,8 +57,8 @@ if ($dataProvider != null) {
 																		TRACKER.showMessageDialog("Error 1");
 																	}
 																}
-																catch(ex) {
-																	TRACKER.showMessageDialog("Error 2");
+																catch(e) {
+																	TRACKER.showMessageDialog("The following error occurred: " + e.name + " - " + e.message);
 																}
 															}',
 											)).
