@@ -16,7 +16,7 @@ return array(
 				'realname'=>'Test User 2',
 				'email'=>'test2@traceper.com',
 				'userType' => UserType::RealUser,
-				'publicPosition'=>0,
+				'publicPosition'=>1,
 				'authorityLevel'=>AuthorityLevel::StandardUser,
 				'fb_id'=>123456789,
 		),

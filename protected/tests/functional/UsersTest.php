@@ -40,20 +40,41 @@ class SiteTest extends WebTestCase
 	
 	public function testDeleteFriendShip()
 	{
-		$this->open("index-test.php");
+		$this->open("index-test.php");		
+		
 		$this->click("id=showLoginWindow");
 		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
 		
 		$this->type("id=LoginForm_email", "test@traceper.com");
 		$this->type("id=LoginForm_password", "12345");
-		$this->click("id=yt0");	
+		$this->click("id=yt0");
+		sleep(1);
 		
 		$this->click("link=".Yii::t('layout', 'Users'));
-		$this->waitForElementPresent("id=userListView");		
+		$this->waitForElementPresent("id=userListView");
+		sleep(1);
+
+		$this->click("//div[@id='userListView']/table/tbody/tr[2]/td[4]/a/img");
+		sleep(1);
+		$this->click("xpath=(//button[@type='button'])[2]");
+		sleep(1);
+		$this->click("//div[@id='userListView']/table/tbody/tr/td[4]/a/img");
+		sleep(1);
+		$this->click("xpath=(//button[@type='button'])[2]");
+		sleep(1);
+		$this->click("css=td");
 		
-	    $this->click("//div[@id='userListView']/table/tbody/tr[2]/td[4]/a/img");
-	    $this->click("xpath=(//button[@type='button'])[2]");
-	    
-	    //$this->assertTrue($this->isTextPresent("Kullan�c� bulunamad�"));
+		//$this->setSpeed('120');
+	
+	    for ($second = 0; ; $second++) {
+	        if ($second >= 60) $this->fail("timeout");
+	        try {
+	            if ($this->isTextPresent("Kullanıcı bulunamadı")) break;
+	        } catch (Exception $e) {}
+	        sleep(1);
+	    }
+	
+	    $this->verifyTextPresent("Kullanıcı bulunamadı");
 	}	
 }
