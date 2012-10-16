@@ -198,15 +198,32 @@ class Friends extends CActiveRecord
 		return $dataProvider;
 	}
 	
-	public function approveFriendShip($friendShipId, $userId) 
+// 	public function approveFriendShip($friendShipId, $userId) 
+// 	{
+// 		// only friend2 can approve friendship because friend1 makes the request
+// 		$friendShip = $this->findByPk($friendShipId, 
+// 								array( 'condition'=>'friend2=:friend2 AND status=0',
+// 										'params'=>array(':friend2'=>$userId,
+// 												),
+// 								)
+// 							);
+// 		$result = false;
+// 		if ($friendShip != null)
+// 		{
+// 			$friendShip->status = 1;
+// 			if ($friendShip->save()) {
+// 				$result = true;
+// 			}
+// 		}
+		
+// 		return $result;
+// 	}
+	
+	public function approveFriendShip($friendId, $userId)
 	{
 		// only friend2 can approve friendship because friend1 makes the request
-		$friendShip = $this->findByPk($friendShipId, 
-								array( 'condition'=>'friend2=:friend2 AND status=0',
-										'params'=>array(':friend2'=>$userId,
-												),
-								)
-							);
+		$friendShip = $this->find('friend1=:friend1 AND friend2=:friend2', array(':friend1'=>$friendId, ':friend2'=>$userId));
+						
 		$result = false;
 		if ($friendShip != null)
 		{
@@ -215,9 +232,9 @@ class Friends extends CActiveRecord
 				$result = true;
 			}
 		}
-		
+	
 		return $result;
-	}
+	}	
 	
 	public function addAsFriend($requesterId, $partnerId)
 	{

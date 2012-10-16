@@ -1,8 +1,8 @@
 <?php
 
 //testDeleteFriendShip() testinde grid view güncellenirken "TypeError: settings is undefined" exception'ý almamak için
-Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
-Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
+//Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
+//Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
 
 if ($dataProvider != null) {
 	$isFriendRequestList = isset($friendRequestList) ? true : false;
@@ -220,7 +220,7 @@ if ($dataProvider != null) {
 									CHtml::link(\'<img src="images/approve.png"  />\', \'#\',
 										array(\'onclick\'=>CHtml::ajax(
 											array(
-												\'url\'=>Yii::app()->createUrl(\'users/approveFriendShip\'),
+												\'url\'=>Yii::app()->createUrl(\'users/approveFriendShip\', array(\'friendId\'=>$data[\'id\'])),
 												\'success\'=> \'function(result) { 
 													try {
 														$("#confirmation").dialog("close");
@@ -231,11 +231,11 @@ if ($dataProvider != null) {
 														}
 														else 
 														{
-															TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+															TRACKER.showMessageDialog("Sorry, an error occured in operation 1");
 														}
 													}
-													catch(ex) {
-														TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+													catch(e) {
+														TRACKER.showMessageDialog("The following error occurred: " + e.name + " - " + e.message);
 													}
 													
 												}\',

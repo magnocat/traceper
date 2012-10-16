@@ -40,7 +40,7 @@ class UsersController extends Controller
 	{
 		return array(
 				array('deny',
-						'actions'=>array('addAsFriend', 'approveFriendShip',
+						'actions'=>array('addAsFriend', '',
 								'deleteFriendShip','getFriendRequestList',
 								'getUserPastPointsXML', 'getUserListXML', 'search',
 								'takeMyLocation', 'getUserInfo',
@@ -342,24 +342,36 @@ class UsersController extends Controller
 	
 	public function actionApproveFriendShip(){
 		$result = 'Missing Data';
-		if (isset($_REQUEST['friendShipId']))
+// 		if (isset($_REQUEST['friendShipId']))
+// 		{
+// 			$friendShipId = (int) $_REQUEST['friendShipId'];
+// 			// only friend2 can approve friendship because friend1 makes the request
+// 			$friendShip = Friends::model()->findByPk($friendShipId, array('condition'=>'friend2=:friend2',
+// 					'params'=>array(':friend2'=>Yii::app()->user->id,
+// 					),
+// 			)
+// 			);
+// 			$result = 'Error occured';
+// 			if (Friends::model()->approveFriendShip($friendShipId, $userId) == true)
+// 			{
+// 				$result = 1;
+// 				$this->unsetFriendIdList();
+// 			}			
+// 		}
+		
+		if (isset($_REQUEST['friendId']))
 		{
-
-			$friendShipId = (int) $_REQUEST['friendShipId'];
+			$friendId = (int) $_REQUEST['friendId'];
 			// only friend2 can approve friendship because friend1 makes the request
-			$friendShip = Friends::model()->findByPk($friendShipId, array('condition'=>'friend2=:friend2',
-					'params'=>array(':friend2'=>Yii::app()->user->id,
-					),
-			)
-			);
-			$result = 'Error occured';
-			if (Friends::model()->approveFriendShip($friendShipId, $userId) == true)
+			//$friendShip = Friends::model()->find('friend1=:friend1 AND friend2=:friend2', array(':friend1'=>$friendId, ':friend2'=>Yii::app()->user->id));
+			
+			$result = 'Error occured';			
+			if (Friends::model()->approveFriendShip($friendId, Yii::app()->user->id) == true)
 			{
 				$result = 1;
 				$this->unsetFriendIdList();
 			}
-			
-		}
+		}		
 		echo CJSON::encode(array(
 				"result"=>$result,
 		));
