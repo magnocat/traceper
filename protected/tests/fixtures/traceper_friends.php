@@ -12,8 +12,8 @@ return array(
 
 		'friendship2'=>array(
 				'Id'=>2,
-				'friend1'=>1,
-				'friend2'=>3,
+				'friend1'=>3,
+				'friend2'=>1,
 				'friend1Visibility'=>1,
 				'friend2Visibility'=>1,
 				'status'=>0,

@@ -77,4 +77,39 @@ class SiteTest extends WebTestCase
 	
 	    $this->verifyTextPresent("Kullanıcı bulunamadı");
 	}	
+	
+	public function testApproveFriendShip()
+	{
+		$this->open("index-test.php");
+	
+		$this->click("id=showLoginWindow");
+		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		sleep(1);
+	
+		$this->click("link=".Yii::t('layout', 'Users'));
+		$this->waitForElementPresent("id=userListView");
+		sleep(1);
+	
+		$this->click("css=#friendRequests > img");
+		sleep(1);
+		
+		$this->click("//div[@id='userListDialog']/table/tbody/tr/td[3]/a/img");
+		sleep(1);
+		
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isTextPresent("Arkadaşlık isteği bulunamadı")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+		
+		$this->verifyTextPresent("Arkadaşlık isteği bulunamadı");	
+	}	
 }
