@@ -75,6 +75,7 @@ function processUserPastLocations(MAP, locations, userId){
 				+"</ul>";
 			MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow,content);			
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
+			TRACKER.users[userId].infoWindowIsOpened = true;
 		});
 
 //		index++;
@@ -174,7 +175,8 @@ function processUsers(MAP, users) {
 			TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 			
 			MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
-				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);	
+				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
+				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
 			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker,true);						
 			
@@ -218,7 +220,8 @@ function processUsers(MAP, users) {
 
 					var infoWindow = MAP.initializeInfoWindow(
 							getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, oldlatitude, oldlongitude, nextGMarkerIndex));
-					MAP.openInfoWindow(infoWindow, userMarker);	
+					MAP.openInfoWindow(infoWindow, userMarker);
+					TRACKER.users[userId].infoWindowIsOpened = true;
 				});
 
 				TRACKER.users[userId].mapMarker.splice(1,0, markerInfoWindow);					
@@ -227,9 +230,44 @@ function processUsers(MAP, users) {
 					// if traceline is not visible, hide the marker
 					MAP.setMarkerVisible(userMarker,false)						
 				}
-
-
 			}
+			
+			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null)&&(TRACKER.users[userId].latitude != latitude ||
+					TRACKER.users[userId].longitude != longitude)){
+				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
+				
+				var content =  '<div>'														   
+				+ '<br/>' + TRACKER.users[userId].realname  
+				+ '<br/>' + TRACKER.users[userId].time
+				+ '<br/>' + latitude + ", " + longitude
+
+				+'</div>'
+				+'<div>'
+				+ '<ul class="sf-menu"> '
+				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+				+ TRACKER.langOperator.previousPoint 
+				+'</a>'+ '</li>'
+				+ '<li>'+ '<a class="infoWinOperations" href="#">'
+				+ TRACKER.langOperator.operations
+				+'</a>'
+				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoom
+				+'</a>'+ '</li>'
+				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+				+ TRACKER.langOperator.zoomMax
+				+'</a>'+'</li>'
+				+'</ul>'
+				+'</li>'
+				+ '</ul>'
+				+ '</div>';
+				
+				if (isWindowOpen == true) {
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
+					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow,content);			
+					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
+				}
+			}
+			
 			
 			TRACKER.users[userId].latitude = latitude;
 			TRACKER.users[userId].longitude = longitude;
@@ -237,17 +275,7 @@ function processUsers(MAP, users) {
 			TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
 			TRACKER.users[userId].deviceId = deviceId;
 			TRACKER.users[userId].friendshipStatus = isFriend;
-			//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
-			// pencerenin yeni konumda da açık olmasının sağlanması
-			/*
-			var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
-			MAP.closeInfoWindow(TRACKER.closeMarkerInfoWindow(userId))
-
-			if (isWindowOpen == true) {
-				TRACKER.openMarkerInfoWindow(userId);
-			}
-			 */
-
+	
 		}
 
 	});

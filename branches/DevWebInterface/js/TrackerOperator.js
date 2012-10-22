@@ -104,24 +104,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var obj = $.parseJSON(result);
 			processUsers(MAP, obj.userlist);
+			
+			
 			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
 			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
 			// to fetched all data reguarly updateFriendListPageNo must be resetted.
 			var updateInt = TRACKER.updateInterval;
 
+			
+			
 			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
 				TRACKER.updateFriendListPageNo = 1;
 				TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;			
+				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
 			}
 			else{
 				TRACKER.updateFriendListPageNo++;
 				TRACKER.updateInterval = TRACKER.getUserListInterval;
 			}
-		
+			
 			TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
-  
-			  
 		}, true);
 		
 	};
@@ -180,8 +182,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			if(TRACKER.preUserId != -1)//Check for the first click in order not to take "undefined" error
 			{
 				MAP.closeInfoWindow(TRACKER.users[TRACKER.preUserId].mapMarker[0].infoWindow);
+				TRACKER.users[userId].infoWindowIsOpened = false;
 			}
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
+			TRACKER.users[userId].infoWindowIsOpened = true;
 			TRACKER.preUserId = userId;
 		}
 	};
@@ -239,6 +243,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (TRACKER.users[userId].mapMarker[i].marker != null) {
 					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
+					TRACKER.users[userId].infoWindowIsOpened = false;
 					
 				}
 			}
@@ -279,6 +284,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
+		TRACKER.users[userId].infoWindowIsOpened = false;
 	};
 
 	this.zoomPoint = function (latitude, longitude) {
@@ -320,6 +326,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					}
 					else {
 						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+						TRACKER.users[userId].infoWindowIsOpened = false;
 						MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
 					}			
 
@@ -345,6 +352,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			}
 			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
+			TRACKER.users[userId].infoWindowIsOpened = false;
 			MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, "click");			
 		}
 	}
