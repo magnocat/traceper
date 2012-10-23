@@ -78,6 +78,46 @@ class SiteTest extends WebTestCase
 	    $this->verifyTextPresent("Kullanıcı bulunamadı");
 	}	
 	
+	public function testDeleteUser()
+	{
+		$this->open("index-test.php");
+	
+		$this->click("id=showLoginWindow");
+		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		sleep(1);
+	
+		$this->click("link=Personel");
+		sleep(1);
+
+		$this->click("//div[@id='staffListView']/table/tbody/tr/td[4]/a/img");
+		sleep(1);
+		
+		$this->click("xpath=(//button[@type='button'])[2]");
+		sleep(1);
+		
+		$this->click("//div[@id='staffListView']/table/tbody/tr/td[4]/a/img");
+		sleep(1);
+		
+		$this->click("xpath=(//button[@type='button'])[2]");
+		sleep(1);
+	
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isTextPresent("Kullanıcı bulunamadı")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->verifyTextPresent("Kullanıcı bulunamadı");
+	}	
+	
 	public function testApproveFriendShip()
 	{
 		$this->open("index-test.php");
@@ -111,5 +151,79 @@ class SiteTest extends WebTestCase
 		}
 		
 		$this->verifyTextPresent("Arkadaşlık isteği bulunamadı");	
+	}
+	
+	public function testAddAsFriend()
+	{
+		$this->open("index-test.php");
+	
+		$this->click("id=showLoginWindow");
+		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		sleep(1);
+	
+		$this->click("link=Personel");
+		sleep(1);
+
+		$this->type("id=SearchForm_keyword", "Test");
+		sleep(1);
+		
+		$this->click("id=searchUserButton");
+		sleep(1);
+		
+		$this->click("//div[@id='searchResultList']/table/tbody/tr[3]/td[2]/a/img");
+		sleep(1);
+		
+		$this->click("xpath=(//button[@type='button'])[2]");
+		
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isTextPresent("Arkadaşlık isteği gönderildi")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}		
+		
+		$this->verifyTextPresent("Arkadaşlık isteği gönderildi");
+	}	
+	
+	public function testSearch()
+	{
+		$this->open("index-test.php");
+	
+		$this->click("id=showLoginWindow");
+		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
+	
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		sleep(1);
+	
+		$this->click("link=Personel");
+		sleep(1);
+	
+	    $this->type("id=SearchForm_keyword", "User privacy group");
+	    sleep(1);
+	    
+	    $this->click("id=searchUserButton");
+	    sleep(1);
+
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isTextPresent("User privacy group test 3")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+	
+		$this->verifyTextPresent("User privacy group test 3");
+		$this->verifyTextPresent("User privacy group test 8");
 	}	
 }
