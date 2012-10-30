@@ -172,12 +172,14 @@ class UploadController extends Controller
 			&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
 			&& isset($_REQUEST['description']) && $_REQUEST['description'] != NULL
 			&& isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL
+/*				
 			&& ($_REQUEST['fileType'] == "0" ||
 						($_REQUEST['fileType'] == "1"
 								&& isset($_REQUEST['isLive']) && $_REQUEST['isLive'] != NULL
 								&& isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] != NULL
 								&& isset($_REQUEST['uniqueId']) && $_REQUEST['uniqueId'] != NULL
 								&& isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] != NULL))
+*/								
 								)
 		{
 			$result = "Upload Error";
