@@ -19,11 +19,22 @@ a {
 }
 #sideBar{
 	width:26%;
-	height:100%;
-	background: #fff;
+	height:93%;
+	top: 7%;
+	background: #ffffff;
 	z-index:100;
 	float:left;
 	position:absolute;	
+}
+#topBar{	 
+	height:7%;
+	width:100%;
+	background: #add8e6;	
+	z-index:100;
+	position: absolute;
+  	top: 0px;
+  	right:0px;
+  	min-width:40px;
 }
 #footer{
 	position:fixed;
@@ -34,6 +45,10 @@ a {
 	text-align:center;
 	z-index: 100;
 	margin:0px;	
+}
+#topBar > #topContent > *  {
+	margin-top:5px;
+
 }
 #sideBar > #content > *  {
 	margin-left:5px;
@@ -48,7 +63,8 @@ a {
 	z-index: 150;
 	position: absolute;
 	right:74%;
-	width:1%;	
+	width:1%;
+	top:7%;	
 	cursor:pointer;
 		
 }
@@ -56,7 +72,7 @@ a {
 	z-index:200; 
 	list-style: none;
 	padding:0;
-	float:left;
+	right: 70%;
 	margin:0px;
 	position: relative;	
 	cursor: pointer;
@@ -87,6 +103,7 @@ a {
 #username{
 	padding-left:22px;
 	background: url("../images/account.png") no-repeat 3px;
+	float: right;
 }
 
 #bar:hover{ background-color:#6261d8;}
@@ -104,17 +121,32 @@ a {
 }
 
 #map{	
-	height:100%;
-	width:75%;
-	float:right;
+	height:93%;
+	width:74%;	
+	position: absolute;
+  	bottom: 0px;
+  	right:0px;
 }
 
 #logo, .logo, .logo_inFullMap {
-	height:70px;
-	background: url("../images/logo.png") no-repeat center;
+	height:40px;
+	width:15%;
+	background: url("../images/logo_mini.png") no-repeat center;
 	cursor:pointer;		
 	position: relative;
+	float: left;
 }
+
+.upperMenu {
+	height:40px;
+	width:15%;
+	float:right;
+	cursor:pointer;		
+	position: relative;
+	padding:0px; 
+	margin:0px;
+}
+
 /*#loginLogo {
 	height:160px;
 }
@@ -155,6 +187,7 @@ a {
 /*	height:100%;
 */
 }
+
 #content{
 	height: 100%;
 }
@@ -305,11 +338,12 @@ a {
 #mailEntraceAlert{
 	font-style:italic;
 }
+
 .userOperations{
-	float:left;
-	margin: 0px;
+	width:2%;
+	float:right;
 	cursor: pointer;
-	padding:5px 2px 5px 2px;
+	
 }
 .userOperations div{
 	display: none;
