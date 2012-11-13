@@ -19,6 +19,9 @@ return array(
 				'publicPosition'=>1,
 				'authorityLevel'=>AuthorityLevel::StandardUser,
 				'fb_id'=>123456789,
+				'latitude'=>10.0,
+				'longitude'=>20.0,
+				'altitude'=>30.0
 		),
 		'user_privacy_group_test'=>array(
 				'Id'=>3,
