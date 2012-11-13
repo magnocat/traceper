@@ -225,5 +225,51 @@ class SiteTest extends WebTestCase
 	
 		$this->verifyTextPresent("User privacy group test 3");
 		$this->verifyTextPresent("User privacy group test 8");
+	}
+
+	public function testGetUserInfo()
+	{
+		$this->open("index-test.php");
+		
+		$this->click("id=showLoginWindow");
+		$this->waitForElementPresent("id=showLoginWindow");
+		sleep(1);
+
+		$this->type("id=LoginForm_email", "test@traceper.com");
+		$this->type("id=LoginForm_password", "12345");
+		$this->click("id=yt0");
+		sleep(1);		
+		
+		$this->waitForElementPresent("id=username");
+		sleep(1);	
+			
+		$this->click("id=username");
+		sleep(1);
+		
+		$this->verifyTextPresent("Test User");
+		$this->verifyTextPresent("0.000000, 0.000000");	
+		$this->verifyTextPresent("<< Previous point");
+		$this->verifyTextPresent("Operations");
+		$this->verifyTextPresent("Zoom in");
+		$this->verifyTextPresent("Zoom max");
+		
+		$this->click("//img[contains(@src,'http://maps.gstatic.com/mapfiles/mv/imgs8.png')]");
+		
+		$this->click("link=Test User 2");
+		for ($second = 0; ; $second++) {
+			if ($second >= 60) $this->fail("timeout");
+			try {
+				if ($this->isTextPresent("Test User 2")) break;
+			} catch (Exception $e) {
+			}
+			sleep(1);
+		}
+		
+		$this->verifyTextPresent("Test User 2");
+		$this->verifyTextPresent("10.000000, 20.000000");
+		$this->verifyTextPresent("<< Previous point");
+		$this->verifyTextPresent("Operations");
+		$this->verifyTextPresent("Zoom in");
+		$this->verifyTextPresent("Zoom max");				
 	}	
 }
