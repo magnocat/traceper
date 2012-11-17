@@ -46,7 +46,9 @@ import android.util.Log;
 
 import com.traceper.R;
 import com.traceper.android.Configuration;
-import com.traceper.android.Main;
+import com.traceper.android.MapViewController;
+
+import com.traceper.android.new_main;
 import com.traceper.android.interfaces.IAppService;
 
 
@@ -118,7 +120,7 @@ public class AppService extends Service implements IAppService{
 
 	public void onCreate() 
 	{   		
-		mainActivityIntent = new Intent(AppService.this, Main.class);
+		mainActivityIntent = new Intent(AppService.this, MapViewController.class);
 		conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		deviceId = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
@@ -424,8 +426,8 @@ public class AppService extends Service implements IAppService{
 			result = jsonObject.getString("result");
 			if (result.equals("1")) 
 			{		
-				int dataSentInterval = Integer.parseInt(jsonObject.getString("minDataSentInterval"));
-				int distanceInterval = Integer.parseInt(jsonObject.getString("minDistanceInterval"));
+				int dataSentInterval = jsonObject.getInt("minDataSentInterval");
+				int distanceInterval = jsonObject.getInt("minDistanceInterval");
 				if (dataSentInterval != this.minDataSentInterval || distanceInterval != this.minDistanceInterval){
 					this.configurationChanged  = true;
 					this.minDataSentInterval = dataSentInterval;
@@ -719,7 +721,7 @@ public class AppService extends Service implements IAppService{
 		name[1] = "email";
 		name[2] = "password";
 
-		value[0] = "users/getUserListJson";
+		value[0] = "users/GetUserListJson";
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 
@@ -956,7 +958,7 @@ public class AppService extends Service implements IAppService{
 		name[5] = "range";
 
 
-		value[0] = "users/getUserPastPointsJSON";
+		value[0] = "users/GetUserPastPointsJSON";
 		value[1] = AppService.this.email;
 		value[2] = AppService.this.password;
 		value[3] = uId;

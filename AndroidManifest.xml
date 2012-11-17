@@ -1,8 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	android:versionCode="1" android:versionName="1.0.0"
 	package="com.traceper">
-	<application android:icon="@drawable/icon" android:label="@string/ApplicationName" android:debuggable="true">
+	   <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="15" />
+	    <application
+        android:icon="@drawable/icon"
+        android:label="@string/ApplicationName"
+        android:theme="@style/AppTheme" >
 		<uses-library android:name="com.google.android.maps" />
 		<activity android:name=".android.Main">
 			<intent-filter>
@@ -12,6 +18,16 @@
 				</category>
 			</intent-filter>
 		</activity>
+		
+				<activity android:name=".android.new_main">
+			<intent-filter>
+				<action android:name="android.intent.action.NEWMAIN"></action>
+				<category
+					android:name="android.intent.category.NORMAL">
+				</category>
+			</intent-filter>
+		</activity>
+		
 		<service android:name=".android.services.AppService"></service>
 		<activity android:name=".android.Login">
 			<intent-filter>
@@ -30,13 +46,21 @@
 		<activity android:name=".android.CameraController" android:screenOrientation="landscape" >
 		</activity>
 		
+		
+					<activity android:name=".android.AndroidFragment"  >
+			<intent-filter>
+				<action android:name="com.traceper.ANDROIDFRAGMENT"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+			</intent-filter>
+		</activity>
+		
 			<activity android:name=".android.MapViewController"  >
 			<intent-filter>
 				<action android:name="com.traceper.MVIEW"></action>
 				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
-		<activity android:name=".android.FriendList"  >
+		<activity android:name=".android.new_friendList"  >
 			<intent-filter>
 				<action android:name="com.traceper.FRIENDS"></action>
 				<category android:name="android.intent.category.DEFAULT"></category>
@@ -84,6 +108,6 @@
 
 <uses-feature android:name="android.hardware.camera" android:required="false" />
 <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15"/>
+
 
 </manifest>

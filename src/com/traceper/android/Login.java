@@ -84,7 +84,7 @@ public class Login extends Activity {
 			}
 			else if (appManager.isUserAuthenticated() == true)
 			{
-				Intent i = new Intent(Login.this, Main.class);																
+				Intent i = new Intent(Login.this, new_main.class);																
 				startActivity(i);
 				Login.this.finish();
 			}
@@ -165,7 +165,7 @@ public class Login extends Activity {
 											editor.commit();	
 										}
 
-										Intent i = new Intent(Login.this, Main.class);																		
+										Intent i = new Intent(Login.this, new_main.class);																		
 										startActivity(i);	
 										Login.this.finish();										
 									}

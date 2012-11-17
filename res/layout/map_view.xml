@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-       <com.google.android.maps.MapView 
-        android:id="@+id/mapView"
+    android:orientation="vertical" >
+
+    <com.readystatesoftware.maps.TapControlledMapView
+        android:id="@+id/mapview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:enabled="true"
-        android:clickable="true"
-        android:apiKey="0_N0WwH5Typ8e9MObmx0hxJeWEP4Bg7pl0cGPWQ"
-        />
-</LinearLayout>
+        android:apiKey="0_N0WwH5Typ_Z9Jb-0XHLssWueaBastxShuAP6g"
+        android:clickable="true" />
+
+    <ImageView
+        android:id="@+id/meButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/mapview"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:padding="10dp"
+        android:src="@drawable/map_gps_icon" />
+
+</RelativeLayout>
+      
+     

@@ -20,15 +20,23 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.SherlockMapActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.readystatesoftware.maps.TapControlledMapView;
 import com.traceper.R;
 import com.traceper.android.interfaces.IAppService;
 import com.traceper.android.services.AppService;
@@ -37,9 +45,9 @@ import com.traceper.android.services.AppService;
 
 
 
-public class MapViewController extends MapActivity {
-
-	private MapView mapView;
+public class MapViewController extends SherlockMapActivity implements ActionBar.TabListener  {
+	ActionBar actionBar;
+	private TapControlledMapView  mapView;
 	private MapController mapController;
 	private Location location;
 	private IAppService appService = null;
@@ -49,7 +57,9 @@ public class MapViewController extends MapActivity {
 	private List<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
 	static Context context;
 	public static final int REFRESH_MAP = Menu.FIRST;
-
+	public static final int MAP = Menu.FIRST+ 1;
+	private Location lastLocation = null;
+	ArrayList<Integer> tabs = new ArrayList<Integer>();
 
 
 	@Override
@@ -79,18 +89,14 @@ public class MapViewController extends MapActivity {
 			if (extra != null)
 			{
 				String action = intent.getAction();
-				if (action.equals(IAppService.SHOW_USER_LOCATION))
+				if (action.equals(IAppService.LAST_LOCATION_DATA_SENT_TIME))
 				{				
 
-
-					lati = Double.parseDouble(extra.getString("latitude"));
-					longi =Double.parseDouble(extra.getString("longitude"));	
-
-
+					lastLocation = (Location)extra.getParcelable(IAppService.LAST_LOCATION);	
 
 					GeoPoint myPoint1 =new GeoPoint(
-							(int) (lati * 1E6), 
-							(int) (longi * 1E6));
+							(int) (lastLocation.getLatitude() * 1E6), 
+							(int) (lastLocation.getLongitude() * 1E6));
 					mapItemizedOverlay.addItem(myPoint1, "myPoint1", "myPoint1");
 
 
@@ -109,7 +115,7 @@ public class MapViewController extends MapActivity {
 	{
 		public void onServiceConnected(ComponentName className, IBinder service) {          
 			appService = ((AppService.IMBinder)service).getService();    
-			updateLocation();
+			appService.sendLocationNow();
 		}
 		public void onServiceDisconnected(ComponentName className) {          
 			appService = null;
@@ -122,15 +128,21 @@ public class MapViewController extends MapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.map_view);
-
-		context = getApplicationContext();
-
-		mapView = (MapView) findViewById(R.id.mapView);
+		
+		
+		//context = getApplicationContext();
+	
+		actionBar = getSupportActionBar();
+		actionBar.setDisplayShowTitleEnabled(true);
+		setTabs();
+		
+	//	mapView = (MapView)findViewById(R.id.mapview);
+		mapView = (TapControlledMapView) findViewById(R.id.mapview);
 
 		// enable Street view by default
-		mapView.setStreetView(false);
+		//mapView.setStreetView(false);
 
 		// enable to show Satellite view
 		// mapView.setSatellite(true);
@@ -143,7 +155,7 @@ public class MapViewController extends MapActivity {
 		mapController.setZoom(16); 
 
 		mapView.invalidate();
-
+		//appService.sendLocationNow();
 
 
 
@@ -169,7 +181,7 @@ public class MapViewController extends MapActivity {
 		if (action != null) {
 			if (action.equals(IAppService.SHOW_MY_LOCATION)) {
 
-				Bundle extra = getIntent().getExtras();
+				Bundle extra = this.getIntent().getExtras();
 				if (extra != null) {
 
 					location = (Location) extra.getParcelable(IAppService.LAST_LOCATION);
@@ -340,13 +352,41 @@ public class MapViewController extends MapActivity {
 	protected void onResume() 
 	{			
 		super.onResume();
+		
+
+		
 		bindService(new Intent(MapViewController.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
 		IntentFilter i = new IntentFilter();
-		i.addAction(IAppService.SHOW_USER_LOCATION);
+		i.addAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
 	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {		
+		super.onActivityResult(requestCode, resultCode, data);		
+	}
+	private void setTabs() {
+		tabs = new ArrayList<Integer>();
+		tabs.add(R.string.friends);
+		tabs.add(R.string.profile);
+		tabs.add(R.string.friend_list);
 
+		// Create the tabs
+		actionBar.addTab(actionBar.newTab().setText(R.string.friends).setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText(R.string.profile).setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText(R.string.friend_list).setTabListener(this));
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	}
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		int selectedTabID = tabs.get(tab.getPosition());
+		if (selectedTabID != R.string.friends) {
+			startActivity(new Intent(this, new_main.class).putExtra("tab", selectedTabID).setFlags(
+					Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION));
+			overridePendingTransition(0, 0);
+			finish();
+		}
+	}
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;
@@ -358,24 +398,42 @@ public class MapViewController extends MapActivity {
 		 * show sign up menu item if registration is made enabled.
 		 */
 		menu.add(0, REFRESH_MAP, 0, R.string.map_refresh).setIcon(R.drawable.rfrsh);
-
+	
 
 
 		return result;
 	}
+	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
 		switch(item.getItemId()) 
 		{
 		case REFRESH_MAP:
-			updateLocation();
-
+			//
+			appService.sendLocationNow();
+			//updateLocation();
 			return true;
-
+			
 		}
 
 		return super.onMenuItemSelected(featureId, item);
 	}
+
+
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

@@ -89,4 +89,6 @@
 <string name="turn_back">Turn Back</string>
 <string name="enterPassword">Please enter password you specified in registration</string>
 <string name="camera_resolution">Choose camera resolution</string>
+<string name="profile">Profile</string>
+<string name="friends">Friends</string>
 </resources>
