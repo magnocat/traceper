@@ -223,58 +223,54 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				if (Yii::app()->user->isGuest == true) { ?>
 
 				<div id="loginBlock">
-
-					<div class="upperMenu">
+<!-- 					<div class="upperMenu"> -->
 						<?php 
 
-						$this->widget('zii.widgets.CMenu',array(
-								'items'=>array(
-										array('label'=>Yii::t('layout', 'Sign in with Facebook'), 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
-								),
-						));
+// 						$this->widget('zii.widgets.CMenu',array(
+// 								'items'=>array(
+// 										array('label'=>Yii::t('layout', 'Sign in with Facebook'), 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
+// 								),
+// 						));
 							
-						?>
-					</div>
-					<div class="upperMenu">
+// 						?>
+<!-- 					</div> -->
+<!-- 					<div class="upperMenu"> -->
 						<?php 
-
-						$this->widget('zii.widgets.jui.CJuiButton', array(
-								'name'=>'facebookLogin',
-								'caption'=>Yii::t('layout', 'Sign in with Facebook'),
-								'id'=>'facebookLoginWindow',
-								'onclick'=>'function(){ '.
-								CHtml::ajax(
-										array(
-												'url'=>array('/site/facebooklogin'),
-										)).
-								' }',
-						));
-
-
-						?>
-					</div>
-					<div class="upperMenu">
+// 						$this->widget('zii.widgets.jui.CJuiButton', array(
+// 								'name'=>'facebookLogin',
+// 								'caption'=>Yii::t('layout', 'Sign in with Facebook'),
+// 								'id'=>'facebookLoginWindow',
+// 								'onclick'=>'function(){ '.
+// 								CHtml::ajax(
+// 										array(
+// 												'url'=>array('/site/facebooklogin'),
+// 										)).
+// 								' }',
+// 						));
+// 						?>
+<!-- 					</div> -->
+<!-- 					<div class="upperMenu"> -->
 						<?php 
-
-						$this->widget('zii.widgets.jui.CJuiButton', array(
-								'name'=>'register',
-								'caption'=>Yii::t('layout', 'Register'),
-								'id'=>'showRegisterWindow',
-								'onclick'=>'function(){ '.
-								CHtml::ajax(
-										array(
-												'url'=>$this->createUrl('site/register'),
-												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
-												'update'=> '#registerWindow',
-										)).
-								' }',
-						));
-
+// 						$this->widget('zii.widgets.jui.CJuiButton', array(
+// 								'name'=>'register',
+// 								'caption'=>Yii::t('layout', 'Register'),
+// 								'id'=>'showRegisterWindow',
+// 								'onclick'=>'function(){ '.
+// 								CHtml::ajax(
+// 										array(
+// 												'url'=>$this->createUrl('site/register'),
+// 												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
+// 												'update'=> '#registerWindow',
+// 										)).
+// 								' }',
+// 						));
+// 						?>
+						
+						<?php
+							echo CHtml::beginForm(array('site/login'),'Post'); 
 						?>
-					</div>
 					<div class="upperMenu">
-						<?php 
-							
+						<?php 						
 						$this->widget('zii.widgets.jui.CJuiButton', array(
 								'name'=>'login',
 								'caption'=>Yii::t('layout', 'Login'),
@@ -287,13 +283,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 												'update'=> '#userLoginWindow',
 										)).
 								' }',
-						));
-							
+						));							
 						?>
-					</div>
+					</div>	
+					<div class="upperMenu">
+						<?php echo CHtml::label(Yii::t('site', 'Password'), '', array('size'=>20,'maxlength'=>128)); ?>
+    					<?php echo CHtml::passwordField('Password', '', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>                
+					</div>										
+					<div class="upperMenu">
+						<?php echo CHtml::label('E-mail', '', array('size'=>20,'maxlength'=>128)); ?>
+    					<?php echo CHtml::textField('E-mail', '', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>           
+					</div>										
+					<?php echo CHtml::endForm(); ?>										
 				</div>
-
-
 				<?php }else{?>
 
 				<div id="userBlock"

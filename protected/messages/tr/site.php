@@ -18,6 +18,19 @@ T�rk�e UTF-8
   � 	ğ
   � 	�
   � 	ş
+  
+�		&#304;
+�		&#305;
+�		&#214;	
+�		&#246;
+�		&#220;
+�		&#252;
+�		&#199;
+�		&#231;
+�		&#286;
+�		&#287;
+�		&#350;
+�		&#351;  
 */
 
 return array(
@@ -37,11 +50,11 @@ return array(
 	'Register' => 'Kaydet',
 	'Name' => 'İsim',
 	'E-mail' => 'E-posta',
-	'Password' => 'Parola',
-	'Password (Again)' => 'Parola (Tekrar)',
+	'Password' => '&#350;ifre',
+	'Password (Again)' => '&#350;ifre (Tekrar)',
 	'E-mail not valid!' => 'E-posta geçerli değil!',
-	'Passwords not same!' => 'Parolalar aynı değil!',
-	'Password has been changed...' => 'Parola değiştirildi...',
+	'Passwords not same!' => '&#350;ifreler aynı değil!',
+	'Password has been changed...' => '&#350;ifre değiştirildi...',
 	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
 	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',	
