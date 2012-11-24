@@ -149,55 +149,47 @@ class SiteController extends Controller
 			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 		}
 	}
+	
 	public function actionLogin()
-	{
-		if (isset($_POST['E-mail']) && $_POST['E-mail'] != NULL)
-		{
-			$eMailOrMobilePhone = $_POST['E-mail'];
-		}
-		else
-		{
-			echo 'No data for email or mobile phone';
-		}
+	{	
+		$model = new LoginForm;
+			
+		$processOutput = true;
 		
-		if (isset($_POST['Password']) && $_POST['Password'] != NULL)
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-			$password = $_POST['Password'];
+			if ($model->getError('password') != null) {
+				$result = $model->getError('password');
+			}
+			else if ($model->getError('email') != null) {
+				$result = $model->getError('email');
+			}
+			else if ($model->getError('rememberMe') != null) {
+				$result = $model->getError('rememberMe');
+			}
+		
+			echo CJSON::encode(array(
+					"result"=> $result,
+			));
+		
+			Yii::app()->end();
 		}
-		else
-		{
-			echo 'No data for password';
+		else {
+			//echo 'Model NOT valid in SiteController';
+				
 		}		
 
-		$identity = new UserIdentity($eMailOrMobilePhone, $password);
-		$identity->authenticate();
-
-		if($identity->errorCode === UserIdentity::ERROR_NONE)
+		// collect user input data
+		if(isset($_REQUEST['LoginForm']))
 		{
-			//$duration=$this->rememberMe ? 3600*24*30 : 0; // 30 days
-			$duration = 0;
-			Yii::app()->user->login($identity,$duration);
-			//echo 'Login successful';
-		}
-		else
-		{			
-			//echo 'Login failed';
-		}	
-		
-		$this->render('index');
-		
-		
-// 		$model = new LoginForm;
+			$model->attributes = $_REQUEST['LoginForm'];
+			// validate user input and if ok return json data and end application.
 			
-// 		$processOutput = true;
-
-// 		// collect user input data
-// 		if(isset($_REQUEST['LoginForm']))
-// 		{
-// 			$model->attributes = $_REQUEST['LoginForm'];
-// 			// validate user input and if ok return json data and end application.
-				
-// 			if($model->validate() && $model->login()) {
+			if (Yii::app()->request->isAjaxRequest) {
+				$processOutput = false;
+			}			
+						
+			if($model->validate() && $model->login()) {
 // 				echo CJSON::encode(array(
 // 						"result"=> "1",
 // 						"id"=>Yii::app()->user->id,
@@ -206,39 +198,20 @@ class SiteController extends Controller
 // 						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
 // 				));
 // 				Yii::app()->end();
-// 			}
-// 			if (Yii::app()->request->isAjaxRequest) {
-// 				$processOutput = false;
-
-// 			}
-// 		}
-
-
-// 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-// 		{
-
-// 			if ($model->getError('password') != null) {
-// 				$result = $model->getError('password');
-// 			}
-// 			else if ($model->getError('email') != null) {
-// 				$result = $model->getError('email');
-// 			}
-// 			else if ($model->getError('rememberMe') != null) {
-// 				$result = $model->getError('rememberMe');
-// 			}
-
-// 			echo CJSON::encode(array(
-// 					"result"=> $result,
-// 			));
 				
-// 			Yii::app()->end();
-// 		}
-// 		else {
-// 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-// 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-// 			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
-// 		}
-	}
+				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);				
+			}
+			else
+			{
+				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				$this->renderPartial('login',array('model'=>$model), false, $processOutput);				
+			}			
+		}
+	}	
+	
 	/**
 	 *
 	 * facebook login action
