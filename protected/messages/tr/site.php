@@ -57,7 +57,8 @@ return array(
 	'Password has been changed...' => '&#350;ifre değiştirildi...',
 	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
 	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
-	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',	
+	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',
+	'Remember me next time' => 'Beni hat&#305;rla'
 );
 
 

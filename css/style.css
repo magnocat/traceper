@@ -19,15 +19,15 @@ a {
 }
 #sideBar{
 	width:26%;
-	height:93%;
-	top: 7%;
+	height:90%;
+	top: 10%;
 	background: #ffffff;
 	z-index:100;
 	float:left;
 	position:absolute;	
 }
 #topBar{	 
-	height:7%;
+	height:10%;
 	width:100%;
 	background: #add8e6;	
 	z-index:100;
@@ -64,7 +64,7 @@ a {
 	position: absolute;
 	right:74%;
 	width:1%;
-	top:7%;	
+	top:10%;	
 	cursor:pointer;
 		
 }

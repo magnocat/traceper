@@ -50,7 +50,8 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		",
 		CClientScript::POS_READY);
 
-if (Yii::app()->user->isGuest == false){
+if (Yii::app()->user->isGuest == false)
+{
 	Yii::app()->clientScript->registerScript('getDataInBackground',
 			'trackerOp.getFriendList(1);
 			trackerOp.getImageList(); ',
@@ -211,29 +212,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 		<div id='topBar'>
 			<div id='topContent'>
-				
-				
-				<?php 
-				
-				echo CHtml::link('<div id="logo"></div>', '#', array(
-						'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
-				));
-				
-				
-				if (Yii::app()->user->isGuest == true) { ?>
+								
+				<?php 				
+					echo CHtml::link('<div id="logo"></div>', '#', array(
+							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+					));
+				 ?>				
 
-				<div id="loginBlock">
-<!-- 					<div class="upperMenu"> -->
-						<?php 
-
-// 						$this->widget('zii.widgets.CMenu',array(
-// 								'items'=>array(
-// 										array('label'=>Yii::t('layout', 'Sign in with Facebook'), 'url'=>array('/site/facebooklogin'), 'visible'=>Yii::app()->user->isGuest),
-// 								),
-// 						));
-							
-// 						?>
-<!-- 					</div> -->
+				<div id="loginBlock"
+				<?php
+				if (Yii::app()->user->isGuest == false) {
+					echo "style='display:none'";
+				}
+				?>>
 <!-- 					<div class="upperMenu"> -->
 						<?php 
 // 						$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -266,37 +257,43 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 // 						));
 // 						?>
 						
-						<?php
-							echo CHtml::beginForm(array('site/login'),'Post'); 
-						?>
-					<div class="upperMenu">
-						<?php 						
-						$this->widget('zii.widgets.jui.CJuiButton', array(
-								'name'=>'login',
-								'caption'=>Yii::t('layout', 'Login'),
-								'id'=>'showLoginWindow',
-								'onclick'=>'function(){ '.
-								CHtml::ajax(
-										array(
-												'url'=>$this->createUrl('site/login'),
-												'complete'=> 'function() { $("#userLoginWindow").dialog("open"); return false;}',
-												'update'=> '#userLoginWindow',
-										)).
-								' }',
-						));							
-						?>
-					</div>	
-					<div class="upperMenu">
-						<?php echo CHtml::label(Yii::t('site', 'Password'), '', array('size'=>20,'maxlength'=>128)); ?>
-    					<?php echo CHtml::passwordField('Password', '', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>                
-					</div>										
-					<div class="upperMenu">
-						<?php echo CHtml::label('E-mail', '', array('size'=>20,'maxlength'=>128)); ?>
-    					<?php echo CHtml::textField('E-mail', '', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>           
-					</div>										
-					<?php echo CHtml::endForm(); ?>										
+						<div id="forAjaxRefresh">
+							<div class="form">
+								<?php 
+									$form=$this->beginWidget('CActiveForm', array(
+										'id'=>'login-form-main',
+										'enableClientValidation'=>true,								
+									)); 
+									
+									$model = new LoginForm;								
+								?> 								
+									<div class="upperMenu">
+										<?php										
+											echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'));
+										?>
+									</div>
+									
+									<div class="upperMenu">
+										<?php echo $form->checkBox($model,'rememberMe',array('size'=>20,'maxlength'=>128,'tabindex'=>3)); ?>
+										<?php echo $form->label($model,'rememberMe'); ?>
+									</div>	
+									
+									<div class="upperMenu">
+										<?php echo $form->labelEx($model,'password'); ?>
+										<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+									</div>	
+									
+									<div class="upperMenu">
+										<?php echo $form->labelEx($model,'email'); ?>
+										<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>			
+									</div>				
+								
+								<?php $this->endWidget(); ?>
+							</div>																	
+						</div>					
 				</div>
-				<?php }else{?>
+				
+				<div id="userId" style="display: none;"></div>
 
 				<div id="userBlock"
 				<?php
@@ -304,20 +301,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				if (Yii::app()->user->isGuest == true) {
 					echo "style='display:none'";
 				}
-				else {
+				else 
+				{
 					$userId = Yii::app()->user->id;
-	 											}  ?>>
-
+	 											
+				}  ?>>
 
 					<div id='userarea'>
 						<div id="username"
 							onclick="TRACKER.trackUser(<?php echo $userId; ?>)" class="vtip"
 							title="<?php echo Yii::t('layout', 'See your position on the map'); ?>"><?php if (Yii::app()->user->isGuest == false){ 
 								echo Yii::app()->user->name;
-							}?></div>
+							}
+							?>
+						</div>
 					</div>
-					<!--<div id="userId" style="display: none;"></div>-->
-
 					<?php 
 					echo CHtml::ajaxLink('<div style="float:right" id="changePassword" class="userOperations">
 							<img src="images/changePassword.png"  /><div></div>
@@ -490,25 +488,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							</div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out')));
 					?>
 				</div>
-
-				<?php }?>
-
-
-
 			</div>
 		</div>
 
 
 
 		<div id='sideBar'>
-			<div id='content'>
-				<?php if (Yii::app()->user->isGuest == true) { ?>
-
-
-
-				<?php }else{?>
-
-				<div id='lists'>
+			<div id='content'>			
+				<div id='lists'
+				<?php
+				if (Yii::app()->user->isGuest == true) {
+					echo "style='display:none'";
+				}
+  				?>>
 					<div class='titles'>
 						<?php										
 						{
@@ -544,16 +536,13 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							'options' => array(
 									'collapsible' => false,
 									'cache'=>true,
+									'selected' => 0,
 							),
 							));
 						}
 						?>
 					</div>
 				</div>
-
-				<?php }?>
-
-
 			</div>
 		</div>
 
