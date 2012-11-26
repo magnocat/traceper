@@ -46,8 +46,10 @@
 ?>
 
 <script type="text/javascript">	
-	
+	$("#registerBlock").hide();
 	$("#loginBlock").hide();
+	$("#userMenuBlock").load();
+	$("#userMenuBlock").show();
 	$("#userBlock").load();
 	$("#userBlock").show();
 	TRACKER.getFriendList(1);	
