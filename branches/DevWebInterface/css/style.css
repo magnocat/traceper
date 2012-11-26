@@ -23,7 +23,6 @@ a {
 	top: 10%;
 	background: #ffffff;
 	z-index:100;
-	float:left;
 	position:absolute;	
 }
 #topBar{	 
@@ -145,6 +144,17 @@ a {
 	position: relative;
 	padding:0px; 
 	margin:0px;
+}
+
+.sideMenu {
+	cursor:pointer;		
+	position: relative;
+	width:30%;
+	height:40px;
+	top: 10%;
+	position: relative;
+	padding:10px; 
+	margin:10px;	
 }
 
 /*#loginLogo {

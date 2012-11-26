@@ -212,12 +212,12 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 		<div id='topBar'>
 			<div id='topContent'>
-								
+
 				<?php 				
-					echo CHtml::link('<div id="logo"></div>', '#', array(
-							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
-					));
-				 ?>				
+				echo CHtml::link('<div id="logo"></div>', '#', array(
+						'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+				));
+				?>
 
 				<div id="loginBlock"
 				<?php
@@ -225,74 +225,74 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='display:none'";
 				}
 				?>>
-<!-- 					<div class="upperMenu"> -->
-						<?php 
-// 						$this->widget('zii.widgets.jui.CJuiButton', array(
-// 								'name'=>'facebookLogin',
-// 								'caption'=>Yii::t('layout', 'Sign in with Facebook'),
-// 								'id'=>'facebookLoginWindow',
-// 								'onclick'=>'function(){ '.
-// 								CHtml::ajax(
-// 										array(
-// 												'url'=>array('/site/facebooklogin'),
-// 										)).
-// 								' }',
-// 						));
+					<!-- 					<div class="upperMenu"> -->
+					<?php 
+					// 						$this->widget('zii.widgets.jui.CJuiButton', array(
+					// 								'name'=>'facebookLogin',
+					// 								'caption'=>Yii::t('layout', 'Sign in with Facebook'),
+					// 								'id'=>'facebookLoginWindow',
+					// 								'onclick'=>'function(){ '.
+					// 								CHtml::ajax(
+					// 										array(
+					// 												'url'=>array('/site/facebooklogin'),
+					// 										)).
+					// 								' }',
+					// 						));
 // 						?>
-<!-- 					</div> -->
-<!-- 					<div class="upperMenu"> -->
-						<?php 
-// 						$this->widget('zii.widgets.jui.CJuiButton', array(
-// 								'name'=>'register',
-// 								'caption'=>Yii::t('layout', 'Register'),
-// 								'id'=>'showRegisterWindow',
-// 								'onclick'=>'function(){ '.
-// 								CHtml::ajax(
-// 										array(
-// 												'url'=>$this->createUrl('site/register'),
-// 												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
-// 												'update'=> '#registerWindow',
-// 										)).
-// 								' }',
-// 						));
+					<!-- 					</div> -->
+					<!-- 					<div class="upperMenu"> -->
+					<?php 
+					// 						$this->widget('zii.widgets.jui.CJuiButton', array(
+					// 								'name'=>'register',
+					// 								'caption'=>Yii::t('layout', 'Register'),
+					// 								'id'=>'showRegisterWindow',
+					// 								'onclick'=>'function(){ '.
+					// 								CHtml::ajax(
+					// 										array(
+					// 												'url'=>$this->createUrl('site/register'),
+					// 												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
+					// 												'update'=> '#registerWindow',
+					// 										)).
+					// 								' }',
+					// 						));
 // 						?>
-						
-						<div id="forAjaxRefresh">
-							<div class="form">
-								<?php 
-									$form=$this->beginWidget('CActiveForm', array(
-										'id'=>'login-form-main',
-										'enableClientValidation'=>true,								
-									)); 
-									
-									$model = new LoginForm;								
-								?> 								
-									<div class="upperMenu">
-										<?php										
-											echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'));
-										?>
-									</div>
-									
-									<div class="upperMenu">
-										<?php echo $form->checkBox($model,'rememberMe',array('size'=>20,'maxlength'=>128,'tabindex'=>3)); ?>
-										<?php echo $form->label($model,'rememberMe'); ?>
-									</div>	
-									
-									<div class="upperMenu">
-										<?php echo $form->labelEx($model,'password'); ?>
-										<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
-									</div>	
-									
-									<div class="upperMenu">
-										<?php echo $form->labelEx($model,'email'); ?>
-										<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>			
-									</div>				
-								
-								<?php $this->endWidget(); ?>
-							</div>																	
-						</div>					
+
+					<div id="forAjaxRefresh">
+						<div class="form">
+							<?php 
+							$form=$this->beginWidget('CActiveForm', array(
+									'id'=>'login-form-main',
+									'enableClientValidation'=>true,
+							));
+
+							$model = new LoginForm;
+							?>
+							<div class="upperMenu">
+								<?php										
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'));
+								?>
+							</div>
+
+							<div class="upperMenu">
+								<?php echo $form->checkBox($model,'rememberMe',array('size'=>20,'maxlength'=>128,'tabindex'=>3)); ?>
+								<?php echo $form->label($model,'rememberMe'); ?>
+							</div>
+
+							<div class="upperMenu">
+								<?php echo $form->labelEx($model,'password'); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+							</div>
+
+							<div class="upperMenu">
+								<?php echo $form->labelEx($model,'email'); ?>
+								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>
+							</div>
+
+							<?php $this->endWidget(); ?>
+						</div>
+					</div>
 				</div>
-				
+
 				<div id="userId" style="display: none;"></div>
 
 				<div id="userBlock"
@@ -301,16 +301,17 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				if (Yii::app()->user->isGuest == true) {
 					echo "style='display:none'";
 				}
-				else 
+				else
 				{
 					$userId = Yii::app()->user->id;
-	 											
+
 				}  ?>>
 
 					<div id='userarea'>
 						<div id="username"
 							onclick="TRACKER.trackUser(<?php echo $userId; ?>)" class="vtip"
-							title="<?php echo Yii::t('layout', 'See your position on the map'); ?>"><?php if (Yii::app()->user->isGuest == false){ 
+							title="<?php echo Yii::t('layout', 'See your position on the map'); ?>">
+							<?php if (Yii::app()->user->isGuest == false){ 
 								echo Yii::app()->user->name;
 							}
 							?>
@@ -415,19 +416,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									mapOperator.addPointToGeoFence(geoFence,Loc3);
 
 									TRACKER.geofences[obj.dataProvider[i].id] = geoFence;
-						}
+}
 
 									mapOperator.setGeoFenceVisibility(TRACKER.geofences[obj.dataProvider[i].id],true);
-						}
-						}
+}
+}
 									else
 									{
 									TRACKER.showMessageDialog("There is no geofence");
-						}
-						}
+}
+}
 									catch (error){
-						}
-						}',
+}
+}',
 							),
 							array(
 									'id'=>'showGeofenceWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Show Geofences')));
@@ -445,18 +446,18 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									for(var i=0; i<obj.count; i++) {
 									if (typeof TRACKER.geofences[obj.dataProvider[i].id] == "undefined")
 									{
-						}
+}
 
 									mapOperator.setGeoFenceVisibility(TRACKER.geofences[obj.dataProvider[i].id],false);
-						}
-						}
+}
+}
 									else
 									{
-						}
-						}
+}
+}
 									catch (error){
-						}
-						}',
+}
+}',
 							),
 							array(
 									'id'=>'hideGeofenceWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Hide Geofences')));
@@ -470,15 +471,15 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									{
 									var polygon = mapOperator.initializePolygon();
 									geoFence_ = new MapStruct.GeoFence({geoFenceId:1,listener:null,polygon:polygon});
-						}
+}
 									if (geoFence_.listener == null)
 									{
 									TRACKER.showInfoBar("Select 3 points to generate a Geofence");
-						}
+}
 									else
 									{
 									TRACKER.showInfoBar("Geofence points selection disabled");
-						}
+}
 									var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,createGeofenceForm);
 									return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Create Geo-Fence'),
 							));
@@ -494,56 +495,113 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 
 		<div id='sideBar'>
-			<div id='content'>			
-				<div id='lists'
+			<div id='content'>
+				<div id="registerBlock"
 				<?php
 				if (Yii::app()->user->isGuest == true) {
-					echo "style='display:none'";
-				}
-  				?>>
-					<div class='titles'>
-						<?php										
-						{
-							$tabs = array();
-
-							if(Yii::app()->params->featureFriendManagementEnabled)
-							{
-								$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))), 'id'=>'users_tab');
-								//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
-							}
-
-							if(Yii::app()->params->featureStaffManagementEnabled)
-							{
-								$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 'id'=>'staff_tab');
-							}
-
-							$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
-							$tabs[Yii::t('layout', 'Friend Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
-							$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
-
-							$this->widget('zii.widgets.jui.CJuiTabs', array(
-									// 											    'tabs' => array(
-									// 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'),
-									// 																	 'id'=>'users_tab'),
-									// 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image
-									// 											        				  'id'=>'photos_tab'),
-									// 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'),
-									// 											        				  'id'=>'groups_tab'),
-									// 											    ),
-							'tabs' => $tabs,
-							'id'=>"tab_view",
-							// additional javascript options for the tabs plugin
-							'options' => array(
-									'collapsible' => false,
-									'cache'=>true,
-									'selected' => 0,
-							),
+					//echo "style='display:none'";
+					?>
+					
+					<div id="forRegisterRefresh">
+						<div class="form">
+							<?php
+							$form=$this->beginWidget('CActiveForm', array(
+									'id'=>'login-form-main',
+									'enableClientValidation'=>true,
 							));
-						}
-						?>
+
+							$model = new RegisterForm;
+							?>
+
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'email'); ?>
+								<?php echo $form->passwordField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'name'); ?>
+								<?php echo $form->passwordField($model,'name', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'password'); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'passwordAgain'); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php										
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'));
+								?>
+							</div>
+
+							<?php $this->endWidget(); ?>
+						</div>
 					</div>
+					<?php
+}
+else{
+	//echo "style='display:none'";
+			?>
+					
+					<div id='userMenuBlock'
+					<div id='lists'>
+					<div class='titles'>
+					<?php
+					if (Yii::app()->user->isGuest == false)
+					{
+						$tabs = array();
+
+						if(Yii::app()->params->featureFriendManagementEnabled)
+						{
+							$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))), 'id'=>'users_tab');
+							//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
+						}
+
+						if(Yii::app()->params->featureStaffManagementEnabled)
+						{
+							$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 'id'=>'staff_tab');
+						}
+
+						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
+						$tabs[Yii::t('layout', 'Friend Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
+						$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
+
+						$this->widget('zii.widgets.jui.CJuiTabs', array(
+								// 											    'tabs' => array(
+										// 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'),
+												// 																	 'id'=>'users_tab'),
+										// 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image
+												// 											        				  'id'=>'photos_tab'),
+										// 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'),
+												// 											        				  'id'=>'groups_tab'),
+										// 											    ),
+								'tabs' => $tabs,
+								'id'=>"tab_view",
+								// additional javascript options for the tabs plugin
+								'options' => array(
+										'collapsible' => false,
+										'cache'=>true,
+										'selected' => 0,
+								),
+						));
+					}
+					?>></div>
 				</div>
+				</div>
+				
+				
+				
+				
 			</div>
+		
+		
+		<?php
+}?>
 		</div>
 
 	</div>
