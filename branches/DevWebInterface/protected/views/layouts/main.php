@@ -273,7 +273,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								?>
 							</div>
 
-							<div class="upperMenu">
+							<div class="upperMenu" style="display:inline;">
 								<?php echo $form->checkBox($model,'rememberMe',array('size'=>20,'maxlength'=>128,'tabindex'=>3)); ?>
 								<?php echo $form->label($model,'rememberMe'); ?>
 							</div>
@@ -492,16 +492,14 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			</div>
 		</div>
 
-
-
 		<div id='sideBar'>
 			<div id='content'>
 				<div id="registerBlock"
 				<?php
-				if (Yii::app()->user->isGuest == true) {
-					//echo "style='display:none'";
-					?>
-					
+				if (Yii::app()->user->isGuest == false) {
+					echo "style='display:none'";
+				}
+				?>>						
 					<div id="forRegisterRefresh">
 						<div class="form">
 							<?php
@@ -542,18 +540,15 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							<?php $this->endWidget(); ?>
 						</div>
 					</div>
-					<?php
-}
-else{
-	//echo "style='display:none'";
-			?>
-					
-					<div id='userMenuBlock'
-					<div id='lists'>
+				</div>
+				
+				<div id="lists"
+				<?php
+				if (Yii::app()->user->isGuest == true) {
+					echo "style='display:none'";
+				}?>>				
 					<div class='titles'>
 					<?php
-					if (Yii::app()->user->isGuest == false)
-					{
 						$tabs = array();
 
 						if(Yii::app()->params->featureFriendManagementEnabled)
@@ -589,19 +584,10 @@ else{
 										'selected' => 0,
 								),
 						));
-					}
-					?>></div>
+					?>
+					</div>
 				</div>
-				</div>
-				
-				
-				
-				
 			</div>
-		
-		
-		<?php
-}?>
 		</div>
 
 	</div>
