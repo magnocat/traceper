@@ -1,8 +1,7 @@
 <script type="text/javascript">		
 
 	$("#username").html('<?php echo $realname ?>');
-	$("#userId").html('<?php echo $id ?>');
-	$("#lists").show();	
+	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
 	$("#tab_view").tabs("select",0);
 
@@ -47,9 +46,9 @@
 
 <script type="text/javascript">	
 	$("#registerBlock").hide();
+	$("#lists").load();
+	$("#lists").show();
 	$("#loginBlock").hide();
-	$("#userMenuBlock").load();
-	$("#userMenuBlock").show();
 	$("#userBlock").load();
 	$("#userBlock").show();
 	TRACKER.getFriendList(1);	
