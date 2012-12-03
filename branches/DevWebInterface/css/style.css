@@ -19,14 +19,14 @@ a {
 }
 #sideBar{
 	width:26%;
-	height:90%;
-	top: 10%;
+	height:89%;
+	top: 11%;
 	background: #ffffff;
 	z-index:100;
 	position:absolute;	
 }
 #topBar{	 
-	height:10%;
+	height:11%;
 	width:100%;
 	background: #add8e6;	
 	z-index:100;
@@ -63,7 +63,7 @@ a {
 	position: absolute;
 	right:74%;
 	width:1%;
-	top:10%;	
+	top:11%;	
 	cursor:pointer;
 		
 }
@@ -128,8 +128,18 @@ a {
 }
 
 #logo, .logo, .logo_inFullMap {
+	height:70px;
+	width:17%;
+	background: url("../images/logo.png") no-repeat center;
+	cursor:pointer;		
+	position: relative;
+	float: left;
+}
+
+
+#logoMini, .logoMini {
 	height:40px;
-	width:15%;
+	width:10%;
 	background: url("../images/logo_mini.png") no-repeat center;
 	cursor:pointer;		
 	position: relative;

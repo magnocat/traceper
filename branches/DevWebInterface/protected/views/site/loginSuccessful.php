@@ -1,10 +1,13 @@
 <script type="text/javascript">		
-
+	document.getElementById('topBar').style.height='6%';
+	document.getElementById('sideBar').style.height='94%';
+	document.getElementById('sideBar').style.top='6%';
+	document.getElementById('bar').style.top='6%';
+	document.getElementById('map').style.height='94%'; //$("#map").css('height', '94%');		
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
 	$("#tab_view").tabs("select",0);
-
 </script>	
 
 <?php
@@ -44,15 +47,17 @@
 	);																	
 ?>
 
-<script type="text/javascript">	
+<script type="text/javascript">
+	$("#logo").hide();
+	$("#logoMini").load();
+	$("#logoMini").show();
 	$("#registerBlock").hide();
 	$("#lists").load();
 	$("#lists").show();
 	$("#loginBlock").hide();
 	$("#userBlock").load();
-	$("#userBlock").show();
+	$("#userBlock").show();	
 	TRACKER.getFriendList(1);	
 	TRACKER.getImageList();
-
 </script>		
 
