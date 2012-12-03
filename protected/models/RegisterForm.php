@@ -51,8 +51,10 @@ class RegisterForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'email'=>Yii::t('general', 'E-mail'),
-			'passwordAgain'=>Yii::t('general', 'Password (Again)'),
+			'email'=>Yii::t('site', 'E-mail'),
+			'name'=>Yii::t('site', 'Name'),
+			'password'=>Yii::t('site', 'Password'),
+			'passwordAgain'=>Yii::t('site', 'Password (Again)'),			
 		);
 	}
 

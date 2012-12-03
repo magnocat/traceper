@@ -524,7 +524,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						<div class="form">
 							<?php
 							$form=$this->beginWidget('CActiveForm', array(
-									'id'=>'login-form-main',
+									'id'=>'register-form-main',
 									'enableClientValidation'=>true,
 							));
 
@@ -533,12 +533,12 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->passwordField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->passwordField($model,'name', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->textField($model,'name', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
 							</div>
 
 							<div class="sideMenu">
