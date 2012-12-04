@@ -60,6 +60,12 @@ div.form label
 	display: block;
 }
 
+input[type=checkbox] + label
+ {
+     display:inline-block;
+     vertical-align:text-top;
+ }
+
 div.form .row
 {
 	margin: 5px 0;

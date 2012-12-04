@@ -23,7 +23,7 @@ class LoginForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('email, password', 'required','message'=>Yii::t('site', 'Field cannot be blank!')),
+			array('email, password', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 			// rememberMe needs to be a boolean
@@ -58,7 +58,7 @@ class LoginForm extends CFormModel
 			{
 				case CUserIdentity::ERROR_USERNAME_INVALID:					
 				case CUserIdentity::ERROR_PASSWORD_INVALID:
-					$this->addError('password','Incorrect password or e-mail!');
+					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
 					break;
 				case CUserIdentity::ERROR_NONE:
 					break;					

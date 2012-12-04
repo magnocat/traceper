@@ -52,11 +52,12 @@ return array(
 	'E-mail' => 'E-posta',
 	'Password' => '&#350;ifre',
 	'Password (Again)' => '&#350;ifre (Tekrar)',
-	'E-mail not valid!' => 'E-posta geçerli değil!',
+	'E-mail not valid!' => 'Ge&#231;erli bir  e-posta giriniz',
 	'Passwords not same!' => '&#350;ifreler aynı değil!',
 	'Password has been changed...' => '&#350;ifre değiştirildi...',
 	'E-mail is already registered!' => 'Bu e-posta kayıtlı!',
-	'Field cannot be blank!' => 'Alan boş bırakılamaz!',
+	'Please, enter the field' => 'L&#252;tfen alan&#305; doldurunuz',
+	'Incorrect password or e-mail' => 'Yanl&#305;&#351; &#351;ifre veya e-posta',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',
 	'Remember me next time' => 'Beni hat&#305;rla'
 );
