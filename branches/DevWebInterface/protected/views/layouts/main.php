@@ -233,10 +233,6 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
 					));					
 				}
-				
-			
-				
-
 				?>
 
 				<div id="loginBlock"
@@ -245,37 +241,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='display:none'";
 				}
 				?>>
-					<!-- 					<div class="upperMenu"> -->
-					<?php 
-					// 						$this->widget('zii.widgets.jui.CJuiButton', array(
-					// 								'name'=>'facebookLogin',
-					// 								'caption'=>Yii::t('layout', 'Sign in with Facebook'),
-					// 								'id'=>'facebookLoginWindow',
-					// 								'onclick'=>'function(){ '.
-					// 								CHtml::ajax(
-					// 										array(
-					// 												'url'=>array('/site/facebooklogin'),
-					// 										)).
-					// 								' }',
-					// 						));
-// 						?>
-					<!-- 					</div> -->
-					<!-- 					<div class="upperMenu"> -->
-					<?php 
-					// 						$this->widget('zii.widgets.jui.CJuiButton', array(
-					// 								'name'=>'register',
-					// 								'caption'=>Yii::t('layout', 'Register'),
-					// 								'id'=>'showRegisterWindow',
-					// 								'onclick'=>'function(){ '.
-					// 								CHtml::ajax(
-					// 										array(
-					// 												'url'=>$this->createUrl('site/register'),
-					// 												'complete'=> 'function() { $("#registerWindow").dialog("open"); return false;}',
-					// 												'update'=> '#registerWindow',
-					// 										)).
-					// 								' }',
-					// 						));
-// 						?>
+					<div class="upperMenu" style="margin-top:1em;width:18%;">
+						<?php 
+							$this->widget('zii.widgets.jui.CJuiButton', array(
+									'name'=>'facebookLogin',
+									'caption'=>Yii::t('layout', 'Sign in with Facebook'),
+									'id'=>'facebookLoginWindow',
+									'onclick'=>'function(){ '.
+									CHtml::ajax(
+											array(
+													'url'=>array('site/facebooklogin'),
+											)).
+									' }',
+							));
+	 						?>
+					</div>
 
 					<div id="forAjaxRefresh">
 						<div class="form">
@@ -287,25 +267,39 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							$model = new LoginForm;
 							?>
-							<div class="upperMenu">
+							<div class="upperMenu" style="margin-top:0.8em;width:11%;">
 								<?php										
-								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'));
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								
+// 								$this->widget('zii.widgets.jui.CJuiButton', array(
+// 										'name'=>'login',
+// 										'caption'=>Yii::t('site', 'Login'),
+// 										'id'=>'loginWindow',
+// 										'onclick'=>'function(){ '.
+// 										CHtml::ajax(
+// 												array(
+// 														'type'=>'POST',
+// 														'url'=>array('site/login'),
+// 														'update'=>'#forAjaxRefresh',														
+// 												)).
+// 										' }',
+// 								));								
 								?>
 							</div>
 
-							<div class="upperMenu" style="display:inline;">
-								<?php echo $form->checkBox($model,'rememberMe',array('size'=>20,'maxlength'=>128,'tabindex'=>3)); ?>
+							<div class="upperMenu" style="margin-top:1.5em;width:10%;">
+								<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
 								<?php echo $form->label($model,'rememberMe'); ?>
 							</div>
 
 							<div class="upperMenu">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>25,'maxlength'=>128,'tabindex'=>2)); ?>
 							</div>
 
 							<div class="upperMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>1)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>25,'maxlength'=>128,'tabindex'=>1)); ?>
 							</div>
 
 							<?php $this->endWidget(); ?>
@@ -524,7 +518,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						<div class="form">
 							<?php
 							$form=$this->beginWidget('CActiveForm', array(
-									'id'=>'register-form-main',
+									'id'=>'login-form-main',
 									'enableClientValidation'=>true,
 							));
 
@@ -533,22 +527,22 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->textField($model,'name', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->textField($model,'name', array('size'=>20,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'passwordAgain'); ?>
-								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>20,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>20,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
