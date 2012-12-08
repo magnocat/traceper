@@ -547,7 +547,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							<div class="sideMenu">
 								<?php										
-								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'));
+								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'));
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
 								?>
 							</div>
 
