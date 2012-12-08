@@ -29,17 +29,17 @@ class RegisterForm extends CFormModel
 			'message'=>'Field cannot be blank!'),
 		*/
 			array('email, name, password, passwordAgain', 'required',
-						'message'=>'Field cannot be blank!'),
-			array('email', 'email', 'message'=>'E-mail not valid!'),			
+						'message'=>Yii::t('site', 'Field cannot be blank!')),
+			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),			
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
-			'message'=>'Passwords not same!'),
+			'message'=>Yii::t('site', 'Passwords not same!')),
 			
 			array('ac_id', 'safe'),
 				
 			array('account_type', 'safe'),
 			
-			array('email', 'isExists', 'message'=>'This e-mail is registered before'),
+			array('email', 'isExists', 'message'=>Yii::t('site', 'E-mail is already registered!')),
 			
 			array('image', 'isExists')
 		);
@@ -71,7 +71,7 @@ class RegisterForm extends CFormModel
 				$data = UserCandidates::model()->find($criteria);
 			}
 			if ($data != null) {
-				$this->addError('email','E-mail is already registered!');
+				$this->addError('email',Yii::t('site', 'E-mail is already registered!'));
 			}							
 		}
 	}
