@@ -29,7 +29,7 @@ class RegisterForm extends CFormModel
 			'message'=>'Field cannot be blank!'),
 		*/
 			array('email, name, password, passwordAgain', 'required',
-						'message'=>Yii::t('site', 'Field cannot be blank!')),
+						'message'=>Yii::t('site', 'Please, enter the field')),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),			
 			// password needs to be same
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
