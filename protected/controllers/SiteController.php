@@ -206,7 +206,7 @@ class SiteController extends Controller
 			}
 			else
 			{
-				echo 'model NOT valid';
+				//echo 'model NOT valid';
 				
 				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
@@ -215,7 +215,7 @@ class SiteController extends Controller
 		}
 		else
 		{
-			echo 'LoginForm NOT set';
+			//echo 'LoginForm NOT set';
 		}
 	}	
 	
@@ -423,7 +423,7 @@ class SiteController extends Controller
 		}
 		else
 		{
-			echo 'RegisterForm is NOT set';
+			//echo 'RegisterForm is NOT set';
 		}
 
 		
