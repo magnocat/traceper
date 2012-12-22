@@ -190,13 +190,14 @@ class SiteController extends Controller
 			}			
 						
 			if($model->validate() && $model->login()) {
-// 				echo CJSON::encode(array(
-// 						"result"=> "1",
-// 						"id"=>Yii::app()->user->id,
-// 						"realname"=> $model->getName(),
-// 						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
-// 						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-// 				));
+				//Now required for android login only
+				echo CJSON::encode(array(
+						"result"=> "1",
+						"id"=>Yii::app()->user->id,
+						"realname"=> $model->getName(),
+						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+				));
 // 				Yii::app()->end();
 				
 				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
@@ -205,10 +206,16 @@ class SiteController extends Controller
 			}
 			else
 			{
+				echo 'model NOT valid';
+				
 				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 				$this->renderPartial('login',array('model'=>$model), false, $processOutput);				
 			}			
+		}
+		else
+		{
+			echo 'LoginForm NOT set';
 		}
 	}	
 	
@@ -400,6 +407,8 @@ class SiteController extends Controller
 			}
 			else
 			{
+				//echo 'RegisterForm not valid';
+				
 				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 				$this->renderPartial('register',array('model'=>$model), false, $processOutput);
@@ -411,6 +420,10 @@ class SiteController extends Controller
 
 			}
 			*/
+		}
+		else
+		{
+			echo 'RegisterForm is NOT set';
 		}
 
 		
