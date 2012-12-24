@@ -502,9 +502,9 @@ class UsersController extends Controller
 		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : "";
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : "";
 		$row['gp_image'] = "";
-		$row['fb_id'] = "";
+		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : "";
 		$row['g_id'] = "";
-		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";;
+		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";
 		
 		$bsk=   CJSON::encode( array(
 				'user'=>$row['id'],
