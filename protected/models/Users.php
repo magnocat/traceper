@@ -312,7 +312,7 @@ class Users extends CActiveRecord
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type
+		u.account_type, u.fb_id
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE Id in ('. $IdList.')';
 		
