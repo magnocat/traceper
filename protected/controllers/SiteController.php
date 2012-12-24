@@ -126,7 +126,8 @@ class SiteController extends Controller
 
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-
+			$result = "1"; //Initialize with "1" to be used whether no error occured
+			
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -158,6 +159,8 @@ class SiteController extends Controller
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
+			$result = "1"; //Initialize with "1" to be used whether no error occured
+			
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -322,6 +325,8 @@ class SiteController extends Controller
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
+			$result = "1"; //Initialize with "1" to be used whether no error occured
+			
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -544,6 +549,8 @@ class SiteController extends Controller
 
 		if ($isMobileClient == true)
 		{
+			$result = "1"; //Initialize with "1" to be used whether no error occured
+			
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -625,6 +632,8 @@ class SiteController extends Controller
 
 		if ($isMobileClient == true)
 		{
+			$result = "1"; //Initialize with "1" to be used whether no error occured
+			
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
