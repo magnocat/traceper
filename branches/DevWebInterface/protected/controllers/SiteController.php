@@ -96,7 +96,6 @@ class SiteController extends Controller
 	{
 		$model = new LoginForm;
 			
-
 		$processOutput = true;
 
 		//	echo print_r($str);
@@ -122,7 +121,6 @@ class SiteController extends Controller
 
 			}
 		}
-
 
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
@@ -173,6 +171,10 @@ class SiteController extends Controller
 		
 			echo CJSON::encode(array(
 					"result"=> $result,
+					"id"=>Yii::app()->user->id,
+					"realname"=> $model->getName(),
+					"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+					"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,					
 			));
 		
 			Yii::app()->end();
@@ -194,13 +196,13 @@ class SiteController extends Controller
 						
 			if($model->validate() && $model->login()) {
 				//Now required for android login only
-				echo CJSON::encode(array(
-						"result"=> "1",
-						"id"=>Yii::app()->user->id,
-						"realname"=> $model->getName(),
-						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
-						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-				));
+// 				echo CJSON::encode(array(
+// 						"result"=> "1",
+// 						"id"=>Yii::app()->user->id,
+// 						"realname"=> $model->getName(),
+// 						"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+// 						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+// 				));
 // 				Yii::app()->end();
 				
 				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
