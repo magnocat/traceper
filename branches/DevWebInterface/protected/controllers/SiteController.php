@@ -153,36 +153,7 @@ class SiteController extends Controller
 	{	
 		$model = new LoginForm;
 			
-		$processOutput = true;
-		
-		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-		{
-			$result = "1"; //Initialize with "1" to be used whether no error occured
-			
-			if ($model->getError('password') != null) {
-				$result = $model->getError('password');
-			}
-			else if ($model->getError('email') != null) {
-				$result = $model->getError('email');
-			}
-			else if ($model->getError('rememberMe') != null) {
-				$result = $model->getError('rememberMe');
-			}
-		
-			echo CJSON::encode(array(
-					"result"=> $result,
-					"id"=>Yii::app()->user->id,
-					"realname"=> $model->getName(),
-					"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
-					"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,					
-			));
-		
-			Yii::app()->end();
-		}
-		else {
-			//echo 'Model NOT valid in SiteController';
-				
-		}		
+		$processOutput = true;		
 
 		// collect user input data
 		if(isset($_REQUEST['LoginForm']))
@@ -204,18 +175,61 @@ class SiteController extends Controller
 // 						"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
 // 				));
 // 				Yii::app()->end();
+
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					echo CJSON::encode(array(
+							"result"=> "1",
+							"id"=>Yii::app()->user->id,
+							"realname"=> $model->getName(),
+							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+					));
 				
-				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-				$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);				
+					Yii::app()->end();
+				}
+				else {
+					//echo 'Model NOT valid in SiteController';
+					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);				
+				}								
 			}
 			else
 			{
 				//echo 'model NOT valid';
 				
-				Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-				$this->renderPartial('login',array('model'=>$model), false, $processOutput);				
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					$result = "1"; //Initialize with "1" to be used whether no error occured
+				
+					if ($model->getError('password') != null) {
+						$result = $model->getError('password');
+					}
+					else if ($model->getError('email') != null) {
+						$result = $model->getError('email');
+					}
+					else if ($model->getError('rememberMe') != null) {
+						$result = $model->getError('rememberMe');
+					}
+				
+					echo CJSON::encode(array(
+							"result"=> $result,
+							"id"=>Yii::app()->user->id,
+							"realname"=> $model->getName(),
+							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
+							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+					));
+				
+					Yii::app()->end();
+				}
+				else {
+					//echo 'Model NOT valid in SiteController';
+					
+					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+				}				
 			}			
 		}
 		else
