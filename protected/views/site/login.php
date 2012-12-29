@@ -8,9 +8,16 @@
 		<div class="upperMenu" style="margin-top:0.8em;width:11%;">
 			<?php 
 				//echo CHtml::submitButton('Login');
-				echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), Yii::app()->createUrl('site/login'), 
-												array(),
-												array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','role'=>'button','tabindex'=>4)); 
+// 				echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), Yii::app()->createUrl('site/login'), 
+// 												array(),
+// 												array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','role'=>'button','tabindex'=>4));
+
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'ajaxLogin',
+						'caption'=>Yii::t('site', 'Login'),
+						'id'=>'loginAjaxButton',
+						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+				));				
 				?>
 		</div>
 		
