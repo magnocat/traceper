@@ -77,7 +77,7 @@
 }
 }',
 				),
-												array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4)); ?>
+				array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4)); ?>
 
 	</div>
 
