@@ -85,11 +85,22 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 													 ),
 												null); ?>
 												
-			<?php echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
+			<?php 
+				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
 												array(
 													'onclick'=> '$("#createGroupWindow").dialog("close"); return false;',
 													 ),
-												null); ?>												
+												null); 
+			?>
+												
+			<?php 
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'createGroupCancel',
+// 						'caption'=>Yii::t('common', 'Cancel'),
+// 						'id'=>'createGroupCancelButton',
+// 						'onclick'=> 'js:function(){$("#createGroupWindow").dialog("close");}'
+// 				));				
+ 			?>																	
 		</div>
 	
 	<?php $this->endWidget(); ?>
