@@ -269,7 +269,13 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							?>
 							<div class="upperMenu" style="margin-top:0.8em;width:11%;">
 								<?php										
-								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								//echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), 
+										array('success'=>'function(data){
+												$("#forAjaxRefresh").html(data);
+										}'),										
+										array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
 								
 // 								$this->widget('zii.widgets.jui.CJuiButton', array(
 // 										'name'=>'login',
@@ -548,7 +554,13 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							<div class="sideMenu">
 								<?php										
 								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'));
-								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								
+								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'),
+										array('success'=>'function(data){
+												$("#forRegisterRefresh").html(data);
+											}'),
+										array('class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));								
 								?>
 							</div>
 
