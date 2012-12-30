@@ -60,23 +60,44 @@
 
 	<div class="sideMenu">
 		<?php 
-		echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), Yii::app()->createUrl('site/register'),
-				array(
-						'success'=> 'function(result){
-						try
-						{
-						var obj = jQuery.parseJSON(result);
-						if (obj.result && obj.result == "1")
-						{
-						TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
-}
-}
-						catch (error)
-						{
-}
-}',
-				),
-				array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+// 		echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), Yii::app()->createUrl('site/register'),
+// 				array(
+// 						'success'=> 'function(result){
+// 						try
+// 						{
+// 						var obj = jQuery.parseJSON(result);
+// 						if (obj.result && obj.result == "1")
+// 						{
+// 						TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
+// }
+// }
+// 						catch (error)
+// 						{
+// }
+// }',
+// 				),
+// 				array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+		
+		$this->widget('zii.widgets.jui.CJuiButton', array(
+				'name'=>'ajaxRegister',
+				'caption'=>Yii::t('site', 'Register'),
+				'id'=>'registerAjaxButton',
+				'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),
+																	'success'=> 'function(result){
+																									try
+																									{
+																										var obj = jQuery.parseJSON(result);
+						
+																										if (obj.result && obj.result == "1")
+																										{
+																											TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
+																										}
+																									}
+																									catch (error)
+																									{
+																									}
+																								}'))
+		));		
 
 		?>
 

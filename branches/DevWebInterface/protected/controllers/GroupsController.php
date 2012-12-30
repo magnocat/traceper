@@ -94,15 +94,15 @@ class GroupsController extends Controller
 				}
 			}
 
-			if(Yii::app()->request->isAjaxRequest) 
-			{
-				$processOutput = false;
-			}			
+// 			if(Yii::app()->request->isAjaxRequest) 
+// 			{
+// 				$processOutput = false;
+// 			}			
 		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-			
+
 		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);			
 	}
 	

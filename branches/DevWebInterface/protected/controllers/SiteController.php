@@ -98,11 +98,11 @@ class SiteController extends Controller
 			$model->attributes = $_REQUEST['LoginForm'];
 			// validate user input and if ok return json data and end application.
 			
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-			}			
+// 			if (Yii::app()->request->isAjaxRequest) {
+// 				$processOutput = false;
+// 			}			
 						
-			if($model->validate() && $model->login()) {				
+			if($model->validate() && $model->login()) {
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					echo CJSON::encode(array(
@@ -111,16 +111,16 @@ class SiteController extends Controller
 							"realname"=> $model->getName(),
 							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-					));
-				
-					Yii::app()->end();
+					));									
 				}
 				else {
 					//echo 'Model NOT valid in SiteController';
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);				
-				}								
+				}
+
+				Yii::app()->end();
 			}
 			else
 			{
@@ -146,9 +146,7 @@ class SiteController extends Controller
 							"realname"=> $model->getName(),
 							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-					));
-				
-					Yii::app()->end();
+					));									
 				}
 				else {
 					//echo 'Model NOT valid in SiteController';
@@ -156,7 +154,9 @@ class SiteController extends Controller
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 					$this->renderPartial('login',array('model'=>$model), false, $processOutput);					
-				}				
+				}
+
+				Yii::app()->end();
 			}			
 		}
 		else
@@ -273,9 +273,9 @@ class SiteController extends Controller
 			
 			// validate user input and if ok return json data and end application.
 			
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-			}
+// 			if (Yii::app()->request->isAjaxRequest) {
+// 				$processOutput = false;
+// 			}
 
 			if($model->validate()) {
 				
