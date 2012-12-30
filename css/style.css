@@ -28,7 +28,6 @@ a {
 #topBar{	 
 	height:12%;
 	width:100%;
-	min-height:60px;
 	background: #add8e6;	
 	z-index:100;
 	position: absolute;
