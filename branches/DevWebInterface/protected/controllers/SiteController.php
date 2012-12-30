@@ -276,8 +276,12 @@ class SiteController extends Controller
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
 			}
+
+			if($model->validate()) {
 				
-			if($model->validate() && $model->register()) {
+				$time = date('Y-m-d h:i:s');
+				
+				echo $model->ac_id;
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					echo CJSON::encode(array(
@@ -292,17 +296,23 @@ class SiteController extends Controller
 							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+							echo '<script type="text/javascript">
+							TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
+							</script>';
 						}
 						else {
 							//echo JSON::encode(array("result"=>"Error in saving"));
 							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+							echo '<script type="text/javascript">
+							TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+							</script>';
 						}
 					}
 					else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
 					{
-						echo $model->email.$time;
+						
 						$key = md5($model->email.$time);
 						$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
 								'Click here to register to traceper</a> <br/>';
@@ -313,11 +323,15 @@ class SiteController extends Controller
 						$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
 						//echo $message;
 						@mail($model->email, "Traceper Activation", $message, $headers);
+						
 							
 						//echo CJSON::encode(array("result"=> "1"));
 						Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+						echo '<script type="text/javascript">
+						TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
+						</script>';
 					}
 					else
 					{
@@ -325,9 +339,12 @@ class SiteController extends Controller
 						Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+						echo '<script type="text/javascript">
+						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+						</script>';
 					}					
 				}
-
+				
 				Yii::app()->end();
 			}
 			else

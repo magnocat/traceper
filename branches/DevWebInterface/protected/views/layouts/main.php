@@ -524,24 +524,28 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							$model = new RegisterForm;
 							?>
 
+							<div class="sideMenu" style="font-size: 3em;">
+								<?php echo $form->labelEx($model,'register'); ?>
+							</div>
+							
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>20,'maxlength'=>128)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>30,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->textField($model,'name', array('size'=>20,'maxlength'=>128)); ?>
+								<?php echo $form->textField($model,'name', array('size'=>30,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>20,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>30,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'passwordAgain'); ?>
-								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>20,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>30,'maxlength'=>128)); ?>
 							</div>
 
 							<div class="sideMenu">

@@ -28,6 +28,7 @@ a {
 #topBar{	 
 	height:12%;
 	width:100%;
+	min-height:60px;
 	background: #add8e6;	
 	z-index:100;
 	position: absolute;
@@ -129,7 +130,7 @@ a {
 
 #logo, .logo, .logo_inFullMap {
 	height:70px;
-	width:17%;
+	width:17%;	
 	background: url("../images/logo.png") no-repeat center;
 	cursor:pointer;		
 	position: relative;
@@ -163,8 +164,8 @@ a {
 	height:40px;
 	top: 10%;
 	position: relative;
-	padding:25px; 
-	margin:20px;	
+	padding:20px; 
+	margin:0px;	
 }
 
 /*#loginLogo {

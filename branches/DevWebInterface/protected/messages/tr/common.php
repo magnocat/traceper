@@ -42,7 +42,8 @@ return array(
 	'Create' => 'Oluştur',
 	'OK' => 'Tamam',
 	'Search' => 'Ara',
-	'Field cannot be blank!' => 'Alan boş bırakılamaz!',		
+	'Field cannot be blank!' => 'Alan boş bırakılamaz!',	
+	'Register' => 'Kaydol',
 
 	
 										
