@@ -1,5 +1,4 @@
-<?php 
-
+<?php
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'createGroupWindow',
 	    // additional javascript options for the dialog plugin
@@ -50,56 +49,96 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton(Yii::t('common', 'Create'), $this->createUrl('groups/createGroup'), 
-												array(
-													'success'=> 'function(result){ 
-																	try {
-																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{
-																			$("#createGroupWindow").dialog("close");
-																			
-																			if(obj.groupType == '.GroupType::FriendGroup.')
-																			{
-																				$.fn.yiiGridView.update("friendGroupsListView");
-																			}
-																			else if(obj.groupType == '.GroupType::StaffGroup.')
-																			{
-																				$.fn.yiiGridView.update("staffGroupsListView");
-																			}
-
-																			TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
-																		}
-																		else if(obj.result && obj.result == "Duplicate Entry")
-																		{
-																			$("#createGroupWindow").html(result);
-
-																			$("#createGroupWindow").dialog("close");
-																			TRACKER.showMessageDialog("'.Yii::t('groups', 'A group with this name already exists!').'");
-																		}
-																	}
-																	catch (error){
-																		$("#createGroupWindow").html(result);
-																	}
-																 }',
-													 ),
-												null); ?>
-												
 			<?php 
-				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
-												array(
-													'onclick'=> '$("#createGroupWindow").dialog("close"); return false;',
-													 ),
-												null); 
+// 				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Create'), $this->createUrl('groups/createGroup'), 
+// 												array(
+// 													'success'=> 'function(result){ 
+// 																	try {
+// 																		var obj = jQuery.parseJSON(result);
+// 																		if (obj.result && obj.result == "1") 
+// 																		{
+// 																			$("#createGroupWindow").dialog("close");
+																			
+// 																			if(obj.groupType == '.GroupType::FriendGroup.')
+// 																			{
+// 																				$.fn.yiiGridView.update("friendGroupsListView");
+// 																			}
+// 																			else if(obj.groupType == '.GroupType::StaffGroup.')
+// 																			{
+// 																				$.fn.yiiGridView.update("staffGroupsListView");
+// 																			}
+
+// 																			TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
+// 																		}
+// 																		else if(obj.result && obj.result == "Duplicate Entry")
+// 																		{
+// 																			$("#createGroupWindow").html(result);
+
+// 																			$("#createGroupWindow").dialog("close");
+// 																			TRACKER.showMessageDialog("'.Yii::t('groups', 'A group with this name already exists!').'");
+// 																		}
+// 																	}
+// 																	catch (error){
+// 																		$("#createGroupWindow").html(result);
+// 																	}
+// 																 }',
+// 													 ),
+// 												null);
+
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'ajaxCreateGroup',
+						'caption'=>Yii::t('common', 'Create'),
+						'id'=>'createGroupAjaxButton',
+						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('groups/createGroup'),
+																			'success'=> 'function(result){ 
+																											try {
+																												var obj = jQuery.parseJSON(result);
+																												if (obj.result && obj.result == "1") 
+																												{
+																													$("#createGroupWindow").dialog("close");
+																													
+																													if(obj.groupType == '.GroupType::FriendGroup.')
+																													{
+																														$.fn.yiiGridView.update("friendGroupsListView");
+																													}
+																													else if(obj.groupType == '.GroupType::StaffGroup.')
+																													{
+																														$.fn.yiiGridView.update("staffGroupsListView");
+																													}
+										
+																													TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
+																												}
+																												else if(obj.result && obj.result == "Duplicate Entry")
+																												{
+																													$("#createGroupWindow").html(result);
+										
+																													$("#createGroupWindow").dialog("close");
+																													TRACKER.showMessageDialog("'.Yii::t('groups', 'A group with this name already exists!').'");
+																												}
+																											}
+																											catch (error){
+																												$("#createGroupWindow").html(result);
+																											}
+																										}'
+										))
+				));				
 			?>
 												
 			<?php 
-// 				$this->widget('zii.widgets.jui.CJuiButton', array(
-// 						'name'=>'createGroupCancel',
-// 						'caption'=>Yii::t('common', 'Cancel'),
-// 						'id'=>'createGroupCancelButton',
-// 						'onclick'=> 'js:function(){$("#createGroupWindow").dialog("close");}'
-// 				));				
+// 				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
+// 												array(
+// 													'onclick'=> '$("#createGroupWindow").dialog("close"); return false;',
+// 													 ),
+// 												null); 
+			?>
+												
+			<?php 
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'createGroupCancel',
+						'caption'=>Yii::t('common', 'Cancel'),
+						'id'=>'createGroupCancelButton',
+						'onclick'=> 'js:function(){$("#createGroupWindow").dialog("close"); return false;}'
+				));				
  			?>																	
 		</div>
 	

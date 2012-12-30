@@ -549,15 +549,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							</div>
 
 							<div class="sideMenu">
-								<?php										
-								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'));
-								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								<?php
+								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
 								
 // 								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'),
 // 										array('success'=>'function(data){
 // 												$("#forRegisterRefresh").html(data);
 // 											}'),
-// 										array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));								
+// 										array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+
+								$this->widget('zii.widgets.jui.CJuiButton', array(
+										'name'=>'ajaxRegister',
+										'caption'=>Yii::t('site', 'Register'),
+										'id'=>'registerAjaxButton',
+										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
+								));								
 								?>
 							</div>
 
