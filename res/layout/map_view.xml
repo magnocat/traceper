@@ -19,7 +19,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:padding="10dp"
-        android:src="@drawable/map_gps_icon" />
+        android:src="@drawable/loc_l" />
 
 </RelativeLayout>
       

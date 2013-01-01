@@ -43,6 +43,10 @@ public interface IAppService {
 	
 	public String getUsername();
 	
+	public int getUserId();
+	
+	public String getRealName();
+	
 	public boolean isNetworkConnected();
 	
 	public boolean isUserAuthenticated();
@@ -55,7 +59,7 @@ public interface IAppService {
 	
 	public void exit();
 	
-	public JSONObject getUserInfo(int userid);
+	public JSONArray getUserInfo(int userid);
 	
 	public String registerUser(String password, String email, String realname, String facebookId);
 	

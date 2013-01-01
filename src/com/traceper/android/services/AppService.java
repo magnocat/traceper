@@ -67,6 +67,7 @@ public class AppService extends Service implements IAppService{
 	private boolean isUserAuthenticated = false;
 	private NotificationManager mManager;
 	private static int NOTIFICATION_ID = 0;
+	private boolean register = false;
 	/**
 	 * this list stores the locations couldnt be sent to server due to lack of network connectivity
 	 */
@@ -91,6 +92,8 @@ public class AppService extends Service implements IAppService{
 	//	private NotificationManager mNM;
 	private String email;
 	private String password;
+	private int userid;
+	private String realname;
 	private String authenticationServerAddress;
 	private Long lastLocationSentTime;
 
@@ -287,10 +290,18 @@ public class AppService extends Service implements IAppService{
 
 		if (enable == true && autoCheckinEnabled == false) {			
 			sendLocation(minDataSentInterval, minDistanceInterval);
+				
 		}
 		else if (enable == false){
 			am.cancel(getLocationIntent);
+			
+
 		}
+		
+		SharedPreferences.Editor editor = getSharedPreferences(Configuration.PREFERENCES_NAME,0).edit();
+		editor.putBoolean(Configuration.PREFRENCES_AUTO_SEND_CHECKBOX,enable);
+		editor.commit();
+		
 		autoCheckinEnabled = enable;
 	}
 
@@ -547,6 +558,11 @@ public class AppService extends Service implements IAppService{
 		{
 			operationResult = this.sendHttpRequest(name, value, filename, file);
 		}
+		//if the register is to be performed
+		if (this.register==true){
+			operationResult = this.sendHttpRequest(name, value, filename, file);	
+		}
+		
 		return operationResult;		
 	}
 	
@@ -701,14 +717,21 @@ public class AppService extends Service implements IAppService{
 		editor.putString(Configuration.PREFERENCES_USEREMAIL, "");
 		editor.putString(Configuration.PREFERENCES_PASSWORD, "");
 		editor.commit();
-		this.stopSelf();	
+		this.stopSelf();
+		
 	}
 
 	public String getUsername() {		
 		return this.email;
 	}
 
-
+	public int getUserId(){
+		return this.userid;
+	}
+	
+	public String getRealName(){
+		return this.realname;
+	}
 
 	public JSONArray getUserList() {		
 
@@ -745,6 +768,7 @@ public class AppService extends Service implements IAppService{
 
 	public String registerUser(String password, String email, String realname, String facebookId) 
 	{
+		String result=null;
 		String[] name = new String[8];
 		String[] value = new String[8];
 		name[0] = "r";
@@ -764,7 +788,7 @@ public class AppService extends Service implements IAppService{
 			accountType = FACEBOOK_ACCOUNT;
 		}
 
-		value[0] = "site/register";
+		value[0] = "site/Register";
 		value[1] = email;
 		value[2] = password;
 		value[3] = password;
@@ -773,9 +797,11 @@ public class AppService extends Service implements IAppService{
 		value[6] = "mobile";		
 		value[7] = facebookId;
 
+		this.register=true;
+		
 		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
 
-		String result = getString(R.string.unknown_error_occured);
+		//String result = getString(R.string.unknown_error_occured);
 
 		try {
 			JSONObject jsonObject = new JSONObject(httpRes);
@@ -824,6 +850,8 @@ public class AppService extends Service implements IAppService{
 				this.isUserAuthenticated = true;
 				this.minDataSentInterval = Integer.parseInt(jsonObject.getString("minDataSentInterval"));
 				this.minDistanceInterval = Integer.parseInt(jsonObject.getString("minDistanceInterval")); 
+				this.userid=Integer.parseInt(jsonObject.getString("id")); 
+				this.realname = jsonObject.getString("realname");
 			}
 			else {
 				this.isUserAuthenticated = false;
@@ -913,11 +941,12 @@ public class AppService extends Service implements IAppService{
 		return searchlist;
 	}	
 	
-	public JSONObject getUserInfo(int userid){
-		JSONObject jArray = null;
+	public JSONArray getUserInfo(int userid){
+
 		String uId = String.valueOf(userid);
-
-
+		JSONArray userList = null;
+		JSONObject jArray = null;
+		
 		String[] name = new String[4];
 		String[] value = new String[4];
 		name[0] = "r";
@@ -931,16 +960,17 @@ public class AppService extends Service implements IAppService{
 		value[2] = AppService.this.password;
 		value[3] = uId;
 
+
 		String httpRes = this.sendHttpRequestWithAuthPacket(name, value, null, null);	
-		JSONObject userList = null;
+		
 		try{
-			jArray = new JSONObject(httpRes);   
-			userList = jArray.getJSONArray("userlist").getJSONObject(0);
+			jArray = new JSONObject(httpRes);     
+			userList = jArray.getJSONArray("userlist");
 		}catch(JSONException e){
 			Log.e("log_tag", "Error parsing data "+e.toString());
 		}
-
-		return  userList;
+		
+		return userList;
 	}
 
 	public JSONArray getUserPastPoints(int userid){
