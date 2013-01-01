@@ -42,6 +42,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		//TODO: queryIntervalForChangedUsers
 		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)
 		trackerOp.setLangOperator(langOp);
+		bindElements(langOp, trackerOp);
 }
 		catch (e) {
 
