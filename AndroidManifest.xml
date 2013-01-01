@@ -1,87 +1,117 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	android:versionCode="1" android:versionName="1.0.0"
-	package="com.traceper">
-	   <uses-sdk
+    package="com.traceper"
+    android:versionCode="1"
+    android:versionName="1.0.0" >
+
+    <uses-sdk
         android:minSdkVersion="7"
         android:targetSdkVersion="15" />
-	    <application
+
+    <application
         android:icon="@drawable/icon"
         android:label="@string/ApplicationName"
-        android:theme="@style/AppTheme" >
-		<uses-library android:name="com.google.android.maps" />
-		<activity android:name=".android.Main">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category
-					android:name="android.intent.category.NORMAL">
-				</category>
-			</intent-filter>
-		</activity>
-		
-				<activity android:name=".android.new_main">
-			<intent-filter>
-				<action android:name="android.intent.action.NEWMAIN"></action>
-				<category
-					android:name="android.intent.category.NORMAL">
-				</category>
-			</intent-filter>
-		</activity>
-		
-		<service android:name=".android.services.AppService"></service>
-		<activity android:name=".android.Login">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.LAUNCHER">
-				</category>
-			</intent-filter>
-		</activity>	
-		
-		<activity android:name=".android.Register">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.NORMAL"></category>
-			</intent-filter>
-		</activity>
-		<activity android:name=".android.CameraController" android:screenOrientation="landscape" >
-		</activity>
-		
-		
-					<activity android:name=".android.AndroidFragment"  >
-			<intent-filter>
-				<action android:name="com.traceper.ANDROIDFRAGMENT"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
-			</intent-filter>
-		</activity>
-		
-			<activity android:name=".android.MapViewController"  >
-			<intent-filter>
-				<action android:name="com.traceper.MVIEW"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
-			</intent-filter>
-		</activity>
-		<activity android:name=".android.new_friendList"  >
-			<intent-filter>
-				<action android:name="com.traceper.FRIENDS"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
-			</intent-filter>
-		</activity>
-		<activity android:name=".android.PastPoints"  >
-			<intent-filter>
-				<action android:name="com.traceper.PASTPOINTS"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
-			</intent-filter>
-		</activity>
-		<activity android:name=".android.SearchUsers"  >
-			<intent-filter>
-				<action android:name="com.traceper.SEARCHUSERS"></action>
-				<category android:name="android.intent.category.DEFAULT"></category>
-			</intent-filter>
-		</activity>
- <activity
-            android:launchMode="singleTask"
-            android:name=".android.OAuth" >
-            <intent-filter >
+        android:theme="@style/AppTheme"
+        android:uiOptions="splitActionBarWhenNarrow" >
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCvbg3jOuJyEkM_6tZ6hUb5YEO7w0a3Onw" />
+
+        <uses-library android:name="com.google.android.maps" />
+
+        <activity android:name="com.traceper.android.Main" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" >
+                </action>
+
+                <category android:name="android.intent.category.NORMAL" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.new_main" >
+            <intent-filter>
+                <action android:name="android.intent.action.NEWMAIN" >
+                </action>
+
+                <category android:name="android.intent.category.NORMAL" >
+                </category>
+            </intent-filter>
+        </activity>
+
+        <service android:name="com.traceper.android.services.AppService" >
+        </service>
+
+        <activity android:name="com.traceper.android.Login" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" >
+                </action>
+
+                <category android:name="android.intent.category.LAUNCHER" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.Register" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" >
+                </action>
+
+                <category android:name="android.intent.category.NORMAL" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.traceper.android.CameraController"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity android:name="com.traceper.android.AndroidFragment" >
+            <intent-filter>
+                <action android:name="com.traceper.ANDROIDFRAGMENT" >
+                </action>
+
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.MapViewController" >
+            <intent-filter>
+                <action android:name="com.traceper.MVIEW" >
+                </action>
+
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.new_friendList" >
+            <intent-filter>
+                <action android:name="com.traceper.FRIENDS" >
+                </action>
+
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.PastPoints" >
+            <intent-filter>
+                <action android:name="com.traceper.PASTPOINTS" >
+                </action>
+
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.traceper.android.SearchUsers" >
+            <intent-filter>
+                <action android:name="com.traceper.SEARCHUSERS" >
+                </action>
+
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.traceper.android.OAuth"
+            android:launchMode="singleTask" >
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -92,22 +122,40 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-		
-</application>
+        <activity
+            android:name="com.traceper.android.UserArea"
+            android:label="@string/title_activity_user_area" >
+        </activity>
+        <activity
+            android:name="com.traceper.CustomOverlayItem"
+            android:label="@string/title_activity_custom_overlay_item" >
+        </activity>
+    </application>
 
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
-<uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>
-<uses-permission android:name="android.permission.CAMERA"></uses-permission>
-<uses-permission android:name="android.permission.RECORD_AUDIO"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <permission
+        android:name="com.traceper.android.MapViewController.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
 
-<uses-feature android:name="android.hardware.camera" android:required="false" />
-<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-permission android:name="com.example.mapdemo.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CAMERA" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
 </manifest>
