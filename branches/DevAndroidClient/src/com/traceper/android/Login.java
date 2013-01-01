@@ -74,7 +74,8 @@ public class Login extends Activity {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			appManager = ((AppService.IMBinder)service).getService();  
 			appManager.setAuthenticationServerAddress(preferences.getString(Configuration.PREFERENCES_SERVER_INDEX, Configuration.DEFAULT_SERVER_ADRESS));
-
+			//appManager.sendLocationNow();
+			
 			String prefEmail = preferences.getString(Configuration.PREFERENCES_USEREMAIL, "");
 			String prefPassword = preferences.getString(Configuration.PREFERENCES_PASSWORD, "");
 			
@@ -147,7 +148,9 @@ public class Login extends Activity {
 						@Override
 						public void run() {
 							result = appManager.authenticateUser(emailText.getText().toString(), passwordText.getText().toString());
-
+							if (result==null){
+								result = appManager.authenticateUser(emailText.getText().toString(), passwordText.getText().toString());
+							}
 							handler.post(new Runnable(){
 								public void run() {										
 									progressDialog.dismiss();

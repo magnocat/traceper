@@ -19,7 +19,7 @@ public class Configuration {
 	public static final String PREFERENCES_USEREMAIL = "PREFERENCES_USEREMAIL";
 	public static final String PREFERENCES_PASSWORD = "PREFERENCES_PASSWORD";
 	public static final String PREFRENCES_REMEMBER_ME_CHECKBOX = "PREFRENCES_REMEMBER_ME_CHECKBOX";
-	public static final String DEFAULT_SERVER_ADRESS = "http://192.168.2.36/Traceper_WebInterface/";
+	public static final String DEFAULT_SERVER_ADRESS = "http://78.186.116.108/Traceper_WebInterface/";
 	//public static final String DEFAULT_SERVER_ADRESS = "http://www.mekya.com/labs/traceper/";
 
 	public static final String PREFRENCES_AUTO_SEND_CHECKBOX = "PREFRENCES_AUTO_SEND_CHECKBOX";
@@ -27,7 +27,7 @@ public class Configuration {
 	public static final String APPLICATION_NAME = "Traceper Tracking System";
 
 	
-	public static final String FB_APP_ID = "370934372924974";
+	public static final String FB_APP_ID = "118597668307459";
 	public static final String FB_ACCESS_TOKEN = "facebook_access_token";
 	public static final String FB_ACCESS_EXPIRES = "facebook_access_expires";
 	public static final String FB_NAME = "facebook_name";

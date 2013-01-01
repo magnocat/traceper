@@ -25,6 +25,7 @@ public class new_FriendsListAdapter extends BaseAdapter {
     public new_FriendsListAdapter(Activity a, ArrayList<HashMap<String, String>> d) {
         activity = a;
         data=d;
+        //inflater = ((Activity)activity).getLayoutInflater();
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         imageLoader=new ImageLoader(activity.getApplicationContext());
     }

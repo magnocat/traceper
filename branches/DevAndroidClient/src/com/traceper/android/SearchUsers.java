@@ -127,7 +127,11 @@ public class SearchUsers extends Activity {
 					@Override
 					public void run() {
 						userList =  appService.searchUser(search);
-
+						
+						if (userList == null){
+							userList =  appService.searchUser(search);
+						}
+						
 						handler.post(new Runnable() {
 							public void run() {
 								if (userList != null && userList.length() != 0 ){
@@ -149,10 +153,13 @@ public class SearchUsers extends Activity {
 
 		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				Intent i = new Intent(SearchUsers.this, Main.class);
-				startActivity(i);
-				SearchUsers.this.finish();
+				//Intent i = new Intent(SearchUsers.this, UserArea.class);
+				//startActivity(i);
+				//finish();
+				//unbindService(mConnection);
+				onBackPressed();
 			}
+			
 		});
 
 		alert.show();
@@ -160,16 +167,30 @@ public class SearchUsers extends Activity {
 
 	}
 
-	public void invitationfriends(){
-		userList =  appService.GetFriendRequestListJson();
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+	}
 
+	public void invitationfriends(){
+		try{
+			userList =  appService.GetFriendRequestListJson();
+			if (userList == null){
+				userList =  appService.GetFriendRequestListJson();	
+			}
+		
+		}catch(Exception e){
+			
+		}
+		
 		if (userList.length() != 0){
 			listele();
 		}
 		else{
 			progressDialog.dismiss();
 			Toast.makeText(getBaseContext(),search + " " + getString(R.string.couldnt_find), Toast.LENGTH_LONG).show(); 
-			Intent i = new Intent(SearchUsers.this, Main.class);
+			Intent i = new Intent(SearchUsers.this, new_main.class);
 			startActivity(i);
 			SearchUsers.this.finish();
 		}
@@ -360,9 +381,12 @@ public class SearchUsers extends Activity {
 
 			return true;
 		case TURN_BACK:
+			/*
 			Intent i = new Intent(SearchUsers.this, Main.class);  
 			startActivity(i);
-
+			*/
+			onBackPressed();
+			//finish();
 			return true;
 		case INVITATION_LIST:
 			invitationfriends();

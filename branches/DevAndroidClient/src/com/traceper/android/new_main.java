@@ -13,7 +13,9 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
+
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 
 import com.actionbarsherlock.view.Window;
 import com.traceper.R;
@@ -22,23 +24,19 @@ import com.traceper.android.interfaces.IAppService;
 
 
 public class new_main extends SherlockFragmentActivity implements ActionBar.TabListener {
-	@SuppressWarnings("unused")
+
 	private final String TAG = getClass().getName();
 	ActionBar actionBar;
 	ArrayList<Integer> tabs;
 
 	
-
-
-
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		requestWindowFeature(Window.FEATURE_OPTIONS_PANEL);
 		setContentView(R.layout.new_main);
 		actionBar = getSupportActionBar();
-		actionBar.setDisplayShowTitleEnabled(true);
+		//actionBar.setDisplayShowTitleEnabled(true);
 		
 		// Try to restore the previous selected tab from the state/intent
 		int selectedTab = 0;
@@ -49,6 +47,7 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 			if (getIntent().getBooleanExtra("friends", false))
 				selectedTab = -1;
 		}
+
 		setTabs(selectedTab);
 	}
 
@@ -58,17 +57,13 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 		setIntent(intent);
 	}
 
-
-
-
 	@Override
 	protected void onResume() {
 		super.onResume();
-	
-		
+
 		if (getIntent().getBooleanExtra("friends", false)) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			//ft.replace(android.R.id.content, Fragment.instantiate(this, PeopleRadarFragment.class.getName()));
+			ft.replace(android.R.id.content, Fragment.instantiate(this, MapViewController.class.getName()));
 			ft.commit();
 			getIntent().removeExtra("friends"); // Reset
 		} else {
@@ -80,7 +75,6 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 				}
 			getIntent().removeExtra("tab"); // Clear the intent
 		}
-		
 	}
 
 	@Override
@@ -108,13 +102,22 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 
 		// Create the tabs
 		actionBar.addTab(actionBar.newTab().setText(R.string.friends).setTabListener(this), (selectedTab == R.string.friends));
+		//actionBar.addTab(actionBar.newTab().setText(R.string.profile).setTabListener(this), (selectedTab == R.string.profile));
+		/*
 		actionBar.addTab(
 				actionBar
 						.newTab()
 						.setText(R.string.profile)
 						.setTabListener(
-								new TabListener<new_friendlist>(this, getResources().getString(R.string.profile),
-										new_friendlist.class)), (selectedTab == R.string.profile));
+								new TabListener<UserArea>(this, getResources().getString(R.string.profile),
+										UserArea.class)), (selectedTab == R.string.profile));*/
+		actionBar.addTab(
+				actionBar
+						.newTab()
+						.setText(R.string.profile)
+						.setTabListener(
+								new TabListener<UserArea>(this, getResources().getString(R.string.profile),
+										UserArea.class)), (selectedTab == R.string.profile));
 		actionBar.addTab(
 				actionBar
 						.newTab()
@@ -123,9 +126,131 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 								new TabListener<new_friendlist>(this, getResources().getString(R.string.friend_list),
 										new_friendlist.class)), (selectedTab == R.string.friend_list));
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME|ActionBar.DISPLAY_SHOW_CUSTOM);
+	
+	}
+	
+	
+
+	public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
+		private final SherlockFragmentActivity mActivity;
+		private final String mTag;
+		private final Class<T> mClass;
+		private final Bundle mArgs;
+		private Fragment mFragment;
+
+		public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz) {
+			this(activity, tag, clz, null);
+		}
+
+		public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz, Bundle args) {
+			mActivity = activity;
+			mTag = tag;
+			mClass = clz;
+			mArgs = args; 
+
+			// Check to see if we already have a fragment for this tab, probably
+			// from a previously saved state. If so, deactivate it, because our
+			// initial state is that a tab isn't shown.
+			mFragment = mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+			if (mFragment != null && !mFragment.isDetached()) {
+				FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+				ft.detach(mFragment);
+				ft.commit();
+			}
+		}
+
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			
+
+		mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
+		ft.add(android.R.id.content, mFragment, mTag);
+
+			
+			//if (mFragment == null) {
+				//mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
+				//ft.add(android.R.id.content, mFragment, mTag);
+		//	} else
+		//		ft.attach(mFragment);
+		}
+
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			
+			if (mFragment != null)
+				ft.detach(mFragment);
+			//ft.hide(mFragment);
+		
+				//ft.remove(mFragment);
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		}
 	}
 
+	
+	
+/*
+	  public static class TabListener<T extends SherlockListFragment> implements ActionBar.TabListener
+	    {
+	        private final SherlockFragmentActivity mActivity;
+	        private final String mTag;
+	        private final Class<T> mClass;
+	        private final Bundle mArgs;
+	        private SherlockListFragment mFragment;
 
+	        public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz)
+	        {
+	            this(activity, tag, clz, null);
+	        }
+
+	        public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz, Bundle args)
+	        {
+	            mActivity = activity;
+	            mTag = tag;
+	            mClass = clz;
+	            mArgs = args;
+
+	            // Check to see if we already have a fragment for this tab, probably
+	            // from a previously saved state. If so, deactivate it, because our
+	            // initial state is that a tab isn't shown.
+	            mFragment = (SherlockListFragment)mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+	            if (mFragment != null && !mFragment.isDetached())
+	            {
+	                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+	                ft.detach(mFragment);
+	                ft.commit();
+	            }
+	        }
+
+	        public void onTabSelected(Tab tab, FragmentTransaction ft)
+	        {
+	            if (mFragment == null)
+	            {
+	                mFragment = (SherlockListFragment)SherlockListFragment.instantiate(mActivity, mClass.getName(), mArgs);
+	                ft.add(android.R.id.content, mFragment, mTag);
+	            }
+	            else
+	            {
+	                ft.attach(mFragment);
+	            }
+	        }
+
+	        public void onTabUnselected(Tab tab, FragmentTransaction ft)
+	        {
+	            if (mFragment != null)
+	            {
+	                ft.detach(mFragment);
+	            }
+	        }
+
+	        public void onTabReselected(Tab tab, FragmentTransaction ft)
+	        {
+	            //Toast.makeText(mActivity, "Reselected!", Toast.LENGTH_SHORT).show();
+	        }
+	    }
 
 
 	public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
@@ -175,7 +300,7 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 		}
 	}
-
+*/
 	/*
 	 * (non-Javadoc)
 	 * @see com.actionbarsherlock.app.ActionBar.TabListener#onTabSelected(com.actionbarsherlock.app.ActionBar.Tab,
@@ -185,11 +310,25 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		// Important: we use this listener only for the nearby tab!
 		// (It's a necessary hack, since a MapFragment isn't possible ATM...)
+		/*int selectedTabID = tabs.get(tab.getPosition());
 	
-		startActivity(new Intent(this, MapViewController.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-				| Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION).setAction(IAppService.SHOW_MY_LOCATION));
-		overridePendingTransition(0, 0);
-		finish();
+		
+	    switch (selectedTabID) {
+	    case R.string.friends:
+	    */
+	    	startActivity(new Intent(this, MapViewController.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+					| Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION).setAction(IAppService.SHOW_MY_LOCATION));
+			overridePendingTransition(0, 0);
+			finish();/*
+	        break;
+	    case R.string.profile:
+	
+	    	startActivity(new Intent(this, UserArea.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+					| Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION));
+			overridePendingTransition(0, 0);
+	        break;
+	    }*/
+	
 	       
 	}
 
@@ -210,5 +349,6 @@ public class new_main extends SherlockFragmentActivity implements ActionBar.TabL
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
+	
 }
 

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="#99CC00" >
+
+        <TableRow
+            android:id="@+id/tbl_user_row"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#669900"
+            android:gravity="center_horizontal|top" >
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="0.2" >
+
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/d_user" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.8" >
+
+                <TextView
+                    android:id="@+id/txt_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="20dp"
+                    android:text=""
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/txt_user_i"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginTop="50dp"
+                    android:text=""
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <ImageView
+                    android:id="@+id/image_auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/txt_user_i"
+                    android:src="@android:drawable/btn_star_big_off" />
+
+            </RelativeLayout>
+
+        </TableRow>
+  </TableLayout>
+
+      <TableLayout
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:background="#99CC00" >
+        
+        <TableRow
+            android:id="@+id/tbl_button1_row"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:background="#FFFFFF"
+            android:gravity="center_horizontal" >
+
+                <Button
+                    android:id="@+id/btn_video"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.30"
+                    android:drawableTop="@drawable/t_device_access_video"
+                    android:height="70dp"
+                    android:text="@string/video"
+                    android:textColor="#0099CC"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_picture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.30"
+                    android:drawableTop="@drawable/t_content_new_picture"
+                    android:height="70dp"
+                    android:text="@string/take_photo"
+                    android:textColor="#0099CC"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_checkin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.33"
+                    android:drawableTop="@drawable/t_device_access_location_found"
+                    android:height="70dp"
+                    android:text="@string/check_in_manually"
+                    android:textColor="#0099CC"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+        </TableRow>
+
+         <TableRow
+             android:id="@+id/tbl_button2_row"
+             android:layout_width="match_parent"
+             android:layout_height="fill_parent"
+             android:background="#FFFFFF"
+             android:gravity="center_horizontal" >
+
+                <Button
+                    android:id="@+id/btn_pastpoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.30"
+                    android:drawableTop="@drawable/t_location_place"
+                    android:height="70dp"
+                    android:text="@string/user_past_point"
+                    android:textSize="12sp"
+                    android:textStyle="bold|italic" />
+
+                <Button
+                    android:id="@+id/btn_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.30"
+                    android:drawableTop="@drawable/t_action_search"
+                    android:height="70dp"
+                    android:text="@string/search_users"
+                    android:textSize="12sp"
+                    android:textStyle="italic|bold" />
+
+                <Button
+                    android:id="@+id/btn_exit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.33"
+                    android:drawableTop="@drawable/t_av_stop"
+                    android:height="70dp"
+                    android:text="@string/exit_application"
+                    android:textSize="12sp"
+                    android:textStyle="bold|italic" />
+
+        </TableRow>
+</TableLayout>
+
+</LinearLayout>

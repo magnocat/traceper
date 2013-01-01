@@ -129,7 +129,8 @@ public class Register extends Activity {
 							
 									progressDialog = ProgressDialog.show(Register.this, "", getString(R.string.saving));
 								
-									Thread thread = new Thread(){
+									Thread registerThread = new Thread(){
+										private Handler handler = new Handler();
 										
 										
 
@@ -138,10 +139,26 @@ public class Register extends Activity {
 //											password = AeSimpleMD5.MD5(passwordText.getText().toString());
 											password = passwordText.getText().toString();
 											
+											try {
+											
 											serverResponse = appService.registerUser(password, 
 																			 eMailText.getText().toString(),
 																			 realnameText.getText().toString(),
 																			 facebookId);
+											if (serverResponse == null){
+											
+												serverResponse = appService.registerUser(password, 
+														 eMailText.getText().toString(),
+														 realnameText.getText().toString(),
+														 facebookId);
+												
+											}
+											
+											}catch(Exception e){
+												
+												e.printStackTrace();
+											
+											}
 											
 		
 											handler.post(new Runnable(){
@@ -177,7 +194,7 @@ public class Register extends Activity {
 										}
 		
 									};
-									thread.start();
+									registerThread.start();
 							}
 							else{
 								showDialog(EMAIL_AND_PASSWORD_LENGTH_SHORT);

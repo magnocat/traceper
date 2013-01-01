@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/m_refresh"
+		android:showAsAction="ifRoom"
+        android:icon="@drawable/t_navigation_refresh"/>
+	<item
+        android:id="@+id/m_friends"
+        android:icon="@drawable/t_social_group"
+        android:showAsAction="ifRoom|collapseActionView"
+       
+    />
+</menu>

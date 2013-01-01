@@ -41,7 +41,7 @@ public class PastPoints extends ListActivity {
 	private ProgressDialog progressDialog;
 	public static final int LIST_REFRESH = Menu.FIRST ;
 	public static final int ALL_PAST_POINTS = Menu.FIRST+1;
-
+	JSONArray  userwashere;
 	ListView lv;
 	int userid; 
 
@@ -112,14 +112,22 @@ public class PastPoints extends ListActivity {
 			@Override
 			public void run() {
 				try{
-					JSONArray  userwashere =  appService.getUserPastPoints(userid);
-
+					
+					try {
+					userwashere =  appService.getUserPastPoints(userid);
+					if (userwashere==null){
+					userwashere =  appService.getUserPastPoints(userid);
+					}
+					
+					}catch(Exception e){
+						e.printStackTrace();
+					}
 					for(int i=0;i<userwashere.length();i++){	
 
 						HashMap<String, String> map = new HashMap<String, String>();
 						JSONObject e = userwashere.getJSONObject(i);
 
-						map.put("point_number", (String.valueOf(i+1) + "/" + String.valueOf(userwashere.length()-1)));
+						map.put("point_number", (String.valueOf(i+1) + "/" + String.valueOf(userwashere.length())));
 						map.put("calculatedTime", e.getString("calculatedTime"));
 						map.put("latitude", e.getString("latitude"));
 						map.put("longitude", e.getString("longitude"));
@@ -142,16 +150,18 @@ public class PastPoints extends ListActivity {
 
 							lv.setOnItemClickListener(new OnItemClickListener() {
 								public void onItemClick(AdapterView<?> parent, View view, int position, long id) {        		
-									@SuppressWarnings("unchecked")
+									//@SuppressWarnings("unchecked")
 
 									HashMap<String, String> o = (HashMap<String, String>) lv.getItemAtPosition(position);        		
 									double lati =Double.valueOf(o.get("latitude"));
 									double longi =Double.valueOf(o.get("longitude"));
-
+									String calculatedTime = o.get("calculatedTime");
+									
 									Intent i = new Intent(PastPoints.this, MapViewController.class);  
 									i.setAction(IAppService.SHOW_USER_PAST_POINT_ON_MAP);
 									i.putExtra("latitude",lati);
 									i.putExtra("longitude",longi);
+									i.putExtra("calculatedTime", calculatedTime);
 									startActivity(i);
 								}
 							});

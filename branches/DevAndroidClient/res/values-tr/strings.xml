@@ -45,7 +45,7 @@
 	<string name="lastLocationDataSentAt">Son Konum bilgisinin gönderilme zamanı</string>
 	<string name="realname">İsim</string>
 	<string name="http_request_failed">Http istek hatası, lütfen internet bağlantısını ve ayarlardaki URL adresini kontrol ediniz</string>
-	<string name="take_photo">Fotoğraf Çek</string>
+	<string name="take_photo">Fotoğ. Çek</string>
 	<string name="http_missing_parameter">Eksik parametre, Lütfen geliştiricilere danışın</string>
 	<string name="upload_succesfull">Yükleme başarıyla tamamlandı</string>
 	<string name="upload_failed">Yükleme hatası oluştu. Lütfen daha sonra tekrar deneyin</string>
@@ -60,7 +60,7 @@
 	<string name="waiting_location">Konum için bekleniyor</string>
 	<string name="sending_location_data_successfull">Konum bilgileri başarıyla gönderildi</string>
 	<string name="check_in_automatically">Arkaplanda otomatik olarak konum bilgileri gönderilsin</string>
-	<string name="check_in_manually">Şimdi konum bilgileri gönderilsin</string>
+	<string name="check_in_manually">İz bırak</string>
 	<string name="location_hasnt_received">Konum bilgileri henüz alınamadı</string>
 	<string name="gps_disabled_message">GPS kapalı durumda! GPS\'i açmak istermisiniz?</string>
 	<string name="enable_gps">GPS\'i aç</string>
@@ -78,7 +78,7 @@
 <string name="map_refresh">Kullanıcı konumunu yenile</string>
 <string name="past_points_refresh">İz geçmişini yenile</string>
 <string name="all_past_points_on_map">İzleri harita üzerinde göster</string>
-<string name="search_users">Arkadaş Ara</string>
+<string name="search_users">Kullanıcı Ara</string>
 <string name="friendship_requests">Arkadaşlık istekleri</string>
 <string name="search_failed">adında kullanıcı mevcut değil</string>
 <string name="couldnt_find">her hangi bir kayıt bulunamadı!</string>
@@ -87,4 +87,9 @@
 <string name="camera_resolution">Kamera çözünürlüğünü seç</string>
 <string name="profile">Ben</string>
 <string name="friends">Arkadaşlar</string>
+<string name="menu_settings">Ayarlar</string>
+<string name="title_activity_user_area">Benim</string>
+<string name="mylocation">Konumum</string>
+<string name="user_past_point">İzler Geçmişi</string>
+<string name="video">Video Çek</string>
 </resources>
