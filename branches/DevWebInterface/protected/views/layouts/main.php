@@ -398,7 +398,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'id'=>'showRegisterNewStaffWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register New Staff')));
 
 					}
-
+					
+					/*
 					echo CHtml::ajaxLink('<div class="userOperations" id="showGeofence">
 							<img src="images/userGeofences.png"  /><div></div>
 							</div>', $this->createUrl('geofence/getGeofences'),
@@ -496,7 +497,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									var openDialog = mapOperator.initializeGeoFenceControl(geoFence_,createGeofenceForm);
 									return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Create Geo-Fence'),
 							));
-
+					
+					*/
 					echo CHtml::link('<div  class="userOperations" id="signout">
 							<img src="images/signout.png"  /><div></div>
 							</div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out')));
