@@ -177,7 +177,7 @@ class UsersController extends Controller
 			$friendArray = $this->getFriendArray();
 			$out = "No permission to get this user location";
 			
-			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) != false)
+			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) !== false)
 			{
 				$dataProvider = Users::model()->getListDataProvider($userId, null, null, 0, 1, 1);
 				$out = $this->prepareJson($dataProvider);
