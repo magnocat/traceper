@@ -156,6 +156,7 @@ if ($dataProvider != null) {
 					'visible'=>$isFriendList
 		),
 		
+		/*
 		array(            // display 'create_time' using an expression
 					'name'=>Yii::t('users', 'Geofence Settings'),
 					'type' => 'raw',
@@ -174,7 +175,7 @@ if ($dataProvider != null) {
 					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
 					'visible'=>$isFriendList
 		),
-		       
+		*/       
 
 		array(            // display 'create_time' using an expression
 				    'name'=>Yii::t('common', 'Name'),

@@ -87,21 +87,21 @@ class SiteController extends Controller
 	}
 
 	public function actionLogin()
-	{	
+	{
 		$model = new LoginForm;
 			
-		$processOutput = true;		
+		$processOutput = true;
 
 		// collect user input data
 		if(isset($_REQUEST['LoginForm']))
 		{
 			$model->attributes = $_REQUEST['LoginForm'];
 			// validate user input and if ok return json data and end application.
-			
-// 			if (Yii::app()->request->isAjaxRequest) {
-// 				$processOutput = false;
-// 			}			
-						
+
+			// 			if (Yii::app()->request->isAjaxRequest) {
+			// 				$processOutput = false;
+			// 			}
+
 			if($model->validate() && $model->login()) {
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
@@ -111,13 +111,13 @@ class SiteController extends Controller
 							"realname"=> $model->getName(),
 							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-					));									
+					));
 				}
 				else {
 					//echo 'Model NOT valid in SiteController';
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);				
+					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);
 				}
 
 				Yii::app()->end();
@@ -125,11 +125,11 @@ class SiteController extends Controller
 			else
 			{
 				//echo 'model NOT valid';
-				
+
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					$result = "1"; //Initialize with "1" to be used whether no error occured
-				
+
 					if ($model->getError('password') != null) {
 						$result = $model->getError('password');
 					}
@@ -139,32 +139,32 @@ class SiteController extends Controller
 					else if ($model->getError('rememberMe') != null) {
 						$result = $model->getError('rememberMe');
 					}
-				
+
 					echo CJSON::encode(array(
 							"result"=> $result,
 							"id"=>Yii::app()->user->id,
 							"realname"=> $model->getName(),
 							"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
 							"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
-					));									
+					));
 				}
 				else {
 					//echo 'Model NOT valid in SiteController';
-					
+
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-					$this->renderPartial('login',array('model'=>$model), false, $processOutput);					
+					$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 				}
 
 				Yii::app()->end();
-			}			
+			}
 		}
 		else
 		{
 			//echo 'LoginForm NOT set';
 		}
-	}	
-	
+	}
+
 	/**
 	 *
 	 * facebook login action
@@ -180,19 +180,19 @@ class SiteController extends Controller
 			$this->FB_Web_Register($nd);
 			if($nd == 0)
 			{
-				 
+					
 
 
 				$str=array("email" => Yii::app()->session['facebook_user']['email'] ,"password" => Yii::app()->session['facebook_user']['id']) ;
 
-	    
+					
 				$this->fbLogin($str);
-				 
+					
 
 			}else {
 
 			}
-			 
+
 
 			//exit;
 			$this->redirect($user->returnUrl);
@@ -265,34 +265,36 @@ class SiteController extends Controller
 		$model = new RegisterForm;
 
 		$processOutput = true;
-		
+
 		// collect user input data
 		if(isset($_REQUEST['RegisterForm']))
-		{				
+		{
 			$model->attributes = $_REQUEST['RegisterForm'];
-			
+
 			// validate user input and if ok return json data and end application.
-			
-// 			if (Yii::app()->request->isAjaxRequest) {
-// 				$processOutput = false;
-// 			}
+
+			// 			if (Yii::app()->request->isAjaxRequest) {
+			// 				$processOutput = false;
+			// 			}
 
 			if($model->validate()) {
-				
+
 				$time = date('Y-m-d h:i:s');
-				
-				echo $model->ac_id;
-				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-				{
-					echo CJSON::encode(array(
-							"result"=> "1",
-					));					
-				}
-				else 
-				{
-					if (isset($model->ac_id) && $model->ac_id != "0") {
-						if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type)) {
-							//echo CJSON::encode(array("result"=> "1"));
+
+				//echo $model->ac_id;
+
+				if (isset($model->ac_id) && $model->ac_id != "0") {
+					if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type)) {
+						//echo CJSON::encode(array("result"=> "1"));
+
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							echo CJSON::encode(array(
+									"result"=> "1",
+							));
+						}
+						else
+						{
 							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
@@ -300,8 +302,19 @@ class SiteController extends Controller
 							TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
 							</script>';
 						}
-						else {
-							//echo JSON::encode(array("result"=>"Error in saving"));
+					}
+					else {
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							/*
+							 echo CJSON::encode(array(
+							 		"result"=> "1",
+							 ));
+							*/
+							echo JSON::encode(array("result"=>"Error in saving"));
+						}
+						else
+						{
 							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
@@ -310,22 +323,31 @@ class SiteController extends Controller
 							</script>';
 						}
 					}
-					else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
+				}
+				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
+				{
+
+					$key = md5($model->email.$time);
+					$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
+							'Click here to register to traceper</a> <br/>';
+					$message .= '<br/> Your Password is :'.$model->password;
+					$message .= '<br/> The Traceper Team';
+					$headers  = 'MIME-Version: 1.0' . "\r\n";
+					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+					$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
+					//echo $message;
+					@mail($model->email, "Traceper Activation", $message, $headers);
+
+
+					//echo CJSON::encode(array("result"=> "1"));
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 					{
-						
-						$key = md5($model->email.$time);
-						$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
-								'Click here to register to traceper</a> <br/>';
-						$message .= '<br/> Your Password is :'.$model->password;
-						$message .= '<br/> The Traceper Team';
-						$headers  = 'MIME-Version: 1.0' . "\r\n";
-						$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-						$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
-						//echo $message;
-						@mail($model->email, "Traceper Activation", $message, $headers);
-						
-							
-						//echo CJSON::encode(array("result"=> "1"));
+						echo CJSON::encode(array(
+								"result"=> "1",
+						));
+					}
+					else
+					{
 						Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
@@ -333,18 +355,31 @@ class SiteController extends Controller
 						TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
 						</script>';
 					}
+				}
+				else
+				{
+					//echo CJSON::encode(array("result"=> "Error in saving"));
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+					{
+						/*
+						 echo CJSON::encode(array(
+						 		"result"=> "1",
+						 ));
+						*/
+						echo JSON::encode(array("result"=>"Error in saving"));
+					}
 					else
 					{
-						//echo CJSON::encode(array("result"=> "Error in saving"));
 						Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
 						echo '<script type="text/javascript">
 						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 						</script>';
-					}					
+					}
 				}
-				
+
+
 				Yii::app()->end();
 			}
 			else
@@ -352,7 +387,7 @@ class SiteController extends Controller
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					$result = "1"; //Initialize with "1" to be used whether no error occured
-						
+
 					if ($model->getError('password') != null) {
 						$result = $model->getError('password');
 					}
@@ -365,19 +400,19 @@ class SiteController extends Controller
 					else if ($model->getError('passwordAgain') != null) {
 						$result = $model->getError('passwordAgain');
 					}
-				
+
 					echo CJSON::encode(array(
 							"result"=> $result,
-					));					
+					));
 				}
 				else
 				{
 					//echo 'RegisterForm not valid';
-					
+
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-					$this->renderPartial('register',array('model'=>$model), false, $processOutput);					
-				}	
+					$this->renderPartial('register',array('model'=>$model), false, $processOutput);
+				}
 
 				Yii::app()->end();
 			}
@@ -387,12 +422,12 @@ class SiteController extends Controller
 			//echo 'RegisterForm is NOT set';
 		}
 	}
-	
+
 	public function actionIsFacebookUserRegistered(){
-		
+
 		$result = "Missing parameter";
-		if (isset($_REQUEST['email']) && $_REQUEST['email'] != NULL 
-			 && isset($_REQUEST['facebookId']) && $_REQUEST['facebookId'] != NULL) 
+		if (isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
+			 && isset($_REQUEST['facebookId']) && $_REQUEST['facebookId'] != NULL)
 		{
 			$email = $_REQUEST['email'];
 			$facebookId = $_REQUEST['facebookId'];
@@ -503,7 +538,7 @@ class SiteController extends Controller
 		if ($isMobileClient == true)
 		{
 			$result = "1"; //Initialize with "1" to be used whether no error occured
-			
+
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
@@ -586,7 +621,7 @@ class SiteController extends Controller
 		if ($isMobileClient == true)
 		{
 			$result = "1"; //Initialize with "1" to be used whether no error occured
-			
+
 			if ($model->getError('password') != null) {
 				$result = $model->getError('password');
 			}
