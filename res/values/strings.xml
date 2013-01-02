@@ -96,4 +96,5 @@
 	<string name="mylocation">My Location</string>
 	<string name="user_past_point">Past Point</string>
 	<string name="video">Take Video</string>
+	<string name="location_wait_warning">Please wait, waiting for location!</string>
 </resources>

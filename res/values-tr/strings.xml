@@ -73,7 +73,7 @@
 	<string name="please_enter_description">Lütfen tanım giriniz</string>
 	<string name="location_fix_problem">Konum bilgilerindeki düzeltme henüz alınamadı</string>
 	<string name="signingout">Oturum kapatılıyor...</string>
-	<string name="show_all_user_location_on_map">Show all us. l. o. m.</string>
+	<string name="show_all_user_location_on_map">Haritada Göster</string>
 <string name="list_refresh">Arkadaş listesini yenile</string>
 <string name="map_refresh">Kullanıcı konumunu yenile</string>
 <string name="past_points_refresh">İz geçmişini yenile</string>
@@ -92,4 +92,5 @@
 <string name="mylocation">Konumum</string>
 <string name="user_past_point">İzler Geçmişi</string>
 <string name="video">Video Çek</string>
+<string name="location_wait_warning">Lütfen konum bilgisi alınana kadar bekleyin!</string>
 </resources>

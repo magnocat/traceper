@@ -90,6 +90,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	List<Overlay> mapOverlays;
 	Drawable drawable;
 	CustomItemizedOverlay<CustomOverlayItem> itemizedOverlay;
+	
 
 
 	@Override
@@ -105,16 +106,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 		public void onReceive(Context context, Intent intent) {
 
 			Log.i("Broadcast receiver ", "received a message");
-/*
-			Drawable marker=getResources().getDrawable(android.R.drawable.star_big_on);
-			int markerWidth = marker.getIntrinsicWidth();
-			int markerHeight = marker.getIntrinsicHeight();
-			marker.setBounds(0, markerHeight, markerWidth, 0);
 
-
-			MapItemizedOverlay mapItemizedOverlay = new MapItemizedOverlay(marker);
-			mapView.getOverlays().add(mapItemizedOverlay); 
-*/
 			Bundle extra = intent.getExtras();
 			if (extra != null)
 			{
@@ -128,24 +120,13 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 
 				
 
-					/*
-					GeoPoint myPoint1 =new GeoPoint(
-							(int) (lastLocation.getLatitude() * 1E6), 
-							(int) (lastLocation.getLongitude() * 1E6));
-					mapItemizedOverlay.addItem(myPoint1, "myPoint1", "myPoint1");
-					*/
+
 					
 					GeoPoint MyPoint1 = new GeoPoint((int)(lastLocation.getLatitude() * 1E6),(int)(lastLocation.getLongitude() *1E6));
 					CustomOverlayItem overlayItem3 = new CustomOverlayItem(MyPoint1,getResources().getString(R.string.mylocation), 
 							appService.getRealName(), null);
 					itemizedOverlay.addOverlay(overlayItem3);
-					/*
-					GeoPoint point4 = new GeoPoint((int)(51.51738*1E6),(int)(-0.08186*1E6));
-					CustomOverlayItem overlayItem4 = new CustomOverlayItem(point4, "Mission: Impossible (1996)", 
-							"(Ethan & Jim cafe meeting)", 
-							"http://ia.media-imdb.com/images/M/MV5BMjAyNjk5Njk0MV5BMl5BanBnXkFtZTcwOTA4MjIyMQ@@._V1._SX40_CR0,0,40,54_.jpg");		
-					itemizedOverlay.addOverlay(overlayItem4);
-					*/
+
 					mapOverlays.add(itemizedOverlay);
 
 					final MapController mc = mapView.getController();
@@ -167,9 +148,11 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	private ServiceConnection mConnection = new ServiceConnection() 
 	{
 		public void onServiceConnected(ComponentName className, IBinder service) {          
-			appService = ((AppService.IMBinder)service).getService();    
+			appService = ((AppService.IMBinder)service).getService();   
+
 			updateLocation();
-		}
+			}
+		
 		public void onServiceDisconnected(ComponentName className) {          
 			appService = null;
 			Toast.makeText(MapViewController.this, R.string.local_service_stopped,
@@ -191,39 +174,17 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 		actionBar.setDisplayShowTitleEnabled(true);
 		setTabs();
 		
-		//mapOverlays = mapView.getOverlays();
-	//	mapView = (MapView)findViewById(R.id.mapview);
+
 		mapView = (TapControlledMapView) findViewById(R.id.mapview);
-		
-		// enable Street view by default
-		//mapView.setStreetView(false);
+		mapView.setBuiltInZoomControls(true);
 
-		// enable to show Satellite view
-		// mapView.setSatellite(true);
-
-		// enable to show Traffic on map
-		// mapView.setTraffic(true);
 		
 		mapOverlays = mapView.getOverlays();
 
-		//mapOverlays.add(myItemizedOverlay);
+		drawable = getResources().getDrawable(android.R.drawable.star_big_off);
+		itemizedOverlay = new CustomItemizedOverlay<CustomOverlayItem>(drawable, mapView);
 		
-		mapView.setBuiltInZoomControls(true);
 
-		//mapController = mapView.getController();
-		
-		
-	
-		
-		
-	//	mapController.setZoom(14); 
-
-	//	mapView.invalidate();
-		
-		
-		
-		//appService.sendLocationNow();
-		//updateLocation();
 
 		ImageView meButton = (ImageView) findViewById(R.id.meButton);
 		meButton.setOnClickListener(new OnClickListener() {
@@ -253,24 +214,10 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	}
 
 	public void updateLocation(){
+		
 
 
-/*
-		Drawable marker=getResources().getDrawable(android.R.drawable.star_big_on);
-		int markerWidth = marker.getIntrinsicWidth();
-		int markerHeight = marker.getIntrinsicHeight();
-		marker.setBounds(0, markerHeight, markerWidth, 0);
 
-
-		mapItemizedOverlay = new MapItemizedOverlay(marker);
-		mapView.getOverlays().add(mapItemizedOverlay);
-
-
-		drawable = getResources().getDrawable(android.R.drawable.star_big_on);
-		itemizedOverlay = new CustomItemizedOverlay<CustomOverlayItem>(drawable, mapView);
-
-		mapOverlays.add(itemizedOverlay);
-		*/
 		String action =  getIntent().getAction();
 		if (action != null) {
 			if (action.equals(IAppService.SHOW_MY_LOCATION)) {
@@ -360,8 +307,12 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	@Override
 	protected void onPause() 
 	{
+		try{
 		unregisterReceiver(messageReceiver);		
 		unbindService(mConnection);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		super.onPause();
 	}
 
@@ -371,12 +322,15 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 		super.onResume();
 		
 
-		
+		try{
 		bindService(new Intent(MapViewController.this, AppService.class), mConnection , Context.BIND_AUTO_CREATE);
 		IntentFilter i = new IntentFilter();
 		i.addAction(IAppService.LAST_LOCATION_DATA_SENT_TIME);
 		//i.addAction(IMService.FRIEND_LIST_UPDATED);
 		registerReceiver(messageReceiver, i);	
+		}catch(Exception e){
+			
+		}
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {		
@@ -425,14 +379,14 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.m_refresh:
-
+			onResume();
 			appService.sendLocationNow();
 			return true;
 			
 		case R.id.m_friends:
 			
 			try{
-
+				
 				new LongOperation().execute(new String[] {String.valueOf(OPERATION_ALL_USER_LOCTION)});
 
 			}catch(Exception e)        {
@@ -475,21 +429,14 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	  					
 	              		try {
 	    					appService.sendLocationNow();
-	    					} catch (Exception e) {
+	              		
+	              		} catch (Exception e) {
 	    						// TODO Auto-generated catch block
 	    						e.printStackTrace();
 	    					}	
-	                  /*
-						String gettime = String.valueOf(location.getTime());
 
-						GeoPoint myPoint =new GeoPoint(
-								(int) (location.getLatitude() * 1E6), 
-								(int) (location.getLongitude() * 1E6));
-						mapItemizedOverlay.addItem(myPoint, "My Point", gettime);
-
-
-						mapController.animateTo(myPoint);
-	                	  */
+	                  
+	                  
 	                	  return null; 
 	                  case(OPERATION_USER_LOCATION):
 	                  //user location
@@ -499,15 +446,17 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 			                			
 			                	}
 	                
-	            
+	                  			try{
 	                  			userlist = appService.getUserInfo(Integer.parseInt(params[1].toString()));
 	                  		
 	                  			if (userlist == null){
 	                  				userlist = appService.getUserInfo(Integer.parseInt(params[1].toString()));
 	                  			}
-	                  			
+	                  				}catch(Exception e){
+	                  			e.printStackTrace();
+	                  			}//try1
 	
-	  	                  	  Thread thr1 = new Thread(){
+	  	                  	  Thread thrd1 = new Thread(){
 	  	                          @Override
 	  	                          public void run() {
 	  		                  
@@ -533,15 +482,14 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	  											String user_name=e.getString("realname");
 	  											String datetime = e.getString("calculatedTime");
 	  										
-	  										
+	  									
 	  										geoPoints.add( new GeoPoint(
 	  												(int) (latitude * 1E6), 
 	  												(int) (longitude * 1E6)));
 	  										
 	  	                        			drawable = getResources().getDrawable(android.R.drawable.star_big_on);
 	  	                        			itemizedOverlay = new CustomItemizedOverlay<CustomOverlayItem>(drawable, mapView);
-
-
+	  									
 
 	  										try {
 	  		                        			//GeoPoint UserPoint1 = new GeoPoint((int)(latitude * 1E6),(int)(longitude * 1E6));
@@ -585,7 +533,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	  	                }
 	  		          };
 	  		                                    
-	  		      thr1.start();  
+	  		      thrd1.start();  
 	            				
 	            				
 	            				
@@ -609,7 +557,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	                		  e.printStackTrace();
 	                	}//try1
 	                	
-	                  	  Thread thr2 = new Thread(){
+	                  	  Thread thrd2 = new Thread(){
                           @Override
                           public void run() {
 	                  
@@ -687,7 +635,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
                 }
 	          };
 	                                    
-	      thr2.start();  				
+	      thrd2.start();  				
 							
 	      return null;
 	                  
@@ -717,7 +665,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 		  						Log.e("log_tag", "Error parsing data "+e.toString());
 		  					}
 	  						
-	  						 Thread thr3 = new Thread(){
+	  						 Thread thrd3 = new Thread(){
 	  	                          @Override
 	  	                          public void run() {
 	  		           
@@ -791,7 +739,7 @@ public class MapViewController extends SherlockMapActivity implements ActionBar.
 	  	                }
 	  		          };
 	  		                                    
-	  		      thr3.start();  				
+	  		      thrd3.start();  				
 	  						
 	  						
 	  						
