@@ -8,11 +8,14 @@
         android:minSdkVersion="7"
         android:targetSdkVersion="15" />
 
-    <application
-        android:icon="@drawable/icon"
-        android:label="@string/ApplicationName"
-        android:theme="@style/AppTheme"
-        android:uiOptions="splitActionBarWhenNarrow" >
+
+     <application
+    android:name="@string/ApplicationName"
+    android:icon="@drawable/icon"
+    android:label="@string/ApplicationName"
+    android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >   
+        
+        
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCvbg3jOuJyEkM_6tZ6hUb5YEO7w0a3Onw" />
