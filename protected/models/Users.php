@@ -369,7 +369,7 @@ class Users extends CActiveRecord
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"' ;
 	
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
-		u.userType, u.deviceId,
+		u.userType, u.deviceId, u.fb_id, u.account_type,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
 		u.account_type, IFNULL(f.status, -1) as status

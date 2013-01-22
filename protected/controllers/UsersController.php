@@ -337,7 +337,7 @@ class UsersController extends Controller
 		$out = $this->prepareSearchUserResultJson($dataProvider);
 		//$out = $this-> prepareJson($sql, "userSearch" ,$userId);
 		echo $out;
-
+		Yii::app()->end();
 	}
 	
 	public function actionApproveFriendShip(){
