@@ -146,7 +146,7 @@ class UserWasHere extends CActiveRecord
 		
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		
-		$pageNo = $pageNo - 1;
+		$pageNo = $pageNo - 1; //Since CPagination's page index starts from 0
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -156,6 +156,7 @@ class UserWasHere extends CActiveRecord
 				),
 				'pagination'=>array(
 						'pageSize'=>$itemCount,
+						'currentPage'=>$pageNo
 				),
 		));
 		
