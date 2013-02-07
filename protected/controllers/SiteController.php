@@ -664,17 +664,17 @@ class SiteController extends Controller
 				$arrayLength = count($emailArray);
 				$invitationSentCount = 0;
 				for ($i = 0; $i < $arrayLength; $i++)
-				{
-					/*
+				{					
 					 $dt = date("Y-m-d H:m:s");
-
-					$invitedUsers = new InvitedUsers;
-					$invitedUsers->email = $emailArray[$i];
-					$invitedUsers->dt = $dt;
-
-					if ($invitedUsers->save())
-						*/
-					if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], date("Y-m-d H:m:s")))
+					 
+					/*
+						$invitedUsers = new InvitedUsers;
+						$invitedUsers->email = $emailArray[$i];
+						$invitedUsers->dt = $dt;
+	
+						if ($invitedUsers->save())
+					*/
+					if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], $dt))
 					{
 						$key = md5($emailArray[$i].$dt);
 						//send invitation mail
