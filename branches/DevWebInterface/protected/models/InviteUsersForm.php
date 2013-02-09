@@ -8,7 +8,7 @@
 class InviteUsersForm extends CFormModel
 {
 	public $emails;
-	public $message;
+	public $invitationMessage;
 
 	/**
 	 * Declares the validation rules.
@@ -21,6 +21,7 @@ class InviteUsersForm extends CFormModel
 			// username and password are required
 			array('emails', 'required', 'message'=>'Field cannot be blank!'),
 			array('emails', 'ext.MultiEmailValidator', 'delimiter'=>',', 'min'=>1, 'max'=>10),
+			array('invitationMessage', 'length', 'max'=>500), //Bu alanýn alanýn düzgün çalýþmasý en azýndan bir rule tanýmlamak gerekiyor
 		);
 	}
 
@@ -30,8 +31,8 @@ class InviteUsersForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'emails'=>Yii::t('general', 'E-mails'),
-			'message'=>Yii::t('general', 'Message for your friends'),
+			'emails'=>Yii::t('site', 'E-mails'),
+			'invitationMessage'=>Yii::t('site', 'Message for your friends'),
 		);
 	}	
 }
