@@ -50,6 +50,8 @@ return array(
 	'Register' => 'Kaydet',
 	'Name' => 'İsim',
 	'E-mail' => 'E-posta',
+	'E-mails' => 'E-postalar',
+	'Message for your friends' => 'Arkada&#351;lar&#305;n&#305;z i&#231;in mesaj&#305;n&#305;z',
 	'Password' => '&#350;ifre',
 	'Password (Again)' => '&#350;ifre (Tekrar)',
 	'E-mail not valid!' => 'Ge&#231;erli bir  e-posta giriniz',
@@ -60,7 +62,15 @@ return array(
 	'Incorrect password or e-mail' => 'Yanl&#305;&#351; &#351;ifre veya e-posta',
 	'This e-mail is registered before' => 'Aynı e-posta ile yalnızca bir kez kayıt olabilirsiniz!',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',
-	'Remember me next time' => 'Beni hat&#305;rla'
+	'Remember me next time' => 'Beni hat&#305;rla',
+	'Hi' => 'Merhaba',
+	'You have been invited to traceper by one of your friends' => 'Bir arkada&#351;&#305;n&#305;z taraf&#305;ndan traceper\'a davet edildiniz',
+	'Your friend\'s message:' => 'Arkada&#351;&#305;n&#305;z&#305;n mesaj&#305;:',
+	'Click here to register to traceper' => 'traceper\'a kay&#305;t olmak i&#231;in buraya t&#305;klay&#305;n&#305;z',
+	'The Traceper Team' => 'Traceper Ekibi',
+	'Invite' => 'Davet et',
+	'Send invitations to your friends' => 'Arkada&#351;lar&#305;n&#305;z&#305; davet edin',
+	'Traceper Invitation' => 'Traceper Daveti'
 );
 
 

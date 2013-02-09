@@ -681,19 +681,21 @@ class SiteController extends Controller
 						$invitationSentCount++;
 
 						//Invitation kontrol� yap�ld���nda bu k�s�m a��lacak
+						
+						$message = Yii::t('site', 'Hi').',<br/>'.Yii::t('site', 'You have been invited to traceper by one of your friends').'. '.Yii::t('site', 'Your friend\'s message:').'<br/><br/>';
+						$message .= $model->invitationMessage;
+						$message .= '<br/><br/>';
+						$message .= '<a href="'.'http://www.elmanotomasyon.com/Traceper_WebInterface/'.'">';
+						$message .= Yii::t('site', 'Click here to register to traceper');
+						$message .= '</a>';
+						$message .= '<br/><br/>';
+						$message .= Yii::t('site', 'The Traceper Team');
 
-						//$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register',array('invitation'=>true, 'email'=>$emailArray[$i],'key'=>$key)).'">'.
-						//'Click here to register to traceper</a> <br/>';
-
-						$message = 'Hi ,<br/> You have been invited to traceper by one of your friends <a href="'.$this->createUrl('site/register').'">'.
-								'Click here to register to traceper</a> <br/>';
-						$message .= '<br/> ' . $model->message;
-						$message .= '<br/> The Traceper Team';
 						$headers  = 'MIME-Version: 1.0' . "\r\n";
 						$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 						$headers  .= 'From: contact@traceper.com' . "\r\n";
 						//echo $message;
-						mail($emailArray[$i], "Traceper Invitation", $message, $headers);
+						mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
 					}
 				}
 
