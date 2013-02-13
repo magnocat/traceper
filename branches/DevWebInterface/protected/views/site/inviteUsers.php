@@ -66,17 +66,35 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					'id'=>'inviteUsersAjaxButton',
 					'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/inviteUsers'),
 							'success'=> 'function(result){
-							try {
-							var obj = jQuery.parseJSON(result);
-							if (obj.result && obj.result == "1")
-							{
-							$("#inviteUsersWindow").dialog("close");
-							}
-							}
-							catch (error){
-							$("#inviteUsersWindow").html(result);
-							}
-							}',
+															try 
+															{
+																var obj = jQuery.parseJSON(result);
+							
+																if (obj.result && obj.result == "1")
+																{
+																	$("#inviteUsersWindow").dialog("close");
+																	TRACKER.showMessageDialog("'.Yii::t('site', 'Invitations sent successfully...').'");
+																}
+																else if(obj.result && obj.result == "Duplicate Entry")
+																{
+																	$("#inviteUsersWindow").html(result);
+																	$("#inviteUsersWindow").dialog("close");
+
+																	var msgString = "'.Yii::t('site', 'Since invitations already sent for the e-mails below, <br/> only the other invitations sent!').'<br/><br/>";
+							
+																	for (var i=0;i<obj.emails.length;i++)
+																	{
+																		msgString = msgString + obj.emails[i] + "<br/>";
+																	}
+							
+																	TRACKER.showMessageDialog(msgString);
+																}							
+															}																
+															catch (error)
+															{
+																$("#inviteUsersWindow").html(result);
+															}
+														}',
 					))
 			));			
 			?>

@@ -70,7 +70,9 @@ return array(
 	'The Traceper Team' => 'Traceper Ekibi',
 	'Invite' => 'Davet et',
 	'Send invitations to your friends' => 'Arkada&#351;lar&#305;n&#305;z&#305; davet edin',
-	'Traceper Invitation' => 'Traceper Daveti'
+	'Traceper Invitation' => 'Traceper Daveti',
+	'Invitations sent successfully...' => 'Davetiye(ler) ba&#351;ar&#305;yla g&#246;nderildi...',
+	'Since invitations already sent for the e-mails below, <br/> only the other invitations sent!' => 'A&#351;a&#287;&#305;daki e-posta(lar) i&#231;in davetiye zaten g&#246;nderildi&#287;i i&#231;in <br/> sadece di&#287;er e-postalara g&#246;nderildi!'
 );
 
 

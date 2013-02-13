@@ -516,9 +516,7 @@ class SiteController extends Controller
 							echo 'Caught exception: ',  $e->getMessage(), "\n";
 							echo 'Code: ', $e->getCode(), "\n";
 						}
-						Yii::app()->end();
-							
-
+						Yii::app()->end();							
 					}
 				}
 				else
@@ -661,41 +659,52 @@ class SiteController extends Controller
 			if($model->validate()) {
 
 				$emailArray= $this->splitEmails($model->emails);
+				$duplicateEmails = array();
 				$arrayLength = count($emailArray);
 				$invitationSentCount = 0;
 				for ($i = 0; $i < $arrayLength; $i++)
 				{					
 					 $dt = date("Y-m-d H:m:s");
-					 
-					/*
-						$invitedUsers = new InvitedUsers;
-						$invitedUsers->email = $emailArray[$i];
-						$invitedUsers->dt = $dt;
-	
-						if ($invitedUsers->save())
-					*/
-					if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], $dt))
+
+					try
 					{
-						$key = md5($emailArray[$i].$dt);
-						//send invitation mail
-						$invitationSentCount++;
-
-						//Invitation kontrol� yap�ld���nda bu k�s�m a��lacak
+						if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], $dt))
+						{
+							$key = md5($emailArray[$i].$dt);
+							//send invitation mail
+							$invitationSentCount++;
 						
-						$message = Yii::t('site', 'Hi').',<br/>'.Yii::t('site', 'You have been invited to traceper by one of your friends').'. '.Yii::t('site', 'Your friend\'s message:').'<br/><br/>';
-						$message .= $model->invitationMessage;
-						$message .= '<br/><br/>';
-						$message .= '<a href="'.'http://www.elmanotomasyon.com/Traceper_WebInterface/'.'">';
-						$message .= Yii::t('site', 'Click here to register to traceper');
-						$message .= '</a>';
-						$message .= '<br/><br/>';
-						$message .= Yii::t('site', 'The Traceper Team');
+							$message = Yii::t('site', 'Hi').',<br/>'.Yii::t('site', 'You have been invited to traceper by one of your friends').'. '.Yii::t('site', 'Your friend\'s message:').'<br/><br/>';
+							$message .= $model->invitationMessage;
+							$message .= '<br/><br/>';
 
-						$headers  = 'MIME-Version: 1.0' . "\r\n";
-						$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-						$headers  .= 'From: contact@traceper.com' . "\r\n";
-						//echo $message;
-						mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
+							$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'">';
+							
+							$message .= Yii::t('site', 'Click here to register to traceper');
+							$message .= '</a>';
+							$message .= '<br/><br/>';
+							$message .= Yii::t('site', 'The Traceper Team');
+						
+							$headers  = 'MIME-Version: 1.0' . "\r\n";
+							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+							$headers  .= 'From: contact@traceper.com' . "\r\n";
+							//echo $message;
+							mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
+						}						
+					} 
+					catch (Exception $e)
+					{
+						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
+						{
+							//echo CJSON::encode(array("result"=> "Duplicate Entry"));
+							$duplicateEmails[] = $emailArray[$i];
+						}
+						else
+						{
+							echo 'Caught exception: ',  $e->getMessage(), "\n";
+							echo 'Code: ', $e->getCode(), "\n";
+						}
+						//Yii::app()->end();
 					}
 				}
 
@@ -705,14 +714,14 @@ class SiteController extends Controller
 				}
 				else
 				{
-					echo CJSON::encode(array("result"=> "0"));
+					//echo CJSON::encode(array("result"=> "0"));
+					echo CJSON::encode(array("result"=>"Duplicate Entry", "emails"=>$duplicateEmails));
 				}
 				Yii::app()->end();
 			}
 
 			if (Yii::app()->request->isAjaxRequest) {
 				$processOutput = false;
-
 			}
 		}
 
