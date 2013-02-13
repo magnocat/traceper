@@ -8,7 +8,7 @@
   class MultiEmailValidator extends CEmailValidator
   {
     /** emails separated by */
-    public $delimiter = ',';
+    public $delimiter = array(',');
 
     /** minimum number of emails required */
     public $min = 0;
@@ -27,8 +27,11 @@
       $values = $object->$attribute;
       if($this->allowEmpty && $this->isEmpty($values))
         return;
+      
+      $values = str_replace(array(" ",",","\r","\n"),array(",",",",",",","),$values);
+      $values = str_replace(",,", ",",$values);
     
-      $values = explode($this->delimiter, $values);
+      $values = explode(",", $values);
       $count = count($values);
 
       if ($count > $this->max && $this->max != 0)
