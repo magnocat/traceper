@@ -18,6 +18,19 @@ Türkçe UTF-8
 ğ 	ÄŸ
 Ş 	Å
 ş 	ÅŸ
+
+İ		&#304;
+ı		&#305;
+Ö		&#214;	
+ö		&#246;
+Ü		&#220;
+ü		&#252;
+Ç		&#199;
+ç		&#231;
+Ğ		&#286;
+ğ		&#287;
+Ş		&#350;
+ş		&#351;
 */
 return array(
 	'No users found' => 'KullanÄ±cÄ± bulunamadÄ±',
@@ -33,6 +46,8 @@ return array(
 	'Reject' => 'Reddet',
 	'Delete from your friend list' => 'ArkadaÅŸ listenden sil',	
 	'Do you want to delete the account of this staff?' => 'Bu personelin hesabÄ±nÄ± silmek istiyor musunuz?',
+	'Friend request is waiting' => 'ArkadaÅŸlÄ±k isteÄŸi bekleniyor',
+	'Add as Friend' => 'ArkadaÅŸ olarak ekle'
 	
 								
 );

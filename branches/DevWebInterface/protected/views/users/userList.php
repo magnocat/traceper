@@ -257,13 +257,13 @@ if ($dataProvider != null) {
 													 TRACKER.showConfirmationDialog(\"'.$addAsFriendQuestion.'\", addasFriend); 
 													 ",
 										  "class"=>"vtip", 
-										  "title"=>"Add as Friend"													 									
+										  "title"=>'."Yii::t('users', 'Add as Friend')".'													 									
 					  					)
 					 				)
 					 			: CHtml::link("<img src=\"images/friend_request_waiting.png\"  />", "#",
 					  				array("onclick"=>"",
 										  "class"=>"vtip", 
-										  "title"=>"Friend request is waiting"													 									
+										  "title"=>'."Yii::t('users', 'Friend request is waiting')".'										  													 									
 					  					)
 					 				);',
 					'htmlOptions'=>array('width'=>'16px'),

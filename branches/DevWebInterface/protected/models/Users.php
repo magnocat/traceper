@@ -366,7 +366,7 @@ class Users extends CActiveRecord
 		
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"' ;
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id ; //Aramada kullanýcýnýn kendisi çýkmaýn diye
 	
 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
 		u.userType, u.deviceId, u.fb_id, u.account_type,
@@ -377,7 +377,7 @@ class Users extends CActiveRecord
 		LEFT JOIN ' . Friends::model()->tableName() . ' f 
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
 		   (f.friend2 = u.Id AND f.friend1 = '. Yii::app()->user->id .')
-		WHERE '. $IdListSql .' u.realname like "%'. $text .'%"';
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullanýcýnýn kendisi çýkmaýn diye
 	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
