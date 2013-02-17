@@ -20,12 +20,17 @@ if ($dataProvider != null) {
 	$deleteFrienshipQuestion = Yii::t('users', 'Do you want to delete this user from your friend list?');
 	$deleteStaffQuestion = Yii::t('users', 'Do you want to delete the account of this staff?');
 	$addAsFriendQuestion = Yii::t('users', 'Do you want to add this user as a friend?');
+
 	if ($isFriendRequestList == true) {
 		$deleteFrienshipQuestion = Yii::t('users', 'Do you want to reject this user\'s friend request?');
 		$emptyText = Yii::t('users', 'No friendship requests found');
 	}
-	else if ($isSearchResult == true){
-		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
+	else 
+	{	
+		if ($isSearchResult == true)
+		{
+			$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
+		}	
 	}
 	
 	
@@ -51,10 +56,16 @@ if ($dataProvider != null) {
 																	if (obj.result && obj.result == "1") 
 																	{
 																		$.fn.yiiGridView.update($("#gridViewId").text());
+																		TRACKER.showMessageDialog("'.Yii::t('users', 'The person is removed from your friend list').'");
 																	}
+																	else if (obj.result && obj.result == "0")
+																	{
+																		$.fn.yiiGridView.update($("#gridViewId").text());
+																		TRACKER.showMessageDialog("'.Yii::t('users', 'The friendship request is rejected').'");
+																	}													
 																	else 
 																	{
-																		TRACKER.showMessageDialog("Error 1");
+																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																	}
 																}
 																catch(e) {
@@ -229,10 +240,12 @@ if ($dataProvider != null) {
 														if (obj.result && obj.result == "1") 
 														{
 															$.fn.yiiGridView.update("'.$viewId.'");
+															$.fn.yiiGridView.update("userListView");
+															TRACKER.showMessageDialog("'.Yii::t('users', 'The friendship request is approved, you are now friends...').'");
 														}
 														else 
 														{
-															TRACKER.showMessageDialog("Sorry, an error occured in operation 1");
+															TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 														}
 													}
 													catch(e) {
@@ -240,7 +253,7 @@ if ($dataProvider != null) {
 													}
 													
 												}\',
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Approve').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('users', 'Approve').'\')
 					  				 )
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),

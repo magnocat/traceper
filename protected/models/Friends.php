@@ -155,7 +155,11 @@ class Friends extends CActiveRecord
 		);
 		$result = false;
 		if ($friendShip != null && $friendShip->delete()){
-			$result = true;
+			$result = $friendShip->status;
+		}
+		else
+		{
+			$result = -1;
 		}
 		return $result;
 	}
