@@ -31,7 +31,6 @@ return array(
 	'Register' => 'Kayıt',
 	'Change Password' => 'Parola Değiştir', 
 	'Invite Friends' => 'Arkadaşlarını Davet Et',
-	'Friendship Requests' => 'Arkadaşlık İstekleri',
 	'Create New Group' => 'Yeni Grup Oluştur',
 	'Register GPS Tracker' => 'GPS Takip Cihazı Kaydet',
 	'Register New Staff' => 'Yeni Personel Kaydet',

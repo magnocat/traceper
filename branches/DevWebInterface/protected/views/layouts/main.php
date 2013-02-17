@@ -362,7 +362,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'update'=> '#friendRequestsWindow',
 								),
 								array(
-										'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Friendship Requests')));
+										'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests')));
 					}
 
 					echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">

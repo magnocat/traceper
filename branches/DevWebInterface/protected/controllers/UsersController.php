@@ -279,21 +279,20 @@ class UsersController extends Controller
 		Yii::app()->end();
 	}
 	public function actionDeleteFriendShip(){
-		$result = 'Missing Data';
+		//$result = 'Missing Data';
 		if (isset($_REQUEST['friendId']))
 		{
 			$friendId = (int) $_REQUEST['friendId'];
 
-			$done = Friends::model()->deleteFriendShip($friendId);
+			$actionResult = Friends::model()->deleteFriendShip($friendId);
 			
-			if ($done == true) {
-				$result = 1;
+			if (($actionResult == 1) || ($actionResult == 0) ) {
 				$this->unsetFriendIdList();
 			}
 		}
 
 		echo CJSON::encode(array(
-				"result"=>$result,
+				"result"=>$actionResult,
 		));
 
 	}
