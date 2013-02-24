@@ -72,7 +72,13 @@ return array(
 	'Send invitations to your friends' => 'Arkada&#351;lar&#305;n&#305;z&#305; davet edin',
 	'Traceper Invitation' => 'Traceper Daveti',
 	'Invitations sent successfully...' => 'Davetiye(ler) ba&#351;ar&#305;yla g&#246;nderildi...',
-	'Since invitations already sent for the e-mails below, <br/> only the other invitations sent!' => 'A&#351;a&#287;&#305;daki e-posta(lar) i&#231;in davetiye zaten g&#246;nderildi&#287;i i&#231;in <br/> sadece di&#287;er e-postalara g&#246;nderildi!'
+	'Since invitations already sent for the e-mails below, <br/> only the other invitations sent!' => 'A&#351;a&#287;&#305;daki e-posta(lar) i&#231;in davetiye zaten g&#246;nderildi&#287;i i&#231;in <br/> sadece di&#287;er e-postalara g&#246;nderildi!',
+	'Click here to activate your traceper account' => 'traceper &#252;yeli&#287;inizi aktive etmek i&#231;in buraya t&#305;klay&#305;n&#305;z',
+	'Your Password is' => '&#350;ifreniz',
+	'Traceper Activation' => 'Traceper Aktivasyonu',
+	'Account Activation' => 'Hesap Aktivasyonu',
+	'Your account has been activated successfully, you can login now' => 'Hesab&#305;n&#305;z ba&#351;ar&#305;yla etkinle&#351;tirilmi&#351;tir, art&#305;k giri&#351; yapabilirsiniz',
+	'Traceper Contact' => 'Traceper İletişim'
 );
 
 

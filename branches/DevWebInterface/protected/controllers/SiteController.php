@@ -326,18 +326,20 @@ class SiteController extends Controller
 				}
 				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
 				{
-
 					$key = md5($model->email.$time);
-					$message = 'Hi '.$model->name.',<br/> <a href="http://'.Yii::app()->request->getServerName() . $this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.
-							'Click here to register to traceper</a> <br/>';
-					$message .= '<br/> Your Password is :'.$model->password;
-					$message .= '<br/> The Traceper Team';
+					$message = Yii::t('site', 'Hi').' '.$model->name.',<br/><br/>'; 
+					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">';
+					$message .= Yii::t('site', 'Click here to activate your traceper account');
+					$message .= '</a>';
+					$message .= '<br/><br/>';					
+					$message .= Yii::t('site', 'Your Password is').':'.$model->password;
+					$message .= '<br/><br/><br/>';
+					$message .= Yii::t('site', 'The Traceper Team');
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers  .= 'From: '. Yii::app()->params->contactEmail .'' . "\r\n";
+					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
 					//echo $message;
-					@mail($model->email, "Traceper Activation", $message, $headers);
-
+					@mail($model->email, Yii::t('site', 'Traceper Activation'), $message, $headers);
 
 					//echo CJSON::encode(array("result"=> "1"));
 					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
@@ -378,7 +380,6 @@ class SiteController extends Controller
 						</script>';
 					}
 				}
-
 
 				Yii::app()->end();
 			}
@@ -687,7 +688,8 @@ class SiteController extends Controller
 						
 							$headers  = 'MIME-Version: 1.0' . "\r\n";
 							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-							$headers  .= 'From: contact@traceper.com' . "\r\n";
+							$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
+							
 							//echo $message;
 							mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
 						}						
@@ -765,7 +767,7 @@ class SiteController extends Controller
 				if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname, UserType::RealUser/*userType*/, 0/*accountType*/))
 				{
 					$userCandidate->delete();
-					$result = "Your account has been activated successfully, you can login now";
+					$result = Yii::t('site', 'Your account has been activated successfully, you can login now');
 					//echo CJSON::encode(array("result"=> "1"));
 				}
 			}
