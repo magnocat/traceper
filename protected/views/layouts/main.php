@@ -174,7 +174,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					'width'=>'auto',
 					'height'=>'auto',
 					'buttons'=>array(
-							"OK"=>"js:function(){
+							Yii::t('common', 'OK')=>"js:function(){
 							$(this).dialog('close');
 }"
 					),
@@ -197,8 +197,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					'modal'=>true,
 					'resizable'=>false,
 					'buttons' =>array (
-							"OK"=>'js:function(){}',
-							"Cancel"=>"js:function() {
+							Yii::t('common', 'OK')=>'js:function(){}',
+							Yii::t('common', 'Cancel')=>"js:function() {
 							$(this).dialog( 'close' );
 }"
 					)),
