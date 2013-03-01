@@ -341,7 +341,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
-			
+			if (nextMarkerIndex == "1") {
+				nextMarkerIndex = 0;
+			}			
 			
 			if (userId != TRACKER.traceLineDrawedUserId ) // ||
 			{				

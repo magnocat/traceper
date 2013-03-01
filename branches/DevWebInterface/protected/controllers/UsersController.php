@@ -498,6 +498,7 @@ class UsersController extends Controller
 		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : "";
 		$row['message'] = isset($row['message']) ? $row['message'] : "";
 		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : "";
+		$row['userType'] = isset($row['userType']) ? $row['userType'] : "";		
 		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : "";
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : "";
 		$row['gp_image'] = "";
@@ -517,6 +518,7 @@ class UsersController extends Controller
 				'message'=>$row['message'],
 				'status_message'=>$row['status_message'],
 				'deviceId'=>$row['deviceId'],
+				'userType'=>$row['userType'],
 				'gp_image'=>$row['gp_image'],
 				'fb_id'=>$row['fb_id'],
 				'g_id'=>$row['g_id'],

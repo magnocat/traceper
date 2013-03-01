@@ -16,6 +16,7 @@ function processUserPastLocations(MAP, locations, userId){
 		var altitude = value.altitude;
 		var time = value.time;
 		var deviceId = value.deviceId;
+		var userType = value.userType;
 
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		pastPoints.push(point);
@@ -30,6 +31,14 @@ function processUserPastLocations(MAP, locations, userId){
 			var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
 			var previousGMarkerIndex = tr + 1; // it is reverse because 
 			var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+			
+			var deviceIdInfo = "";
+			
+			if(userType == 1/*GPS Device*/)
+			{
+				deviceIdInfo = TRACKER.langOperator.deviceId + ": " + deviceId;
+			}
+			
 			// attention similar function is used in 
 			// processXML function				
 			var content =
@@ -37,7 +46,9 @@ function processUserPastLocations(MAP, locations, userId){
 				+ "<b>" + TRACKER.users[userId].realname + "</b> " 
 				+ TRACKER.langOperator.wasHere 
 				+ '<br/>' + TRACKER.langOperator.time + ": " + time
-				+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
+				+ '<br/>' + latitude + ", " + longitude
+				//+ (userType == 1/*GPS Device*/)?'<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId:""
+				+ deviceIdInfo
 				+ "</div>"
 				+ '<ul class="sf-menu"> '
 				+ "<li>"
@@ -119,6 +130,7 @@ function processUsers(MAP, users) {
 		var dataArrivedTime = value.time;
 		var message = value.message;
 		var deviceId = value.deviceId;
+		var userType = value.userType;
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		var visible = false;
 		if (isFriend == "1") {
@@ -140,10 +152,12 @@ function processUsers(MAP, users) {
 				latitude:latitude,
 				longitude:longitude,
 				friendshipStatus:isFriend,
-				time:time,
+				//time:time,
+				time:dataArrivedTime,
 				message:message,
 				status_message:status_message,
 				deviceId:deviceId,
+				userType:userType,
 				mapMarker:new Array(markerInfo),
 				locationCalculatedTime:locationCalculatedTime
 			});
@@ -155,7 +169,8 @@ function processUsers(MAP, users) {
 				+'</div>'
 				+'<div>'
 				+ '<ul class="sf-menu"> '
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
 				+ TRACKER.langOperator.previousPoint 
 				+'</a>'+ '</li>'
 				+ '<li>'+ '<a class="infoWinOperations" href="#">'
@@ -188,6 +203,7 @@ function processUsers(MAP, users) {
 		{
 			var time = dataArrivedTime;
 			var deviceId = deviceId;
+			var userType = userType;
 			MAP.setMarkerPosition(TRACKER.users[userId].mapMarker[0].marker,location);
 
 			if (isFriend == "1" && TRACKER.users[userId].latitude == "" && TRACKER.users[userId].longitude == "")
@@ -219,7 +235,7 @@ function processUsers(MAP, users) {
 					var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
 
 					var infoWindow = MAP.initializeInfoWindow(
-							getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, oldlatitude, oldlongitude, nextGMarkerIndex));
+							getPastPointInfoContent(userId, time, deviceId, userType, previousGMarkerIndex, oldlatitude, oldlongitude, nextGMarkerIndex));
 					MAP.openInfoWindow(infoWindow, userMarker);
 					TRACKER.users[userId].infoWindowIsOpened = true;
 				});
@@ -244,7 +260,8 @@ function processUsers(MAP, users) {
 				+'</div>'
 				+'<div>'
 				+ '<ul class="sf-menu"> '
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
 				+ TRACKER.langOperator.previousPoint 
 				+'</a>'+ '</li>'
 				+ '<li>'+ '<a class="infoWinOperations" href="#">'
@@ -274,10 +291,9 @@ function processUsers(MAP, users) {
 			TRACKER.users[userId].time = time;
 			TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
 			TRACKER.users[userId].deviceId = deviceId;
-			TRACKER.users[userId].friendshipStatus = isFriend;
-	
+			TRACKER.users[userId].userType = userType;
+			TRACKER.users[userId].friendshipStatus = isFriend;	
 		}
-
 	});
 }
 
@@ -378,13 +394,22 @@ function processImageXML(MAP, xml){
 	return list;
 }
 //TODO: latitude longitude -> location a cevrilsin
-function getPastPointInfoContent(userId, time, deviceId, previousGMarkerIndex, latitude, longitude, nextGMarkerIndex) {
+function getPastPointInfoContent(userId, time, deviceId, userType, previousGMarkerIndex, latitude, longitude, nextGMarkerIndex) {
 
+	var deviceIdInfo = "";
+	
+	if(userType == 1/*GPS Device*/)
+	{
+		deviceIdInfo = TRACKER.langOperator.deviceId + ": " + deviceId;
+	}
+	
 	var content = "<div>" 
 		+ "<b>" + TRACKER.users[userId].realname + "</b> " 
 		+ TRACKER.langOperator.wasHere 
 		+ '<br/>' + TRACKER.langOperator.time + ": " + time
-		+ '<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId
+		+ '<br/>' + latitude + ", " + longitude
+		//+ (userType == 1/*GPS Device*/)?'<br/>' + TRACKER.langOperator.deviceId + ": " + deviceId:""
+		+ deviceIdInfo
 		+ "</div>"
 		+ '<ul class="sf-menu"> '
 		+ "<li>"
