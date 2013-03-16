@@ -243,14 +243,18 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='display:none'";
 				}
 				?>>
+					<div class="upperMenu" style="margin-top:1em;width:10%;">
+ 						<!-- This division stands for some empty area at the right upper menu for some low-resolution screen -->
+					</div>					
+					
 					<?php
 					if (Yii::app()->user->isGuest == true) {
 						echo '<div class="upperMenu" style="margin-top:1em;width:4%;">
 								<script src="http://static.qrspider.com/getqr/13/25837" language="javascript"></script>
 							</div>';
 					}					
-					?>
-				
+					?>				
+										
 					<div class="upperMenu" style="margin-top:1em;width:18%;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -278,27 +282,29 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							$model = new LoginForm;
 							?>
 							<div class="upperMenu" style="margin-top:0.8em;width:11%;">
-								<?php										
-								//echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+								<div class="sideMenu" style="top:0%;padding:0px;">								
+									<?php										
+									//echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+									
+	// 								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), 
+	// 										array('success'=>'function(data){
+	// 												$("#forAjaxRefresh").html(data);
+	// 										}'),										
+	// 										array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
+									
+									$this->widget('zii.widgets.jui.CJuiButton', array(
+											'name'=>'ajaxLogin',
+											'caption'=>Yii::t('site', 'Login'),
+											'id'=>'loginAjaxButton',
+											'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+									));															
+									?>
+								</div>
 								
-// 								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), 
-// 										array('success'=>'function(data){
-// 												$("#forAjaxRefresh").html(data);
-// 										}'),										
-// 										array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-								
-								$this->widget('zii.widgets.jui.CJuiButton', array(
-										'name'=>'ajaxLogin',
-										'caption'=>Yii::t('site', 'Login'),
-										'id'=>'loginAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
-								));															
-								?>
-							</div>
-
-							<div class="upperMenu" style="margin-top:1.5em;width:10%;">
-								<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
-								<?php echo $form->label($model,'rememberMe'); ?>
+								<div class="sideMenu" style="top:20%;padding:0px;display:inline;">
+									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
+									<?php echo $form->label($model,'rememberMe'); ?>
+								</div>																									
 							</div>
 
 							<div class="upperMenu">
