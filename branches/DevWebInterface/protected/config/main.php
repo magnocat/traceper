@@ -52,6 +52,7 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+		'application.components.FirePHPCore.*',
     	'ext.facebook.*',  // get facebook lib
     	'ext.facebook.lib.*',
 	),
