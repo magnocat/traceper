@@ -66,6 +66,7 @@ if ($dataProvider != null) {
 										  			)."\"  />", "#",
 										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].");")
 					  				  )',
+					'htmlOptions'=>array('style'=>'text-align:center'),	
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Description'),

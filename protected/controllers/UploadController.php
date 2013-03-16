@@ -118,6 +118,8 @@ class UploadController extends Controller
 
 	public function actionGet()
 	{
+		//Fb::warn("actionGet() called");
+				
 		if (!isset($_REQUEST['id'])) {
 			echo "No id";
 			Yii::app()->end();
@@ -130,20 +132,29 @@ class UploadController extends Controller
 		$fileType = (int) $_REQUEST['fileType'];
 
 		$fileName = $this->getFileName($uploadId, $fileType);
+		
 		if (file_exists($fileName) === true){
 			$thumb = false;
+			
+			Fb::warn($uploadId, "File exists");
+			
 			if (isset($_REQUEST['thumb'])) {
 				$thumb = true;
 			}
+			
 			if ($thumb == true) {
 				$fileName = $this->getFileName($uploadId, $fileType, true);
+				
 				if (file_exists($fileName) === false) {
+					Fb::warn("createThumb() called");
+					
 					$this->createThumb($uploadId, $fileType);
 				}
 			}
-
 		}
 		else {
+			Fb::warn($uploadId, "File does not exist");
+			
 			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';
 		}
 		
@@ -304,20 +315,22 @@ class UploadController extends Controller
 	}
 
 	private function createThumb($uploadId, $fileType) {
-
 		// Set maximum height and width
 		$width  = 36;
 		$height = 36;
 		$filename =  $this->getFileName($uploadId, $fileType);
+
 		if (file_exists($filename) === true) {
+			Fb::warn("file_exists(): true");
+			
+			Fb::warn($fileType, "File Type");
+			
 			if($fileType == 0) //Image
-			{
+			{								
 				// Get new dimensions
-				list($width_orig, $height_orig) = getuploadsize($filename);
-	
+				list($width_orig, $height_orig) = getimagesize($filename);
 				$width = ($height / $height_orig) * $width_orig;
-	
-	
+		
 				// Resample
 				$image_p = imagecreatetruecolor($width, $height);
 				$image   = imagecreatefromjpeg($filename);
@@ -326,12 +339,16 @@ class UploadController extends Controller
 				touch($filenameThumb);
 				// Output
 				imagejpeg($image_p, $filenameThumb);
-				imagedestroy($image);			
+				imagedestroy($image);
 			}
 			else //Video
 			{
 			
 			}			
+		}
+		else
+		{
+			Fb::warn("file_exists(): false");
 		}
 	}
 
