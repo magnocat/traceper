@@ -243,10 +243,6 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='display:none'";
 				}
 				?>>
-					<div class="upperMenu" style="margin-top:1em;width:10%;">
- 						<!-- This division stands for some empty area at the right upper menu for some low-resolution screen -->
-					</div>					
-					
 					<?php
 					if (Yii::app()->user->isGuest == true) {
 						echo '<div class="upperMenu" style="margin-top:1em;width:4%;">
@@ -255,7 +251,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					}					
 					?>				
 										
-					<div class="upperMenu" style="margin-top:1em;width:18%;">
+					<div class="upperMenu" style="margin-top:1em;width:20%;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
 									'name'=>'facebookLogin',
@@ -307,9 +303,9 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								</div>																									
 							</div>
 
-							<div class="upperMenu">
+							<div class="upperMenu" style="width:10%;">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>25,'maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>15,'maxlength'=>128,'tabindex'=>2)); ?>
 							</div>
 
 							<div class="upperMenu">
