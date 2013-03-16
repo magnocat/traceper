@@ -30,6 +30,7 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>
 
 <?php 
+
 Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		try
 		{
@@ -242,6 +243,14 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='display:none'";
 				}
 				?>>
+					<?php
+					if (Yii::app()->user->isGuest == true) {
+						echo '<div class="upperMenu" style="margin-top:1em;width:4%;">
+								<script src="http://static.qrspider.com/getqr/13/25837" language="javascript"></script>
+							</div>';
+					}					
+					?>
+				
 					<div class="upperMenu" style="margin-top:1em;width:18%;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -594,7 +603,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						{
 							$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 'id'=>'staff_tab');
 						}
-
+						
 						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
 						$tabs[Yii::t('layout', 'Friend Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
 						$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
