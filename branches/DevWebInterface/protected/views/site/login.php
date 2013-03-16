@@ -28,12 +28,13 @@
 			<div class="sideMenu" style="top:20%;padding:0px;display:inline;">
 				<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
 				<?php echo $form->label($model,'rememberMe'); ?>
+				<?php echo $form->error($model,'rememberMe'); ?>
 			</div>																									
 		</div>	
 		
-		<div class="upperMenu">
+		<div class="upperMenu" style="width:10%;">
 			<?php echo $form->labelEx($model,'password'); ?>
-			<?php echo $form->passwordField($model,'password', array('size'=>25,'maxlength'=>128,'tabindex'=>2)); ?>
+			<?php echo $form->passwordField($model,'password', array('size'=>15,'maxlength'=>128,'tabindex'=>2)); ?>
 			<?php $errorMessage = $form->error($model,'password'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }

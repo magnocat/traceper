@@ -147,12 +147,12 @@ a {
 }
 
 .upperMenu {
-	height:40px;
+	height:0px;
 	width:16%;
 	float:right;
 	cursor:pointer;		
 	position: relative;
-	padding:0px; 
+	padding:1em; 
 	margin:0px;
 }
 
