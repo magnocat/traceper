@@ -380,6 +380,7 @@ class UsersController extends Controller
 	public function actionAddAsFriend()
 	{
 		$result = 'Missing parameter';
+
 		if (isset($_REQUEST['friendId'])) 
 		{
 			$friendId = (int)$_REQUEST['friendId'];
@@ -398,6 +399,48 @@ class UsersController extends Controller
 		));
 		Yii::app()->end();
 	}
+	
+	public function actionAddAsFriendIfAlreadyMember()
+	{
+		$result = 0;
+		
+		if (isset($_REQUEST['facebookIdOfFriendCandidate']))
+		{
+			$facebookIdOfFriendCandidate = (int)$_REQUEST['facebookIdOfFriendCandidate'];
+			
+			if (isset($_REQUEST['traceperIdOfFriendshipRequestingMember']))
+			{
+				$traceperIdOfFriendshipRequestingMember = (int)$_REQUEST['traceperIdOfFriendshipRequestingMember'];
+				
+				$friendCandidateRecord = Users::model()->find(array('condition'=>'fb_id=:fb_id', 'params'=>array(':fb_id'=>$facebookIdOfFriendCandidate)));
+
+			    if($friendCandidateRecord != null) //The friend candidate with the given Facebook ID is also a Traceper member 
+			    {
+			    	$done = Friends::model()->addAsFriend($traceperIdOfFriendshipRequestingMember, $friendCandidateRecord->Id);
+			    	
+			    	if ($done == true) {
+			    		$result = 1; //If the frienship is made successfully, return 1
+			    	}
+			    	else  if ($done == null) {
+			    		$result = -1; //If there occurs a problem during friendship process, return -1
+			    	}
+			    	else
+			    	{
+			    		$result = -1; //If there occurs a problem during friendship process, return -1
+			    	}					
+			    }
+			    else //The friend candidate with the given Facebook ID is not a Traceper member, so return 0
+			    {
+			    	$result = 0;
+			    }				
+			}			
+		}
+		
+		echo CJSON::encode(array(
+				"result"=>$result,
+		));
+		Yii::app()->end();
+	}	
 	
 	private function prepareJson($dataProvider){
 
