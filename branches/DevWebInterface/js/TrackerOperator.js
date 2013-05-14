@@ -104,14 +104,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var obj = $.parseJSON(result);
 			processUsers(MAP, obj.userlist);
-			
-			
+						
 			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
 			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
 			// to fetched all data reguarly updateFriendListPageNo must be resetted.
 			var updateInt = TRACKER.updateInterval;
-
-			
 			
 			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
 				TRACKER.updateFriendListPageNo = 1;
@@ -123,7 +120,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.updateInterval = TRACKER.getUserListInterval;
 			}
 			
-			TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
+			TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);			
 		}, true);
 		
 	};
@@ -140,7 +137,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
 				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
 	
-				processImageXML(MAP, result);
+				processImageXML(MAP, result);				
+				
 				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
 					setTimeout(TRACKER.getImageList, TRACKER.getUserListInterval);
@@ -152,10 +150,19 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					setTimeout(TRACKER.getImageList, TRACKER.queryUpdatedUserInterval);
 				}
 				if (typeof callback == 'function'){
-					callback();
+					callback();					
 				}
-			}
-		}, true);	
+			}		
+		}, 
+		
+//		_V_("my_video_2", {}, function(){
+//			  // Player (this) is initialized and ready.
+//			
+//				//var player = this;
+//				//player.play();
+//			});	
+		
+		true);	
 	}
 
 	this.trackUser = function(userId){
@@ -275,12 +282,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.showMediaWindow = function(uploadId){
 		if (typeof TRACKER.images[uploadId] == "undefined") {
 			TRACKER.getImageList(function(){
-				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');	
+				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
 			});
 		}
 		else {		
-			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');	
-		}
+			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
+		}		
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
@@ -378,9 +385,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			},
 			success: function(result){ 
 				$("#loading").hide(); 	
-				callback(result);
-
-
+				callback(result);			
 			}, 
 			failure: function(result) {								
 				$("#loading").hide();
