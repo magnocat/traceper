@@ -212,6 +212,24 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
+	public function isUserRegistered($email) {
+		$user = Users::model()->find('email=:email', array(':email'=>$email));
+		$result = false;
+		if ($user != null) {
+			$result = true;
+		}
+		return $result;
+	}
+
+	public function getNameByEmail($email) {
+		$user = Users::model()->find('email=:email', array(':email'=>$email));
+		$name = "";
+		if ($user != null) {
+			$name = $user->realname;
+		}
+		return $name;
+	}	
+	
 	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
 		if ($fb_id == null || $fb_id == 0) {
 			return false;
@@ -256,9 +274,20 @@ class Users extends CActiveRecord
 	
 	public function changePassword($Id, $password) {
 		$result = false;
-		if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
+		
+		$user = Users::model()->findByPk($Id);
+		
+		if($user->password == md5($password)) //If same password
+		{
 			$result = true;
 		}
+		else
+		{
+			if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
+				$result = true;
+			}			
+		}
+		
 		return $result;
 	}
 	

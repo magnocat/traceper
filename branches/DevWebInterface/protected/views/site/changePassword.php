@@ -3,7 +3,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'changePasswordWindow',
 	    // additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('general', 'Change Password'),
+	        'title'=>Yii::t('layout', 'Change Password'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
@@ -51,29 +51,65 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton('Submit', $this->createUrl('site/changePassword'), 
-												array(
-													'success'=> 'function(result){ 
-																	try {
-																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{
-																			$("#changePasswordWindow").dialog("close");
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'Password has been changed...').'");
-																		}
-																	}
-																	catch (error){
-																		$("#changePasswordWindow").html(result);
-																	}
-																 }',
-													 ),
-												null); ?>
+			<?php 
+// 				echo CHtml::ajaxSubmitButton('Submit', $this->createUrl('site/changePassword'), 
+// 													array(
+// 														'success'=> 'function(result){ 
+// 																		try {
+// 																			var obj = jQuery.parseJSON(result);
+// 																			if (obj.result && obj.result == "1") 
+// 																			{
+// 																				$("#changePasswordWindow").dialog("close");
+// 																				TRACKER.showMessageDialog("'.Yii::t('site', 'Password has been changed...').'");
+// 																			}
+// 																		}
+// 																		catch (error){
+// 																			$("#changePasswordWindow").html(result);
+// 																		}
+// 																	 }',
+// 														 ),
+// 													null);
+
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'ajaxChangePassword',
+						'caption'=>Yii::t('site', 'Change'),
+						'id'=>'changePasswordAjaxButton',
+						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/changePassword'),
+										'success'=> 'function(result)
+													{
+														try 
+														{
+															var obj = jQuery.parseJSON(result);
+								
+															if (obj.result && obj.result == "1")
+															{
+																$("#changePasswordWindow").dialog("close");
+																TRACKER.showMessageDialog("'.Yii::t('site', 'Password has been changed...').'");
+															}
+														}
+														catch(error)
+														{
+															$("#changePasswordWindow").html(result);
+														}
+													}',
+						))
+				));				
+			?>
 												
-			<?php echo CHtml::htmlButton('Cancel',  
-												array(
-													'onclick'=> '$("#changePasswordWindow").dialog("close"); return false;',
-													 ),
-												null); ?>												
+			<?php 
+// 				echo CHtml::htmlButton('Cancel',  
+// 													array(
+// 														'onclick'=> '$("#changePasswordWindow").dialog("close"); return false;',
+// 														 ),
+// 													null);
+	
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'changePasswordCancel',
+						'caption'=>Yii::t('common', 'Cancel'),
+						'id'=>'changePasswordCancelButton',
+						'onclick'=> 'js:function(){$("#changePasswordWindow").dialog("close"); return false;}'
+				));			
+			?>												
 		</div>
 	
 	<?php $this->endWidget(); ?>

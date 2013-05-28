@@ -32,6 +32,15 @@ class AuthorityLevel
 	const SuperUser        = 3;
 }
 
+/*Password Reset Status Enumeration in PHP*/
+class PasswordResetStatus
+{
+	const RequestInvalid = -1;
+	const NoRequest      = 0;
+	const RequestValid   = 1;
+}
+
+
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 

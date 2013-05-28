@@ -20,7 +20,7 @@ class RegisterGPSTrackerForm extends CFormModel
 		return array(
 			//name and deviceID (IMEI no) are required
 			array('name, deviceId', 'required',
-			'message'=>'Field cannot be blank!'),						
+			'message'=>Yii::t('site', 'Please, enter the field')),						
 			// password needs to be same
 			/*
 			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
@@ -35,8 +35,8 @@ class RegisterGPSTrackerForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			//'email'=>Yii::t('general', 'E-mail'),
-			//'passwordAgain'=>Yii::t('general', 'Password (Again)'),
+			'name'=>Yii::t('site', 'Name'),	
+			'deviceId'=>Yii::t('site', 'Device ID'),
 		);
 	}	
 }

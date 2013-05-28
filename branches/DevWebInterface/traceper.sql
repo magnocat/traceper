@@ -329,6 +329,23 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
 -- --------------------------------------------------------
 
 --
+-- Tablo için tablo yapýsý `traceper_reset_password`
+--
+
+CREATE TABLE IF NOT EXISTS `traceper_reset_password` (
+  `email` varchar(100) NOT NULL,
+  `token` varchar(50) NOT NULL,
+  `requestTime` datetime NOT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Tablo döküm verisi `traceper_reset_password`
+--
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `traceper_user_was_here`
 --
 

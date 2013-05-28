@@ -12,7 +12,7 @@ class SearchForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('keyword', 'required','message'=>'Field cannot be blank!'),
+			array('keyword', 'required', 'message'=>Yii::t('site', 'Please, enter the field')),
 	//		array('keyword', 'length', 'min'=> 3),
 		);
 	}

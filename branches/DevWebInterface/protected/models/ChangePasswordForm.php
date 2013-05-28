@@ -21,15 +21,15 @@ class ChangePasswordForm extends CFormModel
 		return array(
 			// username and password are required
 			array('currentPassword, newPassword, newPasswordAgain', 'required',
-			'message'=>'Field cannot be blank!'),
+			'message'=>Yii::t('site', 'Please, enter the field')),
 			// current password needs to be checked
 			array('currentPassword', 'checkCurrentPassword'),			
 			// password needs to be same
 			array('newPasswordAgain', 'compare', 'compareAttribute'=>'newPassword',
-			'message'=>'Passwords not same!'),
+			'message'=>Yii::t('site', 'Passwords not same!')),
 			
 			array('newPassword', 'compare', 'compareAttribute'=>'currentPassword',
-				  'operator'=>'!=',	'message'=>'Same with current password!'),
+				  'operator'=>'!=',	'message'=>Yii::t('site', 'Same with current password!')),
 		);
 	}
 
@@ -39,9 +39,9 @@ class ChangePasswordForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'currentPassword'=>Yii::t('general', 'Current Password'),
-			'newPassword'=>Yii::t('general', 'New Password'),
-			'newPasswordAgain'=>Yii::t('general', 'New Password(again)'),
+			'currentPassword'=>Yii::t('site', 'Current Password'),
+			'newPassword'=>Yii::t('site', 'New Password'),
+			'newPasswordAgain'=>Yii::t('site', 'New Password (Again)'),
 		);
 	}
 	

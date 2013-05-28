@@ -19,7 +19,7 @@ class NewGeofenceForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('name', 'required','message'=>'Field cannot be blank!'),
+			array('name', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			array('description', 'length', 'max'=>500),
 		);
 	}
