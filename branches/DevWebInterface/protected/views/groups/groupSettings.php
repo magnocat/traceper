@@ -61,51 +61,96 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)), 
-														array(
-															'success'=> 'function(result){ 
-																			try {
-																				var obj = jQuery.parseJSON(result);
-																				if (obj.result && obj.result == "1") 
-																				{
-																					$("#groupSettingsWindow").dialog("close");
-																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
-																				}
-																				else if(obj.result && obj.result == "Duplicate Entry")
-																				{
-																					$("#groupSettingsWindow").html(result);
+// 					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)), 
+// 														array(
+// 															'success'=> 'function(result){ 
+// 																			try {
+// 																				var obj = jQuery.parseJSON(result);
+// 																				if (obj.result && obj.result == "1") 
+// 																				{
+// 																					$("#groupSettingsWindow").dialog("close");
+// 																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
+// 																				}
+// 																				else if(obj.result && obj.result == "Duplicate Entry")
+// 																				{
+// 																					$("#groupSettingsWindow").html(result);
 		
-																					$("#groupSettingsWindow").dialog("close");
-																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
-																				}																				
-																			}
-																			catch (error){
-																				$("#groupSettingsWindow").html(result);
-																			}
-																		 }',														
-															 ),
-														null);					
+// 																					$("#groupSettingsWindow").dialog("close");
+// 																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
+// 																				}																				
+// 																			}
+// 																			catch (error){
+// 																				$("#groupSettingsWindow").html(result);
+// 																			}
+// 																		 }',														
+// 															 ),
+// 														null);
+
+					$this->widget('zii.widgets.jui.CJuiButton', array(
+							'name'=>'ajaxUpdateGroup',
+							'caption'=>Yii::t('common', 'Save'),
+							'id'=>'updateGroupAjaxButton',
+							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)),
+									'success'=> 'function(result)
+												{
+													try 
+													{
+														var obj = jQuery.parseJSON(result);
+									
+														if (obj.result && obj.result == "1")
+														{
+															$("#groupSettingsWindow").dialog("close");
+															TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
+														}
+														else if(obj.result && obj.result == "Duplicate Entry")
+														{
+															$("#groupSettingsWindow").html(result);													
+															$("#groupSettingsWindow").dialog("close");
+															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
+														}
+													}
+													catch(error)
+													{
+														$("#groupSettingsWindow").html(result);
+													}
+												}',
+							))
+					));					
 				}
 				else
-				{
-					
-					echo CHtml::htmlButton(Yii::t('common', 'OK'),  
-														array(
-															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
-															'style'=>'text-align:center'
-															 ),
-														null); 					
+				{					
+// 					echo CHtml::htmlButton(Yii::t('common', 'OK'),  
+// 														array(
+// 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
+// 															'style'=>'text-align:center'
+// 															 ),
+// 														null);
+
+					$this->widget('zii.widgets.jui.CJuiButton', array(
+							'name'=>'updateGroupOK',
+							'caption'=>Yii::t('common', 'OK'),
+							'id'=>'updateGroupOKButton',
+							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}',
+							'style'=>'text-align:center'
+					));					
 				} 
 			?>
 												
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-					echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
-														array(
-															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
-															 ),
-														null);					
+// 					echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
+// 														array(
+// 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
+// 															 ),
+// 														null);
+
+					$this->widget('zii.widgets.jui.CJuiButton', array(
+							'name'=>'updateGroupCancel',
+							'caption'=>Yii::t('common', 'Cancel'),
+							'id'=>'updateGroupCancelButton',
+							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
+					));					
 				} 
 			?>												
 		</div>	
