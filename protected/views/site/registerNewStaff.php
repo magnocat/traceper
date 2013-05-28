@@ -59,41 +59,91 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>		
 	
 		<div class="row buttons">
-			<?php echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), $this->createUrl('site/registerNewStaff'), 
-												array(
-													'success'=> 'function(result){ 
-																	try {
-																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{
-																			$("#registerNewStaffWindow").dialog("close");
-																			$.fn.yiiGridView.update("staffListView");
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'The staff is registered successfully').'");
-																		}
-																		else if(obj.result && obj.result == "Duplicate Entry")
-																		{
-																			$("#registerNewStaffWindow").html(result);
-
-																			$("#registerNewStaffWindow").dialog("close");
-																			TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one staff with the e-mail!').'");
-																		}																		
-																	}
-																	catch (error){
-																		$("#registerNewStaffWindow").html(result);
-																		var confirmMessage = document.getElementById("messageWindow");
-																		if(confirmMessage.style.display != "block") {																		
-																			confirmMessage.style.display = "none";
-																		}
-																	}
-																 }',
-													 ),
-												null); ?>
+			<?php 
+// 				echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), $this->createUrl('site/registerNewStaff'), 
+// 													array(
+// 														'success'=> 'function(result){ 
+// 																		try {
+// 																			var obj = jQuery.parseJSON(result);
+// 																			if (obj.result && obj.result == "1") 
+// 																			{
+// 																				$("#registerNewStaffWindow").dialog("close");
+// 																				$.fn.yiiGridView.update("staffListView");
+// 																				TRACKER.showMessageDialog("'.Yii::t('site', 'The staff is registered successfully').'");
+// 																			}
+// 																			else if(obj.result && obj.result == "Duplicate Entry")
+// 																			{
+// 																				$("#registerNewStaffWindow").html(result);
+	
+// 																				$("#registerNewStaffWindow").dialog("close");
+// 																				TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one staff with the e-mail!').'");
+// 																			}																		
+// 																		}
+// 																		catch (error){
+// 																			$("#registerNewStaffWindow").html(result);
+// 																			var confirmMessage = document.getElementById("messageWindow");
+// 																			if(confirmMessage.style.display != "block") {																		
+// 																				confirmMessage.style.display = "none";
+// 																			}
+// 																		}
+// 																	 }',
+// 														 ),
+// 													null);
+	
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'ajaxRegisterNewStaff',
+						'caption'=>Yii::t('site', 'Register'),
+						'id'=>'registerNewStaffAjaxButton',
+						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/registerNewStaff'),
+								'success'=> 'function(result)
+											{
+												try 
+												{
+													var obj = jQuery.parseJSON(result);
+								
+													if (obj.result && obj.result == "1")
+													{
+														$("#registerNewStaffWindow").dialog("close");
+														$.fn.yiiGridView.update("staffListView");
+														TRACKER.showMessageDialog("'.Yii::t('site', 'The staff is registered successfully').'");
+													}
+													else if(obj.result && obj.result == "Duplicate Entry")
+													{
+														$("#registerNewStaffWindow").html(result);
+													
+														$("#registerNewStaffWindow").dialog("close");
+														TRACKER.showMessageDialog("'.Yii::t('site', 'You can add only one staff with the e-mail!').'");
+													}
+												}
+												catch(error)
+												{
+													$("#registerNewStaffWindow").html(result);
+													var confirmMessage = document.getElementById("messageWindow");
+								
+													if(confirmMessage.style.display != "block") 
+													{
+														confirmMessage.style.display = "none";
+													}
+												}
+											}',
+						))
+				));			
+			?>
 												
-			<?php echo CHtml::htmlButton(Yii::t('site','Cancel'),  
-												array(
-													'onclick'=> '$("#registerNewStaffWindow").dialog("close"); return false;',
-													 ),
-												null); ?>												
+			<?php 
+// 				echo CHtml::htmlButton(Yii::t('site','Cancel'),  
+// 													array(
+// 														'onclick'=> '$("#registerNewStaffWindow").dialog("close"); return false;',
+// 														 ),
+// 													null);
+
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'registerNewStaffCancel',
+						'caption'=>Yii::t('common', 'Cancel'),
+						'id'=>'registerNewStaffCancelButton',
+						'onclick'=> 'js:function(){$("#registerNewStaffWindow").dialog("close"); return false;}'
+				));				
+			?>												
 		</div>
 	
 	<?php $this->endWidget(); ?>

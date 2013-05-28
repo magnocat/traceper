@@ -32,7 +32,7 @@ class SiteController extends Controller
 	{
 		return array(
 				array('deny',
-						'actions'=>array('changePassword','inviteUser', 'registerGPSTracker'),
+						'actions'=>array('changePassword', 'inviteUser', 'registerGPSTracker'),
 						'users'=>array('?'),
 				)
 		);
@@ -88,6 +88,8 @@ class SiteController extends Controller
 
 	public function actionLogin()
 	{
+		//Fb::warn("actionLogin() called", "SiteController");
+		
 		$model = new LoginForm;
 			
 		$processOutput = true;
@@ -247,11 +249,6 @@ class SiteController extends Controller
 				}
 				Yii::app()->end();
 			}
-
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-
-			}
 		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
@@ -259,6 +256,200 @@ class SiteController extends Controller
 
 		$this->renderPartial('changePassword',array('model'=>$model), false, $processOutput);
 	}
+	
+	/**
+	 * Sends a password reset link to the user's e-mail address 
+	 */
+	public function actionForgotPassword()
+	{
+		//Fb::warn("actionForgotPassword() called", "SiteController");
+		
+		$model = new ForgotPasswordForm;
+	
+		$processOutput = true;
+		// collect user input data
+		if(isset($_POST['ForgotPasswordForm']))
+		{
+			$model->attributes = $_POST['ForgotPasswordForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {				
+				$token = sha1(uniqid(mt_rand(), true));
+
+				if(Users::model()->isUserRegistered($model->email))
+				{
+					ResetPassword::model()->saveToken($model->email, $token);
+					
+					$message = Yii::t('site', 'Hi').' '.Users::model()->getNameByEmail($model->email).',<br/><br/>';
+					//$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/resetPassword',array('tok'=>$token)).'">';					
+					$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking the link below:');
+					$message .= '<br/><br/>';
+					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">';
+					$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
+					$message .= '</a>';
+					$message .= '<br/><br/><br/>';
+					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@mekya.com">us</a>.');
+					$message .= '<br/><br/><br/>';
+					$message .= Yii::t('site', 'The Traceper Team');
+					$headers  = 'MIME-Version: 1.0' . "\r\n";
+					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
+					//echo $message;
+					@mail($model->email, Yii::t('site', 'Did you forget your Traceper password?'), $message, $headers);										
+					
+					echo CJSON::encode(array("result"=> "1"));
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "0"));
+				}
+
+				Yii::app()->end();
+			}
+		}
+	
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+	
+		$this->renderPartial('forgotPassword',array('model'=>$model), false, $processOutput);
+	}	
+	
+	/**
+	 * Resets the user's current password
+	 */
+	public function actionResetPassword()
+	{
+		$model = new ResetPasswordForm;
+		
+		$processOutput = true;
+		
+		$token = null;
+		
+		if (isset($_GET['token']) && $_GET['token'] != null)
+		{
+			$token = $_GET['token'];
+		}			
+		
+		// collect user input data
+		if(isset($_POST['ResetPasswordForm']))
+		{
+			$model->attributes = $_POST['ResetPasswordForm'];
+			// validate user input and if ok return json data and end application.
+			
+			Fb::warn("token:".$token, "SiteController - actionResetPassword()");
+			
+			if($model->validate()) {
+				if(Users::model()->changePassword(Users::model()->getUserId(ResetPassword::model()->getEmailByToken($token)), $model->newPassword)) // save the change to database
+				{
+					ResetPassword::model()->deleteToken($token);
+
+					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					$this->renderPartial('resetPasswordSuccessful',array(), false, $processOutput);
+					
+					Yii::app()->end();
+				}
+				else
+				{				
+					//Fb::warn("An error occured while changing your password!", "SiteController - actionResetPassword()");
+					
+					echo '<script type="text/javascript">
+					TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");
+					</script>';					
+				}								
+			}
+			else
+			{
+				//Fb::warn("model NOT valid", "SiteController - actionResetPassword()");												
+			}
+			
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+			
+			$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), false, $processOutput);
+			
+			Yii::app()->end();
+		}
+		else
+		{
+			//Fb::warn("ResetPasswordForm is NOT set", "SiteController - actionResetPassword()");
+		}															
+	}
+
+	public function actionResetPassword2()
+	{
+		$result = "Sorry, you entered this page with wrong parameters";
+		$tokenNotGiven = false;
+		$tokenNotFound = false;
+		
+		$model = new ResetPasswordForm;
+		$processOutput = true;
+		
+		if (isset($_GET['tok']) && $_GET['tok'] != null)
+		{
+			$token = $_GET['tok'];
+
+			// collect user input data
+			if(isset($_POST['ResetPasswordForm']))
+			{
+				$model->attributes = $_POST['ResetPasswordForm'];
+				// validate user input and if ok return json data and end application.
+				
+				if($model->validate()) {
+// 					if(Users::model()->changePassword(Users::model()->getUserId(ResetPassword::model()->getEmailByToken($token)), $model->newPassword)) // save the change to database
+// 					{
+// 						echo CJSON::encode(array("result"=> "1")); //Password Changed
+// 						ResetPassword::model()->deleteToken($token);
+// 					}
+// 					else
+// 					{
+// 						echo CJSON::encode(array("result"=> "0")); //Password Not Chaged
+// 					}
+					//var_dump($model->getErrors());
+					
+					echo CJSON::encode(array("result"=> "1")); //Password Changed
+					
+ 					Yii::app()->end();
+				}
+				
+				//print_r($model->getErrors());
+					
+				if (Yii::app()->request->isAjaxRequest) {
+					$processOutput = false;							
+				}
+			}
+			else
+			{
+				if(ResetPassword::model()->tokenExists($token) == false)	
+				{
+					$tokenNotFound = true;
+				}				
+			}
+		}
+		else 
+		{
+			$tokenNotGiven = true;
+		}
+	
+		if($tokenNotGiven)
+		{
+			$result = Yii::t('site', 'Sorry, you entered this page with wrong parameters...'); 
+			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
+		}
+		else if($tokenNotFound)
+		{
+			$result = Yii::t('site', 'This link is not valid anymore...');
+			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
+		}
+		else
+		{
+// 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+// 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+			
+			$this->renderPartial('resetPassword2',array('model'=>$model), false, $processOutput);
+			
+			//$this->render('resetPassword2',array('model'=>$model), false);
+		}
+	}	
 
 	public function actionRegister()
 	{
@@ -354,7 +545,7 @@ class SiteController extends Controller
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
 						echo '<script type="text/javascript">
-						TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
+						TRACKER.showMessageDialog("'.Yii::t('site', 'We have sent an activation link to your mailbox. </br> Please make sure you check the spam folder as well.').'");
 						</script>';
 					}
 				}
@@ -528,10 +719,9 @@ class SiteController extends Controller
 				Yii::app()->end();
 			}
 
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-
-			}
+// 			if (Yii::app()->request->isAjaxRequest) {
+// 				$processOutput = false;
+// 			}
 		}
 
 		if ($isMobileClient == true)
@@ -609,11 +799,6 @@ class SiteController extends Controller
 				}
 
 				Yii::app()->end();
-			}
-
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-
 			}
 		}
 
@@ -721,10 +906,6 @@ class SiteController extends Controller
 				}
 				Yii::app()->end();
 			}
-
-			if (Yii::app()->request->isAjaxRequest) {
-				$processOutput = false;
-			}
 		}
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
@@ -759,21 +940,40 @@ class SiteController extends Controller
 			$criteria->condition='email=:email';
 			$criteria->params=array(':email'=>$email);
 			$userCandidate = UserCandidates::model()->find($criteria); // $params is not needed
-
-			$generatedKey =  md5($email.$userCandidate->time);
-			if ($generatedKey == $key)
+			
+			if($userCandidate != null)
 			{
-				$result = "Sorry, there is a problem in activating the user";
-				if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname, UserType::RealUser/*userType*/, 0/*accountType*/))
+				$generatedKey =  md5($email.$userCandidate->time);
+					
+				if ($generatedKey == $key)
 				{
-					$userCandidate->delete();
-					$result = Yii::t('site', 'Your account has been activated successfully, you can login now');
-					//echo CJSON::encode(array("result"=> "1"));
+					$result = "Sorry, there is a problem in activating the user";
+					if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname, UserType::RealUser/*userType*/, 0/*accountType*/))
+					{
+						$userCandidate->delete();
+						$result = Yii::t('site', 'Your account has been activated successfully, you can login now');
+						//echo CJSON::encode(array("result"=> "1"));
+					}
+				}
+				else 
+				{
+					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to register to Traceper again.');
+				}				
+			}
+			else
+			{
+				if(Users::model()->isUserRegistered($email))
+				{
+					$result = Yii::t('site', 'You have already registered to Traceper, so you can login now. If you forgot your password, you can request to generate a new one.');
+				}
+				else 
+				{
+					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to register to Traceper again.');
 				}
 			}
 		}
 
-		$this->renderPartial('accountActivationResult',array('result'=>$result), false, true);
+		$this->renderPartial('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false, true);
 	}
 }
 

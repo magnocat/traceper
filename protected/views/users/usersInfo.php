@@ -24,6 +24,16 @@
 												array(
 													'id'=>'searchUserButton',
 												));
+				
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'ajaxUserSearch',
+// 						'caption'=>Yii::t('common', 'Search'),
+// 						'id'=>'userSearchAjaxButton',
+// 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('users/search'),
+// 																			'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
+// 																			'update'=> '#userSearchResults',
+// 						))
+// 				));				
 			
 			
 			?>

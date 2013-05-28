@@ -21,7 +21,7 @@ class RegisterNewStaffForm extends CFormModel
 	{
 		return array(
 			array('name, email, password, passwordAgain', 'required',
-			'message'=>Yii::t('site', 'Field cannot be blank!')),
+			'message'=>Yii::t('site', 'Please, enter the field')),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 			array('email', 'isExists'),
 			// password needs to be same

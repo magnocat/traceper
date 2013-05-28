@@ -1,9 +1,9 @@
 <script type="text/javascript">		
-	document.getElementById('topBar').style.height='6%';
-	document.getElementById('sideBar').style.height='94%';
-	document.getElementById('sideBar').style.top='6%';
-	document.getElementById('bar').style.top='6%';
-	document.getElementById('map').style.height='94%'; //$("#map").css('height', '94%');		
+	document.getElementById('topBar').style.height='7%';
+	document.getElementById('sideBar').style.height='93%';
+	document.getElementById('sideBar').style.top='7%';
+	document.getElementById('bar').style.top='7%';
+	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');		
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
@@ -52,6 +52,7 @@
 	$("#logoMini").load();
 	$("#logoMini").show();
 	$("#registerBlock").hide();
+	$("#passwordResetBlock").hide();
 	$("#lists").load();
 	$("#lists").show();
 	$("#loginBlock").hide();

@@ -19,7 +19,7 @@ class InviteUsersForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('emails', 'required', 'message'=>'Field cannot be blank!'),
+			array('emails', 'required', 'message'=>Yii::t('site', 'Please, enter the field')),
 			array('emails', 'ext.MultiEmailValidator', 'delimiter'=>',', 'min'=>1, 'max'=>10),
 			array('invitationMessage', 'length', 'max'=>500), //Bu alanýn alanýn düzgün çalýþmasý en azýndan bir rule tanýmlamak gerekiyor
 		);
