@@ -375,81 +375,81 @@ class SiteController extends Controller
 		}															
 	}
 
-	public function actionResetPassword2()
-	{
-		$result = "Sorry, you entered this page with wrong parameters";
-		$tokenNotGiven = false;
-		$tokenNotFound = false;
+// 	public function actionResetPassword2()
+// 	{
+// 		$result = "Sorry, you entered this page with wrong parameters";
+// 		$tokenNotGiven = false;
+// 		$tokenNotFound = false;
 		
-		$model = new ResetPasswordForm;
-		$processOutput = true;
+// 		$model = new ResetPasswordForm;
+// 		$processOutput = true;
 		
-		if (isset($_GET['tok']) && $_GET['tok'] != null)
-		{
-			$token = $_GET['tok'];
+// 		if (isset($_GET['tok']) && $_GET['tok'] != null)
+// 		{
+// 			$token = $_GET['tok'];
 
-			// collect user input data
-			if(isset($_POST['ResetPasswordForm']))
-			{
-				$model->attributes = $_POST['ResetPasswordForm'];
-				// validate user input and if ok return json data and end application.
+// 			// collect user input data
+// 			if(isset($_POST['ResetPasswordForm']))
+// 			{
+// 				$model->attributes = $_POST['ResetPasswordForm'];
+// 				// validate user input and if ok return json data and end application.
 				
-				if($model->validate()) {
-// 					if(Users::model()->changePassword(Users::model()->getUserId(ResetPassword::model()->getEmailByToken($token)), $model->newPassword)) // save the change to database
-// 					{
-// 						echo CJSON::encode(array("result"=> "1")); //Password Changed
-// 						ResetPassword::model()->deleteToken($token);
-// 					}
-// 					else
-// 					{
-// 						echo CJSON::encode(array("result"=> "0")); //Password Not Chaged
-// 					}
-					//var_dump($model->getErrors());
+// 				if($model->validate()) {
+// // 					if(Users::model()->changePassword(Users::model()->getUserId(ResetPassword::model()->getEmailByToken($token)), $model->newPassword)) // save the change to database
+// // 					{
+// // 						echo CJSON::encode(array("result"=> "1")); //Password Changed
+// // 						ResetPassword::model()->deleteToken($token);
+// // 					}
+// // 					else
+// // 					{
+// // 						echo CJSON::encode(array("result"=> "0")); //Password Not Chaged
+// // 					}
+// 					//var_dump($model->getErrors());
 					
-					echo CJSON::encode(array("result"=> "1")); //Password Changed
+// 					echo CJSON::encode(array("result"=> "1")); //Password Changed
 					
- 					Yii::app()->end();
-				}
+//  					Yii::app()->end();
+// 				}
 				
-				//print_r($model->getErrors());
+// 				//print_r($model->getErrors());
 					
-				if (Yii::app()->request->isAjaxRequest) {
-					$processOutput = false;							
-				}
-			}
-			else
-			{
-				if(ResetPassword::model()->tokenExists($token) == false)	
-				{
-					$tokenNotFound = true;
-				}				
-			}
-		}
-		else 
-		{
-			$tokenNotGiven = true;
-		}
+// 				if (Yii::app()->request->isAjaxRequest) {
+// 					$processOutput = false;							
+// 				}
+// 			}
+// 			else
+// 			{
+// 				if(ResetPassword::model()->tokenExists($token) == false)	
+// 				{
+// 					$tokenNotFound = true;
+// 				}				
+// 			}
+// 		}
+// 		else 
+// 		{
+// 			$tokenNotGiven = true;
+// 		}
 	
-		if($tokenNotGiven)
-		{
-			$result = Yii::t('site', 'Sorry, you entered this page with wrong parameters...'); 
-			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
-		}
-		else if($tokenNotFound)
-		{
-			$result = Yii::t('site', 'This link is not valid anymore...');
-			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
-		}
-		else
-		{
-// 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-// 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
+// 		if($tokenNotGiven)
+// 		{
+// 			$result = Yii::t('site', 'Sorry, you entered this page with wrong parameters...'); 
+// 			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
+// 		}
+// 		else if($tokenNotFound)
+// 		{
+// 			$result = Yii::t('site', 'This link is not valid anymore...');
+// 			$this->renderPartial('errorInPage',array('result'=>$result), false, true);
+// 		}
+// 		else
+// 		{
+// // 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+// // 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;			
 			
-			$this->renderPartial('resetPassword2',array('model'=>$model), false, $processOutput);
+// 			$this->renderPartial('resetPassword2',array('model'=>$model), false, $processOutput);
 			
-			//$this->render('resetPassword2',array('model'=>$model), false);
-		}
-	}	
+// 			//$this->render('resetPassword2',array('model'=>$model), false);
+// 		}
+// 	}	
 
 	public function actionRegister()
 	{
