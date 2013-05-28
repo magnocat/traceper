@@ -46,8 +46,7 @@ a {
 	margin:0px;	
 }
 #topBar > #topContent > *  {
-	margin-top:5px;
-
+	margin-top:0px;
 }
 #sideBar > #content > *  {
 	margin-left:5px;
@@ -71,7 +70,7 @@ a {
 	z-index:200; 
 	list-style: none;
 	padding:0;
-	right: 70%;
+	left: 15%;
 	margin:0px;
 	position: relative;	
 	cursor: pointer;
@@ -102,7 +101,7 @@ a {
 #username{
 	padding-left:22px;
 	background: url("../images/account.png") no-repeat 3px;
-	float: right;
+	float: left;
 }
 
 #bar:hover{ background-color:#6261d8;}
@@ -362,6 +361,7 @@ a {
 .userOperations{
 	width:2%;
 	float:right;
+	margin-right:1%;
 	cursor: pointer;
 	
 }
