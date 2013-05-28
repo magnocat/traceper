@@ -35,8 +35,29 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
-				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)), 
-													array(
+// 				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)), 
+// 													array(
+// 														'success'=> 'function(result){ 
+// 																		try {
+// 																			var obj = jQuery.parseJSON(result);
+// 																			if (obj.result && obj.result == "1") 
+// 																			{
+// 																				$("#groupPrivacySettingsWindow").dialog("close");
+// 																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'");
+// 																			}
+// 																		}
+// 																		catch (error){
+// 																			$("#groupPrivacySettingsWindow").html(result);
+// 																		}
+// 																	 }',														
+// 														 ),
+// 													null);
+				
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'ajaxSetPrivacyRights',
+						'caption'=>Yii::t('common', 'Save'),
+						'id'=>'setPrivacyRightsAjaxButton',
+						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)),
 														'success'=> 'function(result){ 
 																		try {
 																			var obj = jQuery.parseJSON(result);
@@ -49,14 +70,22 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																		catch (error){
 																			$("#groupPrivacySettingsWindow").html(result);
 																		}
-																	 }',														
-														 ),
-													null);					
-				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
-													array(
-														'onclick'=> '$("#groupPrivacySettingsWindow").dialog("close"); return false;',
-														 ),
-													null);					
+																	 }',
+						))
+				));
+				
+// 				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
+// 													array(
+// 														'onclick'=> '$("#groupPrivacySettingsWindow").dialog("close"); return false;',
+// 														 ),
+// 													null);
+
+				$this->widget('zii.widgets.jui.CJuiButton', array(
+						'name'=>'setPrivacyRightsCancel',
+						'caption'=>Yii::t('common', 'Cancel'),
+						'id'=>'setPrivacyRightsCancelButton',
+						'onclick'=> 'js:function(){$("#groupPrivacySettingsWindow").dialog("close"); return false;}'
+				));				
 			?>												
 		</div>	
 		

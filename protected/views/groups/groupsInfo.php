@@ -24,6 +24,16 @@
 												array(
 													'id'=>'searchGroupButton',
 												));
+				
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'ajaxGroupSearch',
+// 						'caption'=>Yii::t('common', 'Search'),
+// 						'id'=>'groupSearchAjaxButton',
+// 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('groups/search'),
+// 								'complete'=> 'function() { $("#groupSearchResults").dialog("open"); return false;}',
+// 								'update'=> '#groupSearchResults',
+// 						))
+// 				));				
 			
 			
 			?>

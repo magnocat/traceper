@@ -28,6 +28,15 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>
+	
+
+<!-- <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet"> -->
+<!-- <script src="http://vjs.zencdn.net/c/video.js"></script> -->
+
+<!-- VIDEO WORK	 -->
+	
+<!-- <link href="http://localhost/traceper/branches/DevWebInterface/js/video-js/video-js.css" rel="stylesheet"> -->
+<!-- <script src="http://localhost/traceper/branches/DevWebInterface/js/video-js/video.js"></script>		 -->
 
 <?php 
 
@@ -110,7 +119,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	echo Yii::t('layout', 'Traceper Info');
 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
-
+	
 	///////////////////////////// User Login Window ///////////////////////////
 	echo '<div id="userLoginWindow"></div>';
 	///////////////////////////// Register Window ///////////////////////////
@@ -123,6 +132,10 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	echo '<div id="geoFenceWindow"></div>';
 	///////////////////////////// Change Password Window ///////////////////////////
 	echo '<div id="changePasswordWindow"></div>';
+	///////////////////////////// Forget Password Window ///////////////////////////
+	echo '<div id="forgotPasswordWindow"></div>';
+	///////////////////////////// Reset Password Window ///////////////////////////
+	echo '<div id="resetPasswordWindow"></div>';		
 	///////////////////////////// Invite User Window ///////////////////////////
 	echo '<div id="inviteUsersWindow"></div>';
 	///////////////////////////// Friend Request Window ///////////////////////////
@@ -162,6 +175,35 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	/////////////////////////////////////////////////////////////////////////////////////////////////
+		
+	$token = null;
+	
+	if (isset($_GET['tok'])  && ($_GET['tok'] != null))
+	{
+		//Fb::warn("in main", "main");
+		
+		$token = $_GET['tok'];
+		
+		if(ResetPassword::model()->tokenExists($token))
+		{
+			if(ResetPassword::model()->isRequestTimeValid($token))
+			{
+				$passwordResetRequestStatus = PasswordResetStatus::RequestValid;
+			}
+			else
+			{
+				$passwordResetRequestStatus = PasswordResetStatus::RequestInvalid;
+			}						
+		}
+		else
+		{
+			$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
+		}
+	}
+	else
+	{
+		$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
+	}	
 
 	// this is a generic message dialog
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -244,14 +286,15 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				}
 				?>>
 					<?php
-					if (Yii::app()->user->isGuest == true) {
-						echo '<div class="upperMenu" style="margin-top:1em;width:4%;">
-								<script src="http://static.qrspider.com/getqr/13/25837" language="javascript"></script>
-							</div>';
-					}					
+// 					if (Yii::app()->user->isGuest == true) {
+// 						echo '<div class="upperMenu" style="margin-top:1em;width:4%;">
+// 								<script src="http://static.qrspider.com/getqr/13/25837" language="javascript"></script>
+// 							</div>';
+// 					}					
 					?>				
 										
 					<div class="upperMenu" style="margin-top:1em;width:20%;">
+						<div class="sideMenu" style="top:0%;padding:0px;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
 									'name'=>'facebookLogin',
@@ -264,7 +307,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 											)).
 									' }',
 							));
-	 						?>
+	 					?>
+	 					</div>
+
+	 					<div style="top:0%;padding:0px;">
+							<?php
+							echo CHtml::ajaxLink('<div style="float:left" id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
+												'</div>', $this->createUrl('site/forgotPassword'),
+									array(
+											'complete'=> 'function() { $("#forgotPasswordWindow").dialog("open"); return false;}',
+											'update'=> '#forgotPasswordWindow',
+									),
+									array(
+											'id'=>'showForgotPasswordWindow','class'=>'vtip'));							
+							?>	 					
+	 					</div>
 					</div>
 
 					<div id="forAjaxRefresh">
@@ -277,17 +334,10 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							$model = new LoginForm;
 							?>
+							
 							<div class="upperMenu" style="margin-top:0.8em;width:11%;">
 								<div class="sideMenu" style="top:0%;padding:0px;">								
-									<?php										
-									//echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), array('update'=>'#forAjaxRefresh'), array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-									
-	// 								echo CHtml::ajaxSubmitButton(Yii::t('site','Login'), array('site/login'), 
-	// 										array('success'=>'function(data){
-	// 												$("#forAjaxRefresh").html(data);
-	// 										}'),										
-	// 										array('id'=>'loginAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-									
+									<?php																											
 									$this->widget('zii.widgets.jui.CJuiButton', array(
 											'name'=>'ajaxLogin',
 											'caption'=>Yii::t('site', 'Login'),
@@ -324,10 +374,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				<?php
 				$userId = "$('#userId').html()";
 				if (Yii::app()->user->isGuest == true) {
-					echo "style='display:none'";
+					echo "style='display:none;margin-right:2%;margin-top:1%;'";
 				}
 				else
 				{
+					echo "style='margin-right:2%;margin-top:1%;'";
 					$userId = Yii::app()->user->id;
 
 				}  ?>>
@@ -342,7 +393,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							?>
 						</div>
 					</div>
-					<?php 
+					<?php
+					echo CHtml::link('<div  class="userOperations" id="signout">
+							<img src="images/signout.png"  /><div></div>
+							</div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out')));					
+					
 					echo CHtml::ajaxLink('<div style="float:right" id="changePassword" class="userOperations">
 							<img src="images/changePassword.png"  /><div></div>
 							</div>', $this->createUrl('site/changePassword'),
@@ -351,7 +406,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									'update'=> '#changePasswordWindow',
 							),
 							array(
-									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password')));
+									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password')));										 
 
 					if(Yii::app()->params->featureFriendManagementEnabled)
 					{
@@ -511,9 +566,6 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							));
 					
 					*/
-					echo CHtml::link('<div  class="userOperations" id="signout">
-							<img src="images/signout.png"  /><div></div>
-							</div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out')));
 					?>
 				</div>
 			</div>
@@ -523,7 +575,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			<div id='content'>
 				<div id="registerBlock"
 				<?php
-				if (Yii::app()->user->isGuest == false) {
+				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid) || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid)) {
 					echo "style='display:none'";
 				}
 				?>>						
@@ -585,6 +637,86 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						</div>
 					</div>
 				</div>
+				
+<!-- VIDEO WORK	 -->
+								
+<!-- 				<video id="my_video_1" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" poster="my_video_poster.png" data-setup="{}"> -->
+<!-- 				  <source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type='video/mp4'> -->
+<!-- <!-- 				  <source src="http://localhost/traceper/branches/DevWebInterface/upload/14.flv" type='video/flv'> -->
+<!-- 				</video>				 -->
+				
+				
+				<div id="passwordResetBlock"
+				<?php
+				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::NoRequest) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid)) {
+					echo "style='display:none'";
+				}                                     
+				?>>						
+					<div id="forPasswordResetRefresh">
+						<div class="form">
+							<?php
+							$form=$this->beginWidget('CActiveForm', array(
+									'id'=>'passwordReset-form-main',
+									'enableClientValidation'=>true,
+							));
+
+							$model = new ResetPasswordForm;
+							?>							
+							
+							<div style="font-size:3em;padding:20px;">
+								<?php echo $form->labelEx($model,'resetPassword'); ?>
+							</div>							
+							
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'newPassword'); ?>
+								<?php echo $form->passwordField($model,'newPassword', array('size'=>30,'maxlength'=>128)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'newPasswordAgain'); ?>
+								<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>30,'maxlength'=>128)); ?>
+							</div>
+
+							<div class="sideMenu">
+								<?php
+								$this->widget('zii.widgets.jui.CJuiButton', array(      
+										'name'=>'ajaxResetPassword',
+										'caption'=>Yii::t('site', 'Update'),
+										'id'=>'resetPasswordAjaxButton',
+										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 'update'=>'#forPasswordResetRefresh'))
+								));								
+								?>
+							</div>
+
+							<?php $this->endWidget(); ?>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				<div id="passwordResetInvalidBlock"
+				<?php
+				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::NoRequest) || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid)) {
+					echo "style='display:none'";
+				}                                     
+				?>>						
+					<div id="forPasswordResetInvalidRefresh">
+						<div class="form">							
+							<div style="font-size:3em;padding:20px;color:#E41B17">
+								<?php echo CHtml::label(Yii::t('site', 'Reset Your Password'), false); ?>
+							</div>
+							
+							<div style="font-size:1em;padding:20px;color:#E41B17">
+								<?php echo CHtml::label(Yii::t('site', 'This link is not valid anymore. Did you forget your password, please try to reset your password again.'), false); ?>
+							</div>							
+						</div>
+							
+							
+					</div>
+				</div>								
+
+												
 				
 				<div id="lists"
 				<?php
@@ -657,11 +789,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	{
 ?>	
 <script type="text/javascript">	
-	document.getElementById('topBar').style.height='6%';
-	document.getElementById('sideBar').style.height='94%';
-	document.getElementById('sideBar').style.top='6%';
-	document.getElementById('bar').style.top='6%';
-	document.getElementById('map').style.height='94%'; //$("#map").css('height', '94%');
+	document.getElementById('topBar').style.height='7%';
+	document.getElementById('sideBar').style.height='93%';
+	document.getElementById('sideBar').style.top='7%';
+	document.getElementById('bar').style.top='7%';
+	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');
 </script>	
 <?php	
 	}
