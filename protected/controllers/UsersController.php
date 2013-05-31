@@ -244,6 +244,7 @@ class UsersController extends Controller
 		}
 		echo $out;
 	}
+	
 	public function actionSearch() {
 		$model = new SearchForm();
 
@@ -286,7 +287,7 @@ class UsersController extends Controller
 
 			$actionResult = Friends::model()->deleteFriendShip($friendId);
 			
-			if (($actionResult == 1) || ($actionResult == 0) ) {
+			if ($actionResult == 1) {
 				$this->unsetFriendIdList();
 			}
 		}
@@ -294,7 +295,6 @@ class UsersController extends Controller
 		echo CJSON::encode(array(
 				"result"=>$actionResult,
 		));
-
 	}
 
 	public function actionDeleteUser(){

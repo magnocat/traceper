@@ -405,7 +405,7 @@ class Users extends CActiveRecord
 		FROM '.  Users::model()->tableName() . ' u
 		LEFT JOIN ' . Friends::model()->tableName() . ' f 
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
-		   (f.friend2 = u.Id AND f.friend1 = '. Yii::app()->user->id .')
+		   (f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullanýcýnýn kendisi çýkmaýn diye
 	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();

@@ -153,14 +153,25 @@ class Friends extends CActiveRecord
 				),
 		)
 		);
+		
 		$result = false;
-		if ($friendShip != null && $friendShip->delete()){
-			$result = $friendShip->status;
+		
+		if($friendShip != null)
+		{
+			if($friendShip->delete())
+			{
+				$result = 1;
+			}
+			else
+			{
+				$result = 0;
+			}
 		}
 		else
 		{
 			$result = -1;
 		}
+		
 		return $result;
 	}
 	

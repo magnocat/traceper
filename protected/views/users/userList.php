@@ -263,7 +263,7 @@ if ($dataProvider != null) {
 	/*  This field can only be seen in search results
 	* if status == -1 it means there is no relation between these users*/
 					'type' => 'raw',
-		            'value'=>' (isset($data[\'status\']) && $data[\'status\'] == -1 && $data["id"] != Yii::app()->user->id) ?  
+		            'value'=>' (isset($data[\'status\']) && $data[\'status\'] == -1) ?  
 		            				 CHtml::link("<img src=\"images/user_add_friend.png\"  />", "#",
 					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
 					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
@@ -273,12 +273,20 @@ if ($dataProvider != null) {
 										  "title"=>'."Yii::t('users', 'Add as Friend')".'													 									
 					  					)
 					 				)
-					 			: CHtml::link("<img src=\"images/friend_request_waiting.png\"  />", "#",
-					  				array("onclick"=>"",
-										  "class"=>"vtip", 
-										  "title"=>'."Yii::t('users', 'Friend request is waiting')".'										  													 									
-					  					)
-					 				);',
+					 			: (
+										(isset($data[\'status\']) && $data[\'status\'] == 0) ?
+										CHtml::image("images/friend_request_waiting.png", "#",
+						  				array("class"=>"vtip", 
+											  "title"=>'."Yii::t('users', 'Friend request is waiting')".'										  													 									
+						  					)
+						 				)
+						 				: CHtml::image("images/alreadyFriend.png", "#",
+						  					array("class"=>"vtip", 
+											  	  "title"=>'."Yii::t('users', 'Already your friend')".'										  													 									
+						  					)
+						 				)				
+								   )
+								;',
 					'htmlOptions'=>array('width'=>'16px'),
 					'visible'=>$isSearchResult,
 		),
