@@ -199,16 +199,17 @@ class UsersController extends Controller
 		}
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 		
-		$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+		//$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+		$friendCount = $this->getFriendCount();
 			
 		$friendIdList = $this->getFriendIdList();
 		
-		if ($friendIdList != -1) {
-			$friendIdList .= ',' . Yii::app()->user->id;
-		}
-		else {
-			$friendIdList = Yii::app()->user->id;
-		}
+// 		if ($friendIdList != -1) {
+// 			$friendIdList .= ',' . Yii::app()->user->id;
+// 		}
+// 		else {
+// 			$friendIdList = Yii::app()->user->id;
+// 		}
 		
 		$time = null;
 		if (isset($_REQUEST['list']) && $_REQUEST['list'] == "onlyUpdated") {
