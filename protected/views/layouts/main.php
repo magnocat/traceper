@@ -291,9 +291,52 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 // 								<script src="http://static.qrspider.com/getqr/13/25837" language="javascript"></script>
 // 							</div>';
 // 					}					
-					?>				
-										
-					<div class="upperMenu" style="margin-top:1em;width:20%;">
+					?>														
+
+					<div id="forAjaxRefresh">
+						<div class="form">
+							<?php 
+							$form=$this->beginWidget('CActiveForm', array(
+									'id'=>'login-form-main',
+									'enableClientValidation'=>true,
+							));
+
+							$model = new LoginForm;
+							?>
+
+							<div class="upperMenu">
+								<?php echo $form->labelEx($model,'email'); ?>
+								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>128,'tabindex'=>1)); ?>
+							</div>
+							
+							<div class="upperMenu" style="width:15%;">
+								<?php echo $form->labelEx($model,'password'); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>'28%','maxlength'=>128,'tabindex'=>2)); ?>
+							</div>							
+														
+							<div class="upperMenu" style="margin-top:0.8%;width:10.5em;">
+								<div class="sideMenu" style="top:0%;padding:0px;">								
+									<?php																											
+									$this->widget('zii.widgets.jui.CJuiButton', array(
+											'name'=>'ajaxLogin',
+											'caption'=>Yii::t('site', 'Login'),
+											'id'=>'loginAjaxButton',
+											'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+									));															
+									?>
+								</div>
+								
+								<div class="sideMenu" style="top:20%;padding:0px;display:inline;">
+									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
+									<?php echo $form->label($model,'rememberMe'); ?>
+								</div>																									
+							</div>														
+
+							<?php $this->endWidget(); ?>
+						</div>						
+					</div>
+					
+					<div class="upperMenu" style="margin-top:0.95em;width:16%">
 						<div class="sideMenu" style="top:0%;padding:0px;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -310,7 +353,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	 					?>
 	 					</div>
 
-	 					<div style="top:0%;padding:0px;">
+	 					<div style="margin-left:10%;">
 							<?php
 							echo CHtml::ajaxLink('<div style="float:left" id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 												'</div>', $this->createUrl('site/forgotPassword'),
@@ -323,49 +366,10 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							?>	 					
 	 					</div>
 					</div>
-
-					<div id="forAjaxRefresh">
-						<div class="form">
-							<?php 
-							$form=$this->beginWidget('CActiveForm', array(
-									'id'=>'login-form-main',
-									'enableClientValidation'=>true,
-							));
-
-							$model = new LoginForm;
-							?>
-							
-							<div class="upperMenu" style="margin-top:0.8em;width:11%;">
-								<div class="sideMenu" style="top:0%;padding:0px;">								
-									<?php																											
-									$this->widget('zii.widgets.jui.CJuiButton', array(
-											'name'=>'ajaxLogin',
-											'caption'=>Yii::t('site', 'Login'),
-											'id'=>'loginAjaxButton',
-											'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
-									));															
-									?>
-								</div>
-								
-								<div class="sideMenu" style="top:20%;padding:0px;display:inline;">
-									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
-									<?php echo $form->label($model,'rememberMe'); ?>
-								</div>																									
-							</div>
-
-							<div class="upperMenu" style="width:10%;">
-								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>15,'maxlength'=>128,'tabindex'=>2)); ?>
-							</div>
-
-							<div class="upperMenu">
-								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>25,'maxlength'=>128,'tabindex'=>1)); ?>
-							</div>
-
-							<?php $this->endWidget(); ?>
-						</div>
-					</div>
+					
+					<div class="upperMenu" style="width:1%;padding:0px;margin-top:1em;">
+						<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0."><img src="images/Android_QR.png" onmouseover="this.src='images/QR_code.png'" onmouseout="this.src='images/Android_QR.png'" /></a>	
+					</div>						
 				</div>
 
 				<div id="userId" style="display: none;"></div>
@@ -792,8 +796,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	document.getElementById('topBar').style.height='7%';
 	document.getElementById('sideBar').style.height='93%';
 	document.getElementById('sideBar').style.top='7%';
+	document.getElementById('sideBar').style.width='26%';
 	document.getElementById('bar').style.top='7%';
+	document.getElementById('bar').style.right='74%';
 	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');
+	document.getElementById('map').style.width='74%';
 </script>	
 <?php	
 	}

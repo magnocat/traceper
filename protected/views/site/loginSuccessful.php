@@ -1,9 +1,12 @@
 <script type="text/javascript">		
 	document.getElementById('topBar').style.height='7%';
 	document.getElementById('sideBar').style.height='93%';
+	document.getElementById('sideBar').style.width='26%';
 	document.getElementById('sideBar').style.top='7%';
 	document.getElementById('bar').style.top='7%';
-	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');		
+	document.getElementById('bar').style.right='74%';
+	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');
+	document.getElementById('map').style.width='74%';		
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
