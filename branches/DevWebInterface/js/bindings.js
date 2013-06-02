@@ -5,13 +5,24 @@ function bindElements(langOperator, trackerOp)
 	 */	
 	$("#bar").click(function ()	{	
 				if ($('#sideBar > #content').css('display') == "none")
-				{
-					//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
-					$('#sideBar > #content').fadeIn('slow');
-					$('#sideBar').animate({width:'25%'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
-					$('#map').animate({width:'75%'});
-					$('#bar').animate({right:'75%'});
-					
+				{					
+					//Login olunmuþ ve topBar height'ý düþmüþse
+					if(document.getElementById('topBar').style.height == "7%")
+					{
+						//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
+						$('#sideBar > #content').fadeIn('slow');
+						$('#sideBar').animate({width:'26%'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
+						$('#map').animate({width:'74%'});
+						$('#bar').animate({right:'74%'});						
+					}
+					else
+					{
+						//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
+						$('#sideBar > #content').fadeIn('slow');
+						$('#sideBar').animate({width:'22%'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
+						$('#map').animate({width:'78%'});
+						$('#bar').animate({right:'78%'});						
+					}
 				}	
 				else 
 				{
@@ -22,8 +33,7 @@ function bindElements(langOperator, trackerOp)
 											    $('#bar').css('background-image','url("images/right.png")');
 									});
 					$('#map').animate({width:'99%'});
-					$('#bar').animate({right:'99%'});
-					
+					$('#bar').animate({right:'99%'});					
 				}
 	});	
 };	
