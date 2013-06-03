@@ -12,6 +12,11 @@ a {
    color: #6261d8;
    text-decoration: none;
 }
+
+a, img {
+    border:none;
+}
+
 #wrap{
 	position:absolute;
 	width:100%;
@@ -22,6 +27,8 @@ a {
 	height:88%;
 	top: 12%;
 	background: -moz-linear-gradient(top, #add8e6, #fff);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#add8e6', endColorstr='#ffffff');
+	background: -webkit-gradient(linear, left top, left bottom, from(#add8e6), to(#fff));
 	z-index:100;
 	position:absolute;	
 }
