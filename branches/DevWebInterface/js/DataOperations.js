@@ -376,18 +376,25 @@ function processImageXML(MAP, xml){
 						+'</li>'
 						+ '</ul>'
 						+ "</div>";
-					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);
-					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);
+					
+					
+					//var content = "<video id='my_video_2' class='video-js vjs-default-skin' controls preload='auto' width='320' height='264'><source src='http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4' type='video/mp4'></video>";
+					
+					//var content = "<div> Deneme </div>";
+					
+					//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
+
+					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
+					
+					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
 
 					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
 							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
-						}
+						}				
 					});
-
-				});		
-
-			});			
+				});				
+			});		
 		}
 
 	});
