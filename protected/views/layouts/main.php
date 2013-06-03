@@ -306,12 +306,12 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							<div class="upperMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>128,'tabindex'=>1)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
 							</div>
 							
 							<div class="upperMenu" style="width:15%;">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>'28%','maxlength'=>128,'tabindex'=>2)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
 							</div>							
 														
 							<div class="upperMenu" style="margin-top:0.8%;width:10.5em;">
@@ -336,7 +336,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						</div>						
 					</div>
 					
-					<div class="upperMenu" style="margin-top:0.95em;width:16%">
+					<div class="upperMenu" style="margin-top:1em;width:16%;margin-left:1em;">
 						<div class="sideMenu" style="top:0%;padding:0px;">
 						<?php 
 							$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -369,7 +369,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					
 					<div class="upperMenu" style="width:1%;padding:0px;margin-top:1em;">
 						<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0."><img src="images/Android_QR.png" onmouseover="this.src='images/QR_code.png'" onmouseout="this.src='images/Android_QR.png'" /></a>	
-					</div>						
+					</div>					
 				</div>
 
 				<div id="userId" style="display: none;"></div>

@@ -287,12 +287,12 @@ class SiteController extends Controller
 					$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
 					$message .= '</a>';
 					$message .= '<br/><br/><br/>';
-					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@mekya.com">us</a>.');
+					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.');
 					$message .= '<br/><br/><br/>';
 					$message .= Yii::t('site', 'The Traceper Team');
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
+					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
 					//echo $message;
 					@mail($model->email, Yii::t('site', 'Did you forget your Traceper password?'), $message, $headers);										
 					
@@ -528,7 +528,7 @@ class SiteController extends Controller
 					$message .= Yii::t('site', 'The Traceper Team');
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
+					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
 					//echo $message;
 					@mail($model->email, Yii::t('site', 'Traceper Activation'), $message, $headers);
 
@@ -873,7 +873,7 @@ class SiteController extends Controller
 						
 							$headers  = 'MIME-Version: 1.0' . "\r\n";
 							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-							$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->contactEmail.'>' . "\r\n";
+							$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
 							
 							//echo $message;
 							mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
