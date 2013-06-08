@@ -113,4 +113,25 @@ class UserCandidates extends CActiveRecord
 		
 		return $userCandidates->save();
 	}
+	
+	function getCandidateInfoByEmail($email, &$password, &$name, &$registrationTime)
+	{
+		$userCandidate = UserCandidates::model()->find('email=:email', array(':email'=>$email));
+		$result = false;
+	
+		if($userCandidate != null)
+		{
+			$password = $userCandidate->password;
+			$name = $userCandidate->realname;
+			$registrationTime = $userCandidate->time;
+			
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+		
+		return $result;
+	}	
 }

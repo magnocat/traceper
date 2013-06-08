@@ -135,7 +135,9 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	///////////////////////////// Forget Password Window ///////////////////////////
 	echo '<div id="forgotPasswordWindow"></div>';
 	///////////////////////////// Reset Password Window ///////////////////////////
-	echo '<div id="resetPasswordWindow"></div>';		
+	echo '<div id="resetPasswordWindow"></div>';
+	///////////////////////////// Activation Not Received Window ///////////////////////////
+	echo '<div id="activationNotReceivedWindow"></div>';	
 	///////////////////////////// Invite User Window ///////////////////////////
 	echo '<div id="inviteUsersWindow"></div>';
 	///////////////////////////// Friend Request Window ///////////////////////////
@@ -152,28 +154,29 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	echo '<div id="geofenceSettingsWindow"></div>';
 	////////// Create Geofence Window ///////////////////////////
 	echo '<div id="createGeofenceWindow"></div>';
+	
 	///////////////////////////// Photo Comment Window ///////////////////////////
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-			'id'=>'photoCommentWindow',
-			// additional javascript options for the dialog plugin
-			'options'=>array(
-					'title'=>Yii::t('layout', 'Comment Window'),
-					'autoOpen'=>false,
-					'modal'=>true,
-					'resizable'=>false,
-					'width'=> '400px',
-					'height'=> '300'
-			),
-	));
+// 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+// 			'id'=>'photoCommentWindow',
+// 			// additional javascript options for the dialog plugin
+// 			'options'=>array(
+// 					'title'=>Yii::t('layout', 'Comment Window'),
+// 					'autoOpen'=>false,
+// 					'modal'=>true,
+// 					'resizable'=>false,
+// 					'width'=> '400px',
+// 					'height'=> '300'
+// 			),
+// 	));
 
-	echo '	<div id="photoCommentForm" class="">
-	<div id="photoCommentLabel">Comment:</div>
-	<textarea id="photoCommentTextBox" cols="40" rows="7" style="resize:none">'.Yii::t('layout', 'Enter your comments here...').'</textarea><br/>
-	<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
-	<input type="button" id="deleteCommentButton" value="Delete Comment" />
-	</div>';
+// 	echo '	<div id="photoCommentForm" class="">
+// 	<div id="photoCommentLabel">Comment:</div>
+// 	<textarea id="photoCommentTextBox" cols="40" rows="7" style="resize:none">'.Yii::t('layout', 'Enter your comments here...').'</textarea><br/>
+// 	<input type="button" id="sendCommentButton" value="Upload Comment" /><br/>
+// 	<input type="button" id="deleteCommentButton" value="Delete Comment" />
+// 	</div>';
 
-	$this->endWidget('zii.widgets.jui.CJuiDialog');
+// 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 		
 	$token = null;
@@ -636,6 +639,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								));								
 								?>
 							</div>
+							
+							<div style="padding:1.5em;">
+								<?php
+								echo CHtml::ajaxLink('<div style="float:left" id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
+													'</div>', $this->createUrl('site/activationNotReceived'),
+										array(
+												'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
+												'update'=> '#activationNotReceivedWindow',
+										),
+										array(
+												'id'=>'showActivationNotReceivedWindow','class'=>'vtip'));							
+								?>
+							</div>							
 
 							<?php $this->endWidget(); ?>
 						</div>
@@ -777,14 +793,14 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	</div>
 	</div>
 
-	<div id="forgotPasswordForm"
-		class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }">
-		<div id="emailLabel"></div>
-		<div>
-			<input type="text" name="email" id="email" /><input type="button"
-				id="sendNewPassword" />
-		</div>
-	</div>
+<!-- 	<div id="forgotPasswordForm" -->
+<!-- 		class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }"> -->
+<!-- 		<div id="emailLabel"></div> -->
+<!-- 		<div> -->
+<!-- 			<input type="text" name="email" id="email" /><input type="button" -->
+<!-- 				id="sendNewPassword" /> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
 </body>
 </html>
 
