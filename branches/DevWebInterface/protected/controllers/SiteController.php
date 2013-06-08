@@ -65,6 +65,29 @@ class SiteController extends Controller
 				$this->render('error', $error);
 		}
 	}
+	
+	public function UTF8_mail($from, $to, $subject, $message) 
+	{
+		$from2 = explode("<", $from);
+		
+		if (isset($from2[0])) {
+			$headers = "From: =?UTF-8?B?".base64_encode($from2[0])."?= <".$from2[1]."\r\n";
+		} else {
+			$headers = "From: ".$from[1]."\r\n";
+		}
+		
+		$subject ="=?UTF-8?B?".base64_encode($subject)."?=\n";
+	
+// 		$headers .= "Content-Type: text/plain; charset=iso-8859-1; format=flowed \n".
+// 				"MIME-Version: 1.0 \n" .
+// 				"Content-Transfer-Encoding: 8bit \n".
+// 				"X-Mailer: PHP \n";
+		
+		$headers .= 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";	
+			
+		return mail($to, $subject, $message, $headers);
+	}	
 
 	/**
 	 * Displays the contact page
@@ -280,21 +303,22 @@ class SiteController extends Controller
 					ResetPassword::model()->saveToken($model->email, $token);
 					
 					$message = Yii::t('site', 'Hi').' '.Users::model()->getNameByEmail($model->email).',<br/><br/>';
-					//$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/resetPassword',array('tok'=>$token)).'">';					
-					$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking the link below:');
-					$message .= '<br/><br/>';
+									
+					$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking');
+					$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">'.Yii::t('site', 'here').'</a>';
+					$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
 					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">';
 					$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
 					$message .= '</a>';
-					$message .= '<br/><br/><br/>';
+					$message .= '<br/><br/><br/>';										
 					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.');
-					$message .= '<br/><br/><br/>';
-					$message .= Yii::t('site', 'The Traceper Team');
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
+					$message .= '<br/><br/><br/>';					
+					$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+					$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact</a> address if you need to contact us.');					
+
 					//echo $message;
-					@mail($model->email, Yii::t('site', 'Did you forget your Traceper password?'), $message, $headers);										
+
+					$this->UTF8_mail('Traceper'.' <'.Yii::app()->params->noreplyEmail.'>', $model->email, Yii::t('site', 'Did you forget your Traceper password?'), $message);
 					
 					echo CJSON::encode(array("result"=> "1"));
 				}
@@ -449,7 +473,66 @@ class SiteController extends Controller
 			
 // 			//$this->render('resetPassword2',array('model'=>$model), false);
 // 		}
-// 	}	
+// 	}
+
+	/**
+	 * Resends an account activation link to the user's e-mail address, if he has already started registration process
+	 */
+	public function actionActivationNotReceived()
+	{
+		//Fb::warn("actionActivationNotReceived() called", "SiteController");
+	
+		$model = new ActivationNotReceivedForm;
+	
+		$processOutput = true;
+		// collect user input data
+		if(isset($_POST['ActivationNotReceivedForm']))
+		{
+			$model->attributes = $_POST['ActivationNotReceivedForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) 
+			{
+				$candidatePassword = null;
+				$candidateName = null;
+				$candidateRegistrationTime = null;
+				
+				UserCandidates::model()->getCandidateInfoByEmail($model->email, $candidatePassword, $candidateName, $candidateRegistrationTime);
+				
+				$key = md5($model->email.$candidateRegistrationTime);
+				
+				$message = Yii::t('site', 'Hi').' '.$candidateName.',<br/><br/>';
+				$message .= Yii::t('site', 'You could activate your account by clicking');
+				$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.Yii::t('site', 'here').'</a>';
+				$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
+				$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">';
+				$message .= 'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key));
+				$message .= '</a>';
+				$message .= '<br/><br/>';				
+				$message .= Yii::t('site', 'If you do not remember your password, you could request to generate new one.');
+				$message .= '<br/><br/><br/>';
+				$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+				$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact</a> address if you need to contact us.');
+
+				//echo $message;
+				
+				if($this->UTF8_mail('Traceper'.' <'.Yii::app()->params->noreplyEmail.'>', $model->email, Yii::t('site', 'Traceper Activation'), $message))
+				{
+					echo CJSON::encode(array("result"=> "1"));
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "0"));
+				}
+	
+				Yii::app()->end();
+			}
+		}
+	
+		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+	
+		$this->renderPartial('activationNotReceived',array('model'=>$model), false, $processOutput);
+	}	
 
 	public function actionRegister()
 	{
@@ -518,19 +601,22 @@ class SiteController extends Controller
 				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), $model->name, date('Y-m-d h:i:s')))
 				{
 					$key = md5($model->email.$time);
-					$message = Yii::t('site', 'Hi').' '.$model->name.',<br/><br/>'; 
+					
+					$message = Yii::t('site', 'Hi').' '.$model->name.',<br/><br/>';
+					$message .= Yii::t('site', 'You could activate your account by clicking');
+					$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.Yii::t('site', 'here').'</a>';
+					$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
 					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">';
-					$message .= Yii::t('site', 'Click here to activate your traceper account');
+					$message .= 'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key));
 					$message .= '</a>';
 					$message .= '<br/><br/>';					
 					$message .= Yii::t('site', 'Your Password is').':'.$model->password;
 					$message .= '<br/><br/><br/>';
-					$message .= Yii::t('site', 'The Traceper Team');
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
-					//echo $message;
-					@mail($model->email, Yii::t('site', 'Traceper Activation'), $message, $headers);
+					$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+					$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact</a> address if you need to contact us.');
+								
+					//echo $message;					
+					$this->UTF8_mail('Traceper'.' <'.Yii::app()->params->noreplyEmail.'>', $model->email, Yii::t('site', 'Traceper Activation'), $message);
 
 					//echo CJSON::encode(array("result"=> "1"));
 					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
@@ -545,7 +631,7 @@ class SiteController extends Controller
 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
 						echo '<script type="text/javascript">
-						TRACKER.showMessageDialog("'.Yii::t('site', 'We have sent an activation link to your mailbox. </br> Please make sure you check the spam folder as well.').'");
+						TRACKER.showMessageDialog("'.Yii::t('site', 'We have sent an account activation link to your mailbox. </br> Please make sure you check the spam folder as well. </br> The links in a spam folder may not work sometimes, so if you face such a case </br> please mark our e-mail as \'Not Spam\' and reclick the link.').'");
 						</script>';
 					}
 				}
@@ -869,14 +955,11 @@ class SiteController extends Controller
 							$message .= Yii::t('site', 'Click here to register to traceper');
 							$message .= '</a>';
 							$message .= '<br/><br/>';
-							$message .= Yii::t('site', 'The Traceper Team');
-						
-							$headers  = 'MIME-Version: 1.0' . "\r\n";
-							$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-							$headers .= 'From: '.Yii::t('site', 'Traceper Contact').' <'.Yii::app()->params->noreplyEmail.'>' . "\r\n";
+							$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+							$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact</a> address if you need to contact us.');
 							
-							//echo $message;
-							mail($emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message, $headers);
+							//echo $message;							
+							$this->UTF8_mail('Traceper'.' <'.Yii::app()->params->noreplyEmail.'>', $emailArray[$i], Yii::t('site', 'Traceper Invitation'), $message);
 						}						
 					} 
 					catch (Exception $e)

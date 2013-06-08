@@ -100,9 +100,20 @@
 		));		
 
 		?>
-
-
 	</div>
+	
+	<div style="padding:1.5em;">
+		<?php
+		echo CHtml::ajaxLink('<div style="float:left" id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
+							'</div>', $this->createUrl('site/activationNotReceived'),
+				array(
+						'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
+						'update'=> '#activationNotReceivedWindow',
+				),
+				array(
+						'id'=>'showActivationNotReceivedWindow','class'=>'vtip'));							
+		?>
+	</div>	
 
 
 	<?php $this->endWidget(); ?>
