@@ -30,7 +30,7 @@
 							'name'=>'ajaxLogin',
 							'caption'=>Yii::t('site', 'Login'),
 							'id'=>'loginAjaxButton',
-							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 					));															
 					?>
 				</div>

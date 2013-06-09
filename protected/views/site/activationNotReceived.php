@@ -31,7 +31,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 		<div class="row">
 			<?php echo $form->labelEx($model,'email'); ?>
-			<?php echo $form->textField($model,'email', array('size'=>40,'maxlength'=>128,'tabindex'=>1));?>
+			<?php echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>1));?>
 			<?php $errorMessage = $form->error($model,'email'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }

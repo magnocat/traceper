@@ -39,7 +39,7 @@ class LoginForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'rememberMe'=>Yii::t('site', 'Remember me next time'),
+			'rememberMe'=>Yii::t('site', 'Remember me'),
 			'email'=>Yii::t('site', 'E-mail'),
 			'password'=>Yii::t('site', 'Password'),
 		);

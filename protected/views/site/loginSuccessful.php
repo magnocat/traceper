@@ -56,6 +56,7 @@
 	$("#logoMini").show();
 	$("#registerBlock").hide();
 	$("#passwordResetBlock").hide();
+	$("#languageBlock").hide();	
 	$("#lists").load();
 	$("#lists").show();
 	$("#loginBlock").hide();

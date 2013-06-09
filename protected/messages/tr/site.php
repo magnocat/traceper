@@ -66,7 +66,7 @@ return array(
 	'Incorrect password or e-mail' => 'Yanl&#305;&#351; &#351;ifre veya e-posta',
 	'This e-mail is registered before' => 'Aynı e-posta ile yalnızca bir kez kayıt olabilirsiniz!',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',
-	'Remember me next time' => 'Beni hat&#305;rla',
+	'Remember me' => 'Beni hat&#305;rla',
 	'Hi' => 'Merhaba',
 	'You have been invited to traceper by one of your friends' => 'Bir arkada&#351;&#305;n&#305;z taraf&#305;ndan traceper\'a davet edildiniz',
 	'Your friend\'s message:' => 'Arkada&#351;&#305;n&#305;z&#305;n mesaj&#305;:',

@@ -187,6 +187,7 @@ class SiteController extends Controller
 		else
 		{
 			//echo 'LoginForm NOT set';
+			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 		}
 	}
 
@@ -231,7 +232,7 @@ class SiteController extends Controller
 	 */
 	public function actionLogout()
 	{
-		Yii::app()->user->logout();
+		Yii::app()->user->logout(false);
 		if (isset($_REQUEST['client']) && $_REQUEST['client'] == 'mobile') {
 			// if mobile client end the app, no need to redirect...
 			echo CJSON::encode(array(
@@ -698,6 +699,8 @@ class SiteController extends Controller
 		else
 		{
 			//echo 'RegisterForm is NOT set';
+			//Even if model is not set this renderPartial is useful for language transition
+			$this->renderPartial('register',array('model'=>$model), false, $processOutput);
 		}
 	}
 
@@ -1058,6 +1061,17 @@ class SiteController extends Controller
 
 		$this->renderPartial('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false, true);
 	}
+	
+	public function actionChangeLanguage()
+	{
+		$app = Yii::app();
+		
+		if (isset($_GET['lang'])  && ($_GET['lang'] != null))
+		{
+			$app->language = $_GET['lang'];
+			$app->session['_lang'] = $_GET['lang'];
+		}
+	}	
 }
 
 
