@@ -100,6 +100,34 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 <body>
 
 	<?php
+	
+	//Yii::app()->session['_lang'] = 'en';
+	
+	$app = Yii::app();
+	$language = 'tr';
+	
+	if (isset($app->session['_lang']))
+	{
+		$language = $app->session['_lang'];
+		
+		//echo 'Session VAR';
+	}
+	else
+	{
+		$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+		//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+		
+		//echo 'Session YOK - pref. lang: '.substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+	}
+	
+	if($language == 'tr')
+	{
+		$app->language = 'tr';
+	}
+	else
+	{
+		$app->language = 'en';
+	}
 
 	///////////////////////////// About traceper Window ///////////////////////////
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -324,7 +352,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 											'name'=>'ajaxLogin',
 											'caption'=>Yii::t('site', 'Login'),
 											'id'=>'loginAjaxButton',
-											'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 									));															
 									?>
 								</div>
@@ -340,19 +368,19 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					</div>
 					
 					<div class="upperMenu" style="margin-top:1em;width:16%;margin-left:1em;">
-						<div class="sideMenu" style="top:0%;padding:0px;">
+						<div class="sideMenu" style="top:0%;padding:0px;cursor:default;">
 						<?php 
-							$this->widget('zii.widgets.jui.CJuiButton', array(
-									'name'=>'facebookLogin',
-									'caption'=>Yii::t('layout', 'Sign in with Facebook'),
-									'id'=>'facebookLoginWindow',
-									'onclick'=>'function(){ '.
-									CHtml::ajax(
-											array(
-													'url'=>array('site/facebooklogin'),
-											)).
-									' }',
-							));
+// 							$this->widget('zii.widgets.jui.CJuiButton', array(
+// 									'name'=>'facebookLogin',
+// 									'caption'=>Yii::t('layout', 'Sign in with Facebook'),
+// 									'id'=>'facebookLoginWindow',
+// 									'onclick'=>'function(){ '.
+// 									CHtml::ajax(
+// 											array(
+// 													'url'=>array('site/facebooklogin'),
+// 											)).
+// 									' }',
+// 							));
 	 					?>
 	 					</div>
 
@@ -579,7 +607,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 		</div>
 
 		<div id='sideBar'>
-			<div id='content'>
+			<div id='content'>				
 				<div id="registerBlock"
 				<?php
 				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid) || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid)) {
@@ -651,8 +679,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										array(
 												'id'=>'showActivationNotReceivedWindow','class'=>'vtip'));							
 								?>
-							</div>							
-
+							</div>														
 							<?php $this->endWidget(); ?>
 						</div>
 					</div>
@@ -734,7 +761,44 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							
 							
 					</div>
-				</div>								
+				</div>
+				
+				<div id="languageBlock"
+				<?php
+				if (Yii::app()->user->isGuest == false) {
+					echo "style='display:none'";
+				}
+				?>>												
+				    <div id="languageSelection">
+				        <div id="langTr">	
+				        	<?php
+				        		if(Yii::app()->language == 'tr')
+				        		{
+				        			echo CHtml::image("images/Turkish.png", "#", array('class'=>'vtip', 'title'=>'Türkçe (şu an bu dil seçili)', 'style'=>'cursor:default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
+				        		}
+				        		else
+				        		{
+				        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
+				        		}				        					        		
+				        	?>
+				        </div>					    
+				    
+				        <div id="langEn">
+				        	<?php
+				        	//echo CHtml::link('<img src="images/English.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() {'.CHtml::ajax(array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh')).';'.CHtml::ajax(array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh')).';$("#logo").load();}')));
+				        		
+					        	if(Yii::app()->language == 'en')
+					        	{
+					        		echo CHtml::image("images/English.png", "#", array('class'=>'vtip', 'title'=>'English (This is the current language)', 'style'=>'cursor: default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
+					        	}
+					        	else
+					        	{					        		
+					        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
+					        	}
+				        	?>
+				        </div>					        
+				    </div>									
+				</div>												
 
 												
 				

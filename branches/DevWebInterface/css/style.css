@@ -384,6 +384,21 @@ a, img {
 	cursor: pointer;
 	
 }
+
+#languageSelection{
+	float:left;
+	cursor: pointer;
+	left:20%;
+	top:2em;
+	position:relative;	
+}
+
+#langTr, #langEn
+{
+    display:inline;
+    margin-left:1em;
+}
+
 .userOperations div{
 	display: none;
 }
