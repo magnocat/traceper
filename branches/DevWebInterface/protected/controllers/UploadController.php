@@ -273,7 +273,7 @@ class UploadController extends Controller
 				}		
 			}
 		}
-		echo CJSON::encode(array("result"=> $result));
+		echo CJSON::encode(array("result"=>$result, "uploadId"=>$uploadId));
 		Yii::app()->end();
 
 	}
