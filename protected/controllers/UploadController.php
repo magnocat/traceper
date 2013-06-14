@@ -176,7 +176,9 @@ class UploadController extends Controller
 	 */
 	public function actionUpload()
 	{		
-		$result = "Missing parameter";		
+		$result = "Missing parameter";
+		$uploadId = 0;
+				
 		if (isset($_FILES["upload"])
 			&& isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
@@ -232,8 +234,9 @@ class UploadController extends Controller
 				if ($insertToDB == true) {
 									
 					$result = "Unknown Error";
-					$effectedRows = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
-					if ($effectedRows == 1)
+					$uploadId = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
+					
+					if($uploadId > 0)
 					{
 						$result = "Error in moving uploading file";
 						$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
@@ -247,6 +250,7 @@ class UploadController extends Controller
 								//echo $out;
 								
 							}
+							
 							$result = "1";
 						}
 					}
@@ -275,7 +279,6 @@ class UploadController extends Controller
 		}
 		echo CJSON::encode(array("result"=>$result, "uploadId"=>$uploadId));
 		Yii::app()->end();
-
 	}
 	
 	private function getCombineFlvVideosCommand($file1, $file2)
