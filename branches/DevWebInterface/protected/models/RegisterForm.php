@@ -39,9 +39,9 @@ class RegisterForm extends CFormModel
 				
 			array('account_type', 'safe'),
 			
-			array('email', 'isExists', 'message'=>Yii::t('site', 'E-mail is already registered!')),
+			array('email', 'isExists'),
 			
-			array('image', 'isExists')
+			//array('image', 'isExists')
 		);
 	}
 
@@ -51,7 +51,7 @@ class RegisterForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'register'=>Yii::t('common', 'Register'),
+			'register'=>Yii::t('common', 'Sign Up'),
 			'email'=>Yii::t('site', 'E-mail'),
 			'name'=>Yii::t('site', 'Name'),
 			'password'=>Yii::t('site', 'Password'),
@@ -67,13 +67,23 @@ class RegisterForm extends CFormModel
 			$criteria->select='email';
 			$criteria->condition='email=:email';
 			$criteria->params=array(':email'=>$this->email);
-			$data = Users::model()->find($criteria);
-			if ($data == null) {
-				$data = UserCandidates::model()->find($criteria);
-			}
-			if ($data != null) {
+			//$data = Users::model()->find($criteria);
+			
+			if(Users::model()->find($criteria) != null) 
+			{
 				$this->addError('email',Yii::t('site', 'E-mail is already registered!'));
-			}							
+			}
+			else if(UserCandidates::model()->find($criteria) != null)
+			{
+				$this->addError('email',Yii::t('site', 'Registration incomplete, please request activation e-mail below'));
+			}
+			
+// 			if ($data == null) {
+// 				$data = UserCandidates::model()->find($criteria);
+// 			}
+// 			if ($data != null) {
+// 				$this->addError('email',Yii::t('site', 'E-mail is already registered!'));				
+// 			}							
 		}
 	}
 }
