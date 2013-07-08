@@ -490,16 +490,18 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							array(
 									'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')));
 
-
-					echo CHtml::ajaxLink('<div class="userOperations" id="registerGPSTracker">
-							<img src="images/registerGPSTracker.png"  /><div></div>
-							</div>', $this->createUrl('site/registerGPSTracker'),
-							array(
-									'complete'=> 'function() { $("#registerGPSTrackerWindow").dialog("open"); return false;}',
-									'update'=> '#registerGPSTrackerWindow',
-							),
-							array(
-									'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));
+					if(Yii::app()->params->featureGPSDeviceEnabled)
+					{
+						echo CHtml::ajaxLink('<div class="userOperations" id="registerGPSTracker">
+								<img src="images/registerGPSTracker.png"  /><div></div>
+								</div>', $this->createUrl('site/registerGPSTracker'),
+								array(
+										'complete'=> 'function() { $("#registerGPSTrackerWindow").dialog("open"); return false;}',
+										'update'=> '#registerGPSTrackerWindow',
+								),
+								array(
+										'id'=>'showRegisterGPSTrackerWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Register GPS Tracker')));						
+					}
 
 					if(Yii::app()->params->featureStaffManagementEnabled)
 					{
