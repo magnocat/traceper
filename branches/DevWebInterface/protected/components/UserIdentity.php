@@ -27,12 +27,14 @@ class UserIdentity extends CUserIdentity
 		$user = Users::model()->find($criteria); // $params is not needed
 		
 		if ($user == null) {
- 			if ($this->facebookId !== "0") {
-				$this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
- 			}
- 			else {
- 				$this->errorCode = self::ERROR_USERNAME_INVALID;
- 			}
+//  			if ($this->facebookId !== "0") {
+// 				$this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
+//  			}
+//  			else {
+//  				$this->errorCode = self::ERROR_USERNAME_INVALID;
+//  			}
+ 			
+ 			$this->errorCode = self::ERROR_USERNAME_INVALID;
 		}
 		else if ($user->password == md5($this->password)) {
 			$this->errorCode = self::ERROR_NONE;

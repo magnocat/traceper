@@ -216,6 +216,8 @@ class UsersController extends Controller
 		if (isset($_REQUEST['list']) && $_REQUEST['list'] == "onlyUpdated") {
 			$time = Yii::app()->session[$this->dataFetchedTimeKey];
 		}	
+		
+		//Fb::warn("actionGetUserListJson() called", "UsersController");
 
 		$dataProvider = Users::model()->getListDataProvider($friendIdList, null, $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
 		
@@ -514,6 +516,15 @@ class UsersController extends Controller
 			if ($i > 0) {
 				$str .= ',';
 			}
+
+			if(Yii::app()->language == 'tr')
+			{
+				$timestamp = strtotime($rows[$i]['dataArrivedTime']);
+				$rows[$i]['dataArrivedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+			
+				$timestamp = strtotime($rows[$i]['dataCalculatedTime']);
+				$rows[$i]['dataCalculatedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+			}			
 			
 			$str .= CJSON::encode(array(
 						'latitude'=>$rows[$i]['latitude'],
@@ -551,6 +562,15 @@ class UsersController extends Controller
 		$row['g_id'] = "";
 		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";
 		
+		if(Yii::app()->language == 'tr')
+		{
+			$timestamp = strtotime($row['dataArrivedTime']);
+			$row['dataArrivedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+
+			$timestamp = strtotime($row['dataCalculatedTime']);
+			$row['dataCalculatedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+		}
+				
 		$bsk=   CJSON::encode( array(
 				'user'=>$row['id'],
 				'isFriend'=>$row['isFriend'],
@@ -569,6 +589,12 @@ class UsersController extends Controller
 				'g_id'=>$row['g_id'],
 				'account_type'=>$row['account_type'],
 		));
+		
+		if($row['id'] == 2)
+		{
+			//setlocale(LC_TIME, 'Turkish');
+			//Fb::warn(strftime("%d %b %Y %H:%M:%S", strtotime($row['dataArrivedTime'])), "getUserJsonItem() - dataCalculatedTime");
+		}
 
 		return $bsk;
 	}
