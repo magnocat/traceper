@@ -136,7 +136,7 @@ class UploadController extends Controller
 		if (file_exists($fileName) === true){
 			$thumb = false;
 			
-			Fb::warn($uploadId, "File exists");
+			//Fb::warn($uploadId, "File exists");
 			
 			if (isset($_REQUEST['thumb'])) {
 				$thumb = true;
@@ -146,14 +146,14 @@ class UploadController extends Controller
 				$fileName = $this->getFileName($uploadId, $fileType, true);
 				
 				if (file_exists($fileName) === false) {
-					Fb::warn("createThumb() called");
+					//Fb::warn("createThumb() called");
 					
 					$this->createThumb($uploadId, $fileType);
 				}
 			}
 		}
 		else {
-			Fb::warn($uploadId, "File does not exist");
+			//Fb::warn($uploadId, "File does not exist");
 			
 			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';
 		}
@@ -324,9 +324,8 @@ class UploadController extends Controller
 		$filename =  $this->getFileName($uploadId, $fileType);
 
 		if (file_exists($filename) === true) {
-			Fb::warn("file_exists(): true");
-			
-			Fb::warn($fileType, "File Type");
+			//Fb::warn("file_exists(): true");			
+			//Fb::warn($fileType, "File Type");
 			
 			if($fileType == 0) //Image
 			{								
@@ -351,7 +350,7 @@ class UploadController extends Controller
 		}
 		else
 		{
-			Fb::warn("file_exists(): false");
+			//Fb::warn("file_exists(): false");
 		}
 	}
 
