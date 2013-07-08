@@ -31,13 +31,28 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			?>			
 		</div>
 		
-		<div class="row">
+		<?php 
+		if(Yii::app()->params->featureFriendManagementEnabled && Yii::app()->params->featureStaffManagementEnabled)
+		{
+		?>
+		<div class="row">			
 			<?php echo $form->dropDownList($model,'groupType', array(GroupType::FriendGroup => Yii::t('groups', 'Friend Group'), GroupType::StaffGroup => Yii::t('groups', 'Staff Group')), array('empty'=>Yii::t('groups', 'Select Group Type'))); ?>
 			<?php $errorMessage = $form->error($model,'groupType'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
 			?>
-		</div>		
+		</div>
+		<?php 
+		}
+		else if(Yii::app()->params->featureFriendManagementEnabled)
+		{
+			echo $form->hiddenField($model,'groupType',array('value'=>GroupType::FriendGroup));
+		}
+		else if(Yii::app()->params->featureStaffManagementEnabled)
+		{
+			echo $form->hiddenField($model,'groupType',array('value'=>GroupType::StaffGroup));
+		}
+		?>				
 			
 		<div class="row">
 			<?php echo $form->labelEx($model,'description'); ?>
@@ -96,16 +111,27 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																												if (obj.result && obj.result == "1") 
 																												{
 																													$("#createGroupWindow").dialog("close");
-																													
+								
+																													//var selectedTab = $("#tab_view").tabs("option", "selected");																													
+																													//alert("Selected Tab Index: " + selectedTab);								
+
 																													if(obj.groupType == '.GroupType::FriendGroup.')
 																													{
-																														$.fn.yiiGridView.update("friendGroupsListView");
+																														//"#friendGroupsListView" elemaný yuklu degilse JS hata veriyor ve asagidaki mesaj gözükmüyor
+																														if($("#friendGroupsListView").length)
+																														{
+																															$.fn.yiiGridView.update("friendGroupsListView");
+																														}																														
 																													}
 																													else if(obj.groupType == '.GroupType::StaffGroup.')
 																													{
-																														$.fn.yiiGridView.update("staffGroupsListView");
+																														//"#staffGroupsListView" elemaný yuklu degilse JS hata veriyor ve asagidaki mesaj gözükmüyor
+																														if($("#staffGroupsListView").length)
+																														{
+																															$.fn.yiiGridView.update("staffGroupsListView");
+																														}																														
 																													}
-										
+
 																													TRACKER.showMessageDialog("'.Yii::t('groups', 'The group is created successfully').'");
 																												}
 																												else if(obj.result && obj.result == "Duplicate Entry")
