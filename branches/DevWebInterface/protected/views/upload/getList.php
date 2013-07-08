@@ -11,8 +11,9 @@ if ($dataProvider != null) {
 		        'autoOpen'=>false,
 		        'modal'=>true, 
 				'resizable'=>false,
+		    	'width'=> '440px',
 				'buttons' =>array (
-					"OK"=>"js:function(){
+					Yii::t('common', 'OK')=>"js:function(){
 									". CHtml::ajax(
 											array(
 													'url'=>Yii::app()->createUrl('upload/delete'),
@@ -37,12 +38,12 @@ if ($dataProvider != null) {
 																}',
 												)) .
 								"}",
-					"Cancel"=>"js:function() {
+					Yii::t('common', 'Cancel')=>"js:function() {
 						$( this ).dialog( \"close\" );
 					}" 
 					)),
 				));
-		echo "Do you want to delete this file?";
+		echo Yii::t('upload', 'Do you really want to delete this file?');
 		$this->endWidget('zii.widgets.jui.CJuiDialog');
 	}
 	$this->widget('zii.widgets.grid.CGridView', array(

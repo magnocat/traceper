@@ -11,7 +11,7 @@
 
 	<div class="sideMenu">
 		<?php echo $form->labelEx($model,'newPassword'); ?>
-		<?php echo $form->passwordField($model,'newPassword', array('size'=>30,'maxlength'=>128,'tabindex'=>2)); ?>
+		<?php echo $form->passwordField($model,'newPassword', array('size'=>'30%','maxlength'=>128,'tabindex'=>2)); ?>
 		<?php $errorMessage = $form->error($model,'newPassword'); 
 		if (strip_tags($errorMessage) == '') {
 			echo '<div class="errorMessage">&nbsp;</div>';
@@ -23,7 +23,7 @@
 
 	<div class="sideMenu">
 		<?php echo $form->labelEx($model,'newPasswordAgain'); ?>
-		<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>30,'maxlength'=>128,'tabindex'=>2)); ?>
+		<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>'30%','maxlength'=>128,'tabindex'=>2)); ?>
 		<?php $errorMessage = $form->error($model,'newPasswordAgain'); 
 		if (strip_tags($errorMessage) == '') {
 			echo '<div class="errorMessage">&nbsp;</div>';

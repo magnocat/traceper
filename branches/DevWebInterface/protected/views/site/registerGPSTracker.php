@@ -7,7 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '20%'      
+			'width'=> '280px'      
 	    ),
 	));
 ?>
@@ -24,7 +24,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		
 		<div class="row">
 			<?php echo $form->labelEx($model,'name'); ?>
-			<?php echo $form->textField($model,'name'); ?>
+			<?php echo $form->textField($model,'name', array('size'=>'30%')); ?>
 			<?php $errorMessage = $form->error($model,'name');  
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
@@ -33,7 +33,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		
 		<div class="row">
 			<?php echo $form->labelEx($model,'deviceId'); ?>
-			<?php echo $form->textField($model,'deviceId'); ?>
+			<?php echo $form->textField($model,'deviceId', array('size'=>'30%')); ?>
 			<?php $errorMessage = $form->error($model,'deviceId');  
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }

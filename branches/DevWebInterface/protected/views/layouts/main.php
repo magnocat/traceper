@@ -50,7 +50,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		//TODO: ../index.php should be changed
 		//TODO: updateUserListInterval
 		//TODO: queryIntervalForChangedUsers
-		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000)
+		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000);
 		trackerOp.setLangOperator(langOp);
 		bindElements(langOp, trackerOp);
 }
@@ -88,12 +88,13 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 ?>
 
 <script type="text/javascript">		
-		var langOp = new LanguageOperator();
-		var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
-		langOp.load("en");  //TODO: itshould be parametric
-		
-		var mapOperator = new MapOperator();
-	</script>
+	var langOp = new LanguageOperator();
+	var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
+	
+	langOp.load("tr");  //TODO: itshould be parametric
+	
+	var mapOperator = new MapOperator();
+</script>
 
 
 </head>
@@ -123,31 +124,28 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	if($language == 'tr')
 	{
 		$app->language = 'tr';
+		?>
+		<script type="text/javascript">		
+			langOp.load("tr");
+		</script>		
+		<?php
 	}
 	else
 	{
 		$app->language = 'en';
+		?>
+		<script type="text/javascript">		
+			langOp.load("en");
+		</script>		
+		<?php
 	}
-
-	///////////////////////////// About traceper Window ///////////////////////////
-	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-			'id'=>'Logo',
-			// additional javascript options for the dialog plugin
-			'options'=>array(
-					'title'=>Yii::t('layout', 'About'),
-					'autoOpen'=>false,
-					'modal'=>true,
-					'resizable'=>false,
-					'width'=> '600px'
-			),
-	));
-
-	//echo '<div id="logo"></div>';
-	//echo 'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>';
-	echo Yii::t('layout', 'Traceper Info');
-
-	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	
+	///////////////////////////// About Us Window///////////////////////////
+	echo '<div id="aboutUsWindow"></div>';	
+	///////////////////////////// Terms Window ///////////////////////////
+	echo '<div id="termsWindow"></div>';
+	///////////////////////////// Contact Window ///////////////////////////
+	echo '<div id="contactWindow"></div>';			
 	///////////////////////////// User Login Window ///////////////////////////
 	echo '<div id="userLoginWindow"></div>';
 	///////////////////////////// Register Window ///////////////////////////
@@ -270,6 +268,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					'autoOpen'=>false,
 					'modal'=>true,
 					'resizable'=>false,
+					'width'=>'500px',
 					'buttons' =>array (
 							Yii::t('common', 'OK')=>'js:function(){}',
 							Yii::t('common', 'Cancel')=>"js:function() {
@@ -281,7 +280,14 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 
 	?>
+<script type="text/javascript">
+//document.write(screen.width+'x'+screen.height);
+
+	//document.getElementById('wrap').style.width=screen.width+'px';
+	//document.getElementById('wrap').style.height=screen.height+'px';
+</script>	
 	<div id='wrap'>
+<!-- 	<div id='wrap'> -->
 		<div class='logo_inFullMap'></div>
 		<div id='bar'></div>
 
@@ -291,21 +297,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				<?php
 				if (Yii::app()->user->isGuest == false) {
 					echo CHtml::link('<div id="logo" style="display:none"></div>', '#', array(
-							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
 					));
 						
 					echo CHtml::link('<div id="logoMini"></div>', '#', array(
-							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
 					));					
 				}
 				else
 				{
-					echo CHtml::link('<div id="logo"></div>', '#', array(
-							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+					echo CHtml::link('<div id="logo" style="width:246px;"></div>', '#', array(
+							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
 					));
 					
 					echo CHtml::link('<div id="logoMini" style="display:none"></div>', '#', array(
-							'onclick'=>'$("#Logo").dialog("open"); return false;', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to learn about traceper'),
+							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
 					));					
 				}
 				?>
@@ -336,38 +342,60 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							?>
 
 							<div class="upperMenu">
-								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
+								<div style="height:3.3em;top:0%;padding:0px;">
+									<?php echo $form->labelEx($model,'email'); ?>
+									<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
+								</div>
+								
+								<div style="margin-top:18px;padding:0px;">
+									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>4)); ?>
+									<?php echo $form->label($model,'rememberMe'); ?>
+								</div>									
 							</div>
-							
-							<div class="upperMenu" style="width:15%;">
-								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
+
+							<div class="upperMenu" style="margin-left:30px;">
+								<div style="height:3.3em;top:0%;padding:0px;">
+									<?php echo $form->labelEx($model,'password'); ?>
+									<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
+								</div>
+								
+			 					<div style="margin-top:18px;padding:0px;">
+									<?php
+									echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
+														'</div>', $this->createUrl('site/forgotPassword'),
+											array(
+													'complete'=> 'function() { $("#forgotPasswordWindow").dialog("open"); return false;}',
+													'update'=> '#forgotPasswordWindow',
+											),
+											array(
+													'id'=>'showForgotPasswordWindow','tabindex'=>5));									
+									?>	 					
+			 					</div>								
 							</div>							
 														
-							<div class="upperMenu" style="margin-top:0.8%;width:10.5em;">
-								<div class="sideMenu" style="top:0%;padding:0px;">								
+							<div class="upperMenu" style="margin-top:0.8%;width:10.5em;margin-left:30px;">
+								<div style="height:3.3em;top:0%;padding:0px;">								
 									<?php																											
 									$this->widget('zii.widgets.jui.CJuiButton', array(
 											'name'=>'ajaxLogin',
 											'caption'=>Yii::t('site', 'Login'),
 											'id'=>'loginAjaxButton',
-											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 									));															
 									?>
 								</div>
-								
-								<div class="sideMenu" style="top:20%;padding:0px;display:inline;">
-									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>3)); ?>
-									<?php echo $form->label($model,'rememberMe'); ?>
-								</div>																									
+																									
 							</div>														
 
 							<?php $this->endWidget(); ?>
 						</div>						
 					</div>
 					
-					<div class="upperMenu" style="margin-top:1em;width:16%;margin-left:1em;">
+					<div id="appLink" class="upperMenu" style="width:1%;padding:0px;margin-top:1em;">
+						<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0." tabindex="6"><img src="images/Android_QR.png" onmouseover="this.src='images/QR_code.png'" onmouseout="this.src='images/Android_QR.png';document.getElementById('appLink').style.cursor='wait';" /></a>	
+					</div>					
+					
+					<div class="upperMenu" style="margin-top:2.2em;width:15%;margin-left:1em;">
 						<div class="sideMenu" style="top:0%;padding:0px;cursor:default;">
 						<?php 
 // 							$this->widget('zii.widgets.jui.CJuiButton', array(
@@ -384,23 +412,9 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	 					?>
 	 					</div>
 
-	 					<div style="margin-left:10%;">
-							<?php
-							echo CHtml::ajaxLink('<div style="float:left" id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
-												'</div>', $this->createUrl('site/forgotPassword'),
-									array(
-											'complete'=> 'function() { $("#forgotPasswordWindow").dialog("open"); return false;}',
-											'update'=> '#forgotPasswordWindow',
-									),
-									array(
-											'id'=>'showForgotPasswordWindow','class'=>'vtip'));							
-							?>	 					
-	 					</div>
+
 					</div>
-					
-					<div class="upperMenu" style="width:1%;padding:0px;margin-top:1em;">
-						<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0."><img src="images/Android_QR.png" onmouseover="this.src='images/QR_code.png'" onmouseout="this.src='images/Android_QR.png'" /></a>	
-					</div>					
+										
 				</div>
 
 				<div id="userId" style="display: none;"></div>
@@ -605,7 +619,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				</div>
 			</div>
 		</div>
-
+		
 		<div id='sideBar'>
 			<div id='content'>				
 				<div id="registerBlock"
@@ -613,40 +627,72 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid) || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid)) {
 					echo "style='display:none'";
 				}
+				else {
+					echo "style='height:85%;min-height:420px;'";
+				}				
 				?>>						
-					<div id="forRegisterRefresh">
-						<div class="form">
+					<div id="forRegisterRefresh" style='height:100%;'>
+						<div class="form" style='height:100%;'>
 							<?php
 							$form=$this->beginWidget('CActiveForm', array(
 									'id'=>'register-form-main',
 									'enableClientValidation'=>true,
+									'htmlOptions'=>array('style'=>'height:100%;'),
 							));
 
 							$model = new RegisterForm;
 							?>
 
-							<div class="sideMenu" style="font-size: 3em;">
+							<div style="padding-left:15px;font-size:3em;">
 								<?php echo $form->labelEx($model,'register'); ?>
 							</div>
 							
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>128,'tabindex'=>7)); ?>
+								<?php $errorMessage = $form->error($model,'email'); 
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									}
+								?>								
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->textField($model,'name', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->textField($model,'name', array('size'=>'30%','maxlength'=>128,'tabindex'=>8)); ?>
+								<?php $errorMessage = $form->error($model,'name');  
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									}
+								?>								
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>128,'tabindex'=>9)); ?>
+								<?php $errorMessage = $form->error($model,'password'); 
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									}
+								?>								
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'passwordAgain'); ?>
-								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'30%','maxlength'=>128,'tabindex'=>10)); ?>
+								<?php $errorMessage = $form->error($model,'passwordAgain'); 
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									}
+								?>								
 							</div>
 
 							<div class="sideMenu">
@@ -661,23 +707,23 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 								$this->widget('zii.widgets.jui.CJuiButton', array(
 										'name'=>'ajaxRegister',
-										'caption'=>Yii::t('site', 'Register'),
+										'caption'=>Yii::t('site', 'Sign Up'),
 										'id'=>'registerAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
+										'htmlOptions'=>array('type'=>'submit','tabindex'=>11,'ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
 								));								
 								?>
 							</div>
 							
-							<div style="padding:1.5em;">
+							<div style="padding-left:1em;">
 								<?php
-								echo CHtml::ajaxLink('<div style="float:left" id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
+								echo CHtml::ajaxLink('<div id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
 													'</div>', $this->createUrl('site/activationNotReceived'),
 										array(
 												'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
 												'update'=> '#activationNotReceivedWindow',
 										),
 										array(
-												'id'=>'showActivationNotReceivedWindow','class'=>'vtip'));							
+												'id'=>'showActivationNotReceivedWindow','tabindex'=>12));							
 								?>
 							</div>														
 							<?php $this->endWidget(); ?>
@@ -710,18 +756,18 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							$model = new ResetPasswordForm;
 							?>							
 							
-							<div style="font-size:3em;padding:20px;">
+							<div style="padding:6.6%;font-size:3em;">
 								<?php echo $form->labelEx($model,'resetPassword'); ?>
 							</div>							
 							
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'newPassword'); ?>
-								<?php echo $form->passwordField($model,'newPassword', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'newPassword', array('size'=>'30%','maxlength'=>128,'tabindex'=>7)); ?>
 							</div>
 
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'newPasswordAgain'); ?>
-								<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>30,'maxlength'=>128)); ?>
+								<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>'30%','maxlength'=>128,'tabindex'=>8)); ?>
 							</div>
 
 							<div class="sideMenu">
@@ -730,7 +776,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'name'=>'ajaxResetPassword',
 										'caption'=>Yii::t('site', 'Update'),
 										'id'=>'resetPasswordAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 'update'=>'#forPasswordResetRefresh'))
+										'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 'update'=>'#forPasswordResetRefresh'))
 								));								
 								?>
 							</div>
@@ -778,7 +824,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				        		}
 				        		else
 				        		{
-				        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
+				        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>13, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
 				        		}				        					        		
 				        	?>
 				        </div>					    
@@ -793,7 +839,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					        	}
 					        	else
 					        	{					        		
-					        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
+					        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>13, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
 					        	}
 				        	?>
 				        </div>					        
@@ -823,8 +869,16 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						}
 						
 						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
-						$tabs[Yii::t('layout', 'Friend Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
-						$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
+						
+						if(Yii::app()->params->featureFriendManagementEnabled)
+						{
+							$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
+						}
+							
+						if(Yii::app()->params->featureStaffManagementEnabled)
+						{
+							$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 'id'=>'staff_groups_tab');
+						}	
 
 						$this->widget('zii.widgets.jui.CJuiTabs', array(
 								// 											    'tabs' => array(
@@ -850,12 +904,64 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			</div>
 		</div>
 
+
+		<div id='bottomBar'>			
+			<div id='bottomContent'>
+				<div class="bottomMenu">
+					<?php
+					echo CHtml::ajaxLink('<div id="aboutUs">'.Yii::t('layout', 'About Us').
+							'</div>', $this->createUrl('site/aboutUs'),
+							array(
+									'complete'=> 'function() { $("#aboutUsWindow").dialog("open"); return false;}',
+									'update'=> '#aboutUsWindow',
+							),
+							array(
+									'id'=>'showAboutUsWindow','tabindex'=>14));
+
+					//echo 'AAA';
+					?>
+				</div>
+				
+<!-- 				<div class="bottomMenu">	 -->
+					<?php
+// 					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Terms').
+// 							'</div>', $this->createUrl('site/terms'),
+// 							array(
+// 									'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
+// 									'update'=> '#termsWindow',
+// 							),
+// 							array(
+// 									'id'=>'showTermsWindow','tabindex'=>15));
+
+// 					//echo 'BBB';
+// 					?>
+<!-- 				</div> -->
+				
+				<div class="bottomMenu">	
+					<a href= "http://traceper.blogspot.com" tabindex="15">Blog</a>
+				</div>
+				
+				<div class="bottomMenu">	
+					<?php
+					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Contact').
+							'</div>', $this->createUrl('site/contact'),
+							array(
+									'complete'=> 'function() { $("#contactWindow").dialog("open"); return false;}',
+									'update'=> '#contactWindow',
+							),
+							array(
+									'id'=>'showContactWindow','tabindex'=>16));
+
+					//echo 'BBB';
+					?>
+				</div>									
+			</div>			
+		</div>
+		
+		<div id="map"></div>			
 	</div>
-	<div id="map"></div>
-	<div id='infoBottomBar'></div>
-	<div id='loading'></div>
-	</div>
-	</div>
+	
+
 
 <!-- 	<div id="forgotPasswordForm" -->
 <!-- 		class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }"> -->
@@ -865,6 +971,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 <!-- 				id="sendNewPassword" /> -->
 <!-- 		</div> -->
 <!-- 	</div> -->
+		
+	
 </body>
 </html>
 
@@ -872,15 +980,24 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 	if (Yii::app()->user->isGuest == false)
 	{
 ?>	
-<script type="text/javascript">	
-	document.getElementById('topBar').style.height='7%';
-	document.getElementById('sideBar').style.height='93%';
-	document.getElementById('sideBar').style.top='7%';
-	document.getElementById('sideBar').style.width='26%';
-	document.getElementById('bar').style.top='7%';
-	document.getElementById('bar').style.right='74%';
-	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');
-	document.getElementById('map').style.width='74%';
+<script type="text/javascript">
+	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
+	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset	
+
+	$('#topBar').css('height', '60px');
+	$('#sideBar').css('top', '60px');
+	$('#sideBar').css('width', '380px');
+	$('#sideBar').css('height', (h - offsetTop));
+	$('#sideBar').css('min-height', (485 + 100 - 60));
+	$('#bar').css('top', offsetTop);
+	$('#bar').css('height', (h - offsetTop));
+	$('#bar').css('left', '380px');
+	$('#bar').css('min-height', (485 + 100 - 60));		
+	$('#map').css('height', (h - offsetTop)); //$("#map").css('height', '94%');
+	$('#map').css('width', (w - offsetLeft));
+	$('#map').css('min-width', (735 + 260 - 380));
+	$('#map').css('min-height', (485 + 100 - 60));
+		
 </script>	
 <?php	
 	}

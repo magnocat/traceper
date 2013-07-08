@@ -1,16 +1,27 @@
-<script type="text/javascript">		
-	document.getElementById('topBar').style.height='7%';
-	document.getElementById('sideBar').style.height='93%';
-	document.getElementById('sideBar').style.width='26%';
-	document.getElementById('sideBar').style.top='7%';
-	document.getElementById('bar').style.top='7%';
-	document.getElementById('bar').style.right='74%';
-	document.getElementById('map').style.height='93%'; //$("#map").css('height', '94%');
-	document.getElementById('map').style.width='74%';		
+<script type="text/javascript">
+	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
+	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
+
+	$('#topBar').css('height', '60px');
+	$('#sideBar').css('top', '60px');
+	$('#sideBar').css('width', '380px');
+	$('#sideBar').css('height', (h - offsetTop));
+	$('#sideBar').css('min-height', (485 + 100 - 60));
+	$('#bar').css('top', offsetTop);
+	$('#bar').css('height', (h - offsetTop));
+	$('#bar').css('left', '380px');
+	$('#bar').css('min-height', (485 + 100 - 60));		
+	$('#map').css('height', (h - offsetTop)); //$("#map").css('height', '94%');
+	$('#map').css('width', (w - offsetLeft));
+	$('#map').css('min-width', (735 + 260 - 380));
+	$('#map').css('min-height', (485 + 100 - 60));
+		
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
 	$("#tab_view").tabs("select",0);
+
+	//alert('loginSuccessful.php: offsetTop:'+(offsetTop)+' offsetLeft:'+(offsetLeft));
 </script>	
 
 <?php
