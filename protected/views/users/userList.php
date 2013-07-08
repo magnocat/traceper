@@ -17,8 +17,8 @@ if ($dataProvider != null) {
 	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
 	// keyword parameter
 	$ajaxUrl = null;
-	$deleteFrienshipQuestion = Yii::t('users', 'Do you want to delete this user from your friend list?');
-	$deleteStaffQuestion = Yii::t('users', 'Do you want to delete the account of this staff?');
+	$deleteFrienshipQuestion = Yii::t('users', 'Do you really want to delete this user from your friend list?');
+	$deleteStaffQuestion = Yii::t('users', 'Do you really want to delete the account of this staff?');
 	$addAsFriendQuestion = Yii::t('users', 'Do you want to add this user as a friend?');
 
 	if ($isFriendRequestList == true) {

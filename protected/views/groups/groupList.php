@@ -4,7 +4,7 @@ if ($dataProvider != null) {
 	$emptyText = Yii::t('groups', 'No groups found');
 	$ajaxUrl = null;
 	$isSearchResult = isset($searchResult) ? true : false;
-	$deleteGroupQuestion = Yii::t('groups', 'Do you want to delete this group?');
+	$deleteGroupQuestion = Yii::t('groups', 'Do you really want to delete this group?');
 	
 	if ($isSearchResult == true){
 		$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
