@@ -173,7 +173,7 @@ return array(
 		'minDataSentInterval'=> 300000,
 		'duplicateEntryDbExceptionCode' => 23000,
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
-		'featureStaffManagementEnabled' => true,
+		'featureStaffManagementEnabled' => false,
 		'featureFriendManagementEnabled' => true,
 	),
 );

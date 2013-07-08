@@ -133,6 +133,7 @@ function processUsers(MAP, users) {
 		var userType = value.userType;
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		var visible = false;
+
 		if (isFriend == "1") {
 			visible = true;
 		}
@@ -161,6 +162,7 @@ function processUsers(MAP, users) {
 				mapMarker:new Array(markerInfo),
 				locationCalculatedTime:locationCalculatedTime
 			});
+		
 			var content =  '<div>'														   
 				+ '<br/>' + TRACKER.users[userId].realname  
 				+ '<br/>' + TRACKER.users[userId].time
@@ -200,7 +202,7 @@ function processUsers(MAP, users) {
 
 		}
 		else
-		{
+		{						
 			var time = dataArrivedTime;
 			var deviceId = deviceId;
 			var userType = userType;
@@ -248,13 +250,13 @@ function processUsers(MAP, users) {
 				}
 			}
 			
-			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null)&&(TRACKER.users[userId].latitude != latitude ||
-					TRACKER.users[userId].longitude != longitude)){
+			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null) && ((TRACKER.users[userId].latitude != latitude) ||
+					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].time != time))){
 				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
-				
+
 				var content =  '<div>'														   
 				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + TRACKER.users[userId].time
+				+ '<br/>' + time //TRACKER.users[userId].time
 				+ '<br/>' + latitude + ", " + longitude
 
 				+'</div>'
@@ -284,8 +286,7 @@ function processUsers(MAP, users) {
 					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				}
 			}
-			
-			
+						
 			TRACKER.users[userId].latitude = latitude;
 			TRACKER.users[userId].longitude = longitude;
 			TRACKER.users[userId].time = time;
