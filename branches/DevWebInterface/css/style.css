@@ -1,12 +1,12 @@
 body, .generalStyle {
 	padding:0px;
 	margin:0px;	
-	overflow-y:hidden;
+	/*overflow-y:hidden;*/ /*When this feature is commented out y-axis scroll of the page not working*/
 	font-size:14px;
 	font-family:arial;
-	letter-spacing:2px;
+	letter-spacing:1px;
 	color:#555;
-	overflow-x:hidden;	
+/* 	overflow-x:hidden; */
 }
 a {
    color: #6261d8;
@@ -20,27 +20,92 @@ a, img {
 #wrap{
 	position:absolute;
 	width:100%;
-	height:100%;	
+	height:100%;
+/* 	width:auto; */
+/* 	height:auto; */
+	min-width:1007px;
+	min-height:585px;
+/* 	margin: 0 auto;	 */
 }
 #sideBar{
-	width:22%;
-	height:88%;
-	top: 12%;
+/* 	width:22%; */
+	width:276px;
+	height:86%;
+	min-height:485px;
+/* 	top: 14%; */
+	top:100px;
 	background: -moz-linear-gradient(top, #add8e6, #fff);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#add8e6', endColorstr='#ffffff');
-	background: -webkit-gradient(linear, left top, left bottom, from(#add8e6), to(#fff));
+	background: -webkit-gradient(linear, left top, left bottom, from(#add8e6), to(#fff));	
+	background: -ms-linear-gradient(top, #add8e6, #fff);
+	background: -webkit-linear-gradient(top, #add8e6, #fff);
+	background: -o-linear-gradient(top, #add8e6, #fff);
+	background: linear-gradient(to bottom, #add8e6, #fff);	
 	z-index:100;
 	position:absolute;	
 }
 #topBar{	 
-	height:12%;
+/* 	height:14%; */
+	height:100px;
 	width:100%;
 	background: #add8e6;	
 	z-index:100;
 	position: absolute;
   	top: 0px;
   	right:0px;
-  	min-width:40px;
+}
+#bottomBar{	 
+/* 	height:14%; */
+	height:70px;
+	width:100%;
+	background: #ffffff;	
+	z-index:100;
+	position: absolute;
+  	top: 100%; 	
+
+}
+#bar{
+	height:86%;
+	min-height:485px;
+	background-color: #EEE; /*#6261d8;*/ 
+	background-image: url("../images/left.png");
+	background-repeat:no-repeat;
+	background-position:center;
+	z-index: 150;
+	position: absolute;
+/* 	right:78%; */
+	left:260px;
+	width:16px;
+/* 	width:1%; */
+/* 	min-width:12px; */
+/* 	top:14%; */
+	top:100px;	
+	cursor:pointer;
+		
+}
+#map{	
+	height:86%;
+	width:78%;	
+	position: absolute;
+/* 	left:272px; */
+/* 	top:100px; */	
+  	bottom: 0px;
+  	right:0px;	
+	min-width:735px;
+	min-height:485px;	 	
+}
+
+/* #map{	
+	height:88%;
+	width:78%;	
+	position: absolute;
+  	bottom: 0px;
+  	right:0px;
+} */
+
+#bottomContent{
+	padding-top:2%;
+	text-align: center;		
 }
 #footer{
 	position:fixed;
@@ -55,31 +120,21 @@ a, img {
 #topBar > #topContent > *  {
 	margin-top:0px;
 }
+#bottomBar > #bottomContent > *  {
+	margin-top:0px;
+}
 #sideBar > #content > *  {
-	margin-left:5px;
+	margin-left:1em;
 
 }
-#bar{
-	height:100%;
-	background-color: #EEE; /*#6261d8;*/ 
-	background-image: url("../images/left.png");
-	background-repeat:no-repeat;
-	background-position:center;
-	z-index: 150;
-	position: absolute;
-	right:78%;
-	width:1%;
-	top:12%;	
-	cursor:pointer;
-		
-}
+
 #userarea  { 
 	z-index:200; 
 	list-style: none;
 	padding:0;
-	left: 15%;
+	left: 376px;
 	margin:0px;
-	position: relative;	
+	position: absolute;	
 	cursor: pointer;
 	color:#13a;
 	font-size: 14px;
@@ -88,7 +143,7 @@ a, img {
 #forAjaxRefresh  { 
 	list-style: none;
 	padding:0;
-	left: 3%;
+	left:0px;
 	margin:0px;
 	position: relative;	
 	cursor: pointer;
@@ -135,14 +190,6 @@ a, img {
 	background-color: #FFF;
 }
 
-#map{	
-	height:88%;
-	width:78%;	
-	position: absolute;
-  	bottom: 0px;
-  	right:0px;
-}
-
 #logo, .logo, .logo_inFullMap {
 	height:90px;
 	width:17%;	
@@ -153,20 +200,31 @@ a, img {
 	left: 1%;
 }
 
-
 #logoMini, .logoMini {
 	height:40px;
-	width:10%;
+	width:95px;
 	background: url("../images/logo_mini.png") no-repeat center;
 	cursor:pointer;		
-	position: relative;
-	float: left;
-	left: 7%;
+	position: absolute;
+/* 	float: left; */
+	left:140px;
+	
+	
+/* 	z-index:200;  */
+/* 	list-style: none; */
+/* 	padding:0; */
+/* 	left: 376px; */
+/* 	margin:0px; */
+/* 	position: absolute;	 */
+/* 	cursor: pointer; */
+/* 	color:#13a; */
+/* 	font-size: 14px;	 */
 }
 
 .upperMenu {
 	height:0px;
 	width:16%;
+	max-width:200px;
 	float:left;
 	cursor:pointer;		
 	position: relative;
@@ -174,15 +232,23 @@ a, img {
 	margin:0px;
 }
 
+.bottomMenu {	
+	position: relative;
+	display:inline-block;
+	width:10%;
+}
+
 .sideMenu {
 	cursor:pointer;		
 	position: relative;
-	width:30%;
-	height:40px;
-	top: 10%;
-	position: relative;
-	padding:20px; 
-	margin:0px;	
+/* 	width:30%; */
+/* 	height:2.4em; */
+	height:10%;
+	max-height:50px;
+	min-height:40px;
+	top: 0em;
+	padding:1em; 
+	margin-left:0px;	
 }
 
 /*#loginLogo {
@@ -388,8 +454,8 @@ a, img {
 #languageSelection{
 	float:left;
 	cursor: pointer;
-	left:20%;
-	top:2em;
+	left:15%;
+	top:1em;
 	position:relative;	
 }
 
