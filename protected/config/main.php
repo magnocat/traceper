@@ -175,5 +175,6 @@ return array(
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
 		'featureStaffManagementEnabled' => false,
 		'featureFriendManagementEnabled' => true,
+		'featureGPSDeviceEnabled' => false,
 	),
 );
