@@ -22,7 +22,8 @@ T�rk蔒 UTF-8
 return array(
 	'Description' => 'Tan覺m',
 	'Sender' => 'G繹nderen',
-	'Delete file' => 'Dosyay覺 sil'
+	'Delete file' => 'Dosyay覺 sil',
+	'Do you really want to delete this file?' => 'Bu dosyay覺 ger癟ekten silmek istiyor musunuz?',
 	
 	
 	

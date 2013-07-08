@@ -26,7 +26,7 @@ return array(
 	'Delete Group' => 'Grubu Sil',
 	'Sorry,an error occured in operation - 1'=> 'Çalışma sırasında hata oluştu - 1',
 	'Sorry,an error occured in operation - 2'=> 'Çalışma sırasında hata oluştu - 2',
-	'Do you want to delete this group?'=> 'Bu grubu silmek istiyor musunuz?',
+	'Do you really want to delete this group?'=> 'Bu grubu gerçekten silmek istiyor musunuz?',
 	'Delete Group Member'=> 'Grup üyeliğini sil',
 	'Do you want to delete this group member?'=> 'Bu üyeyi gruptan silmek istiyor musunuz?',
 	'Group Members' => 'Grup Üyeleri',
