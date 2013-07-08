@@ -34,7 +34,7 @@ T�rk�e UTF-8
 */
 return array(
 	'No users found' => 'Kullanıcı bulunamadı',
-	'Do you want to delete this user from your friend list?' => 'Bu kullanıcıyı arkadaş listenizden silmek istiyor musunuz?',
+	'Do you really want to delete this user from your friend list?' => 'Bu kullanıcıyı gerçekten arkadaş listenizden silmek istiyor musunuz?',
 	'Do you want to add this user as a friend?' => 'Bu kullanıcıyı arkadaş olarak eklemek istiyor musunuz?',	
 	'Do you want to reject this user\'s friend request?' => 'Bu kullanıcının arkadaşlık isteğini reddetmek istiyor musunuz?',
 	'No friendship requests found' => 'Arkadaşlık isteği bulunamadı',
@@ -45,7 +45,7 @@ return array(
 	'Approve' => 'Onayla',
 	'Reject' => 'Reddet',
 	'Delete from your friend list' => 'Arkadaş listenden sil',	
-	'Do you want to delete the account of this staff?' => 'Bu personelin hesabını silmek istiyor musunuz?',
+	'Do you really want to delete the account of this staff?' => 'Bu personelin hesabını gerçekten silmek istiyor musunuz?',
 	'Friend request is waiting' => 'Arkadaşlık isteği bekleniyor',
 	'Add as Friend' => 'Arkadaş olarak ekle',
 	'Friendship Requests' => 'Arkadaşlık İstekleri',

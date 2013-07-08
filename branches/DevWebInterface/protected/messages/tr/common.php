@@ -43,9 +43,19 @@ return array(
 	'OK' => 'Tamam',
 	'Search' => 'Ara',
 	'Field cannot be blank!' => 'Alan boş bırakılamaz!',	
-	'Register' => 'Kaydol',
-
-	
+	'Sign Up' => 'Kaydol',		
+	'Jan' => 'Oca',
+	'Feb' => '&#350;ub',
+	'Mar' => 'Mar',
+	'Apr' => 'Nis',
+	'May' => 'May',
+	'Jun' => 'Haz',		
+	'Jul' => 'Tem',
+	'Aug' => 'A&#287;u',
+	'Sep' => 'Eyl',		
+	'Oct' => 'Eki',
+	'Nov' => 'Kas',
+	'Dec' => 'Ara',
 										
 );
 

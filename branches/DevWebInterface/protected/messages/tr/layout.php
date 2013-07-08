@@ -18,15 +18,30 @@ T�rk�e UTF-8
   � 	ğ
   � 	�
   � 	ş
+  
+�		&#304;
+�		&#305;
+�		&#214;	
+�		&#246;
+�		&#220;
+�		&#252;
+�		&#199;
+�		&#231;
+�		&#286;
+�		&#287;
+�		&#350;
+�		&#351;
 */
 return array(
 	'Message' => 'Mesaj',
 	'About' => 'Hakkında',
-	'Traceper Info' => '<b>traceper</b> mobil kullanıcılar için geliştirilmiş bir GPS takip sistemidir. Ücretsizdir ve basittir. Bu servisle arkadaşlarınızı çevrimiçi takip edebilir ve nerede olduklarını görebilirsiniz.<br/><br/><div class=\"title\"><b>Destek</b></div>Bu servisi kullanmak için desteğe ihtiyacınız olursa, sahip olduğumuz tüm bilgiyi paylaşmaya hazırız. Bizimle iletişime geçmekten çekinmeyin.<br/><br/><div class=\"title\"><b>Lisans</b></div>Bu servis tamamen ücretsizdir.<br/><br/><div class=\"title\"><b>Sorumluluk Reddi</b></div>Bu servis hiçbir şeyi garanti etmez, kendi riskinizi göze alarak kullanırsınız. Hiçbir durumda sorumluluk kabul edilmez.<br/><br/><div class=\"title\"><b>Blog Adresi</b></div><a href="http://traceper.blogspot.com">http://traceper.blogspot.com</a><br/><br/><div class=\"title\"><b>İletişim</b></div><a href=\"mailto:contact@traceper.com\">contact@traceper.com</a><br/><br/><div class=\"title\"><b>Proje Ekibi</b></div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Murat Salman - salman.murat@gmail.com <br/> Yusuf Selçuk - yuduata@gmail.com </div>',
+	'About Us' => 'Hakk&#305;m&#305;zda',
+	'Terms' => 'Ko&#351;ullar',
+	'Traceper Info' => '<b>traceper</b> mobil kullanıcılar için geliştirilmiş bir GPS takip sistemidir. Ücretsizdir ve basittir. Bu servisle arkadaşlarınızı çevrimiçi takip edebilir ve nerede olduklarını görebilirsiniz.<br/><br/><div class=\"title\"><b>Destek</b></div>Bu servisi kullanmak için desteğe ihtiyacınız olursa, sahip olduğumuz tüm bilgiyi paylaşmaya hazırız. Bizimle iletişime geçmekten çekinmeyin.<br/><br/><div class=\"title\"><b>Lisans</b></div>Bu servis tamamen ücretsizdir.<br/><br/><div class=\"title\"><b>Sorumluluk Reddi</b></div>Bu servis hiçbir şeyi garanti etmez, kendi riskinizi göze alarak kullanırsınız. Hiçbir durumda sorumluluk kabul edilmez.<br/><br/><div class=\"title\"><b>Blog Adresi</b></div><a href="http://traceper.blogspot.com">http://traceper.blogspot.com</a><br/><br/><div class=\"title\"><b>İletişim</b></div>contact@traceper.com<br/><br/>',
 	'Comment Window' => 'Yorum Penceresi',
 	'Enter your comments here...' => 'Yorumlarınızı buraya yazınız...',
 	'Confirmation' => 'Onaylama',
-	'Click here to learn about traceper' => 'traceper hakkında bilgi almak için burayı tıklayınız',
+	'Click here to reload the main page or scroll down to bottom of the page for contact and other info.' => 'Ana sayfayı yeniden yüklemek için burayı tıklayınız. İletişim ve diğer bilgiler içinse sayfayı en aşağı kaydırınız.',
 	'Login' => 'Oturum aç',
 	'Register' => 'Kayıt',
 	'Change Password' => 'Parola Değiştir', 
@@ -44,9 +59,11 @@ return array(
 	'Photos' => 'Fotolar',
 	'Friend Groups' => 'Ark. Grupları',
 	'Staff Groups'  => 'Per. Grupları',
+	'Groups' => 'Gruplar',
 	'See your position on the map' => 'Konumunuzu haritada görün',
 	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',
 	'Sign in with Facebook' => 'Facebook ile giriş yap',
+	'Contact' => '&#304;leti&#351;im',
 );
 
 
