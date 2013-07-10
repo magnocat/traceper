@@ -7,7 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '350px'      
+			'width'=> '500px'      
 	    ),
 	));
 ?>
@@ -22,20 +22,17 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 						 ),
 	
 	)); ?>
-	
-		<div class="row" style="padding-top:1em">
-			<?php echo Yii::t('groups', 'Check the groups that you want to enroll the selected user:'); ?>
-		</div>		
-		
+
 		<div class="row" style="padding-top:2em;padding-left:10px">
 			<?php			
 				if(empty($groupsOfUser))
 				{
-					echo '</br></br>'.Yii::t('groups', 'There is no group to show...').'</br></br>';
-					echo Yii::t('groups', 'First create some group(s) please');
+					echo Yii::t('groups', 'Unfortunately, you have no groups to show yet. You can create new group(s) using the top menu, and then you can enroll your friend(s) into the groups you want.');
 				}
 				else
 				{
+					echo Yii::t('groups', 'You can enroll your friend to the selected group(s) just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friend from the membership of a group, just remove the tick on the corresponding checkbox and save the operation again:').'</br></br>';
+					
 					echo CHtml::activeCheckboxList(
 					  $model, 'groupStatusArray', 
 					  CHtml::listData($groupsOfUser, 'id', 'name'),
@@ -51,9 +48,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 //					  CHtml::listData($groupsOfUser, 'id', 'name'),
 //					  array()
 //					);					
-				}				
-				
-				
+				}
 			?>				
 		</div>
 		
@@ -61,31 +56,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-// 					echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)), 
-// 														array(
-// 															'success'=> 'function(result){ 
-// 																			try {
-// 																				var obj = jQuery.parseJSON(result);
-// 																				if (obj.result && obj.result == "1") 
-// 																				{
-// 																					$("#groupSettingsWindow").dialog("close");
-// 																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
-// 																				}
-// 																				else if(obj.result && obj.result == "Duplicate Entry")
-// 																				{
-// 																					$("#groupSettingsWindow").html(result);
-		
-// 																					$("#groupSettingsWindow").dialog("close");
-// 																					TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
-// 																				}																				
-// 																			}
-// 																			catch (error){
-// 																				$("#groupSettingsWindow").html(result);
-// 																			}
-// 																		 }',														
-// 															 ),
-// 														null);
-
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxUpdateGroup',
 							'caption'=>Yii::t('common', 'Save'),
@@ -119,19 +89,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				}
 				else
 				{					
-// 					echo CHtml::htmlButton(Yii::t('common', 'OK'),  
-// 														array(
-// 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
-// 															'style'=>'text-align:center'
-// 															 ),
-// 														null);
-
 					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'updateGroupOK',
+							'name'=>'groupSettingsOK',
 							'caption'=>Yii::t('common', 'OK'),
-							'id'=>'updateGroupOKButton',
-							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}',
-							'style'=>'text-align:center'
+							'id'=>'groupSettingsOKButton',
+							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
 					));					
 				} 
 			?>
@@ -139,12 +101,6 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($groupsOfUser))
 				{
-// 					echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
-// 														array(
-// 															'onclick'=> '$("#groupSettingsWindow").dialog("close"); return false;',
-// 															 ),
-// 														null);
-
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'updateGroupCancel',
 							'caption'=>Yii::t('common', 'Cancel'),

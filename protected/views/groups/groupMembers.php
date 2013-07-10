@@ -10,12 +10,13 @@ if ($dataProvider != null)
 	    'id'=>'groupMemberDeleteConfirmation',
 		// additional javascript options for the dialog plugin
 	    'options'=>array(
-	        'title'=>Yii::t('groups', 'Delete Group Member'),
+	        'title'=>Yii::t('groups', 'Remove Group Member'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
+	    	'width'=>'400px',
 			'buttons' =>array (
-				"OK"=>"js:function(){
+			Yii::t('common', 'OK')=>"js:function(){
 							". CHtml::ajax(
 									array(
 											'url'=>Yii::app()->createUrl('groups/deleteGroupMember'),
@@ -40,12 +41,12 @@ if ($dataProvider != null)
 														}',
 										)) .
 						"}",
-			"Cancel"=>"js:function() {
+			Yii::t('common', 'Cancel')=>"js:function() {
 				$( this ).dialog( \"close\" );
 			}" 
 			)),
 		));	
-	echo Yii::t('groups', 'Do you want to delete this group member?').'<br/> <br/>';
+	echo Yii::t('groups', 'Do you really want to remove this group member?').'<br/> <br/>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');	
 	
 
@@ -73,7 +74,7 @@ if ($dataProvider != null)
 												  $(\"#groupId\").text(".$data[\'groupId\'].");
 												  $(\"#groupMemberDeleteConfirmation\").dialog(\"open\");", 
 										"class"=>"vtip", 
-										"title"=>'.("Yii::t('groups', 'Delete Group Member')").'))',
+										"title"=>'.("Yii::t('groups', 'Remove Group Member')").'))',
 
 					'htmlOptions'=>array('width'=>'16px')
 		),
