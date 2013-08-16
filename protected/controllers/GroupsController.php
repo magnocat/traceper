@@ -102,6 +102,12 @@ class GroupsController extends Controller
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		
+		//Yukarýdakiler kullanýlýnca az da olsa sorun oluyor, bunu koyunca hiç sorun olmuyor
+		if (Yii::app()->request->getIsAjaxRequest()) {
+			Yii::app()->clientScript->scriptMap['*.js'] = false;
+			Yii::app()->clientScript->scriptMap['*.css'] = false;
+		}		
 
 		$this->renderPartial('createGroup',array('model'=>$model), false, $processOutput);			
 	}
@@ -334,7 +340,7 @@ class GroupsController extends Controller
 
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
-		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;		
 		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'groupType'=>$groupType), false, true);
 	}
 	
