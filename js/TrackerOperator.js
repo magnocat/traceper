@@ -20,6 +20,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.updateInterval = interval;
 	this.timer;
 	this.traceLineDrawedUserId = null;
+	this.showImagesOnTheMap = false;
+	this.showUsersOnTheMap = true;
+	
+	this.showImagesOnTheMapJustToggled = false;
 	/*
 	 * After all users info is got, only users whose location changed is queried every
 	 * queryUpdatedUserInterval seconds
@@ -91,20 +95,40 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	/**
 	 * 
 	 */
-	this.getFriendList = function(pageNo){
-
-		var jsonparams = "r=users/getUserListJson&page="+ TRACKER.updateFriendListPageNo +"&"; 
+	this.getFriendList = function(pageNo, userType, newFriendId, deletedFriendId){
+		
+		//alert('getFriendList() called');	
+		
+		//Default value implementation in JS
+		//newFriendId = typeof newFriendId !== 'undefined' ? newFriendId : null;
+		//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
+		
+		var jsonparams = "r=users/getUserListJson&page=" + TRACKER.updateFriendListPageNo + "&userType=" + userType + "&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
 		{
 			jsonparams += "list=onlyUpdated";
 		}
 		
+		//if(newFriendId != null)
+		if(typeof newFriendId !== 'undefined')
+		{
+			jsonparams += "newFriendId=" + newFriendId;
+		}
+		
 		TRACKER.ajaxReq(jsonparams, function(result){
 			
 			var obj = $.parseJSON(result);
-			processUsers(MAP, obj.userlist);
-						
+			
+			if(typeof deletedFriendId !== 'undefined')
+			{
+				processUsers(MAP, obj.userlist, deletedFriendId);
+			}
+			else
+			{
+				processUsers(MAP, obj.userlist);
+			}
+			
 			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
 			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
 			// to fetched all data reguarly updateFriendListPageNo must be resetted.
@@ -131,13 +155,19 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		if (TRACKER.allImagesFetched == true) {
 			params += "list=onlyUpdated";
 		}
+		
+		TRACKER.showImagesOnTheMapJustToggled = false;
+		
+		//alert("getImageList() called");
 
 		TRACKER.ajaxReq(params, function(result){	
 			if (result != "") {
 				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
 				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
 	
-				processImageXML(MAP, result);				
+				processImageXML(MAP, result);
+				
+				//alert("processImageXML() called");
 				
 				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
@@ -420,12 +450,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 	
 	this.showMessageDialog = function(message) {
-		$("#messageDialogText").html(message); 
+		$("#messageDialogText").html('</br>' + message); 
 		$("#messageDialog").dialog("open"); 
 	}
 	
+	this.showLongMessageDialog = function(message) {
+		$("#longMessageDialogText").html('</br>' + message); 
+		$("#longMessageDialog").dialog("open"); 
+	}	
+	
 	this.showConfirmationDialog = function(question, callback){
-		$("#confirmationDialog #question").html(question); 
+		$("#confirmationDialog #question").html('</br>' + question); 
 		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
 		// dont forget first button is positivie button so below loop works
 		for(var property in buttons) {
