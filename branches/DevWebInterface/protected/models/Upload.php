@@ -48,9 +48,8 @@ class Upload extends CActiveRecord
         return array(
             array('fileType, userId, latitude, longitude, altitude, uploadTime, description, isLive, liveKey', 'required'),
             array('fileType, publicData, isLive, liveKey', 'numerical', 'integerOnly'=>true),
-            array('userId', 'length', 'max'=>11),
-            array('latitude', 'length', 'max'=>8),
-            array('longitude', 'length', 'max'=>9),
+        	array('userId, longitude', 'length', 'max'=>11), //Condidering -180.000000 for latitude (11 digits)
+        	array('latitude', 'length', 'max'=>10), //Condidering -90.000000 for latitude (10 digits)
             array('altitude', 'length', 'max'=>15),
             array('description', 'length', 'max'=>255),
             // The following rule is used by search().

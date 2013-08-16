@@ -8,7 +8,9 @@
 class RegisterForm extends CFormModel
 {
 	public $email;
+	public $emailAgain;
 	public $name;
+	public $lastName;
 	public $password;
 	public $passwordAgain;
 	public $image;
@@ -28,18 +30,26 @@ class RegisterForm extends CFormModel
 			array('email, name, password, account_type, ac_id, passwordAgain', 'required',
 			'message'=>'Field cannot be blank!'),
 		*/
-			array('email, name, password, passwordAgain', 'required',
-						'message'=>Yii::t('site', 'Please, enter the field')),
-			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),			
-			// password needs to be same
-			array('passwordAgain', 'compare', 'compareAttribute'=>'password',
-			'message'=>Yii::t('site', 'Passwords not same!')),
-			
-			array('ac_id', 'safe'),
+			array('email, emailAgain, name, lastName, password, passwordAgain', 'required', 'message'=>Yii::t('site', 'Please, enter the field')),
+
+			//array('password, passwordAgain', 'required', 'message'=>Yii::t('site', 'Enter the field')),
+								
+			array('email, emailAgain', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 				
-			array('account_type', 'safe'),
+			array('emailAgain', 'compare', 'compareAttribute'=>'email', 'message'=>Yii::t('site', 'E-mails not same!')),
+
+			array('password', 'checkLength'),
+				
+			// password needs to be same
+			array('passwordAgain', 'compare', 'compareAttribute'=>'password', 'message'=>Yii::t('site', 'Passwords not same!')),
+			
+			//array('ac_id', 'safe'),
+				
+			//array('account_type', 'safe'),
 			
 			array('email', 'isExists'),
+				
+			array('email', 'checkEmailDomain'),				
 			
 			//array('image', 'isExists')
 		);
@@ -53,7 +63,9 @@ class RegisterForm extends CFormModel
 		return array(
 			'register'=>Yii::t('common', 'Sign Up'),
 			'email'=>Yii::t('site', 'E-mail'),
-			'name'=>Yii::t('site', 'Name'),
+			'emailAgain'=>Yii::t('site', 'E-mail (Again)'),
+			'name'=>Yii::t('site', 'First Name'),
+			'lastName'=>Yii::t('site', 'Last Name'),
 			'password'=>Yii::t('site', 'Password'),
 			'passwordAgain'=>Yii::t('site', 'Password (Again)'),			
 		);
@@ -86,4 +98,51 @@ class RegisterForm extends CFormModel
 // 			}							
 		}
 	}
+	
+	public function checkLength($attribute,$params)
+	{
+		//if(!$this->hasErrors())
+		{
+			if(strlen($this->password) < 5)
+				//if(true)
+			{
+				$this->addError('password',Yii::t('site', 'Minimum 5 characters'));
+			}			
+		}
+	}	
+	
+	public function checkEmailDomain($attribute,$params)
+	{
+		//if(!$this->hasErrors())
+		{
+			//list($user, $domain) = explode('@', $this->email); -> Buna e-mail alanı boşken hata veriyor
+			$user = strtok($this->email, "@");
+			$domain = strtok("@");
+						
+			//list($domainName, $extension) = explode('.', $domain);  -> Buna e-mail alanı boşken hata veriyor
+			$domainName = strtok($domain, ".");
+			$extension = strtok(".");
+									
+			if(($domain == 'gmial.com') || ($domain == 'gmil.com') || ($domain == 'gmal.com'))
+			{
+				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@gmail.com?');
+			}
+			else if(($domain == 'yaho.com') || ($domain == 'yhao.com') || ($domain == 'yhaoo.com') || ($domain == 'yhoo.com'))
+			{
+				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@yahoo.com?');
+			} 
+			else if(($domain == 'hotmial.com') || ($domain == 'hotmal.com') || ($domain == 'hotmil.com') || ($domain == 'htmail.com') || ($domain == 'hotma.com'))
+			{
+				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@hotmail.com?');
+			}	
+			else if(($domain == 'myet.com') || ($domain == 'mynt.com'))
+			{
+				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@mynet.com?');
+			}
+			else if(($extension == 'con') || ($extension == 'co'))
+			{
+				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@'.$domainName.'.com?');
+			}					
+		}
+	}	
 }

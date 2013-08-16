@@ -22,12 +22,15 @@ class ContactForm extends CFormModel
 	{
 		return array(
 			// name, email, subject and body are required
-			array('firstName, lastName, subject, email, detail', 'required','message'=>Yii::t('site', 'Please, enter the field')),
+			(Yii::app()->user->isGuest == true)?array('firstName, lastName, email, subject, detail', 'required','message'=>Yii::t('site', 'Please, enter the field')):array('subject, detail', 'required','message'=>Yii::t('site', 'Please, enter the field')),
+			
 			// email has to be a valid email address
 			array('email', 'email'),
 			
 			// verifyCode needs to be entered correctly
-			array('verifyCode', 'captcha', 'allowEmpty'=>!CCaptcha::checkRequirements()),
+			//array('verifyCode', 'captcha', 'allowEmpty'=>!CCaptcha::checkRequirements()),
+				
+			array('verifyCode', 'CaptchaExtendedValidator', 'allowEmpty'=>!CCaptcha::checkRequirements()),
 		);
 	}
 

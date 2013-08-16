@@ -64,6 +64,7 @@ return array(
 	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',
 	'Sign in with Facebook' => 'Facebook ile giriş yap',
 	'Contact' => '&#304;leti&#351;im',
+	'Download the application at Google Play' => 'Uygulamay&#305; Google Play\'den indirin',
 );
 
 

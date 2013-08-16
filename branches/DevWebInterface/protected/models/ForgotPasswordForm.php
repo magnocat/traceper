@@ -42,9 +42,14 @@ class ForgotPasswordForm extends CFormModel
 			$criteria->params=array(':email'=>$this->email);
 			$data = Users::model()->find($criteria);
 
-			if ($data == null) {
+			if(UserCandidates::model()->find($criteria) != null)
+			{
+				$this->addError('email',Yii::t('site', 'Registration incomplete, please request activation e-mail below the sign up form'));
+			}						
+			else if(Users::model()->find($criteria) == null)
+			{
 				$this->addError('email',Yii::t('site', 'This e-mail is not registered!'));
-			}
+			}			
 		}
 	}	
 }

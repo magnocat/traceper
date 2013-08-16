@@ -60,6 +60,11 @@ class LoginForm extends CFormModel
 				case CUserIdentity::ERROR_PASSWORD_INVALID:
 					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
 					break;
+					
+				case UserIdentity::ERROR_REGISTRATION_UNCOMPLETED:
+					$this->addError('email',Yii::t('site', 'Activate your account first'));
+					break;
+					
 				case CUserIdentity::ERROR_NONE:
 					break;					
 			}	
@@ -73,19 +78,23 @@ class LoginForm extends CFormModel
 	 */
 	public function login()
 	{
-		if($this->_identity===null)
+		if($this->_identity === null)
 		{
-			$this->_identity=new UserIdentity($this->email, $this->password);
+			$this->_identity = new UserIdentity($this->email, $this->password);
 			$this->_identity->authenticate();
 		}
-		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
+		
+		if($this->_identity->errorCode === UserIdentity::ERROR_NONE)
 		{
-			$duration=$this->rememberMe ? 3600*24*30 : 0; // 30 days
-			Yii::app()->user->login($this->_identity,$duration);
+			$duration = $this->rememberMe ? 3600*24*30 : 0; // 30 days
+			Yii::app()->user->login($this->_identity, $duration);
+			
 			return true;
 		}
 		else
+		{
 			return false;
+		}
 	}
 	
 	public function getName() {
