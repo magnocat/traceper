@@ -169,8 +169,8 @@ return array(
 		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
 		'uploadCountInOnePage'=> 5, // this is the number of images that are shown in a page	
 		'itemCountInDataListPage'=> 20,
-		'minDistanceInterval'=> 500,
-		'minDataSentInterval'=> 300000,
+		'minDistanceInterval'=> 500, //meters
+		'minDataSentInterval'=> 300000, //milliseconds
 		'duplicateEntryDbExceptionCode' => 23000,
 		'uploadPath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'upload',
 		'featureStaffManagementEnabled' => false,
