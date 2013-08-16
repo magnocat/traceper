@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `traceper_friends` (
   `friend2` int(11) unsigned NOT NULL,
   `friend2Visibility` tinyint(1) NOT NULL,
   `status` tinyint(4) DEFAULT '0',
+  `isNew` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `friend1_2` (`friend1`,`friend2`),
   KEY `friend1` (`friend1`),
@@ -155,8 +156,8 @@ CREATE TABLE IF NOT EXISTS `traceper_upload` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `fileType` tinyint(4) NOT NULL,
   `userId` int(11) unsigned NOT NULL,
-  `latitude` decimal(8,6) NOT NULL,
-  `longitude` decimal(9,6) NOT NULL,
+  `latitude` decimal(10,6) NOT NULL, -- Condidering -90.000000 for latitude (10 digits)
+  `longitude` decimal(11,6) NOT NULL, -- Condidering -180.000000 for latitude (11 digits)
   `altitude` decimal(15,6) NOT NULL,
   `uploadTime` datetime NOT NULL,
   `publicData` tinyint(4) NOT NULL DEFAULT '0',
@@ -247,8 +248,8 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `password` char(32) NOT NULL,
   `group` int(10) unsigned NOT NULL DEFAULT '0',
-  `latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
-  `longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `latitude` decimal(10,6) NOT NULL DEFAULT '0.000000',
+  `longitude` decimal(11,6) NOT NULL DEFAULT '0.000000',
   `altitude` decimal(15,6) NOT NULL DEFAULT '0.000000',
   `publicPosition` tinyint(4) NOT NULL DEFAULT '0',
   `authorityLevel` tinyint(4) NOT NULL DEFAULT '1',
@@ -266,20 +267,29 @@ CREATE TABLE IF NOT EXISTS `traceper_users` (
   `userType` tinyint(4) NOT NULL DEFAULT '0',
   `account_type` tinyint(4) NOT NULL,
   `gp_image` varchar(255) DEFAULT NULL,
+  `lastLocationAddress` text,
+  `minDataSentInterval` int(11) NOT NULL DEFAULT '300000',
+  `minDistanceInterval` int(11) NOT NULL DEFAULT '500',
+  `autoSend` tinyint(1) NOT NULL DEFAULT '0',
+  `androidVer` varchar(20) DEFAULT NULL,
+  `appVer` varchar(10) DEFAULT NULL,
+  `registrationMedium` varchar(10) DEFAULT NULL,
+  `preferredLanguage` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `email` (`email`),
   KEY `dataArrivedTime` (`dataArrivedTime`),
   KEY `realname` (`realname`) USING BTREE,
   KEY `password` (`password`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=87 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='This is for mobile app users' AUTO_INCREMENT=70 ;
 
 --
 -- Dumping data for table `traceper_users`
 --
 
-INSERT INTO `traceper_users` (`Id`, `password`, `group`, `latitude`, `longitude`, `altitude`, `publicPosition`, `authorityLevel`, `realname`, `email`, `dataArrivedTime`, `deviceId`, `status_message`, `status_source`, `status_message_time`, `dataCalculatedTime`, `fb_id`, `g_id`, `gender`, `userType`, `account_type`, `gp_image`) VALUES
-(1, '827ccb0eea8a706c4c34a16891f84e7b', 0, 39.922642, 32.867466, 1330.000000, 0, 1, 'Test', 'test@traceper.com', '2012-08-28 20:10:03', '353043053846625', '', 1, '2010-10-31 20:10:09', '2012-08-28 20:10:04', '0', '0', 0, 0, 0, NULL),
-(86, 'a384b6463fc216a5f8ecb6670f86456a', 0, 0.000000, 0.000000, 0.000000, 0, 1, 'Ahmet OÄŸuz Mermerkaya', 'ahmetmermerkaya@hotmail.com', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '711388294', '0', 0, 0, 1, NULL);
+INSERT INTO `traceper_users` (`Id`, `password`, `group`, `latitude`, `longitude`, `altitude`, `publicPosition`, `authorityLevel`, `realname`, `email`, `dataArrivedTime`, `deviceId`, `status_message`, `status_source`, `status_message_time`, `dataCalculatedTime`, `fb_id`, `g_id`, `gender`, `userType`, `account_type`, `gp_image`, `lastLocationAddress`, `minDataSentInterval`, `minDistanceInterval`, `autoSend`, `androidVer`, `appVer`, `registrationMedium`, `preferredLanguage`) VALUES
+(1, '827ccb0eea8a706c4c34a16891f84e7b', 0, '39.700000', '-118.800000', '1000.000000', 0, 1, 'Test', 'test@traceper.com', '2013-07-14 00:39:16', '1', '', 1, '2010-10-31 20:10:09', '1970-01-01 01:23:20', '0', '0', 0, 0, 0, NULL, 'Esk Mahfesï¿½ï¿½maz Mh., 79138. Sokak (92. Sk.), Adana, Tï¿½rkiye', 200000, 300, 0, '4.1.2 Jelly Bean', NULL, NULL, NULL),
+(2, '827ccb0eea8a706c4c34a16891f84e7b', 0, '40.000000', '35.000000', '115.000000', 0, 1, 'test2', 'test2@traceper.com', '2013-02-28 07:37:28', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL, NULL, 300000, 500, 0, NULL, NULL, NULL, NULL),
+(3, '', 0, '1.000000', '0.000000', '0.000000', 0, 1, '1', '2', '0000-00-00 00:00:00', NULL, NULL, NULL, NULL, '0000-00-00 00:00:00', '0', '0', 0, 0, 0, NULL, NULL, 300000, 500, 0, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -293,20 +303,22 @@ CREATE TABLE IF NOT EXISTS `traceper_user_candidates` (
   `realname` varchar(100) NOT NULL,
   `password` char(32) NOT NULL,
   `time` datetime NOT NULL,
+  `registrationMedium` varchar(10) DEFAULT NULL,
+  `preferredLanguage` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `index_name` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=44 ;
 
 --
 -- Dumping data for table `traceper_user_candidates`
 --
 
-INSERT INTO `traceper_user_candidates` (`Id`, `email`, `realname`, `password`, `time`) VALUES
-(1, 'test3@traceper.com', 'test3', '8ad8757baa8564dc136c1e07507f4a98', '2011-10-04 10:27:00'),
-(2, 'qwe@qwe.com', 'kdfkjdlf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:36:46'),
-(3, 'qwer@qer.com', 'dlfkdf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:38:56'),
-(4, 'deneme@deneme.com', 'deneme', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 03:02:02'),
-(5, 'contact@mekya.com', 'mekya', 'e10adc3949ba59abbe56e057f20f883e', '2011-12-03 06:06:58');
+INSERT INTO `traceper_user_candidates` (`Id`, `email`, `realname`, `password`, `time`, `registrationMedium`, `preferredLanguage`) VALUES
+(1, 'test3@traceper.com', 'test3', '8ad8757baa8564dc136c1e07507f4a98', '2011-10-04 10:27:00', NULL, NULL),
+(2, 'qwe@qwe.com', 'kdfkjdlf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:36:46', NULL, NULL),
+(3, 'qwer@qer.com', 'dlfkdf', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 02:38:56', NULL, NULL),
+(4, 'deneme@deneme.com', 'deneme', '827ccb0eea8a706c4c34a16891f84e7b', '2011-11-26 03:02:02', NULL, NULL),
+(5, 'contact@mekya.com', 'mekya', 'e10adc3949ba59abbe56e057f20f883e', '2011-12-03 06:06:58', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -329,7 +341,7 @@ CREATE TABLE IF NOT EXISTS `traceper_user_privacy_group_relation` (
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapýsý `traceper_reset_password`
+-- Tablo iï¿½in tablo yapï¿½sï¿½ `traceper_reset_password`
 --
 
 CREATE TABLE IF NOT EXISTS `traceper_reset_password` (
@@ -340,7 +352,7 @@ CREATE TABLE IF NOT EXISTS `traceper_reset_password` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Tablo döküm verisi `traceper_reset_password`
+-- Tablo dï¿½kï¿½m verisi `traceper_reset_password`
 --
 
 -- --------------------------------------------------------
@@ -353,9 +365,9 @@ CREATE TABLE IF NOT EXISTS `traceper_user_was_here` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) unsigned NOT NULL,
   `dataArrivedTime` datetime NOT NULL,
-  `latitude` decimal(8,6) NOT NULL DEFAULT '0.000000',
+  `latitude` decimal(10,6) NOT NULL DEFAULT '0.000000', -- Condidering -90.000000 for latitude (10 digits)
   `altitude` decimal(15,6) NOT NULL DEFAULT '0.000000',
-  `longitude` decimal(9,6) NOT NULL DEFAULT '0.000000',
+  `longitude` decimal(11,6) NOT NULL DEFAULT '0.000000', -- Condidering -180.000000 for latitude (11 digits)
   `deviceId` varchar(64) NOT NULL DEFAULT '0',
   `dataCalculatedTime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`Id`),
