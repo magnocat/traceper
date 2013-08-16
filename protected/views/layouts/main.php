@@ -4,7 +4,7 @@
 <title><?php echo Yii::app()->name; ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="keywords" content="" />
-<meta name="description" content="open source GPS tracking system" />
+<meta name="description" content="Location-based social network and GPS tracking system" />
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css"
 	media="screen, projection" />
@@ -17,18 +17,18 @@
 	type="image/x-icon" />
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/DataOperations.js"></script>
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/MapStructs.js"></script>	
 
 <script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/MapStructs.js"></script>
-<script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/GMapOperator.js"></script>
+	
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/TrackerOperator.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>
-	
 
 <!-- <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet"> -->
 <!-- <script src="http://vjs.zencdn.net/c/video.js"></script> -->
@@ -64,11 +64,16 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 if (Yii::app()->user->isGuest == false)
 {
 	Yii::app()->clientScript->registerScript('getDataInBackground',
-			'trackerOp.getFriendList(1);
+			'trackerOp.getFriendList(1, 0/*UserType::RealUser*/);
 			trackerOp.getImageList(); ',
 			CClientScript::POS_READY);
 }
-
+else
+{
+	Yii::app()->clientScript->registerScript('getDataInBackground',
+			'trackerOp.getImageList(); ',
+			CClientScript::POS_READY);	
+}
 
 $createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
 .CHtml::ajax(
@@ -101,7 +106,6 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 <body>
 
 	<?php
-	
 	//Yii::app()->session['_lang'] = 'en';
 	
 	$app = Yii::app();
@@ -128,7 +132,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 		<script type="text/javascript">		
 			langOp.load("tr");
 		</script>		
-		<?php
+		<?php          
 	}
 	else
 	{
@@ -139,47 +143,51 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 		</script>		
 		<?php
 	}
-	
+		
 	///////////////////////////// About Us Window///////////////////////////
-	echo '<div id="aboutUsWindow"></div>';	
+	echo '<div id="aboutUsWindow" style="display:none;"></div>';	
 	///////////////////////////// Terms Window ///////////////////////////
-	echo '<div id="termsWindow"></div>';
+	echo '<div id="termsWindow" style="display:none;"></div>';
 	///////////////////////////// Contact Window ///////////////////////////
-	echo '<div id="contactWindow"></div>';			
+	echo '<div id="contactWindow" style="display:none;"></div>';			
 	///////////////////////////// User Login Window ///////////////////////////
-	echo '<div id="userLoginWindow"></div>';
+	echo '<div id="userLoginWindow" style="display:none;"></div>';
 	///////////////////////////// Register Window ///////////////////////////
-	echo '<div id="registerWindow"></div>';
+	echo '<div id="registerWindow" style="display:none;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
-	echo '<div id="registerGPSTrackerWindow"></div>';
+	echo '<div id="registerGPSTrackerWindow" style="display:none;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
-	echo '<div id="registerNewStaffWindow"></div>';
+	echo '<div id="registerNewStaffWindow" style="display:none;"></div>';
 	///////////////////////////// GeoFence Window ///////////////////////////
-	echo '<div id="geoFenceWindow"></div>';
+	echo '<div id="geoFenceWindow" style="display:none;"></div>';
 	///////////////////////////// Change Password Window ///////////////////////////
-	echo '<div id="changePasswordWindow"></div>';
+	echo '<div id="changePasswordWindow" style="display:none;"></div>';
 	///////////////////////////// Forget Password Window ///////////////////////////
-	echo '<div id="forgotPasswordWindow"></div>';
+	echo '<div id="forgotPasswordWindow" style="display:none;"></div>';
 	///////////////////////////// Reset Password Window ///////////////////////////
-	echo '<div id="resetPasswordWindow"></div>';
+	echo '<div id="resetPasswordWindow" style="display:none;"></div>';
 	///////////////////////////// Activation Not Received Window ///////////////////////////
-	echo '<div id="activationNotReceivedWindow"></div>';	
+	echo '<div id="activationNotReceivedWindow" style="display:none;"></div>';	
 	///////////////////////////// Invite User Window ///////////////////////////
-	echo '<div id="inviteUsersWindow"></div>';
+	echo '<div id="inviteUsersWindow" style="display:none;"></div>';
 	///////////////////////////// Friend Request Window ///////////////////////////
-	echo '<div id="friendRequestsWindow"></div>';
+	echo '<div id="friendRequestsWindow" style="display:none;"></div>';
 	///////////////////////////// Create Group Window ///////////////////////////
-	echo '<div id="createGroupWindow"></div>';
+	echo '<div id="createGroupWindow" style="display:none;"></div>';
 	///////////////////////////// Group Settings Window ///////////////////////////
-	echo '<div id="groupSettingsWindow"></div>';
+	echo '<div id="groupSettingsWindow" style="display:none;"></div>';
 	///////////////////////////// Group Privacy Settings Window ///////////////////////////
-	echo '<div id="groupPrivacySettingsWindow"></div>';
+	echo '<div id="groupPrivacySettingsWindow" style="display:none;"></div>';
 	///////////////////////////// Group Members Window ///////////////////////////
-	echo '<div id="groupMembersWindow"></div>';
+	echo '<div id="groupMembersWindow" style="display:none;"></div>';
 	///////////////////////////// Geofence Settings Window ///////////////////////////
-	echo '<div id="geofenceSettingsWindow"></div>';
+	echo '<div id="geofenceSettingsWindow" style="display:none;"></div>';
 	////////// Create Geofence Window ///////////////////////////
-	echo '<div id="createGeofenceWindow"></div>';
+	echo '<div id="createGeofenceWindow" style="display:none;"></div>';
+	////////// User Search Results Window ///////////////////////////
+	echo '<div id="userSearchResults" style="display:none;"></div>';
+	////////// Upload Search Results Window ///////////////////////////
+	echo '<div id="uploadSearchResults" style="display:none;"></div>';
 	
 	///////////////////////////// Photo Comment Window ///////////////////////////
 // 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -250,13 +258,34 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							$(this).dialog('close');
 }"
 					),
-
 			),
 	));
-	echo '</br>';
+	//echo '</br>';
 	echo '<div align="center" id="messageDialogText"></div>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
-	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// this is a long generic message dialog
+	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+			'id'=>'longMessageDialog',
+			// additional javascript options for the dialog plugin
+			'options'=>array(
+					'title'=>Yii::t('layout', 'Message'),
+					'autoOpen'=>false,
+					'modal'=>true,
+					'resizable'=>false,
+					'width'=>'600px',
+					'height'=>'auto',
+					'buttons'=>array(
+							Yii::t('common', 'OK')=>"js:function(){
+							$(this).dialog('close');
+	}"
+					),	
+			),
+	));
+	//echo '</br>';
+	echo '<div align="justified" id="longMessageDialogText"></div>';
+	$this->endWidget('zii.widgets.jui.CJuiDialog');
+	
 	/*
 	* this is a generic confirmation dialog
 	*/
@@ -353,7 +382,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								</div>									
 							</div>
 
-							<div class="upperMenu" style="margin-left:30px;">
+							<div class="upperMenu">
 								<div style="height:3.3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'password'); ?>
 									<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
@@ -371,50 +400,24 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 													'id'=>'showForgotPasswordWindow','tabindex'=>5));									
 									?>	 					
 			 					</div>								
-							</div>							
+							</div>						
 														
-							<div class="upperMenu" style="margin-top:0.8%;width:10.5em;margin-left:30px;">
+							<div class="upperMenu" style="margin-top:0.7em;width:10%;min-width:5em;">
 								<div style="height:3.3em;top:0%;padding:0px;">								
 									<?php																											
-									$this->widget('zii.widgets.jui.CJuiButton', array(
+									$this->widget('zii.widgets.jui.CJuiButton', array(											
 											'name'=>'ajaxLogin',
 											'caption'=>Yii::t('site', 'Login'),
 											'id'=>'loginAjaxButton',
 											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 									));															
 									?>
-								</div>
-																									
-							</div>														
+								</div>																					
+							</div>													
 
 							<?php $this->endWidget(); ?>
 						</div>						
-					</div>
-					
-					<div id="appLink" class="upperMenu" style="width:1%;padding:0px;margin-top:1em;">
-						<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0." tabindex="6"><img src="images/Android_QR.png" onmouseover="this.src='images/QR_code.png'" onmouseout="this.src='images/Android_QR.png';document.getElementById('appLink').style.cursor='wait';" /></a>	
-					</div>					
-					
-					<div class="upperMenu" style="margin-top:2.2em;width:15%;margin-left:1em;">
-						<div class="sideMenu" style="top:0%;padding:0px;cursor:default;">
-						<?php 
-// 							$this->widget('zii.widgets.jui.CJuiButton', array(
-// 									'name'=>'facebookLogin',
-// 									'caption'=>Yii::t('layout', 'Sign in with Facebook'),
-// 									'id'=>'facebookLoginWindow',
-// 									'onclick'=>'function(){ '.
-// 									CHtml::ajax(
-// 											array(
-// 													'url'=>array('site/facebooklogin'),
-// 											)).
-// 									' }',
-// 							));
-	 					?>
-	 					</div>
-
-
-					</div>
-										
+					</div>										
 				</div>
 
 				<div id="userId" style="display: none;"></div>
@@ -469,15 +472,61 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								array(
 										'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends')));
 
-						echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
-								<img src="images/friends.png"  /><div></div>
-								</div>', $this->createUrl('users/GetFriendRequestList'),
-								array(
-										'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
-										'update'=> '#friendRequestsWindow',
-								),
-								array(
-										'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests')));
+						$newRequestsCount = null;
+						$totalRequestsCount = null;
+						
+						if (Yii::app()->user->isGuest == false)
+						{
+							Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+						}
+						else
+						{
+							//Bir kullanıcı ID'si olmadığından sorgu yapma
+						}
+																
+						if($newRequestsCount > 0)
+						{
+							//Fb::warn("newRequestsCount > 0", "main");
+							
+							if($newRequestsCount <= 5)
+							{
+								echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
+										<img id="friendRequestsImage" src="images/friends_'.$newRequestsCount.'.png"/><div></div>
+										</div>', $this->createUrl('users/GetFriendRequestList'),
+										array(
+												'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); document.getElementById("friendRequestsImage").src = "images/friends.png"; document.getElementById("friendRequestsImage").title = "'.Yii::t('users', 'Friendship Requests').'"; return false;}',
+												'update'=> '#friendRequestsWindow',
+										),
+										array(
+												'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')'));								
+							}
+							else
+							{
+								echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
+										<img id="friendRequestsImage" src="images/friends_many.png"/><div></div>
+										</div>', $this->createUrl('users/GetFriendRequestList'),
+										array(
+												'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); document.getElementById("friendRequestsImage").src = "images/friends.png"; document.getElementById("friendRequestsImage").title = "'.Yii::t('users', 'Friendship Requests').'"; return false;}',
+												'update'=> '#friendRequestsWindow',
+										),
+										array(
+												'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')'));								
+							}							
+						}
+						else
+						{
+							//Fb::warn("newRequestsCount == 0", "main");
+							
+							echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
+									<img id="friendRequestsImage" src="images/friends.png"  /><div></div>
+									</div>', $this->createUrl('users/GetFriendRequestList'),
+									array(
+											'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
+											'update'=> '#friendRequestsWindow',
+									),
+									array(
+											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests')));							
+						}						
 					}
 
 					echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
@@ -506,7 +555,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					if(Yii::app()->params->featureStaffManagementEnabled)
 					{
 						echo CHtml::ajaxLink('<div class="userOperations" id="registerNewStaff">
-								<img src="images/user_add_friend.png"  /><div></div>
+								<img src="images/add_as_friend.png"  /><div></div>
 								</div>', $this->createUrl('site/registerNewStaff'),
 								array(
 										'complete'=> 'function() { $("#registerNewStaffWindow").dialog("open"); return false;}',
@@ -646,58 +695,97 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							?>
 
 							<div style="padding-left:15px;font-size:3em;">
-								<?php echo $form->labelEx($model,'register'); ?>
+								<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
 							</div>
 							
 							<div class="sideMenu">
-								<?php echo $form->labelEx($model,'email'); ?>
-								<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>128,'tabindex'=>7)); ?>
-								<?php $errorMessage = $form->error($model,'email'); 
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
-									}
-								?>								
-							</div>
-
-							<div class="sideMenu">
+								<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
 								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->textField($model,'name', array('size'=>'30%','maxlength'=>128,'tabindex'=>8)); ?>
+								<?php echo $form->textField($model,'name', array('size'=>'22%','maxlength'=>128,'tabindex'=>7)); ?>
 								<?php $errorMessage = $form->error($model,'name');  
 									if (strip_tags($errorMessage) == '') {
 										echo '<div class="errorMessage">&nbsp;</div>';
 									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
 									}
-								?>								
-							</div>
-
-							<div class="sideMenu">
-								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>128,'tabindex'=>9)); ?>
-								<?php $errorMessage = $form->error($model,'password'); 
+								?>
+								</div>
+								
+								<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
+								<?php echo $form->labelEx($model,'lastName'); ?>
+								<?php echo $form->textField($model,'lastName', array('size'=>'22%','maxlength'=>128,'tabindex'=>8)); ?>
+								<?php $errorMessage = $form->error($model,'lastName');  
 									if (strip_tags($errorMessage) == '') {
 										echo '<div class="errorMessage">&nbsp;</div>';
 									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+									}
+								?>
+								</div>																
+							</div>							
+							
+							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'email'); ?>
+								<?php 
+									$this->widget('ext.tooltipster.tooltipster',
+											array(
+													//'identifier'=>'.registerEmailField',
+													'options'=>array('position'=>'right',
+															'trigger'=>'click',
+															'theme'=>'.tooltipster-noir')
+											));
+																
+									echo $form->textField($model,'email', array('id'=>'registerEmailField', 'class'=>'tooltipster', 'title'=>'Deneme', 'size'=>'50%','maxlength'=>128,'tabindex'=>9));								
+								?>
+								<?php $errorMessage = $form->error($model,'email'); 
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
 									}
 								?>								
 							</div>
 
 							<div class="sideMenu">
+								<?php echo $form->labelEx($model,'emailAgain'); ?>
+								<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10)); ?>
+								<?php $errorMessage = $form->error($model,'emailAgain'); 
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+									}
+								?>								
+							</div>							
+
+							<div class="sideMenu">
+								<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
+								<?php echo $form->labelEx($model,'password'); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>'22%','maxlength'=>128,'tabindex'=>11)); ?>
+								<?php $errorMessage = $form->error($model,'password');
+									if (strip_tags($errorMessage) == '') {
+										echo '<div class="errorMessage">&nbsp;</div>';
+									}
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+									}
+								?>
+								</div>
+								
+								<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
 								<?php echo $form->labelEx($model,'passwordAgain'); ?>
-								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'30%','maxlength'=>128,'tabindex'=>10)); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'22%','maxlength'=>128,'tabindex'=>12)); ?>
 								<?php $errorMessage = $form->error($model,'passwordAgain'); 
 									if (strip_tags($errorMessage) == '') {
 										echo '<div class="errorMessage">&nbsp;</div>';
 									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;width:1000%;">'.$errorMessage.'</div>';
+									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
 									}
-								?>								
+								?>
+								</div>																
 							</div>
 
 							<div class="sideMenu">
+								<div style="position:absolute;display:inline-block;vertical-align:top;width:40%;">
 								<?php
 								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
 								
@@ -711,13 +799,13 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'name'=>'ajaxRegister',
 										'caption'=>Yii::t('site', 'Sign Up'),
 										'id'=>'registerAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','tabindex'=>11,'ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
+										'htmlOptions'=>array('type'=>'submit','tabindex'=>13,'ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
 								));								
 								?>
-							</div>
-							
-							<div style="padding-left:1em;">
-								<?php
+								</div>
+								
+								<div style="position:absolute;left:9em;top:1.2em;display:inline-block;vertical-align:top;width:60%;">
+																<?php
 								echo CHtml::ajaxLink('<div id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
 													'</div>', $this->createUrl('site/activationNotReceived'),
 										array(
@@ -725,9 +813,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 												'update'=> '#activationNotReceivedWindow',
 										),
 										array(
-												'id'=>'showActivationNotReceivedWindow','tabindex'=>12));							
+												'id'=>'showActivationNotReceivedWindow','tabindex'=>14));							
 								?>
-							</div>														
+								</div>
+							</div>
+																					
 							<?php $this->endWidget(); ?>
 						</div>
 					</div>
@@ -758,21 +848,21 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							$model = new ResetPasswordForm;
 							?>							
 							
-							<div style="padding:6.6%;font-size:3em;">
+							<div style="padding:9%;font-size:3em;">
 								<?php echo $form->labelEx($model,'resetPassword'); ?>
 							</div>							
 							
-							<div class="sideMenu">
+							<div class="sideMenu" style="margin-left:2em;">
 								<?php echo $form->labelEx($model,'newPassword'); ?>
 								<?php echo $form->passwordField($model,'newPassword', array('size'=>'30%','maxlength'=>128,'tabindex'=>7)); ?>
 							</div>
 
-							<div class="sideMenu">
+							<div class="sideMenu" style="margin-left:2em;">
 								<?php echo $form->labelEx($model,'newPasswordAgain'); ?>
 								<?php echo $form->passwordField($model,'newPasswordAgain', array('size'=>'30%','maxlength'=>128,'tabindex'=>8)); ?>
 							</div>
 
-							<div class="sideMenu">
+							<div class="sideMenu" style="margin-left:2em;">
 								<?php
 								$this->widget('zii.widgets.jui.CJuiButton', array(      
 										'name'=>'ajaxResetPassword',
@@ -787,9 +877,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						</div>
 					</div>
 				</div>
-				
-				
-				
+												
 				<div id="passwordResetInvalidBlock"
 				<?php
 				if ((Yii::app()->user->isGuest == false) || ($passwordResetRequestStatus == PasswordResetStatus::NoRequest) || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid)) {
@@ -798,11 +886,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				?>>						
 					<div id="forPasswordResetInvalidRefresh">
 						<div class="form">							
-							<div style="font-size:3em;padding:20px;color:#E41B17">
+							<div style="font-size:3em;padding:9%;color:#E41B17">
 								<?php echo CHtml::label(Yii::t('site', 'Reset Your Password'), false); ?>
 							</div>
 							
-							<div style="font-size:1em;padding:20px;color:#E41B17">
+							<div style="font-size:1em;padding:9%;color:#E41B17">
 								<?php echo CHtml::label(Yii::t('site', 'This link is not valid anymore. Did you forget your password, please try to reset your password again.'), false); ?>
 							</div>							
 						</div>
@@ -810,46 +898,26 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							
 					</div>
 				</div>
-				
-				<div id="languageBlock"
+											
+				<div id="appLinkBlock"
 				<?php
-				if (Yii::app()->user->isGuest == false) {
+				if ((Yii::app()->user->isGuest == false)  || ($passwordResetRequestStatus == PasswordResetStatus::RequestValid) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid)) {
 					echo "style='display:none'";
 				}
-				?>>												
-				    <div id="languageSelection">
-				        <div id="langTr">	
-				        	<?php
-				        		if(Yii::app()->language == 'tr')
-				        		{
-				        			echo CHtml::image("images/Turkish.png", "#", array('class'=>'vtip', 'title'=>'Türkçe (şu an bu dil seçili)', 'style'=>'cursor:default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
-				        		}
-				        		else
-				        		{
-				        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>13, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
-				        		}				        					        		
-				        	?>
-				        </div>					    
-				    
-				        <div id="langEn">
-				        	<?php
-				        	//echo CHtml::link('<img src="images/English.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() {'.CHtml::ajax(array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh')).';'.CHtml::ajax(array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh')).';$("#logo").load();}')));
-				        		
-					        	if(Yii::app()->language == 'en')
-					        	{
-					        		echo CHtml::image("images/English.png", "#", array('class'=>'vtip', 'title'=>'English (This is the current language)', 'style'=>'cursor: default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
-					        	}
-					        	else
-					        	{					        		
-					        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>13, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
-					        	}
-				        	?>
-				        </div>					        
-				    </div>									
-				</div>												
-
-												
+				?>>
+			        <div id="appLink" style="position:relative;top:3em;left:1em;" class="vtip" title="<?php echo Yii::t('layout', 'Download the application at Google Play'); ?>">
+			            <a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0." tabindex="6"><img src="images/GooglePlay.png" style="position:absolute;bottom:0;"/></a>  			
+			        </div>				
 				
+			        <div id="appQRCode" style="position:relative;top:3.6em;left:10em;">
+			            <img id="androidBubbleTr" src="images/AndroidBubble_tr.png" style="<?php if(Yii::app()->language != 'tr') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_tr.png';this.style.cursor='default';"/>  			
+			        </div>
+			        
+			        <div id="appQRCode" style="position:relative;top:3.6em;left:10em;">
+			            <img id="androidBubbleEn" src="images/AndroidBubble_en.png" style="<?php if(Yii::app()->language != 'en') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_en.png';this.style.cursor='default';"/>  			
+			        </div>			        									
+				</div>
+
 				<div id="lists"
 				<?php
 				if (Yii::app()->user->isGuest == true) {
@@ -871,7 +939,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 						}
 						
 						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 'id'=>'photos_tab'); //0:image 'id'=>'photos_tab');
-						
+
 						if(Yii::app()->params->featureFriendManagementEnabled)
 						{
 							$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 'id'=>'groups_tab');
@@ -899,6 +967,9 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'cache'=>true,
 										'selected' => 0,
 								),
+								'htmlOptions'=>array(
+										'style'=>'width:345px;',
+								),								
 						));
 					?>
 					</div>
@@ -918,7 +989,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									'update'=> '#aboutUsWindow',
 							),
 							array(
-									'id'=>'showAboutUsWindow','tabindex'=>14));
+									'id'=>'showAboutUsWindow','tabindex'=>16));
 
 					//echo 'AAA';
 					?>
@@ -940,23 +1011,53 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 <!-- 				</div> -->
 				
 				<div class="bottomMenu">	
-					<a href= "http://traceper.blogspot.com" tabindex="15">Blog</a>
+					<a href= "http://traceper.blogspot.com" tabindex="17">Blog</a>
 				</div>
 				
 				<div class="bottomMenu">	
 					<?php
-					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Contact').
+					echo CHtml::ajaxLink('<div id="contact">'.Yii::t('layout', 'Contact').
 							'</div>', $this->createUrl('site/contact'),
 							array(
 									'complete'=> 'function() { $("#contactWindow").dialog("open"); return false;}',
 									'update'=> '#contactWindow',
 							),
 							array(
-									'id'=>'showContactWindow','tabindex'=>16));
+									'id'=>'showContactWindow','tabindex'=>18));
 
 					//echo 'BBB';
 					?>
-				</div>									
+				</div>
+				
+			    <div id="languageSelection">
+			        <div id="langTr">	
+			        	<?php
+			        		if(Yii::app()->language == 'tr')
+			        		{
+			        			echo CHtml::image("images/Turkish.png", "#", array('class'=>'vtip', 'title'=>'Türkçe (şu an bu dil seçili)', 'style'=>'cursor:default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
+			        		}
+			        		else
+			        		{
+			        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
+			        		}				        					        		
+			        	?>
+			        </div>					    
+			    
+			        <div id="langEn">
+			        	<?php
+			        	//echo CHtml::link('<img src="images/English.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() {'.CHtml::ajax(array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh')).';'.CHtml::ajax(array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh')).';$("#logo").load();}')));
+			        		
+				        	if(Yii::app()->language == 'en')
+				        	{
+				        		echo CHtml::image("images/English.png", "#", array('class'=>'vtip', 'title'=>'English (This is the current language)', 'style'=>'cursor: default;border:ridge;border-radius:10px;border-color:#98AFC7;border-width:5px;'));
+				        	}
+				        	else
+				        	{					        		
+				        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
+				        	}
+			        	?>
+			        </div>			        					        
+			    </div>													
 			</div>			
 		</div>
 		

@@ -51,6 +51,7 @@ if ($dataProvider != null) {
 			'summaryText'=>'',
 			'emptyText'=>$emptyText,
 			'pager'=>array( 
+				 'id'=>'GroupsPager',
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',

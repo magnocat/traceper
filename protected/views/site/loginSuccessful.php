@@ -21,6 +21,12 @@
 	$("#tab_view").tabs("load",0);
 	$("#tab_view").tabs("select",0);
 
+	function changeSrcTitleBack(elementid, imgSrc, titleText)
+	{
+	  document.getElementById(elementid).src = imgSrc;
+	  document.getElementById(elementid).title = titleText;
+	}	
+
 	//alert('loginSuccessful.php: offsetTop:'+(offsetTop)+' offsetLeft:'+(offsetLeft));
 </script>	
 
@@ -58,7 +64,36 @@
 		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
 		'update'=>'#staff_groups_tab',
 		)
-	);																	
+	);
+
+	$newRequestsCount = null;
+	$totalRequestsCount = null;
+
+	Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+
+	if($newRequestsCount > 0)
+	{
+		if($newRequestsCount <= 5)
+		{
+		?>
+		<script type="text/javascript">
+			document.getElementById('friendRequestsImage').src = "images/friends_" + <?php echo $newRequestsCount ?> + ".png";			
+			document.getElementById('friendRequestsImage').title = "<?php echo Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')' ?>";
+			document.getElementById('friendRequestsImage').onclick = function() {changeSrcTitleBack('friendRequestsImage', 'images/friends.png', '<?php echo Yii::t('users', 'Friendship Requests') ?>')};
+		</script>	
+		<?php
+		}
+		else
+		{
+		?>
+		<script type="text/javascript">
+			document.getElementById('friendRequestsImage').src = "images/friends_many.png";			
+			document.getElementById('friendRequestsImage').title = "<?php echo Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')' ?>";
+			document.getElementById('friendRequestsImage').onclick = function() {changeSrcTitleBack('friendRequestsImage', 'images/friends.png', '<?php echo Yii::t('users', 'Friendship Requests') ?>')};
+		</script>	
+		<?php
+		}
+	}	
 ?>
 
 <script type="text/javascript">
@@ -72,8 +107,9 @@
 	$("#lists").show();
 	$("#loginBlock").hide();
 	$("#userBlock").load();
-	$("#userBlock").show();	
-	TRACKER.getFriendList(1);	
+	$("#userBlock").show();
+	$("#appLinkBlock").hide();		
+	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
 	TRACKER.getImageList();
 </script>		
 

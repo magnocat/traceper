@@ -8,7 +8,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '500px'      
+			'width'=> '600px'      
 	    ),
 	));
 ?>
@@ -55,7 +55,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 										if (obj.result == "1") 
 										{
 											$("#activationNotReceivedWindow").dialog("close");
-											TRACKER.showMessageDialog("'.Yii::t('site', 'We have sent an account activation link to your mailbox. </br> Please make sure you check the spam folder as well. </br> The links in a spam folder may not work sometimes, so if you face such a case </br> please mark our e-mail as \'Not Spam\' and reclick the link.').'");
+											TRACKER.showLongMessageDialog("'.Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
 										}
 										else if (obj.result == "0")
 										{

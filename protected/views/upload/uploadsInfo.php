@@ -39,6 +39,4 @@
 	{
 		echo 'No files to show... <br/> <br/>';			
 	}
-	
-	echo '<div id="uploadSearchResults"></div>';
 ?>
