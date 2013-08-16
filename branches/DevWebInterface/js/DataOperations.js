@@ -112,11 +112,26 @@ function processUserPastLocations(MAP, locations, userId){
 }
 
 /**
- * this function process users arrayy returned when actions are search user, get user list, update list,
+ * this function process users array returned when actions are search user, get user list, update list,
  * updated list...
  */	
-function processUsers(MAP, users) {
+function processUsers(MAP, users, deletedFriendId) {
 	
+	//alert("processUsers(), start - TRACKER.users.length:" + TRACKER.users.length);
+	//alert('processUsers() called');
+	
+	//Default value implementation in JS
+	//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
+		
+	//if(deletedFriendId != null)
+	if(typeof deletedFriendId !== 'undefined')
+	{
+		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
+		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
+		
+		TRACKER.users.splice(deletedFriendId, 1);			
+	}	
+
 	$.each(users, function(index, value)
 	{
 		var userId = value.user;
@@ -137,7 +152,7 @@ function processUsers(MAP, users) {
 		if (isFriend == "1") {
 			visible = true;
 		}
-		
+
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
 			if(fb_id != 0){
@@ -145,7 +160,7 @@ function processUsers(MAP, users) {
 			}else{
 				var userMarker = MAP.putMarker(location, "images/person.png", visible);
 			}
-				
+	
 			var markerInfo= new MapStruct.MapMarker({marker:userMarker});
 			
 			TRACKER.users[userId] = new TRACKER.User( {//username:username,
@@ -195,7 +210,8 @@ function processUsers(MAP, users) {
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
-			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker,true);						
+			
+			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);						
 			
 			//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
 			//pencerenin yeni konumda da açık olmasının sağlanması
@@ -212,7 +228,7 @@ function processUsers(MAP, users) {
 			{
 				// if they have just become friend, there are no latitude and longitude data 
 				// so this statement will run and we update latitude and longitude
-				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker,true);						
+				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);						
 			}
 
 			if ((TRACKER.users[userId].latitude != latitude ||
@@ -246,7 +262,7 @@ function processUsers(MAP, users) {
 
 				if (TRACKER.traceLineDrawedUserId != userId) {
 					// if traceline is not visible, hide the marker
-					MAP.setMarkerVisible(userMarker,false)						
+					MAP.setMarkerVisible(userMarker, false)						
 				}
 			}
 			
@@ -296,8 +312,26 @@ function processUsers(MAP, users) {
 			TRACKER.users[userId].friendshipStatus = isFriend;	
 		}
 	});
+	
+	//alert("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
+	
+	for (key in TRACKER.users) {
+	    if (TRACKER.users.hasOwnProperty(key)  &&        // These are explained
+	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
+	        key <= 4294967294                // away below
+	        ) {
+			
+	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
+			
+			MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+			
+			if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+			{
+				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
+			}
+	    }
+	}	
 }
-
 
 /**
  * 
@@ -306,7 +340,13 @@ function processImageXML(MAP, xml){
 	var list = "";
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
+	
+	//alert("processImageXML(), start - TRACKER.images.length:" + TRACKER.images.length);
+	
 	$(xml).find("page").find("upload").each(function(){
+		
+		//alert("processImageXML(), find-each");
+		
 		var image = $(this);
 		var imageId = $(image).attr('id');
 		var imageURL =  decodeURIComponent($(image).attr('url'));
@@ -325,7 +365,6 @@ function processImageXML(MAP, xml){
 			TRACKER.imageIds.push(imageId);
 		}
 		
-
 		if (typeof TRACKER.images[imageId] == "undefined") {
 				
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
@@ -344,8 +383,10 @@ function processImageXML(MAP, xml){
 				mapMarker:markerInfoWindow,
 				description:description,
 			});
+			
+			//alert("MAP.setMarkerVisible(true)");
 						
-			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, true);						
+			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN					
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
 				var image = new Image();
 
@@ -388,7 +429,8 @@ function processImageXML(MAP, xml){
 					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
 					
 					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
-
+					TRACKER.images[imageId].infoWindowIsOpened = true;	
+					
 					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
 							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
@@ -397,8 +439,37 @@ function processImageXML(MAP, xml){
 				});				
 			});		
 		}
+		else
+		{
+			//alert("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
+			
+			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN		
+		}
 
 	});
+	
+//	for (var i = 0; i < TRACKER.images.length; i++) {
+//		MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+//	}
+	
+	for (key in TRACKER.images) {
+	    if (TRACKER.images.hasOwnProperty(key)  &&        // These are explained
+	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
+	        key <= 4294967294                // away below
+	        ) {
+			//alert("processUsers(), TRACKER.images[" + key + "]: false");
+
+			MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+			
+			if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+			{
+				MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+			}			
+	    }
+	}	
+	
+	//alert("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
+	
 	return list;
 }
 //TODO: latitude longitude -> location a cevrilsin
