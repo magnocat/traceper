@@ -58,6 +58,7 @@ div.form label
 	font-weight: bold;
 	font-size: 0.9em;
 	display: block;
+	cursor:pointer;
 }
 
 input[type=checkbox] + label
@@ -130,7 +131,7 @@ div.form .errorSummary
 div.form .errorMessage
 {
 	color: red;
-	font-size: 0.9em;
+	font-size: 12px;
 }
 
 div.form .errorSummary p

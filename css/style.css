@@ -29,7 +29,7 @@ a, img {
 }
 #sideBar{
 /* 	width:22%; */
-	width:276px;
+	width:380px; /*width:276px; 300px*/
 	height:86%;
 	min-height:485px;
 /* 	top: 14%; */
@@ -74,14 +74,13 @@ a, img {
 	z-index: 150;
 	position: absolute;
 /* 	right:78%; */
-	left:260px;
+	left:380px; /*left:260px; 284px*/
 	width:16px;
 /* 	width:1%; */
 /* 	min-width:12px; */
 /* 	top:14%; */
 	top:100px;	
-	cursor:pointer;
-		
+	cursor:pointer;		
 }
 #map{	
 	height:86%;
@@ -91,7 +90,7 @@ a, img {
 /* 	top:100px; */	
   	bottom: 0px;
   	right:0px;	
-	min-width:735px;
+	min-width:615px; /*min-width:735px; 711px*/
 	min-height:485px;	 	
 }
 
@@ -124,7 +123,7 @@ a, img {
 	margin-top:0px;
 }
 #sideBar > #content > *  {
-	margin-left:1em;
+	margin-left:0.7em;
 
 }
 
@@ -143,10 +142,11 @@ a, img {
 #forAjaxRefresh  { 
 	list-style: none;
 	padding:0;
-	left:0px;
+	width:78%;
+	left:121px;
 	margin:0px;
 	position: relative;	
-	cursor: pointer;
+	cursor: default;
 }
 
 #userarea ul {
@@ -197,7 +197,7 @@ a, img {
 	cursor:pointer;		
 	position: relative;
 	float: left;
-	left: 1%;
+	left: 0%;
 }
 
 #logoMini, .logoMini {
@@ -223,10 +223,11 @@ a, img {
 
 .upperMenu {
 	height:0px;
-	width:16%;
-	max-width:200px;
+	width:20%;
+	min-width:190px;
+	max-width:250px;
 	float:left;
-	cursor:pointer;		
+	cursor:default;		
 	position: relative;
 	padding:1em; 
 	margin:0px;
@@ -239,7 +240,7 @@ a, img {
 }
 
 .sideMenu {
-	cursor:pointer;		
+	cursor:default;		
 	position: relative;
 /* 	width:30%; */
 /* 	height:2.4em; */
@@ -293,7 +294,7 @@ a, img {
 }
 
 #content{
-	height: 100%;
+	height:100%;
 }
 #friendsList, #photosList{
 	clear: both;
@@ -452,17 +453,17 @@ a, img {
 }
 
 #languageSelection{
-	float:left;
+	float:right;
 	cursor: pointer;
-	left:15%;
-	top:1em;
-	position:relative;	
+	right:1%;
+	bottom:0.5em;
+	position:absolute;	
 }
 
-#langTr, #langEn
+#langTr, #langEn, #appLink, #appQRCode
 {
     display:inline;
-    margin-left:1em;
+    margin-left:0.5em;
 }
 
 .userOperations div{
