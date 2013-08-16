@@ -1,6 +1,6 @@
 <?php
 
-//testDeleteFriendShip() testinde grid view güncellenirken "TypeError: settings is undefined" exception'ı almamak için
+//testDeleteFriendShip() testinde grid view gï¿½ncellenirken "TypeError: settings is undefined" exception'ï¿½ almamak iï¿½in
 //Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
 //Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
 
@@ -32,9 +32,7 @@ if ($dataProvider != null) {
 			$ajaxUrl = Yii::app()->createUrl($this->route, array( CHtml::encode('SearchForm[keyword]')=>$model->attributes['keyword']) ) ;
 		}	
 	}
-	
-	
-	
+
 	if ($isFriendList == true) {
 		
 		//TODO: Refactor make common confirmation dialog 	
@@ -56,12 +54,22 @@ if ($dataProvider != null) {
 																	if (obj.result && obj.result == "1") 
 																	{
 																		$.fn.yiiGridView.update($("#gridViewId").text());
-																		TRACKER.showMessageDialog("'.Yii::t('users', 'The person is removed from your friend list').'");
+													
+																		if(obj.friendShipStatus == "0")
+																		{
+																			TRACKER.showMessageDialog("'.Yii::t('users', 'You have rejected the friendship request').'");
+																		}
+																		else
+																		{
+																			TRACKER.getFriendList(1, 0/*UserType::RealUser*/, null/*New friend id*/, obj.deletedFriendId);
+																			TRACKER.showMessageDialog("'.Yii::t('users', 'The person is removed from your friend list').'");
+																		}
+																		
 																	}
 																	else if (obj.result && obj.result == "0")
 																	{
 																		$.fn.yiiGridView.update($("#gridViewId").text());
-																		TRACKER.showMessageDialog("'.Yii::t('users', 'The friendship request is rejected').'");
+																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
 																	}													
 																	else 
 																	{
@@ -110,7 +118,7 @@ if ($dataProvider != null) {
 															var obj = jQuery.parseJSON(result);
 															if (obj.result && obj.result == "1") 
 															{
-																TRACKER.showMessageDialog("'.Yii::t('users', 'Friend request is sent').'");
+																TRACKER.showMessageDialog("'.Yii::t('users', 'Friend request is sent...').'");
 																$.fn.yiiGridView.update($("#gridViewId").text());
 															}
 															else 
@@ -133,16 +141,15 @@ if ($dataProvider != null) {
 														.$addAsFriendJSFunction,
 		 												CClientScript::POS_READY);									
 	}
-	
-		
-
+			
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
 			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
 			'emptyText'=>$emptyText,
-			'pager'=>array( 
+			'pager'=>array(
+				 'id'=>'UsersPager',	 
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
@@ -192,19 +199,21 @@ if ($dataProvider != null) {
 				    'name'=>Yii::t('common', 'Name'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
-		            'value'=>'CHtml::link($data["Name"], "#", array(
-    										"onclick"=>"TRACKER.trackUser(".$data["id"].");",
-										))',	
+		            'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' : 
+								'(isset($data[\'status\']) && $data[\'status\'] == 1) ? 
+								CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):
+								$data["Name"]',	
 		),
 		//below line is the first line of onClick...
 		//it is deleted due to refactoring on model and controller side
 		// $(\"#friendShipId\").text(".$data[\'friendShipId\'].");
 		array(            // display 'create_time' using an expression
 					'type' => 'raw',
-		            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
+		            'value'=> 'CHtml::link("<img src=\"images/delete.png\"  />", "#",
 										array("onclick"=>"
 														 $(\"#friendId\").text(".$data[\'id\'].");
 														 $(\"#gridViewId\").text(\"'.$viewId.'\");
+				
 														 if((".$data[\'userType\']." == \"'.UserType::RealUser.'\") || (".$data[\'userType\']." == \"'.UserType::GPSDevice.'\"))
 														 {
 															 TRACKER.showConfirmationDialog(\"'.$deleteFrienshipQuestion.'\", deleteFriendship);
@@ -217,9 +226,11 @@ if ($dataProvider != null) {
 												"class"=>"vtip", 
 												"title"=>'.($isFriendRequestList?"Yii::t('users', 'Reject')":"Yii::t('users', 'Delete from your friend list')").
 											')
-					  				  )', 
+					  				  )'				
+				, 
 					'htmlOptions'=>array('width'=>'16px'),
-					'visible'=>$isFriendList || $isFriendRequestList,
+					//'visible'=>($isFriendList || $isFriendRequestList) || '(isset($data[\'status\']) && $data[\'status\'] == 0 && isset($data[\'requester\']) && $data[\'requester\'] == false)',
+					'visible'=>($isFriendList || $isFriendRequestList)
 		),
 		    		
 		   //below line is a parameter of Yii::app()->createUrl(\'users/approveFriendShip...
@@ -227,7 +238,7 @@ if ($dataProvider != null) {
 		    		/*, array(\'friendShipId\'=>$data[\'friendShipId\'])*/
 		array(            // display 'create_time' using an expression
 					'type' => 'raw',
-		            'value'=>'(isset($data[\'status\']) && $data[\'status\'] == 0 
+		            'value'=> '(isset($data[\'status\']) && $data[\'status\'] == 0 
 								&& isset($data[\'requester\']) && $data[\'requester\'] == false) ?
 									CHtml::link(\'<img src="images/approve.png"  />\', \'#\',
 										array(\'onclick\'=>CHtml::ajax(
@@ -241,6 +252,7 @@ if ($dataProvider != null) {
 														{
 															$.fn.yiiGridView.update("'.$viewId.'");
 															$.fn.yiiGridView.update("userListView");
+															TRACKER.getFriendList(1, 0/*UserType::RealUser*/, obj.friendId/*New friend id*/);
 															TRACKER.showMessageDialog("'.Yii::t('users', 'The friendship request is approved, you are now friends...').'");
 														}
 														else 
@@ -257,14 +269,14 @@ if ($dataProvider != null) {
 					  				 )
 					  			: ""',
 					'htmlOptions'=>array('width'=>'16px'),
-					'visible'=>$isFriendRequestList,
+					'visible'=>$isFriendRequestList
 		),
 		array(            // display 'create_time' using an expression
 	/*  This field can only be seen in search results
 	* if status == -1 it means there is no relation between these users*/
 					'type' => 'raw',
 		            'value'=>' (isset($data[\'status\']) && $data[\'status\'] == -1) ?  
-		            				 CHtml::link("<img src=\"images/user_add_friend.png\"  />", "#",
+		            				 CHtml::link("<img src=\"images/add_as_friend.png\"  />", "#",
 					  				array("onclick"=>"$(\"#friendId\").text(".$data[\'id\'].")
 					  								 $(\"#gridViewId\").text(\"'.$viewId.'\"); 
 													 TRACKER.showConfirmationDialog(\"'.$addAsFriendQuestion.'\", addasFriend); 
@@ -274,17 +286,30 @@ if ($dataProvider != null) {
 					  					)
 					 				)
 					 			: (
-										(isset($data[\'status\']) && $data[\'status\'] == 0) ?
-										CHtml::image("images/friend_request_waiting.png", "#",
-						  				array("class"=>"vtip", 
-											  "title"=>'."Yii::t('users', 'Friend request is waiting')".'										  													 									
-						  					)
-						 				)
-						 				: CHtml::image("images/alreadyFriend.png", "#",
+										(isset($data[\'status\']) && $data[\'status\'] == 1) ?
+				
+										CHtml::image("images/alreadyYourFriend.png", "#",
 						  					array("class"=>"vtip", 
 											  	  "title"=>'."Yii::t('users', 'Already your friend')".'										  													 									
 						  					)
-						 				)				
+						 				):										
+										
+										(
+											(isset($data[\'status\']) && $data[\'status\'] == 0 && isset($data[\'requester\']) && $data[\'requester\'] == true)?
+				
+											CHtml::image("images/friendship_request_waiting.png", "#",
+							  				array("class"=>"vtip", 
+												  "title"=>'."Yii::t('users', 'Waiting reply for your friendship request')".'										  													 									
+							  					)
+							 				):
+
+											CHtml::image("images/wants_to_be_friend.png", "#",
+							  				array("class"=>"vtip",
+												  "title"=>'."Yii::t('users', 'This user wants to be friend with you. You can approve or reject the request via <Friendship Requests> menu at the top')".'								  													 									
+							  					)
+											)
+				
+										)
 								   )
 								;',
 					'htmlOptions'=>array('width'=>'16px'),
@@ -292,11 +317,6 @@ if ($dataProvider != null) {
 		),
 	),
 	));
-	
-
-
-
-
 }
 /*
  */

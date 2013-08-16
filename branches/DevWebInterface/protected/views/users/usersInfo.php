@@ -16,7 +16,7 @@
 			<?php echo $form->textField($model,'keyword', array('class'=>'searchBox')); ?>
 			<?php 
 				
-				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Search'), $this->createUrl('users/search'), 
+				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Search'), $this->createUrl('users/search'),
 												array(
 													'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
 													'update'=> '#userSearchResults',
@@ -61,6 +61,4 @@
 	{
 		echo Yii::t('users', 'No users to show...').'<br/> <br/>';				
 	}
-	
-	echo '<div id="userSearchResults"></div>';
 ?>

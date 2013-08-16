@@ -1,56 +1,45 @@
 <?php		
-if ($dataProvider != null) {
-	
+if ($dataProvider != null) {	
 	if (isset($uploadList) && $uploadList == true) {
-		echo "<div id='uploadId' style='display:none'></div>";
-		$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
-		    'id'=>'uploadDeleteConfirmation',
-			// additional javascript options for the dialog plugin
-		    'options'=>array(
-		        'title'=>Yii::t('upload', 'Delete file'),
-		        'autoOpen'=>false,
-		        'modal'=>true, 
-				'resizable'=>false,
-		    	'width'=> '440px',
-				'buttons' =>array (
-					Yii::t('common', 'OK')=>"js:function(){
-									". CHtml::ajax(
-											array(
-													'url'=>Yii::app()->createUrl('upload/delete'),
-													'data'=> array('id'=>"js:$('#uploadId').html()"),
-													'success'=> 'function(result) { 	
-																 	try {
-																 		$("#uploadDeleteConfirmation").dialog("close");
-																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{
-																			$.fn.yiiGridView.update("uploadListView");
-																		}
-																		else 
-																		{
-																			TRACKER.showMessageDialog("Sorry,an error occured in operation");
-																		}
-	
-																	}
-																	catch(ex) {
-																		TRACKER.showMessageDialog("Sorry,an error occured in operation");
-																	}
-																}',
-												)) .
-								"}",
-					Yii::t('common', 'Cancel')=>"js:function() {
-						$( this ).dialog( \"close\" );
-					}" 
-					)),
-				));
-		echo Yii::t('upload', 'Do you really want to delete this file?');
-		$this->endWidget('zii.widgets.jui.CJuiDialog');
+		echo "<div id='uploadId' style='display:none;'></div>";
+
+		$deleteUploadJSFunction = "function deleteUpload() { "
+		.CHtml::ajax(
+			array(
+					'url'=>Yii::app()->createUrl('upload/delete'),
+					'data'=> array('id'=>"js:$('#uploadId').html()"),
+					'success'=> 'function(result) { 	
+								 	try {
+								 		TRACKER.closeConfirmationDialog();
+										var obj = jQuery.parseJSON(result);
+										if (obj.result && obj.result == "1") 
+										{
+											$.fn.yiiGridView.update("uploadListView");
+										}
+										else 
+										{
+											TRACKER.showMessageDialog("Sorry,an error occured in operation");
+										}
+
+									}
+									catch(ex) {
+										TRACKER.showMessageDialog("Sorry,an error occured in operation");
+									}
+								}',
+				)).
+				"}";	
+
+		Yii::app()->clientScript->registerScript('uploadFunctions',
+				$deleteUploadJSFunction,
+				CClientScript::POS_READY);		
 	}
+	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>'uploadListView',
 			'summaryText'=>'',
 			'pager'=>array( 
+				 'id'=>'UploadsPager',
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
@@ -91,7 +80,8 @@ if ($dataProvider != null) {
 		            			?
 		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
 		            						"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
-		            									$(\"#uploadDeleteConfirmation\").dialog(\"open\");", "class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".'
+		            									TRACKER.showConfirmationDialog(\"'.Yii::t('upload', 'Do you really want to delete this file?').'\", deleteUpload);", 				
+											"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".'
 		            						))
 		            			: ""; ',
 					'htmlOptions'=>array('width'=>'16px'),
@@ -99,8 +89,5 @@ if ($dataProvider != null) {
 
 			),
 	));
-	
-	
-
 }
 ?>

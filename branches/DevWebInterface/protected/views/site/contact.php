@@ -21,44 +21,47 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 						 ),
 	
 	)); ?>
-	
 
+	<?php if(Yii::app()->user->isGuest == true) { ?>
 		<div class="row">
-			<?php echo $form->labelEx($model,'firstName'); ?>
-			<?php echo $form->textField($model,'firstName', array('size'=>'30%','maxlength'=>'60%')); ?>
-			<?php $errorMessage = $form->error($model,'firstName'); 
-				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
-				  else { echo $errorMessage; }
-			?>
-		</div>
-	
-		<div class="row">
-			<?php echo $form->labelEx($model,'lastName'); ?>
-			<?php echo $form->textField($model,'lastName', array('size'=>'30%','maxlength'=>'60%')); ?>
-			<?php $errorMessage = $form->error($model,'lastName'); 
-				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
-				  else { echo $errorMessage; }
-			?>
-		</div>
-	
-		<div class="row">
-			<?php echo $form->labelEx($model,'subject'); ?>
-			<?php echo $form->textField($model,'subject', array('size'=>'30%','maxlength'=>'60%')); ?>
-			<?php $errorMessage = $form->error($model,'subject'); 
-				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
-				  else { echo $errorMessage; }
-			?>
-		</div>
+			<div style="display:inline-block;">
+				<?php echo $form->labelEx($model,'firstName'); ?>
+				<?php echo $form->textField($model,'firstName', array('size'=>'25%','maxlength'=>'60%')); ?>
+				<?php $errorMessage = $form->error($model,'firstName'); 
+					  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+					  else { echo $errorMessage; }
+				?>
+			</div>
+		
+			<div style="display:inline-block;margin-left:0.5em;">
+				<?php echo $form->labelEx($model,'lastName'); ?>
+				<?php echo $form->textField($model,'lastName', array('size'=>'25%','maxlength'=>'60%')); ?>
+				<?php $errorMessage = $form->error($model,'lastName'); 
+					  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+					  else { echo $errorMessage; }
+				?>
+			</div>
+		</div>	
 		
 		<div class="row">
 			<?php echo $form->labelEx($model,'email'); ?>
-			<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'60%')); ?>
+			<?php echo $form->textField($model,'email', array('size'=>'55%','maxlength'=>'80%')); ?>
 			<?php $errorMessage = $form->error($model,'email'); 
 				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
 				  else { echo $errorMessage; }
 			?>
 		</div>
-		
+	<?php } ?>			
+	
+		<div class="row">
+			<?php echo $form->labelEx($model,'subject'); ?>
+			<?php echo $form->textField($model,'subject', array('size'=>'55%','maxlength'=>'80%')); ?>
+			<?php $errorMessage = $form->error($model,'subject'); 
+				  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+				  else { echo $errorMessage; }
+			?>
+		</div>
+				
 		<div class="row">
 			<?php echo $form->labelEx($model,'detail'); ?>
 			<?php echo $form->textArea($model,'detail',array('rows'=>'4%', 'cols'=>'65%')); ?>
@@ -71,9 +74,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	<?php if(CCaptcha::checkRequirements()): ?>
 		<div class="row">
 			<?php echo $form->labelEx($model,'verifyCode'); ?>
-			<div class="hint"><?php echo Yii::t('site', 'Please enter the letters as they are shown in the image below. Letters are not case-sensitive.'); ?></div>			
-			<div>
-			<?php $this->widget('CCaptcha'); ?>
+			<div class="hint"><?php echo Yii::t('site', 'Please enter the result of the mathematical operation shown in the image below:'); ?></div>	
+			
+					
+			<div style="height:60px;">
+			<?php $this->widget('CCaptcha', array('id'=>'captchaWidget')); //Her widget'a id vermeyi unutma, yoksa default 'yw0' id'si alýyor!?>
 			<?php echo $form->textField($model,'verifyCode'); ?>
 			</div>
 			<?php $errorMessage = $form->error($model,'verifyCode'); 

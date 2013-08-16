@@ -21,7 +21,7 @@
 				</div>									
 			</div>
 
-			<div class="upperMenu" style="margin-left:30px;">
+			<div class="upperMenu">
 				<div style="height:3.3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'password'); ?>
 					<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
@@ -45,7 +45,7 @@
  				</div>								
 			</div>							
 											
-			<div class="upperMenu" style="margin-top:0.8%;width:10.5em;margin-left:30px;">
+			<div class="upperMenu" style="margin-top:0.7em;width:10%;min-width:5em;">
 				<div style="height:3.3em;top:0%;padding:0px;">								
 					<?php																											
 					$this->widget('zii.widgets.jui.CJuiButton', array(
