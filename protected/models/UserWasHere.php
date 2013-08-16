@@ -42,9 +42,9 @@ class UserWasHere extends CActiveRecord
 		return array(
 			array('userId, dataArrivedTime', 'required'),
 			array('userId', 'numerical', 'integerOnly'=>true),
-			array('latitude', 'length', 'max'=>8),
+			array('latitude', 'length', 'max'=>10), //Condidering -90.000000 for latitude (10 digits)
 			array('altitude', 'length', 'max'=>15),
-			array('longitude', 'length', 'max'=>9),
+			array('longitude', 'length', 'max'=>11), //Condidering -180.000000 for latitude (11 digits)	
 			array('deviceId', 'length', 'max'=>64),
 			array('dataCalculatedTime', 'safe'),
 			// The following rule is used by search().

@@ -28,6 +28,8 @@ class ChangePasswordForm extends CFormModel
 			array('newPasswordAgain', 'compare', 'compareAttribute'=>'newPassword',
 			'message'=>Yii::t('site', 'Passwords not same!')),
 			
+			array('newPassword', 'checkLength'),
+				
 			array('newPassword', 'compare', 'compareAttribute'=>'currentPassword',
 				  'operator'=>'!=',	'message'=>Yii::t('site', 'Same with current password!')),
 		);
@@ -56,7 +58,19 @@ class ChangePasswordForm extends CFormModel
 			
 			if($result == NULL)
 			{
-				$this->addError('currentPassword','Password incorrect!');	
+				$this->addError('currentPassword', Yii::t('site', 'Password incorrect!'));	
+			}
+		}
+	}	
+	
+	public function checkLength($attribute,$params)
+	{
+		//if(!$this->hasErrors())
+		{
+			if(strlen($this->newPassword) < 5)
+				//if(true)
+			{
+				$this->addError('newPassword',Yii::t('site', 'Minimum 5 characters'));
 			}
 		}
 	}	

@@ -10,6 +10,7 @@
  * @property string $friend2
  * @property integer $friend2Visibility
  * @property integer $status
+ * @property integer $isNew
  *
  * The followings are the available model relations:
  * @property TraceperUsers $friend10
@@ -43,11 +44,11 @@ class Friends extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('friend1, friend1Visibility, friend2, friend2Visibility', 'required'),
-			array('friend1Visibility, friend2Visibility, status', 'numerical', 'integerOnly'=>true),
+			array('friend1Visibility, friend2Visibility, status, isNew', 'numerical', 'integerOnly'=>true),
 			array('friend1, friend2', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, friend1, friend1Visibility, friend2, friend2Visibility, status', 'safe', 'on'=>'search'),
+			array('Id, friend1, friend1Visibility, friend2, friend2Visibility, status, isNew', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,6 +77,7 @@ class Friends extends CActiveRecord
 			'friend2' => 'Friend2',
 			'friend2Visibility' => 'Friend2 Visibility',
 			'status' => 'Status',
+			'isNew' => 'Is New',
 		);
 	}
 
@@ -96,11 +98,13 @@ class Friends extends CActiveRecord
 		$criteria->compare('friend2',$this->friend2,true);
 		$criteria->compare('friend2Visibility',$this->friend2Visibility);
 		$criteria->compare('status',$this->status);
+		$criteria->compare('isNew',$this->isNew);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
 	}
+	
 	
 	public function makeFriends($friend1, $friend2){
 		$friends = new Friends();
@@ -108,16 +112,16 @@ class Friends extends CActiveRecord
 		$friends->friend1Visibility = 1; //default visibility setting is visible
 		$friends->friend2 = $friend2;
 		$friends->friend2Visibility = 1; //default visibility setting is visible
-		$friends->status = 1;		
+		$friends->status = 1;
 	
 		return $friends->save();
-	}	
+	}
 	
 	
 	public function makeFriendsVisibilities($friend1, $friend2, $allowToSeeMyPosition){
-		
+	
 		$errorOccured = true;
-		
+	
 		$friendship = Friends::model()->find(array('condition'=>'(friend1=:friend1Id AND friend2=:friend2Id) OR (friend1=:friend2Id AND friend2=:friend1Id)',
 				'params'=>array(':friend1Id'=>$friend1,
 						':friend2Id'=>$friend2
@@ -134,18 +138,18 @@ class Friends extends CActiveRecord
 			{
 				$friendship->friend2Visibility = $allowToSeeMyPosition;
 			}
-		
+	
 			if($friendship->save())
 			{
-				//Privacy setting saved	
+				//Privacy setting saved
 				$errorOccured = false;
 			}
 		}
-
+	
 		return $errorOccured;
 	}
 	
-	public function deleteFriendShip($friendId) 
+	public function deleteFriendShip($friendId, &$par_friendShipStatus)
 	{
 		//TODO: use delete function not findByPk and then delete
 		$friendShip = Friends::model()->find(array('condition'=>'(friend1=:friend1 AND friend2=:friend2) OR (friend1=:friend2 AND friend2=:friend1)',
@@ -153,9 +157,10 @@ class Friends extends CActiveRecord
 				),
 		)
 		);
-		
+	
 		$result = false;
-		
+		$par_friendShipStatus = $friendShip->status;
+	
 		if($friendShip != null)
 		{
 			if($friendShip->delete())
@@ -171,10 +176,9 @@ class Friends extends CActiveRecord
 		{
 			$result = -1;
 		}
-		
+	
 		return $result;
 	}
-	
 	
 	public function getFriendRequestDataProvider($userId, $pageSize) {
 		// we look at the friend2 field because requester id is stored in friend1 field
@@ -183,21 +187,21 @@ class Friends extends CActiveRecord
 		FROM '. Friends::model()->tableName() . ' f
 		WHERE friend2 = '.$userId.'
 		AND status= 0';
-		
+	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
-		
+	
 		/**
 		 * because we use same view in listing users, we put requester field as false
 		 * to make view show approve link,
 		 * requester who make friend request cannot approve request
 		 */
-		$sql = 'SELECT u.Id as id, u.userType as userType, u.realname as Name, f.Id as friendShipId, f.status, u.fb_id, u.account_type,
-					false as requester
-				FROM '. Friends::model()->tableName() . ' f
-				LEFT JOIN ' . Users::model()->tableName() . ' u
-					ON u.Id = f.friend1
-				WHERE friend2='. $userId .' AND status= 0'  ;
-		
+		$sql = 'SELECT u.Id as id, u.userType as userType, u.realname as Name, f.status, u.fb_id, u.account_type,
+		false as requester
+		FROM '. Friends::model()->tableName() . ' f
+		LEFT JOIN ' . Users::model()->tableName() . ' u
+		ON u.Id = f.friend1
+		WHERE friend2='. $userId .' AND status= 0'  ;
+	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -209,36 +213,56 @@ class Friends extends CActiveRecord
 						'pageSize'=>$pageSize,
 				),
 		));
-		
+	
 		return $dataProvider;
 	}
 	
-// 	public function approveFriendShip($friendShipId, $userId) 
-// 	{
-// 		// only friend2 can approve friendship because friend1 makes the request
-// 		$friendShip = $this->findByPk($friendShipId, 
-// 								array( 'condition'=>'friend2=:friend2 AND status=0',
-// 										'params'=>array(':friend2'=>$userId,
-// 												),
-// 								)
-// 							);
-// 		$result = false;
-// 		if ($friendShip != null)
-// 		{
-// 			$friendShip->status = 1;
-// 			if ($friendShip->save()) {
-// 				$result = true;
-// 			}
-// 		}
+	public function getFriendRequestsInfo($par_userId, &$par_newRequestsCount, &$par_totalRequestsCount) {
+		// we look at the friend2 field because requester id is stored in friend1 field
+		// and only friend who has been requested to be a friend can approve frienship
 		
-// 		return $result;
-// 	}
+		$sqlCount = 'SELECT count(*)
+		FROM '. Friends::model()->tableName() . ' f
+		WHERE friend2 = '.$par_userId.'
+		AND status = 0 AND isNew = 1';
+		
+		$par_newRequestsCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();		
+		
+		$sqlCount = 'SELECT count(*)
+		FROM '. Friends::model()->tableName() . ' f
+		WHERE friend2 = '.$par_userId.'
+		AND status = 0';
+	
+		$par_totalRequestsCount = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	}
+	
+	
+	// 	public function approveFriendShip($friendShipId, $userId)
+	// 	{
+	// 		// only friend2 can approve friendship because friend1 makes the request
+	// 		$friendShip = $this->findByPk($friendShipId,
+	// 								array( 'condition'=>'friend2=:friend2 AND status=0',
+	// 										'params'=>array(':friend2'=>$userId,
+	// 												),
+	// 								)
+	// 							);
+	// 		$result = false;
+	// 		if ($friendShip != null)
+		// 		{
+		// 			$friendShip->status = 1;
+		// 			if ($friendShip->save()) {
+		// 				$result = true;
+		// 			}
+		// 		}
+	
+		// 		return $result;
+		// 	}
 	
 	public function approveFriendShip($friendId, $userId)
 	{
 		// only friend2 can approve friendship because friend1 makes the request
 		$friendShip = $this->find('friend1=:friend1 AND friend2=:friend2', array(':friend1'=>$friendId, ':friend2'=>$userId));
-						
+	
 		$result = false;
 		if ($friendShip != null)
 		{
@@ -249,7 +273,7 @@ class Friends extends CActiveRecord
 		}
 	
 		return $result;
-	}	
+	}
 	
 	public function addAsFriend($requesterId, $partnerId)
 	{
@@ -259,22 +283,31 @@ class Friends extends CActiveRecord
 		$friend->friend2 = $partnerId;
 		$friend->friend2Visibility = 1; //default visibility setting is visible
 		$friend->status = 0;
-		$result = false;
+		$friend->isNew = 1;
+		$result = "-100";
+	
 		try
 		{
 			if ($friend->save()) {
-				$result = true;
+				$result = "1"; //New friendship record saved
+			}
+			else
+			{
+				$result = "0"; //New friendship record cannot be saved
 			}
 		}
 		catch (Exception $e)
 		{
 			if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
 			{
-				$result = null;
-
+				$result = "-1"; //Duplicate entry exception occured during friendship record save
+			}
+			else
+			{
+				$result = "-2"; //Unknown exception occured during friendship record save
 			}
 		}
+	
 		return $result;
 	}
-	
 }

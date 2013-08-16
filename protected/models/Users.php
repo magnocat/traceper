@@ -26,6 +26,14 @@
  * @property integer $userType
  * @property integer $account_type
  * @property string $gp_image
+ * @property string $lastLocationAddress
+ * @property integer $minDataSentInterval
+ * @property integer $minDistanceInterval
+ * @property integer $autoSend
+ * @property string $androidVer
+ * @property string $appVer
+ * @property string $registrationMedium
+ * @property string $preferredLanguage
  *
  * The followings are the available model relations:
  * @property TraceperFriends[] $traceperFriends
@@ -62,26 +70,23 @@ class Users extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('password, realname, email, account_type', 'required'),
-			array('publicPosition, authorityLevel, status_source, gender, userType, account_type', 'numerical', 'integerOnly'=>true),
-			array('password', 'length', 'min'=>5, 'max'=>32),
-			array('group', 'length', 'max'=>10),
-			array('latitude', 'length', 'max'=>8),
-			array('longitude', 'length', 'max'=>9),
+			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend', 'numerical', 'integerOnly'=>true),
+			array('password', 'length', 'max'=>32),
+			array('group, latitude, appVer, registrationMedium', 'length', 'max'=>10),
+			array('longitude', 'length', 'max'=>11),
 			array('altitude', 'length', 'max'=>15),
 			array('realname', 'length', 'max'=>80),
 			array('email', 'length', 'max'=>100),
-			/*
-			array('email', 'length', 'min'=>5,'max'=>100),
-			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
-			*/
 			array('deviceId', 'length', 'max'=>64),
 			array('status_message', 'length', 'max'=>128),
 			array('fb_id, g_id', 'length', 'max'=>50),
 			array('gp_image', 'length', 'max'=>255),
-			array('dataArrivedTime, status_message_time, dataCalculatedTime', 'safe'),
+			array('androidVer', 'length', 'max'=>20),
+			array('preferredLanguage', 'length', 'max'=>5),
+			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -129,6 +134,14 @@ class Users extends CActiveRecord
 			'userType' => 'User Type',
 			'account_type' => 'Account Type',
 			'gp_image' => 'Gp Image',
+			'lastLocationAddress' => 'Last Location Address',
+			'minDataSentInterval' => 'Min Data Sent Interval',
+			'minDistanceInterval' => 'Min Distance Interval',
+			'autoSend' => 'Auto Send',
+			'androidVer' => 'Android Ver',
+			'appVer' => 'App Ver',
+			'registrationMedium' => 'Registration Medium',
+			'preferredLanguage' => 'Preferred Language',
 		);
 	}
 
@@ -165,13 +178,21 @@ class Users extends CActiveRecord
 		$criteria->compare('userType',$this->userType);
 		$criteria->compare('account_type',$this->account_type);
 		$criteria->compare('gp_image',$this->gp_image,true);
+		$criteria->compare('lastLocationAddress',$this->lastLocationAddress,true);
+		$criteria->compare('minDataSentInterval',$this->minDataSentInterval);
+		$criteria->compare('minDistanceInterval',$this->minDistanceInterval);
+		$criteria->compare('autoSend',$this->autoSend);
+		$criteria->compare('androidVer',$this->androidVer,true);
+		$criteria->compare('appVer',$this->appVer,true);
+		$criteria->compare('registrationMedium',$this->registrationMedium,true);
+		$criteria->compare('preferredLanguage',$this->preferredLanguage,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
 	}
 	
-	public function updateLocation($latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId){
+	public function updateLocation($latitude, $longitude, $altitude, $address, $calculatedTime, $userId){
 	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
@@ -179,19 +200,42 @@ class Users extends CActiveRecord
 				latitude = %f , '
 				.'	longitude = %f , '
 				.'	altitude = %f ,	'
+				.'	lastLocationAddress = "%s" , '
 				.'	dataArrivedTime = NOW(), '
-				.'	deviceId = "%s"	,'
 				.'  dataCalculatedTime = "%s" '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
-				$latitude, $longitude, $altitude, $deviceId, $calculatedTime, $userId);
+				$latitude, $longitude, $altitude, $address, $calculatedTime, $userId);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		//$effectedRows = 0;
 		return $effectedRows;
 	}
 	
-	public function saveUser($email, $password, $realname, $userType, $accountType){
+	public function updateLocationTime($userId, $par_time)
+	{
+		$sql = sprintf('UPDATE '
+				. $this->tableName() .'
+				SET
+				dataCalculatedTime = "%s" '
+				.' WHERE '
+				.' 	Id = %d '
+				.' LIMIT 1;',
+				$par_time, $userId);
+	
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+	
+		$result = false;
+	
+		if ($effectedRows == 1) {
+			$result = true;
+		}
+	
+		return $result;
+	}
+	
+	public function saveUser($email, $password, $realname, $userType, $accountType, $registrationMedium, $preferredLanguage){
 		$users=new Users;
 	
 		$users->email = $email;
@@ -199,6 +243,8 @@ class Users extends CActiveRecord
 		$users->password = $password;
 		$users->userType = $userType;
 		$users->account_type = $accountType;
+		$users->registrationMedium = $registrationMedium;
+		$users->preferredLanguage = $preferredLanguage;
 	
 		return $users->save();
 	}
@@ -220,7 +266,7 @@ class Users extends CActiveRecord
 		}
 		return $result;
 	}
-
+	
 	public function getNameByEmail($email) {
 		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$name = "";
@@ -228,14 +274,14 @@ class Users extends CActiveRecord
 			$name = $user->realname;
 		}
 		return $name;
-	}	
+	}
 	
 	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
 		if ($fb_id == null || $fb_id == 0) {
 			return false;
 		}
 		$users=new Users;
-		
+	
 		$users->email = $email;
 		$users->realname = $realname;
 		$users->password = $password;
@@ -274,9 +320,9 @@ class Users extends CActiveRecord
 	
 	public function changePassword($Id, $password) {
 		$result = false;
-		
+	
 		$user = Users::model()->findByPk($Id);
-		
+	
 		if($user->password == md5($password)) //If same password
 		{
 			$result = true;
@@ -285,9 +331,9 @@ class Users extends CActiveRecord
 		{
 			if(Users::model()->updateByPk($Id, array("password"=>md5($password)))) {
 				$result = true;
-			}			
+			}
 		}
-		
+	
 		return $result;
 	}
 	
@@ -316,7 +362,7 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
-	public function getListDataProvider($IdList, $userType=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
+	public function getListDataProvider($IdList, $userType=null, $newFriendId=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
 	{
 		$userTypeSqlPart = '';
 		if ($userType != null) {
@@ -334,29 +380,46 @@ class Users extends CActiveRecord
 	
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE Id in ('. $IdList.')';
+		WHERE ((Id in ('. $IdList.')';
 	
-				
-		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
+	
+		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress,
 		u.userType, u.deviceId,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
 		u.account_type, u.fb_id
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE Id in ('. $IdList.')';
-		
+		WHERE ((Id in ('. $IdList.')';
+	
 			
 		if ($time != null) {
-			$timeSql = ' AND unix_timestamp(u.dataArrivedTime) >= '. $time;
+			$timeSql = ' AND unix_timestamp(u.dataArrivedTime) >= '. $time.')';
 			$sqlCount .= $timeSql;
 			$sql .= $timeSql;
+			
+			if ($newFriendId != null) {
+				$newFriendIdSql = ' OR Id = '.$newFriendId.')';
+				$sqlCount .= $newFriendIdSql;
+				$sql .= $newFriendIdSql;
+			}
+			else
+			{
+				$closeParanthesisSql = ')';
+				$sqlCount .= $closeParanthesisSql;
+				$sql .= $closeParanthesisSql;				
+			}			
+		}
+		else {			
+			$doubleCloseParanthesisSql = '))';
+			$sqlCount .= $doubleCloseParanthesisSql;
+			$sql .= $doubleCloseParanthesisSql;			
 		}
 	
 		if ($userTypeSqlPart != '') {
 			$sqlCount .= ' AND ('. $userTypeSqlPart. ')';
 			$sql .= ' AND (' . $userTypeSqlPart. ')';
 		}
-		
+	
 		//echo '</br>$sqlCount: '.$sqlCount.'</br>';
 	
 		//	if ($offset !== null && $itemCount !== null) {
@@ -364,11 +427,11 @@ class Users extends CActiveRecord
 		//	}
 	
 		$count = $totalItemCount;
-						
+	
 		if ($count == null) {
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		}
-		
+	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
 				'sort'=>array(
@@ -391,23 +454,20 @@ class Users extends CActiveRecord
 		if ($IdList != null){
 			$IdListSql = ' Id in ('. $IdList.') AND ';
 		}
-		
-		
+	
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
-		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id ; //Aramada kullan�c�n�n kendisi 踦kma�n diye
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id ; //Aramada kullan覺c覺n覺n kendisi 癟覺kmas覺n diye
 	
-		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude,
-		u.userType, u.deviceId, u.fb_id, u.account_type,
-		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type, IFNULL(f.status, -1) as status
+		$sql = 'SELECT  u.Id as id, u.realname as Name,
+		u.userType, u.fb_id, u.account_type,
+		IFNULL(f.status, -1) as status, IF(f.friend1 = '.Yii::app()->user->id.', true, false) as requester
 		FROM '.  Users::model()->tableName() . ' u
-		LEFT JOIN ' . Friends::model()->tableName() . ' f 
+		LEFT JOIN ' . Friends::model()->tableName() . ' f
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
-		   (f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
-		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullan�c�n�n kendisi 踦kma�n diye
-	
+		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
+		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullan覺c覺n覺n kendisi 癟覺kmas覺n diye
+		
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
@@ -417,7 +477,7 @@ class Users extends CActiveRecord
 								'id', 'Name',
 						),
 				),
-			//	'params'=>array($searchIndex=>$text),
+				//	'params'=>array($searchIndex=>$text),
 				'pagination'=>array(
 						'pageSize'=>Yii::app()->params->itemCountInOnePage,
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
@@ -438,7 +498,7 @@ class Users extends CActiveRecord
 		.' ) '
 		.' AND STATUS = 1';
 		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
-		
+	
 		//echo "Friend Count: ".count($friendsResult);
 	
 		return $friendsResult;
@@ -446,10 +506,13 @@ class Users extends CActiveRecord
 	
 	public function setUserPositionPublicity($userId, $isPublic)
 	{
-		$user=Users::model()->findByPk($userId);
-		$user->publicPosition = ($isPublic == true)?1:0;
+		$result = false;
 	
-		return $user->save();
+		if(Users::model()->updateByPk($userId, array("publicPosition"=>($isPublic == true)?1:0))) {
+			$result = true;
+		}
+	
+		return $result;
 	}
 	
 	public function isUserPositionPublic($userId)
@@ -461,10 +524,13 @@ class Users extends CActiveRecord
 	
 	public function setAuthorityLevel($userId, $level)
 	{
-		$user=Users::model()->findByPk($userId);
-		$user->authorityLevel = $level;
+		$result = false;
 	
-		return $user->save();
+		if(Users::model()->updateByPk($userId, array("authorityLevel"=>$level))) {
+			$result = true;
+		}
+	
+		return $result;
 	}
 	
 	public function getAuthorityLevel($userId)
@@ -474,4 +540,182 @@ class Users extends CActiveRecord
 		return $user->authorityLevel;
 	}
 	
+	public function getUserInfo($userId, &$par_name, &$par_email)
+	{
+		$found = false;
+		$user=Users::model()->findByPk($userId);
+		
+		if($user != null)
+		{
+			$par_name = $user->realname;
+			$par_email = $user->email;
+			$found = true;
+		}
+
+		return $found;
+	}	
+	
+	public function getLoginRequiredValues($userId, &$par_minDataSentInterval, &$par_minDistanceInterval, &$par_facebookId, &$par_autoSend, &$par_deviceId, &$par_androidVer, &$par_appVer, &$preferredLanguage)
+	{
+		$user=Users::model()->findByPk($userId);
+		$result = false;
+	
+		if($user != null)
+		{
+			$par_minDataSentInterval = $user->minDataSentInterval;
+			$par_minDistanceInterval = $user->minDistanceInterval;
+			$par_facebookId = $user->fb_id;
+			$par_autoSend = $user->autoSend;
+			$par_deviceId = $user->deviceId;
+			$par_androidVer = $user->androidVer;
+			$par_appVer = $user->appVer;
+			$preferredLanguage = $user->preferredLanguage;
+	
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+	
+		return $result;
+	}
+	
+	public function getLocationAndMinDistanceInterval($userId, &$par_latitude, &$par_longitude, &$par_altitude, &$par_minDistanceInterval)
+	{
+		$user=Users::model()->findByPk($userId);
+		$result = false;
+	
+		if($user != null)
+		{
+			$par_latitude = $user->latitude;
+			$par_longitude = $user->longitude;
+			$par_altitude = $user->altitude;
+			$par_minDistanceInterval = $user->minDistanceInterval;
+	
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+	
+		return $result;
+	}
+	
+	public function updateProfileItemsNotNull($userId, $par_realname, $par_password, $par_gender, $par_minDataSentInterval, $par_minDistanceInterval, $par_autoSend)
+	{
+		$user=Users::model()->findByPk($userId);
+	
+		// 		$result = false;
+		// 		$paramsArray = array();
+	
+		if($par_realname != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("realname"=>$par_realname));
+				
+			$user->realname = $par_realname;
+		}
+	
+		if($par_password != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("password"=>$par_password));
+				
+			$user->password = $par_password;
+		}
+	
+		if($par_gender != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("gender"=>$par_gender));
+				
+			$user->gender = $par_gender;
+		}
+	
+		if($par_minDataSentInterval != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("minDataSentInterval"=>$par_minDataSentInterval));
+				
+			$user->minDataSentInterval = $par_minDataSentInterval;
+		}
+	
+		if($par_minDistanceInterval != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("minDistanceInterval"=>$par_minDistanceInterval));
+				
+			$user->minDistanceInterval = $par_minDistanceInterval;
+		}
+	
+		if($par_autoSend != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("autoSend"=>$par_autoSend));
+				
+			$user->autoSend = $par_autoSend;
+		}
+	
+		// 		if(Users::model()->updateByPk($userId, $paramsArray)) {
+		// 			$result = true;
+		// 		}
+	
+		return $user->save();
+	}
+	
+	public function updateLoginSentItemsNotNull($userId, $par_deviceId, $par_androidVer, $par_appVer, $par_preferredLanguage)
+	{
+		$user=Users::model()->findByPk($userId);
+
+		if($par_deviceId != null)
+		{
+			$user->deviceId = $par_deviceId;
+		}
+	
+		if($par_androidVer != null)
+		{
+			$user->androidVer = $par_androidVer;
+		}
+	
+		if($par_appVer != null)
+		{
+			$user->appVer = $par_appVer;
+		}
+	
+		if($par_preferredLanguage != null)
+		{
+			$user->preferredLanguage = $par_preferredLanguage;
+		}
+	
+		return $user->save();
+	}	
+	
+	public function setDeviceId($userId, $par_deviceId)
+	{
+		$result = false;
+	
+		if(Users::model()->updateByPk($userId, array("deviceId"=>$par_deviceId))) {
+			$result = true;
+		}
+	
+		return $result;
+	}
+	
+	public function setAndroidVersion($userId, $par_androidVer)
+	{
+		$result = false;
+	
+		if(Users::model()->updateByPk($userId, array("androidVer"=>$par_androidVer))) {
+			$result = true;
+		}
+	
+		return $result;
+	}
+	
+	public function setApplicationVersion($userId, $par_appVer)
+	{
+		$result = false;
+	
+		if(Users::model()->updateByPk($userId, array("appVer"=>$par_appVer))) {
+			$result = true;
+		}
+	
+		return $result;
+	}	
 }
