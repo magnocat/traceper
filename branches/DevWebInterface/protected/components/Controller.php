@@ -1,4 +1,7 @@
 <?php
+
+require_once(dirname(__FILE__).'/PHPMailer_5.2.4/class.phpmailer.php');
+
 /**
  * Controller is the customized base controller class.
  * All controller classes for this application should extend from this base class.
@@ -40,5 +43,63 @@ class Controller extends CController
 			$app->language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
 			//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
 		}
+		
+		// register class paths for extension captcha extended
+		Yii::$classMap = array_merge( Yii::$classMap, array(
+				'CaptchaExtendedAction' => Yii::getPathOfAlias('ext.captchaExtended').DIRECTORY_SEPARATOR.'CaptchaExtendedAction.php',
+				'CaptchaExtendedValidator' => Yii::getPathOfAlias('ext.captchaExtended').DIRECTORY_SEPARATOR.'CaptchaExtendedValidator.php'
+		));		
+	}
+
+	public function SMTP_UTF8_mail($fromEmail, $fromName, $toEmail, $toName, $subject, $message)
+	{
+		$message .= '<br/><br/>';
+		$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+		$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact (contact@traceper.com)</a> address if you need to contact us.');		
+		
+		header("Content-Type: text/html; charset=utf-8");
+	
+		error_reporting(E_ALL);
+		//error_reporting(E_STRICT);
+		date_default_timezone_set('Europe/Istanbul');
+	
+		$mail = new PHPMailer();
+		$body = '
+		<html>
+		<head>
+		<title>'.$subject.'</title>
+		</head>
+		<body>'.$message.
+		'</body>
+		</html>
+		';
+		$mail->Subject = $subject;
+		$mail->MsgHTML($body);
+		//$mail->Body = $message; //$mail->MsgHTML($body);
+	
+		$mail->IsSMTP(); // telling the class to use SMTP
+		$mail->Host = "mail.traceper.com"; // SMTP server
+		$mail->SMTPDebug = 1; // enables SMTP debug information (for testing) - 1 = errors and messages / 2 = messages only
+		$mail->SMTPAuth   = true;                  // enable SMTP authentication
+		$mail->Port       = 587;                    // set the SMTP port for the GMAIL server
+		$mail->Username   = "noreply@traceper.com"; // SMTP account username
+		$mail->Password   = "yudu1234yudu";        // SMTP account password
+		$mail->IsHTML(true);
+		$mail->SetFrom($fromEmail, $fromName);
+		$mail->AddReplyTo($fromEmail, $fromName);
+		$mail->CharSet    = 'utf-8';
+		$mail->AltBody    = Yii::t('site', 'Allow the HTML browser to view this message!'); // optional, comment out and test
+	
+		$mail->AddAddress($toEmail, $toName);
+	
+		return $mail->Send();
+	
+		// 		if(!$mail->Send()) {
+		// 			$arr = array ('kmt'=>0);
+		// 			echo json_encode($arr);
+		// 		} else {
+		// 			$arr = array ('kmt'=>1);
+		// 			echo json_encode($arr);
+		// 		}
 	}	
 }

@@ -7,6 +7,8 @@
  */
 class UserIdentity extends CUserIdentity
 {
+	const ERROR_REGISTRATION_UNCOMPLETED=10;
+	
 	private $realname;
 	private $userId;
 
@@ -33,8 +35,15 @@ class UserIdentity extends CUserIdentity
 //  			else {
 //  				$this->errorCode = self::ERROR_USERNAME_INVALID;
 //  			}
- 			
- 			$this->errorCode = self::ERROR_USERNAME_INVALID;
+
+			if(UserCandidates::model()->find($criteria) != null)
+			{
+				$this->errorCode = self::ERROR_REGISTRATION_UNCOMPLETED;
+			}
+			else
+			{
+				$this->errorCode = self::ERROR_USERNAME_INVALID;
+			} 			 			
 		}
 		else if ($user->password == md5($this->password)) {
 			$this->errorCode = self::ERROR_NONE;
@@ -44,6 +53,7 @@ class UserIdentity extends CUserIdentity
 		else {
 			$this->errorCode = self::ERROR_PASSWORD_INVALID;				
 		}
+		
 		return $this->errorCode;
 	}
 	
