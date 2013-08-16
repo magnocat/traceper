@@ -56,7 +56,7 @@
         {
           if (!empty($value))
           {
-            $message=$this->message!==null?$this->message:Yii::t('yii', '{value} is not a valid email address.');
+            $message=$this->message!==null?$this->message:Yii::t('site', '{value} is not a valid email address');
             $this->addError($object,$attribute,$message, array('{value}'=>$value));
           }
         }

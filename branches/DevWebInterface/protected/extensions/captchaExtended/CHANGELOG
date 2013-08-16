@@ -1,0 +1,12 @@
+Captcha Extended Change Log
+===========================
+
+Version 1.0.1 July 01, 2012
+---------------------------
+- fixed client-side validation that generated incorrect validation hash
+
+Version 1.0.0 August 29, 2011
+----------------------------
+Initial release
+
+Please report bugs to lubosdz AT hotmail DOT com.
