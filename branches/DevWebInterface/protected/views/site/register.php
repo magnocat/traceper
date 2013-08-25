@@ -88,22 +88,41 @@
 	
 	<div class="sideMenu">
 		<div style="position:absolute;display:inline-block;vertical-align:top;width:40%;">
-		<?php
-								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-								
-// 								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'),
-// 										array('success'=>'function(data){
-// 												$("#forRegisterRefresh").html(data);
-// 											}'),
-// 										array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-
-								$this->widget('zii.widgets.jui.CJuiButton', array(
-										'name'=>'ajaxRegister',
-										'caption'=>Yii::t('site', 'Sign Up'),
-										'id'=>'registerAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','tabindex'=>13,'ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
-								));								
-								?>
+			<?php
+			$this->widget('zii.widgets.jui.CJuiButton', array(
+					'name'=>'ajaxRegister',
+					'caption'=>Yii::t('site', 'Sign Up'),
+					'id'=>'registerAjaxButton',
+					'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),
+											'success'=> 'function(msg){																																								
+															try
+															{																								
+																var obj = jQuery.parseJSON(msg);
+																	
+																if (obj.result)
+																{
+																	if (obj.result == "1") 
+																	{
+																		TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																	}
+																	else if (obj.result == "2")
+																	{
+																		TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+																	}
+																	else if (obj.result == "0")
+																	{
+																		TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
+																	}																													
+																}
+															}
+															catch (error)
+															{
+																$("#forRegisterRefresh").html(msg);
+															}			
+											}',
+					))
+			));								
+			?>
 		</div>
 		
 		<div style="position:absolute;left:9em;top:1.2em;display:inline-block;vertical-align:top;width:60%;">

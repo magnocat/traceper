@@ -105,66 +105,49 @@ class UsersController extends Controller
 			else 
 			{
 				$address = null;
-			}						
+			}
 
 			if (Yii::app()->user->id != false)
 			{
 				$lastLatitude = 0;
 				$lastLongitude = 0; 
 				$lastAltitude = 0; 
-				$minDistanceInterval = 0; 
+				$minDistanceInterval = 0;
+				$minDataSentInterval = 0;
 
-				Users::model()->getLocationAndMinDistanceInterval(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $minDistanceInterval);
+				Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+				UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
 				
 				$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 				$distanceInMs = $distanceInKms * 1000;
+				
+				//Users table is always updated whether the distance difference is high enough or not
+				if (Users::model()->updateLocation($latitude, $longitude, $altitude, $address, $calculatedTime, Yii::app()->user->id) == 1)
+				{
+					$result = "1"; //Location updated successfully
+				}
+				else
+				{
+					$result = "0"; //Error occured in save operation
+				}
 
+				//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table 
 				if($distanceInMs > $minDistanceInterval)
 				{
 					//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
-					
-					if (Users::model()->updateLocation($latitude, $longitude, $altitude, $address, $calculatedTime, Yii::app()->user->id) == 1)
+
+					if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
 					{
-						//Fb::warn('Users::model()->updateLocation() successful', "UsersController");
+						//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
 						
-						if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
-						{
-							//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
-							
-							$result = "1"; //Values updated successfully
-						}
-						else
-						{
-							//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
-							
-							$result = "0"; //Error occured in save operation
-						}
-											
-						//Fb::warn("Both Users and UserWasHere updated", "UsersController");
+						//$result = "1"; //Values updated successfully
 					}
 					else
 					{
-						//Fb::warn('Users::model()->updateLocation() ERROR', "UsersController");
+						//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
 						
-						$result = "0"; //Error occured in save operation
+						//$result = "0"; //Error occured in save operation
 					}					
-				}
-				else
-				{	
-					//Fb::warn('else', "UsersController");
-					
-					if(Users::model()->updateLocationTime(Yii::app()->user->id, $calculatedTime))
-					{
-						$result = "1"; //Values updated successfully
-						
-						//Fb::warn("Users::model()->updateLocationTime() successful", "UsersController");
-					}
-					else
-					{
-						$result = "0"; //Error occured in save operation
-						
-						//Fb::warn("Users::model()->updateLocationTime() ERROR", "UsersController");
-					}
 				}				
 			}
 			else
@@ -181,8 +164,8 @@ class UsersController extends Controller
 		
 		if($result == "1") {
 			$resultArray = array_merge($resultArray, array(
-					"minDataSentInterval"=> Yii::app()->params->minDataSentInterval,
-					"minDistanceInterval"=> Yii::app()->params->minDistanceInterval,
+					"minDataSentInterval"=>$minDataSentInterval,
+					"minDistanceInterval"=>$minDistanceInterval,
 			));
 		}
 		
@@ -392,13 +375,20 @@ class UsersController extends Controller
 			
 		$friendIdList = $this->getFriendIdList();
 		
-		if ($friendIdList != -1) {
-			$friendIdList .= ',' . Yii::app()->user->id;
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+		{
+			//Do not add user himself for mobile
 		}
-		else {
-			$friendIdList = Yii::app()->user->id;
+		else //For web
+		{
+			if ($friendIdList != -1) {
+				$friendIdList .= ',' . Yii::app()->user->id;
+			}
+			else {
+				$friendIdList = Yii::app()->user->id;
+			}			
 		}
-		
+				
 		$time = null;
 		
 		if (isset($_REQUEST['list']) && $_REQUEST['list'] == "onlyUpdated") {
@@ -538,7 +528,7 @@ class UsersController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
 			Yii::app()->clientScript->scriptMap['*.js'] = false;
 			Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -601,34 +591,95 @@ class UsersController extends Controller
 	{
 		$result = "-100";
 
-		if(isset($_REQUEST['friendId'])) 
+		if(isset($_REQUEST['friendId']) && isset($_REQUEST['language'])) 
 		{
 			$friendId = (int)$_REQUEST['friendId'];
+			
+			$mobileLang = null;
+			$mobileLang = $_REQUEST['language'];
+						
 			$result = Friends::model()->addAsFriend(Yii::app()->user->id, $friendId);
 			
-			$requesterName = null;
-			$requesterEmail = null;
-			Users::model()->getUserInfo(Yii::app()->user->id, $requesterName, $requesterEmail);
-			
-			$friendCandidateName = null;
-			$friendCandidateEmail = null;
-			Users::model()->getUserInfo($friendId, $friendCandidateName, $friendCandidateEmail);
-
-			$message = Yii::t('site', 'Hi').' '.$friendCandidateName.',<br/><br/>';
-			$message .= $requesterName.', ';				
-			$message .= Yii::t('users', 'wants to be your friend at Traceper').'.'.'<br/><br/>';
-			$message .= Yii::t('users', 'If you wish you could accept or reject this friendship request using the "Friendship Requests" menu of your mobile application or at address www.traceper.com.');
-			
-			//echo $message;
+			//Friends tablosuna ekleme başarılıysa mail at, yoksa boşuna mail atma
+			if(1 == $result)
+			{
+				$requesterName = null;
+				$requesterEmail = null;
+				Users::model()->getUserInfo(Yii::app()->user->id, $requesterName, $requesterEmail);
+					
+				$friendCandidateName = null;
+				$friendCandidateEmail = null;
+				Users::model()->getUserInfo($friendId, $friendCandidateName, $friendCandidateEmail);
+					
+				$isTranslationRequired = false;
+					
+				if($mobileLang != null)
+				{
+					if($mobileLang == 'tr')
+					{
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = false;
+						}
+						else
+						{
+							$isTranslationRequired = true;
+						}
+					}
+					else
+					{
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = true;
+						}
+						else
+						{
+							$isTranslationRequired = false;
+						}
+					}
+				}
+					
+				if($isTranslationRequired == true)
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'tr';
+					}
+					else
+					{
+						Yii::app()->language = 'en';
+					}
+				}
 				
-			if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $friendCandidateEmail, $friendCandidateName, $requesterName.', '.Yii::t('users', 'wants to be your friend at Traceper'), $message))
-			{
-				//Mail gönderildi
-			}
-			else
-			{
-				//Mail gönderilirken hata oluştu
-			}			
+				$message = Yii::t('site', 'Hi').' '.$friendCandidateName.',<br/><br/>';
+				$message .= $requesterName.', ';
+				$message .= Yii::t('users', 'wants to be your friend at Traceper').'.'.'<br/><br/>';
+				$message .= Yii::t('users', 'If you wish you could accept or reject this friendship request using the "Friendship Requests" menu of your mobile application or at address www.traceper.com.');
+					
+				//echo $message;
+				
+				if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $friendCandidateEmail, $friendCandidateName, $requesterName.', '.Yii::t('users', 'wants to be your friend at Traceper'), $message))
+				{
+					//Mail gönderildi
+				}
+				else
+				{
+					//Mail gönderilirken hata oluştu
+				}
+				
+				//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
+				if($isTranslationRequired == true) //Recover the language if needed for mobile
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'en';
+					}
+					else
+					{
+						Yii::app()->language = 'tr';
+					}
+				}				
+			}						
 		}
 		else
 		{

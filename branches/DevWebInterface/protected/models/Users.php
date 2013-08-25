@@ -82,7 +82,7 @@ class Users extends CActiveRecord
 			array('fb_id, g_id', 'length', 'max'=>50),
 			array('gp_image', 'length', 'max'=>255),
 			array('androidVer', 'length', 'max'=>20),
-			array('preferredLanguage', 'length', 'max'=>5),
+			array('preferredLanguage', 'length', 'max'=>20),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -218,7 +218,8 @@ class Users extends CActiveRecord
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
 				SET
-				dataCalculatedTime = "%s" '
+				dataArrivedTime = NOW(), '				
+				.' dataCalculatedTime = "%s" '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
@@ -581,17 +582,15 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
-	public function getLocationAndMinDistanceInterval($userId, &$par_latitude, &$par_longitude, &$par_altitude, &$par_minDistanceInterval)
+	public function getMinimumIntervalValues($userId, &$par_minDistanceInterval, &$par_minDataSentInterval)
 	{
 		$user=Users::model()->findByPk($userId);
 		$result = false;
 	
 		if($user != null)
 		{
-			$par_latitude = $user->latitude;
-			$par_longitude = $user->longitude;
-			$par_altitude = $user->altitude;
 			$par_minDistanceInterval = $user->minDistanceInterval;
+			$par_minDataSentInterval = $user->minDataSentInterval;
 	
 			$result = true;
 		}

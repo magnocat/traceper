@@ -103,7 +103,7 @@ class GroupsController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 		
-		//Yukarýdakiler kullanýlýnca az da olsa sorun oluyor, bunu koyunca hiç sorun olmuyor
+		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
 			Yii::app()->clientScript->scriptMap['*.js'] = false;
 			Yii::app()->clientScript->scriptMap['*.css'] = false;

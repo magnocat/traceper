@@ -50,7 +50,7 @@
 					<?php																											
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxLogin',
-							'caption'=>Yii::t('site', 'Login'),
+							'caption'=>Yii::t('site', 'Log in'),
 							'id'=>'loginAjaxButton',
 							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 					));															
