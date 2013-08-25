@@ -3,7 +3,22 @@ function bindElements(langOperator, trackerOp)
 	/**
 	 * binding operation to search user
 	 */	
+	
+//	$(document).ready(function() {
+//		   $('.tooltip').tooltipster();
+//		});	
+	
+// 	$("#registerEmailField").click(function ()	{
+// 		$("#registerEmailField").tooltipster('show');
+// 		//$('.tooltip').tooltipster('show');
+// 		
+// 		//alert("Deneme");
+//	});
+ 	
 	$("#bar").click(function ()	{
+		
+		//alert("Deneme");
+		
 	    var w = $(window).width();
 	    
 	    if(w < 1007)
@@ -157,7 +172,9 @@ function bindElements(langOperator, trackerOp)
 	    	 }
 	    	 break;
     	 }     	 
-     });     
+     });
+     
+     
 		
 //	$("#bar").click(function ()	{	
 //				if ($('#sideBar > #content').css('display') == "none")

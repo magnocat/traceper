@@ -166,7 +166,7 @@ class SiteController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
 			Yii::app()->clientScript->scriptMap['*.js'] = false;
 			Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -237,11 +237,11 @@ class SiteController extends Controller
 						}
 					}
 					
-					if (isset($_REQUEST['preferredLanguage']))
+					if (isset($_REQUEST['language']))
 					{
-						if(strcmp($preferredLanguage, $_REQUEST['preferredLanguage']) != 0)
+						if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
 						{
-							$preferredLanguage = $_REQUEST['preferredLanguage'];
+							$preferredLanguage = $_REQUEST['language'];
 							$isRecordUpdateRequired = true;
 						}
 					}
@@ -258,7 +258,7 @@ class SiteController extends Controller
 							"minDataSentInterval"=> $minDataSentInterval,
 							"minDistanceInterval"=> $minDistanceInterval,							
 							"facebookId"=> $facebookId,
-							"autoSend "=> $autoSend
+							"autoSend"=> $autoSend
 					));
 				}
 				else {
@@ -282,7 +282,7 @@ class SiteController extends Controller
 					{
 						$result = "0";
 					}
-					else if($model->getError('password') == Yii::t('site', 'Activate your account first'))
+					else if($model->getError('email') == Yii::t('site', 'Activate your account first'))
 					{
 						$result = "-1";
 					}
@@ -307,7 +307,7 @@ class SiteController extends Controller
 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 					
-					//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+					//Complete solution for blinking problem at FireFox
 					if (Yii::app()->request->getIsAjaxRequest()) {
 						Yii::app()->clientScript->scriptMap['*.js'] = false;
 						Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -340,20 +340,14 @@ class SiteController extends Controller
 
 			$this->FB_Web_Register($nd);
 			if($nd == 0)
-			{
-					
-
-
+			{					
 				$str=array("email" => Yii::app()->session['facebook_user']['email'] ,"password" => Yii::app()->session['facebook_user']['id']) ;
-
 					
 				$this->fbLogin($str);
 					
-
 			}else {
 
 			}
-
 
 			//exit;
 			$this->redirect($user->returnUrl);
@@ -378,7 +372,6 @@ class SiteController extends Controller
 			$this->redirect(Yii::app()->homeUrl);
 		}
 	}
-
 
 	/**
 	 * Changes the user's current password with the new one
@@ -413,7 +406,7 @@ class SiteController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
 			Yii::app()->clientScript->scriptMap['*.js'] = false;
 			Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -432,6 +425,16 @@ class SiteController extends Controller
 		$model = new ForgotPasswordForm;
 	
 		$processOutput = true;
+				
+		$mobileLang = null;
+		
+		if(isset($_REQUEST['language']))
+		{
+			$mobileLang = $_REQUEST['language'];
+		}
+				
+		$result = "-100";
+		
 		// collect user input data
 		if(isset($_POST['ForgotPasswordForm']))
 		{
@@ -440,52 +443,129 @@ class SiteController extends Controller
 			if($model->validate()) {				
 				$token = sha1(uniqid(mt_rand(), true));
 
-				if(Users::model()->isUserRegistered($model->email))
+				ResetPassword::model()->saveToken($model->email, $token);
+				$name = Users::model()->getNameByEmail($model->email);
+				
+				$isTranslationRequired = false;
+				
+				if($mobileLang != null)
 				{
-					ResetPassword::model()->saveToken($model->email, $token);
-					$name = Users::model()->getNameByEmail($model->email);
-					
-					$message = Yii::t('site', 'Hi').' '.$name.',<br/><br/>';
-									
-					$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking');
-					$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">'.Yii::t('site', 'here').'</a>';
-					$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
-					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">';
-					$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
-					$message .= '</a>';
-					$message .= '<br/><br/><br/>';										
-					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.');				
-
-					//echo $message;
-					
-					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, $name, Yii::t('site', 'Did you forget your Traceper password?'), $message))
+					if($mobileLang == 'tr')
 					{
-						echo CJSON::encode(array("result"=> "1", "email"=>$model->email));
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = false;
+						}
+						else
+						{
+							$isTranslationRequired = true;
+						}
 					}
 					else
 					{
-						echo CJSON::encode(array("result"=> "0"));
-					}										
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = true;
+						}
+						else
+						{
+							$isTranslationRequired = false;
+						}
+					}
+				}
+				
+				if($isTranslationRequired == true)
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'tr';
+					}
+					else
+					{
+						Yii::app()->language = 'en';
+					}
+				}				
+				
+				$message = Yii::t('site', 'Hi').' '.$name.',<br/><br/>';
+								
+				$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking');
+				$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">'.Yii::t('site', 'here').'</a>';
+				$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
+				$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">';
+				$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
+				$message .= '</a>';
+				$message .= '<br/><br/><br/>';										
+				$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.');				
+
+				//echo $message;
+				
+				if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, $name, Yii::t('site', 'Did you forget your Traceper password?'), $message))
+				{
+					echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
 				}
 				else
 				{
-					echo CJSON::encode(array("result"=> "0"));
+					echo CJSON::encode(array("result"=>"0")); //Error occured while sending e-mail
 				}
 
+				//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
+				if($isTranslationRequired == true) //Recover the language if needed for mobile
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'en';
+					}
+					else
+					{
+						Yii::app()->language = 'tr';
+					}
+				}				
+				
+				//Even if web for these results no renderPartial required so end the running code
 				Yii::app()->end();
 			}
+			else //Form invalid
+			{	
+				//Update results to be used in mobile
+				
+				if($model->getError('email') == Yii::t('site', 'This e-mail is not registered!'))
+				{
+					$result = "-1";
+				}
+				else if($model->getError('email') == Yii::t('site', 'Registration incomplete, please request activation e-mail below the sign up form'))
+				{
+					$result = "-2";
+				}
+				else
+				{
+					$result = "-3"; //Unknown form error
+				}													
+			}
 		}
-	
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		else
+		{
+			//Update results to be used in mobile
+			
+			$result = "-4"; //Form missing					
+		}
 		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
-		if (Yii::app()->request->getIsAjaxRequest()) {
-			Yii::app()->clientScript->scriptMap['*.js'] = false;
-			Yii::app()->clientScript->scriptMap['*.css'] = false;
-		}		
-	
-		$this->renderPartial('forgotPassword',array('model'=>$model), false, $processOutput);
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+		{
+			echo CJSON::encode(array("result"=> $result));
+		}
+		else
+		{
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			
+			//Complete solution for blinking problem
+			if (Yii::app()->request->getIsAjaxRequest()) {
+				Yii::app()->clientScript->scriptMap['*.js'] = false;
+				Yii::app()->clientScript->scriptMap['*.css'] = false;
+			}
+			
+			$this->renderPartial('forgotPassword',array('model'=>$model), false, $processOutput);			
+		}
 	}	
 	
 	/**
@@ -517,20 +597,25 @@ class SiteController extends Controller
 				{
 					ResetPassword::model()->deleteToken($token);
 
-					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-					$this->renderPartial('resetPasswordSuccessful',array(), false, $processOutput);
+// 					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+// 					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+// 					$this->renderPartial('resetPasswordSuccessful',array(), false, $processOutput);
 					
-					Yii::app()->end();
+// 					Yii::app()->end();
+
+					echo CJSON::encode(array("result"=>"1"));
 				}
 				else
 				{				
 					//Fb::warn("An error occured while changing your password!", "SiteController - actionResetPassword()");
 					
-					echo '<script type="text/javascript">
-					TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");
-					</script>';					
-				}								
+// 					echo '<script type="text/javascript">
+// 					TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");
+// 					</script>';
+
+					echo CJSON::encode(array("result"=>"0"));
+				}
+				Yii::app()->end();
 			}
 			else
 			{
@@ -540,7 +625,7 @@ class SiteController extends Controller
 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 
-			//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
 				Yii::app()->clientScript->scriptMap['*.js'] = false;
 				Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -642,6 +727,16 @@ class SiteController extends Controller
 		$model = new ActivationNotReceivedForm;
 	
 		$processOutput = true;
+		
+		$mobileLang = null;
+		
+		if(isset($_REQUEST['language']))
+		{
+			$mobileLang = $_REQUEST['language'];
+		}
+		
+		$result = "-100";
+		
 		// collect user input data
 		if(isset($_POST['ActivationNotReceivedForm']))
 		{
@@ -657,6 +752,46 @@ class SiteController extends Controller
 				
 				$key = md5($model->email.$candidateRegistrationTime);
 				
+				$isTranslationRequired = false;
+				
+				if($mobileLang != null)
+				{
+					if($mobileLang == 'tr')
+					{
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = false;
+						}
+						else
+						{
+							$isTranslationRequired = true;
+						}
+					}
+					else
+					{
+						if(Yii::app()->language == 'tr')
+						{
+							$isTranslationRequired = true;
+						}
+						else
+						{
+							$isTranslationRequired = false;
+						}
+					}
+				}
+				
+				if($isTranslationRequired == true)
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'tr';
+					}
+					else
+					{
+						Yii::app()->language = 'en';
+					}
+				}				
+				
 				$message = Yii::t('site', 'Hi').' '.$candidateName.',<br/><br/>';
 				$message .= Yii::t('site', 'You could activate your account by clicking');
 				$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.Yii::t('site', 'here').'</a>';
@@ -665,7 +800,7 @@ class SiteController extends Controller
 				$message .= 'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key));
 				$message .= '</a>';
 				$message .= '<br/><br/>';				
-				$message .= Yii::t('site', 'If you do not remember your password, you could request to generate new one.');
+				$message .= Yii::t('site', 'If you do not remember your password, you could request to generate new one.');							
 
 				//echo $message;
 												
@@ -675,23 +810,67 @@ class SiteController extends Controller
 				}
 				else
 				{
-					echo CJSON::encode(array("result"=>"0"));
+					echo CJSON::encode(array("result"=>"0")); //Error occured while sending e-mail
 				}
+				
+				//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
+				if($isTranslationRequired == true) //Recover the language if needed for mobile
+				{
+					if($mobileLang == 'tr')
+					{
+						Yii::app()->language = 'en';
+					}
+					else
+					{
+						Yii::app()->language = 'tr';
+					}
+				}				
 	
+				//Even if web for these results no renderPartial required so end the running code
 				Yii::app()->end();
 			}
+			else //Form invalid
+			{
+				//Update results to be used in mobile
+			
+				if($model->getError('email') == Yii::t('site', 'You are already registered!'))
+				{
+					$result = "-1";
+				}
+				else if($model->getError('email') == Yii::t('site', 'There has been a problem with your registration process. Please try to sign up for Traceper again.'))
+				{
+					$result = "-2";
+				}
+				else
+				{
+					$result = "-3"; //Unknown form error
+				}
+			}			
 		}
-	
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
-		if (Yii::app()->request->getIsAjaxRequest()) {
-			Yii::app()->clientScript->scriptMap['*.js'] = false;
-			Yii::app()->clientScript->scriptMap['*.css'] = false;
-		}		
-	
-		$this->renderPartial('activationNotReceived',array('model'=>$model), false, $processOutput);
+		else
+		{
+			//Update results to be used in mobile
+				
+			$result = "-4"; //Form missing
+		}
+				
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+		{
+			echo CJSON::encode(array("result"=> $result));
+		}
+		else
+		{
+			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			
+			//Complete solution for blinking problem at FireFox
+			if (Yii::app()->request->getIsAjaxRequest()) {
+				Yii::app()->clientScript->scriptMap['*.js'] = false;
+				Yii::app()->clientScript->scriptMap['*.css'] = false;
+			}
+			
+			$this->renderPartial('activationNotReceived',array('model'=>$model), false, $processOutput);			
+		}	
 	}	
 
 	public function actionRegister()
@@ -706,7 +885,7 @@ class SiteController extends Controller
 		if(isset($_REQUEST['language']))
 		{
 			$mobileLang = $_REQUEST['language'];
-			$preferredLaguage = $_REQUEST['language'];;
+			$preferredLaguage = $_REQUEST['language'];
 		}
 		
 		// collect user input data
@@ -739,58 +918,12 @@ class SiteController extends Controller
 		
 				if (isset($model->ac_id) && $model->ac_id != "0") {
 					if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type)) {
-						//echo CJSON::encode(array("result"=> "1"));
-		
-						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-						{
-							echo CJSON::encode(array(
-									"result"=> "1",
-							));
-						}
-						else
-						{
-							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-							
-							//Complete solution for blinks at FireFox
-							if (Yii::app()->request->getIsAjaxRequest()) {
-								Yii::app()->clientScript->scriptMap['*.js'] = false;
-								Yii::app()->clientScript->scriptMap['*.css'] = false;
-							}
-														
-							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
-							echo '<script type="text/javascript">
-							TRACKER.showMessageDialog("'.Yii::t('site', 'An activation mail is sent to your e-mail address...').'");
-							</script>';
-						}
+						echo CJSON::encode(array("result"=>"1"));
+						Yii::app()->end();
 					}
 					else {
-						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-						{
-							/*
-							 echo CJSON::encode(array(
-							 		"result"=> "1",
-							 ));
-							*/
-							echo JSON::encode(array("result"=>"Error in saving"));
-						}
-						else
-						{
-							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-							
-							//Complete solution for blinks at FireFox
-							if (Yii::app()->request->getIsAjaxRequest()) {
-								Yii::app()->clientScript->scriptMap['*.js'] = false;
-								Yii::app()->clientScript->scriptMap['*.css'] = false;
-							}
-							
-							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
-							
-							echo '<script type="text/javascript">
-							TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
-							</script>';
-						}
+						echo CJSON::encode(array("result"=>"Error in saving"));
+						Yii::app()->end();
 					}
 				}
 				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), trim($model->name).' '.trim($model->lastName), date('Y-m-d h:i:s'), $registrationMedium, $preferredLaguage))
@@ -834,9 +967,7 @@ class SiteController extends Controller
 							Yii::app()->language = 'en';
 						}
 					}
-					
-					//Yii::app()->language = 'en';
-						
+	
 					$key = md5($model->email.$time);
 						
 					$message = Yii::t('site', 'Hi').' '.trim($model->name).',<br/><br/>';
@@ -850,65 +981,22 @@ class SiteController extends Controller
 					$message .= 'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key));
 					$message .= '</a>';
 					$message .= '<br/><br/>';
-					$message .= Yii::t('site', 'Your Password is').':'.$model->password;
+					$message .= Yii::t('site', 'Your Password is').':'.$model->password;										
 		
 					//echo $message;
 
 					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, trim($model->name).' '.trim($model->lastName), Yii::t('site', 'Traceper Activation'), $message))
 					{
-						//echo CJSON::encode(array("result"=> "1"));
-						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-						{
-							echo CJSON::encode(array(
-									"result"=> "1",
-							));
-						}
-						else
-						{
-							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						
-							//Complete solution for blinks at FireFox
-							if (Yii::app()->request->getIsAjaxRequest()) {
-								Yii::app()->clientScript->scriptMap['*.js'] = false;
-								Yii::app()->clientScript->scriptMap['*.css'] = false;
-							}
-						
-							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
-						
-							echo '<script type="text/javascript">
-							TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').$model->email.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-							</script>';														
-						}						
+						echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
+						Yii::app()->end();					
 					}
 					else
 					{
-						//echo CJSON::encode(array("result"=> "1"));
-						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-						{
-							echo CJSON::encode(array(
-									"result"=> "2", //Account created but an error occured while sending the activation e-mail
-							));
-						}
-						else
-						{
-							Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						
-							//Complete solution for blinks at FireFox
-							if (Yii::app()->request->getIsAjaxRequest()) {
-								Yii::app()->clientScript->scriptMap['*.js'] = false;
-								Yii::app()->clientScript->scriptMap['*.css'] = false;
-							}
-						
-							$this->renderPartial('register',array('model'=>$model), false, $processOutput);
-						
-							echo '<script type="text/javascript">
-							TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your account activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the Sign Up form. If the error persists, please contact us about the problem.').'");
-							</script>';
-						}						
+						echo CJSON::encode(array("result"=>"2"));
+						Yii::app()->end();						
 					}
 
+					//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
 					if($isTranslationRequired == true) //Recover the language if needed for mobile
 					{
 						if($mobileLang == 'tr')
@@ -919,39 +1007,12 @@ class SiteController extends Controller
 						{
 							Yii::app()->language = 'tr';
 						}
-					}
-
-					//Yii::app()->language = 'tr';	
+					}					
 				}
 				else
 				{
-					//echo CJSON::encode(array("result"=> "Error in saving"));
-					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-					{
-						/*
-						 echo CJSON::encode(array(
-						 		"result"=> "1",
-						 ));
-						*/
-						echo JSON::encode(array("result"=>"0")); //Error in saving
-					}
-					else
-					{
-						Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-							
-						//Complete solution for blinks at FireFox
-						if (Yii::app()->request->getIsAjaxRequest()) {
-							Yii::app()->clientScript->scriptMap['*.js'] = false;
-							Yii::app()->clientScript->scriptMap['*.css'] = false;
-						}
-							
-						$this->renderPartial('register',array('model'=>$model), false, $processOutput);
-						
-						echo '<script type="text/javascript">
-						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
-						</script>';
-					}
+					echo JSON::encode(array("result"=>"0")); //Error in saving
+					Yii::app()->end();
 				}
 		
 				Yii::app()->end();
@@ -961,22 +1022,7 @@ class SiteController extends Controller
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					$result = "1"; //Initialize with "1" to be used whether no error occured
-						
-					//These kind of controls are done in mobile now
-		
-					// 					if ($model->getError('password') != null) {
-					// 						$result = $model->getError('password');
-					// 					}
-					// 					else if ($model->getError('email') != null) {
-					// 						$result = $model->getError('email');
-					// 					}
-					// 					else if ($model->getError('passwordAgain') != null) {
-					// 						$result = $model->getError('passwordAgain');
-					// 					}
-					// 					else if ($model->getError('passwordAgain') != null) {
-					// 						$result = $model->getError('passwordAgain');
-					// 					}
-						
+
 					if($model->getError('email') == Yii::t('site', 'E-mail is already registered!'))
 					{
 						$result = "-1";
@@ -1062,7 +1108,6 @@ class SiteController extends Controller
 		}
 		return $result;
 	}
-
 
 	public function actionRegisterGPSTracker()
 	{
@@ -1157,7 +1202,7 @@ class SiteController extends Controller
 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 			
-			//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
 				Yii::app()->clientScript->scriptMap['*.js'] = false;
 				Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -1165,7 +1210,6 @@ class SiteController extends Controller
 						
 			$this->renderPartial('registerGPSTracker',array('model'=>$model), false, $processOutput);
 		}
-
 	}
 
 	public function actionRegisterNewStaff()
@@ -1250,7 +1294,7 @@ class SiteController extends Controller
 			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 			
-			//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
 				Yii::app()->clientScript->scriptMap['*.js'] = false;
 				Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -1334,7 +1378,7 @@ class SiteController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 		
-		//Yukar�dakiler kullan�l�nca az da olsa sorun oluyor, bunu koyunca hi� sorun olmuyor
+		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
 			Yii::app()->clientScript->scriptMap['*.js'] = false;
 			Yii::app()->clientScript->scriptMap['*.css'] = false;
@@ -1386,7 +1430,7 @@ class SiteController extends Controller
 				}
 				else 
 				{
-					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to register to Traceper again.');
+					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to sign up for Traceper again.');
 				}				
 			}
 			else
@@ -1397,7 +1441,7 @@ class SiteController extends Controller
 				}
 				else 
 				{
-					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to register to Traceper again.');
+					$result = Yii::t('site', 'There has been a problem with your registration process. Please try to sign up for Traceper again.');
 				}
 			}
 		}
@@ -1440,102 +1484,7 @@ class SiteController extends Controller
 		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 	
 		$this->renderPartial('terms',array(), false, $processOutput);
-	}
-
-// 	public function sendUserDemands(){
-// 		if (isset($_REQUEST['email']) && $_REQUEST['email'] != NULL
-// 				&& isset($_REQUEST['demandType']) && $_REQUEST['demandType'] != NULL)
-// 		{
-// 			$email = $_REQUEST['email'];
-// 			$demandType = $_REQUEST['demandType'];
-			
-// 			if($demandType == 0) //Forgot Password
-// 			{
-// 				$token = sha1(uniqid(mt_rand(), true));
-			
-// 				if(Users::model()->isUserRegistered($email))
-// 				{
-// 					ResetPassword::model()->saveToken($email, $token);
-// 					$name = Users::model()->getNameByEmail($email);
-						
-// 					$message = Yii::t('site', 'Hi').' '.$name.',<br/><br/>';
-						
-// 					$message .= Yii::t('site', 'If you forgot your password, you can create a new password by clicking');
-// 					$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">'.Yii::t('site', 'here').'</a>';
-// 					$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
-// 					$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token.'">';
-// 					$message .= 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/index.php?tok='.$token;
-// 					$message .= '</a>';
-// 					$message .= '<br/><br/><br/>';
-// 					$message .= Yii::t('site', 'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.');
-			
-// 					//echo $message;
-						
-// 					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $email, $name, Yii::t('site', 'Did you forget your Traceper password?'), $message))
-// 					{
-// 						echo CJSON::encode(array("result"=> "1", "email"=>$email));
-// 					}
-// 					else
-// 					{
-// 						$result = "-4"; //An error occured while sending the mail
-// 					}
-// 				}
-// 				else
-// 				{
-// 					$result = "-3"; //This e-mail is not registered
-// 				}				
-// 			}
-// 			else if($demandType == 1) //Activation E-mail
-// 			{
-// 				$candidatePassword = null;
-// 				$candidateName = null;
-// 				$candidateRegistrationTime = null;
-			
-// 				UserCandidates::model()->getCandidateInfoByEmail($email, $candidatePassword, $candidateName, $candidateRegistrationTime);
-			
-// 				$key = md5($model->email.$candidateRegistrationTime);
-			
-// 				$message = Yii::t('site', 'Hi').' '.$candidateName.',<br/><br/>';
-// 				$message .= Yii::t('site', 'You could activate your account by clicking');
-// 				$message .= ' '.'<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">'.Yii::t('site', 'here').'</a>';
-// 				$message .= ' '.Yii::t('site', 'or the link below:').'<br/>';
-// 				$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key)).'">';
-// 				$message .= 'http://'.Yii::app()->request->getServerName().$this->createUrl('site/activate',array('email'=>$model->email,'key'=>$key));
-// 				$message .= '</a>';
-// 				$message .= '<br/><br/>';
-// 				$message .= Yii::t('site', 'If you do not remember your password, you could request to generate new one.');
-			
-// 				//echo $message;
-			
-// 				if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, $candidateName, Yii::t('site', 'Traceper Activation'), $message))
-// 				{
-// 					echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
-// 				}
-// 				else
-// 				{
-// 					echo CJSON::encode(array("result"=>"0"));
-// 				}
-			
-// 				Yii::app()->end();								
-// 			}
-// 			else //Unknown Demand
-// 			{
-// 				$result = "-2"; //Unknown demand type
-// 			}
-				
-			
-// 			$result = "0";
-// 			if (Users::model()->isFacebookUserRegistered($email, $facebookId)){
-// 				$result = "1";
-// 			}
-// 		}
-// 		else
-// 		{
-// 			$result = "-1"; //Missing parameter
-// 		}
-		
-// 		echo CJSON::encode(array("result" => $result));
-// 	}	
+	}	
 }
 
 

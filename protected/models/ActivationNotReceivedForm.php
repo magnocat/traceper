@@ -60,7 +60,7 @@ class ActivationNotReceivedForm extends CFormModel
 			$data = UserCandidates::model()->find($criteria);
 
 			if ($data == null) {
-				$this->addError('email',Yii::t('site', 'There has been a problem with your registration process. Please try to register to Traceper again.'));
+				$this->addError('email',Yii::t('site', 'There has been a problem with your registration process. Please try to sign up for Traceper again.'));
 			}
 		}
 	}	

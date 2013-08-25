@@ -87,7 +87,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 										else if (obj.result == "0")
 										{
 											$("#forgotPasswordWindow").dialog("close");
-											TRACKER.showMessageDialog("'.Yii::t('site', 'This e-mail is not registered!').'");																									
+											TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.').'");																									
 										}
 									}	
 								}

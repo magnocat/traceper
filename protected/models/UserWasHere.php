@@ -164,4 +164,29 @@ class UserWasHere extends CActiveRecord
 		
 		
 	}
+	
+	public function getMostRecentLocation($userId, &$par_latitude, &$par_longitude, &$par_altitude)
+	{
+		//$sql = 'SELECT latitude, longitude, altitude FROM traceper_user_was_here WHERE userId = '.$userId.' ORDER BY dataArrivedTime DESC LIMIT 1';
+		//$userWasHere = UserWasHere::model()->findBySql($sql); 
+		
+		$userWasHere = UserWasHere::model()->find(array('order'=>'dataArrivedTime DESC', 'limit'=>1, 'condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
+				
+		$result = false;
+	
+		if($userWasHere != null)
+		{
+			$par_latitude = $userWasHere->latitude;
+			$par_longitude = $userWasHere->longitude;
+			$par_altitude = $userWasHere->altitude;
+	
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+	
+		return $result;
+	}	
 }

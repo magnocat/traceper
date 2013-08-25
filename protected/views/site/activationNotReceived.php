@@ -60,7 +60,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 										else if (obj.result == "0")
 										{
 											$("#activationNotReceivedWindow").dialog("close");
-											TRACKER.showMessageDialog("'.Yii::t('site', 'Activation e-mail cannot be sent! If the problem persits, please inform <a href=\'mailto:contact@traceper.com\'>us</a>.').'");																									
+											TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.').'");																									
 										}
 									}	
 								}

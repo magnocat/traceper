@@ -7,6 +7,7 @@
  */
 class RegisterForm extends CFormModel
 {
+	public $register;
 	public $email;
 	public $emailAgain;
 	public $name;

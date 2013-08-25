@@ -30,6 +30,14 @@
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>
 
+<!--	
+    <script>
+        $(document).ready(function() {
+            $('.tooltip').tooltipster();
+        });
+    </script>
+-->    	
+
 <!-- <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet"> -->
 <!-- <script src="http://vjs.zencdn.net/c/video.js"></script> -->
 
@@ -407,7 +415,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									<?php																											
 									$this->widget('zii.widgets.jui.CJuiButton', array(											
 											'name'=>'ajaxLogin',
-											'caption'=>Yii::t('site', 'Login'),
+											'caption'=>Yii::t('site', 'Log in'),
 											'id'=>'loginAjaxButton',
 											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
 									));															
@@ -538,6 +546,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							),
 							array(
 									'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')));
+														
 
 					if(Yii::app()->params->featureGPSDeviceEnabled)
 					{
@@ -727,15 +736,16 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							<div class="sideMenu">
 								<?php echo $form->labelEx($model,'email'); ?>
 								<?php 
-									$this->widget('ext.tooltipster.tooltipster',
-											array(
-													//'identifier'=>'.registerEmailField',
-													'options'=>array('position'=>'right',
-															'trigger'=>'click',
-															'theme'=>'.tooltipster-noir')
-											));
+// 									$this->widget('ext.tooltipster.tooltipster',
+// 											array(
+// 													'options'=>array('position'=>'right',
+// 															'trigger'=>'custom',
+// 															'theme'=>'.tooltipster-noir')
+// 											));
 																
-									echo $form->textField($model,'email', array('id'=>'registerEmailField', 'class'=>'tooltipster', 'title'=>'Deneme', 'size'=>'50%','maxlength'=>128,'tabindex'=>9));								
+// 									echo $form->textField($model,'email', array('id'=>'registerEmailField', 'class'=>'tooltip', 'title'=>'Deneme', 'size'=>'50%','maxlength'=>128,'tabindex'=>9));								
+									
+									echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9));
 								?>
 								<?php $errorMessage = $form->error($model,'email'); 
 									if (strip_tags($errorMessage) == '') {
@@ -787,19 +797,38 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 							<div class="sideMenu">
 								<div style="position:absolute;display:inline-block;vertical-align:top;width:40%;">
 								<?php
-								//echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'), array('update'=>'#forRegisterRefresh'), array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-								
-// 								echo CHtml::ajaxSubmitButton(Yii::t('site','Register'), array('site/register'),
-// 										array('success'=>'function(data){
-// 												$("#forRegisterRefresh").html(data);
-// 											}'),
-// 										array('id'=>'registerAjaxButton','class'=>'ui-button ui-widget ui-state-default ui-corner-all','tabindex'=>4));
-
 								$this->widget('zii.widgets.jui.CJuiButton', array(
 										'name'=>'ajaxRegister',
 										'caption'=>Yii::t('site', 'Sign Up'),
 										'id'=>'registerAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','tabindex'=>13,'ajax'=>array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh'))
+										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),
+																'success'=> 'function(msg){
+																			try
+																			{																								
+																				var obj = jQuery.parseJSON(msg);
+																					
+																				if (obj.result)
+																				{
+																					if (obj.result == "1") 
+																					{
+																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																					}
+																					else if (obj.result == "2")
+																					{
+																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+																					}
+																					else if (obj.result == "0")
+																					{
+																						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
+																					}																													
+																				}
+																			}
+																			catch (error)
+																			{
+																				$("#forRegisterRefresh").html(msg);
+																			}																															
+																}',
+										))																		
 								));								
 								?>
 								</div>
@@ -864,11 +893,51 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 							<div class="sideMenu" style="margin-left:2em;">
 								<?php
-								$this->widget('zii.widgets.jui.CJuiButton', array(      
-										'name'=>'ajaxResetPassword',
-										'caption'=>Yii::t('site', 'Update'),
-										'id'=>'resetPasswordAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 'update'=>'#forPasswordResetRefresh'))
+// 								$this->widget('zii.widgets.jui.CJuiButton', array(      
+// 										'name'=>'ajaxResetPassword',
+// 										'caption'=>Yii::t('site', 'Update'),
+// 										'id'=>'resetPasswordAjaxButton',
+// 										'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 'update'=>'#forPasswordResetRefresh'))
+// 								));
+
+								
+								$this->widget('zii.widgets.jui.CJuiButton', array(
+																		'name'=>'ajaxResetPassword',
+																		'caption'=>Yii::t('site', 'Update'),
+																		'id'=>'resetPasswordAjaxButton',
+																		'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 
+																																		  'success'=> 'function(msg){
+																																							try
+																																							{																								
+																																								var obj = jQuery.parseJSON(msg);
+																																									
+																																								if (obj.result)
+																																								{
+																																									if (obj.result == "1") 
+																																									{
+																																										//TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																																										
+																																										TRACKER.showMessageDialog("'.Yii::t('site', 'Your password has been changed successfully, you can login now...').'");
+																																										$("#passwordResetBlock").hide();
+																																										$("#registerBlock").css("height", "85%");
+																																										$("#registerBlock").css("min-height", "420px");
+																																										$("#registerBlock").load();
+																																										$("#registerBlock").show();
+																																										$("#appLinkBlock").load();
+																																										$("#appLinkBlock").show();																																										
+																																									}
+																																									else if (obj.result == "0")
+																																									{
+																																										TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");																									
+																																									}																													
+																																								}
+																																							}
+																																							catch (error)
+																																							{
+																																								$("#forPasswordResetRefresh").html(msg);
+																																							}																															
+																																						}',																		
+																		))
 								));								
 								?>
 							</div>

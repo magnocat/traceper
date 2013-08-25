@@ -34,7 +34,7 @@ T�rk�e UTF-8
 */
 
 return array(
-	'Login' => 'Oturum aç',
+	'Log in' => 'Oturum aç',
 	'Sign Up' => 'Kaydol',		
 	'Save' => 'Kaydet',
 	'Register GPS Tracker' => 'GPS Takip Cihazı Kaydet',
@@ -100,14 +100,13 @@ return array(
 	'If you did not attempt to create a new password, take no action and please inform <a href="mailto:contact@traceper.com">us</a>.' => '&#350;ifre de&#287;i&#351;ikli&#287;i talebinde bulunmad&#305;ysan&#305;z, herhangi bir i&#351;lem yapmay&#305;n&#305;z ve l&#252;tfen <a href="mailto:contact@traceper.com">bize</a> bilgi veriniz.',
 	'Did you forget your Traceper password?' => 'Traceper şifrenizi mi unuttunuz?',
 	'You have already registered to Traceper, so you can login now. If you forgot your password, you can request to generate a new one.' => 'Traceper\'a zaten kay&#305;tl&#305;s&#305;n&#305;z, yani giri&#351; yapabilirsiniz. E&#287;er &#351;ifrenizi unuttuysan&#305;z, &#351;ifrenizi yeniden olu&#351;turma iste&#287;inde bulunabilirsiniz.',
-	'There has been a problem with your registration process. Please try to register to Traceper again.' => 'Traceper kay&#305;t i&#351;leminiz s&#305;ras&#305;nda bir hata olu&#351;mu&#351;. L&#252;tfen kay&#305;t i&#351;lemini yeniden yap&#305;n&#305;z.',
+	'There has been a problem with your registration process. Please try to sign up for Traceper again.' => 'Traceper kay&#305;t i&#351;leminiz s&#305;ras&#305;nda bir hata olu&#351;mu&#351;. L&#252;tfen kay&#305;t i&#351;lemini yeniden yap&#305;n&#305;z.',
 	'Not Received Our Activation E-Mail?' => 'Aktivasyon E-Postam&#305;z Size Ula&#351;mad&#305; m&#305;?',
 	'If you have not received our account activation e-mail although you sent the regisration form, please enter your registration e-mail address into the field below and we will send you a link to activate your account again:' => 'Kay&#305;t formunu g&#246;ndermenize ra&#287;men hesap aktivasyon e-postam&#305;z size ula&#351;mam&#305;&#351;sa, l&#252;tfen a&#351;a&#287;&#305;daki alana kay&#305;t s&#305;ras&#305;nda kulland&#305;&#287;&#305;n&#305;z e-posta adresinizi girin ve size aktivasyon e-postas&#305;n&#305; yeniden g&#246;nderelim:',
 	'Your account created successfully. ' => 'Hesab&#305;n&#305;z ba&#351;ar&#305;yla olu&#351;turuldu. ',	
 	'We have sent the password reset link to your mail address \"<b>' => '&#350;ifrenizi yeniden belirlemek i&#231;in gerekli ba&#287;lant&#305;y&#305; \"<b>',
 	'We have sent an account activation link to your mail address \"<b>' => 'Hesab&#305;n&#305;z&#305; etkinle&#351;tirmek i&#231;in gerekli ba&#287;lant&#305;y&#305; \"<b>',
-	'</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.' => '</b>\" adresine g&#246;nderdik. </br></br>L&#252;tfen spam/junk kutunuzu da kontrol etmeyi unutmay&#305;n. Spam/Junk dizinindeki ba&#287;lant&#305;lar bazen &#231;al&#305;&#351;mayabilir; b&#246;yle bir durumla kar&#351;&#305;la&#351;&#305;rsan&#305;z, e-postam&#305;z&#305; \"Spam De&#287;il\" olarak i&#351;aretleyin ve ba&#287;lant&#305;ya yeniden t&#305;klay&#305;n.',	
-	'Activation e-mail cannot be sent! If the problem persits, please inform <a href="mailto:contact@traceper.com">us</a>.' => 'Aktivasyon e-postas&#305; g&#246;nderilemedi! Sorun devam ederse, l&#252;tfen <a href="mailto:contact@traceper.com">bize</a> bilgi veriniz.',
+	'</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.' => '</b>\" adresine g&#246;nderdik. </br></br>L&#252;tfen spam/junk kutunuzu da kontrol etmeyi unutmay&#305;n. Spam/Junk dizinindeki ba&#287;lant&#305;lar bazen &#231;al&#305;&#351;mayabilir; b&#246;yle bir durumla kar&#351;&#305;la&#351;&#305;rsan&#305;z, e-postam&#305;z&#305; \"Spam De&#287;il\" olarak i&#351;aretleyin ve ba&#287;lant&#305;ya yeniden t&#305;klay&#305;n.',
 	'You are already registered!' => 'Zaten kay&#305;tl&#305;s&#305;n&#305;z!',
 	'If you do not remember your password, you could request to generate new one.' => '&#350;ifrenizi hat&#305;rlam&#305;yorsan&#305;z, yeni &#351;ifre talebinde bulunabilirsiniz.',
 	'You could activate your account by clicking' => 'Hesab&#305;n&#305;z&#305; etkinle&#351;tirmek i&#231;in',
@@ -132,7 +131,8 @@ return array(
 	'After you send the sign up form that you will fill in a little while, an account activation e-mail message will be sent to your registered e-mail adress. When you click the account activation link at this message, you will have completed the registration process successfully.' => 'Birazdan dolduracağınız kayıt formunu gönderdiğinizde, kayıt sırasında belirttiğiniz e-posta adresine hesap aktivasyon e-postası gönderilecektir. Bu e-postadaki bağlantıya tıklayarak hesabınızı etkinleştirdiğinizde kayıt işlemini başarıyla tamamlamış olacaksınız.',
 	'Activate your account first' => 'Önce hesabınızı aktive edin',
 	'Allow the HTML browser to view this message!' => 'Bu mesajı görebilmek için HTML tarayıcıya izin verin!',
-	'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your account activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the Sign Up form. If the error persists, please contact us about the problem.' => 'Hesabınız başarıyla oluşturuldu, fakat hesap etkinleştirme e-postanız gönderilirken bir hata oluştu. Kayıt formunun hemen altında yer alan \"Aktivasyon E-Postamız Size Ulaşmadı mı?\" bağlantısına tıklayarak hesabınızı etkinleştirebilmek için gerekli e-postanın gönderilmesini isteyebilirsiniz. Hata hala devam ederse, lütfen sorun hakkında bizimle iletişime geçiniz.',
+	'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.' => 'Hesabınız başarıyla oluşturuldu, fakat hesap etkinleştirme e-postanız gönderilirken bir hata oluştu. Kayıt formunun hemen altında yer alan \"Aktivasyon E-Postamız Size Ulaşmadı mı?\" bağlantısına tıklayarak hesabınızı etkinleştirebilmek için gerekli e-postanın gönderilmesini isteyebilirsiniz. Hata hala devam ederse, lütfen sorun hakkında bizimle iletişime geçiniz.',
+	'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.' => 'E-posta gönderilirken bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse lütfen bizimle iletişime geçiniz.',
 	
 );
 
