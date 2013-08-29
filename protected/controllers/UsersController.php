@@ -591,13 +591,17 @@ class UsersController extends Controller
 	{
 		$result = "-100";
 
-		if(isset($_REQUEST['friendId']) && isset($_REQUEST['language'])) 
+		if(isset($_REQUEST['friendId'])) 
 		{
 			$friendId = (int)$_REQUEST['friendId'];
 			
 			$mobileLang = null;
-			$mobileLang = $_REQUEST['language'];
-						
+			
+			if(isset($_REQUEST['language']))
+			{
+				$mobileLang = $_REQUEST['language'];
+			}
+			
 			$result = Friends::model()->addAsFriend(Yii::app()->user->id, $friendId);
 			
 			//Friends tablosuna ekleme başarılıysa mail at, yoksa boşuna mail atma
