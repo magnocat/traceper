@@ -124,7 +124,7 @@ class RegisterForm extends CFormModel
 			$domainName = strtok($domain, ".");
 			$extension = strtok(".");
 									
-			if(($domain == 'gmial.com') || ($domain == 'gmil.com') || ($domain == 'gmal.com'))
+			if(($domain == 'gmial.com') || ($domain == 'gmil.com') || ($domain == 'gmal.com') || ($domain == 'glail.com'))
 			{
 				$this->addError('email',Yii::t('site', 'Did you mean ').$user.'@gmail.com?');
 			}
