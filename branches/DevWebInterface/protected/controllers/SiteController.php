@@ -608,10 +608,6 @@ class SiteController extends Controller
 				else
 				{				
 					//Fb::warn("An error occured while changing your password!", "SiteController - actionResetPassword()");
-					
-// 					echo '<script type="text/javascript">
-// 					TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");
-// 					</script>';
 
 					echo CJSON::encode(array("result"=>"0"));
 				}
