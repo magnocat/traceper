@@ -43,7 +43,7 @@ class UserCandidates extends CActiveRecord
 			array('email, realname', 'length', 'max'=>100),
 			array('password', 'length', 'max'=>32),
 			array('registrationMedium', 'length', 'max'=>10),
-			array('preferredLanguage', 'length', 'max'=>5),
+			array('preferredLanguage', 'length', 'max'=>20),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('Id, email, realname, password, time, registrationMedium, preferredLanguage', 'safe', 'on'=>'search'),
