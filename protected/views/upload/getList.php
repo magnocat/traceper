@@ -1,5 +1,10 @@
 <?php		
-if ($dataProvider != null) {	
+if ($dataProvider != null) {
+	$isSearchResult = isset($searchResult) ? true : false;
+	
+	$emptyText = Yii::t('upload', 'There is not any upload shared by you, your friends or publicly at the moment. You could take photos by your mobile app and share them with your friends or as public');	
+	$uploadSearchEmptyText = Yii::t('upload', 'No uploads found by your search criteria');
+	
 	if (isset($uploadList) && $uploadList == true) {
 		echo "<div id='uploadId' style='display:none;'></div>";
 
@@ -33,11 +38,14 @@ if ($dataProvider != null) {
 				$deleteUploadJSFunction,
 				CClientScript::POS_READY);		
 	}
-	
+	?>
+	<div id="uploadsGridView" style="overflow:auto;">
+	<?php	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>'uploadListView',
 			'summaryText'=>'',
+			'emptyText'=>$isSearchResult?$uploadSearchEmptyText:$emptyText,
 			'pager'=>array( 
 				 'id'=>'UploadsPager',
 				 'header'=>'',
@@ -55,8 +63,8 @@ if ($dataProvider != null) {
 														)
 										  			)."\"  />", "#",
 										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].");")
-					  				  )',
-					'htmlOptions'=>array('style'=>'text-align:center'),	
+					  				  )',	
+					'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align:center;'),
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Description'),
@@ -89,5 +97,8 @@ if ($dataProvider != null) {
 
 			),
 	));
+	?>
+	</div>
+	<?php	
 }
 ?>

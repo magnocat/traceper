@@ -13,7 +13,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	));
 
 	if (isset($dataProvider)) {
-		$this->renderPartial('getList', array('dataProvider'=>$dataProvider, 'fileType'=>$fileType), false, true);
+		$this->renderPartial('getList', array('dataProvider'=>$dataProvider, 'fileType'=>$fileType,  'searchResult'=>true), false, true);
 	}
 	else
 	{

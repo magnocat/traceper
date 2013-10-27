@@ -8,7 +8,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '600px'      
+			'width'=> '600px',
+	    	'close' => 'js:function(){ showFormErrorsIfExist(); }'
 	    ),
 	));
 ?>
@@ -23,7 +24,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-		<div class="row" style="padding-top:1em">
+		<div class="row" style="padding-top:1em;">
 			<?php echo Yii::t('site', 'Enter your registered e-mail address into the below field and we will send you a link to change your password:'); ?>
 		</div>	
 		

@@ -1,6 +1,6 @@
 <?php
 
-//testDeleteFriendShip() testinde grid view g�ncellenirken "TypeError: settings is undefined" exception'� almamak i�in
+//In order not to receive "TypeError: settings is undefined" exception while the grid view is being updated at testDeleteFriendShip() test
 //Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
 //Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
 
@@ -13,7 +13,27 @@ if ($dataProvider != null) {
 	if (isset($groupType) == false) {
 		$groupType = ""; // TODO: grouptype is defined in usersInfo.php. Needs refactoring 
 	}
-	$emptyText = Yii::t('users', 'No users found');
+	
+	$emptyText = Yii::t('users', 'You do not have any friend at the moment. In order to add new friends, you could search them by name and choose from the list. If you could not find your friends by search, you could invite them to Traceper first by the link {inviteIcon} at the top menu or by {inviteByHere}.', array('{inviteIcon}'=>CHtml::image("images/inviteSmall.png"), 
+			'{inviteByHere}'=>CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('site/inviteUsers'),
+								array(
+										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
+										'update'=> '#inviteUsersWindow',
+								),
+								array(
+										'id'=>'showInviteUsersWindowAtUserList'))			
+			));
+			
+	$userSearchEmptyText = Yii::t('users', 'No users found registered by this name unfortunately. You should invite your friend to Traceper first by the link {inviteIcon} at the top menu or by {inviteByHere}. After he/she joins Traceper, you could be friends.', array('{inviteIcon}'=>CHtml::image("images/inviteSmall.png"), 
+			'{inviteByHere}'=>CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('site/inviteUsers'),
+								array(
+										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
+										'update'=> '#inviteUsersWindow',
+								),
+								array(
+										'id'=>'showInviteUsersWindowAtUserSearch'))			
+			));
+	
 	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
 	// keyword parameter
 	$ajaxUrl = null;
@@ -141,13 +161,15 @@ if ($dataProvider != null) {
 														.$addAsFriendJSFunction,
 		 												CClientScript::POS_READY);									
 	}
-			
+	?>
+	<div id="usersGridView" style="overflow:auto;">
+	<?php		
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
 			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
-			'emptyText'=>$emptyText,
+			'emptyText'=>$isFriendList?$emptyText:$userSearchEmptyText,
 			'pager'=>array(
 				 'id'=>'UsersPager',	 
 				 'header'=>'',
@@ -155,24 +177,32 @@ if ($dataProvider != null) {
 		         'lastPageLabel'=>'',
 			       ),
 		    'columns'=>array(
-		array(            // display 'create_time' using an expression
-					'name'=>Yii::t('users', 'Group Settings'),
-					'type' => 'raw',
+				    		array(            // display 'create_time' using an expression
+				    				'name'=>Yii::t('users', ''),
+				    				'type' => 'raw',				    					
+				    				'value'=>'CHtml::image("images/Friend.png")',				    		
+				    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;'),
+				    				'visible'=>$isFriendList
+				    		),		    		
+		    		
+// 		array(            // display 'create_time' using an expression
+// 					'name'=>Yii::t('users', 'Group Settings'),
+// 					'type' => 'raw',
 					
-		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
-										array(\'onclick\'=>CHtml::ajax(
-											array(
-												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'], \'groupType\'=>'.$groupType.')),
+// 		            'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
+// 										array(\'onclick\'=>CHtml::ajax(
+// 											array(
+// 												\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'friendId\'=>$data[\'id\'], \'groupType\'=>'.$groupType.')),
 												
-					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
-					 							\'update\'=> \'#groupSettingsWindow\',	
+// 					    						\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
+// 					 							\'update\'=> \'#groupSettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
-					  				 )',	
+// 											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
+// 					  				 )',	
 		
-					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;'),
-					'visible'=>$isFriendList
-		),
+// 					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;'),
+// 					'visible'=>$isFriendList
+// 		),
 		
 		/*
 		array(            // display 'create_time' using an expression
@@ -317,6 +347,9 @@ if ($dataProvider != null) {
 		),
 	),
 	));
+	?>
+	</div>
+	<?php	
 }
 /*
  */

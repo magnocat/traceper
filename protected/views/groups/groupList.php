@@ -1,7 +1,18 @@
 <?php
 
 if ($dataProvider != null) {
-	$emptyText = Yii::t('groups', 'No groups found');
+	$emptyText = Yii::t('groups', 'You do not have any groups at the moment. In order to group your friends, you could create new group(s) by the link {createGroupIcon} at the top menu or by {createGroupByHere}.', array('{createGroupIcon}'=>CHtml::image("images/createGroupSmall.png"), 
+			'{createGroupByHere}'=>	CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('groups/createGroup'),
+														array(
+																'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
+																'update'=> '#createGroupWindow',
+														),
+														array(
+																'id'=>'showCreateGroupWindowAtGroupList'))
+			));
+	
+	
+	
 	$ajaxUrl = null;
 	$isSearchResult = isset($searchResult) ? true : false;
 	$deleteGroupQuestion = Yii::t('groups', 'Do you really want to delete this group?');
@@ -43,7 +54,9 @@ if ($dataProvider != null) {
 	Yii::app()->clientScript->registerScript('groupFunctions',
 			$deleteGroupJSFunction,
 			CClientScript::POS_READY);
-		
+	?>
+	<div id="groupsGridView" style="overflow:auto;">
+	<?php		
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
@@ -69,11 +82,28 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupPrivacySettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupPrivacySettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('common', 'Edit Settings').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the privacy settings of this group').'\')
 					  				 )',		
 		
-					'htmlOptions'=>array('width'=>'50px', 'style'=>'padding-left:30px;')
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;')
 		),
+		    		
+    		array(            // display 'create_time' using an expression
+    				'name'=>Yii::t('users', 'Group Settings'),
+    				'type' => 'raw',   					
+    				'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
+    				array(\'onclick\'=>CHtml::ajax(
+    				array(
+    				\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'groupId\'=>$data[\'id\'])),
+    		
+    				\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
+    				\'update\'=> \'#groupSettingsWindow\',
+    					
+    		)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the members of this group').'\')
+    		)',
+    		
+    				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;')
+    		),		    		
 		       
 
 		array(            // display 'create_time' using an expression
@@ -112,11 +142,9 @@ if ($dataProvider != null) {
 		),
 	),
 	));
-	
-
-
-
-
+	?>
+	</div>
+	<?php
 }
 /*
  */

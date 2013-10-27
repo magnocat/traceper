@@ -54,6 +54,7 @@ if ($dataProvider != null)
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>'groupMembersListView',
 			'summaryText'=>'',
+			'emptyText'=>Yii::t('groups','You have not added any friend into this group yet.'),
 			'pager'=>array( 
 				 'header'=>'',
 		         'firstPageLabel'=>'',
