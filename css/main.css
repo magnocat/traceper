@@ -3,7 +3,9 @@ body
 	margin: 0;
 	padding: 0;
 	color: #555;
-	font: normal 10pt Arial,Helvetica,sans-serif;
+/* 	font: normal 10pt Arial,Helvetica,sans-serif; */
+    font-family: Helvetica,"lucida grande",tahoma,verdana,arial,sans-serif;  
+    font-size: 14px;
 	background: #EFEFEF;
 }
 
@@ -43,7 +45,7 @@ body
 
 #logo
 {
-	top:0.4em;
+	top:0em;
 	padding: 0px;
 	font-size: 200%;
 }
