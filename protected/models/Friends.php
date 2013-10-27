@@ -180,6 +180,37 @@ class Friends extends CActiveRecord
 		return $result;
 	}
 	
+	//For administer's staff deletions
+	public function deleteAllFriendShipRelations($friendId)
+	{
+		//TODO: use delete function not findByPk and then delete
+		$friendShip = Friends::model()->find(array('condition'=>'(friend1=:friend OR friend2=:friend)',
+				'params'=>array(':friend'=>$friendId,
+				),
+		)
+		);
+	
+		$result = false;
+	
+		if($friendShip != null)
+		{
+			if($friendShip->delete())
+			{
+				$result = 1;
+			}
+			else
+			{
+				$result = 0;
+			}
+		}
+		else
+		{
+			$result = -1;
+		}
+	
+		return $result;
+	}	
+	
 	public function getFriendRequestDataProvider($userId, $pageSize) {
 		// we look at the friend2 field because requester id is stored in friend1 field
 		// and only friend who has been requested to be a friend can approve frienship
@@ -310,4 +341,32 @@ class Friends extends CActiveRecord
 	
 		return $result;
 	}
+	
+	public function getFriendIdList($ownerId)
+	{
+		$sql = 'SELECT IF( friend1 != '. $ownerId.', friend1, friend2 ) as friend '
+		.' FROM ' .  Friends::model()->tableName()
+		.' WHERE '
+		.' ((friend1='.$ownerId.')'
+		.' OR (friend2='.$ownerId.')'
+		.' ) '
+		.' AND STATUS = 1';
+		
+		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
+	
+		$length = count($friendsResult);
+		$friends = array();
+		
+		for ($i = 0; $i < $length; $i++) {
+			array_push($friends, $friendsResult[$i]['friend']);
+		}
+		
+		$result = -1;
+		
+		if (count($friends) > 0) {
+			$result = implode(',', $friends);
+		}
+	
+		return $result;
+	}	
 }

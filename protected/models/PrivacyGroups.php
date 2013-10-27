@@ -118,7 +118,7 @@ class PrivacyGroups extends CActiveRecord
 						//'with'=>array('author'),
 				),
 				'pagination'=>array(
-						'pageSize'=>$itemCountInOnePage,
+						'pageSize'=>($_SESSION['screen_height'] - 100)/30//$itemCountInOnePage,
 				),
 		));
 	
