@@ -163,8 +163,19 @@ class SiteController extends Controller
 			}
 		}
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
 		
 		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
@@ -206,10 +217,10 @@ class SiteController extends Controller
 			$isRecordUpdateRequired = false;
 
 			if($model->validate() && $model->login()) {
+				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+				
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-				{			
-					Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
-					
+				{													
 					if (isset($_REQUEST['deviceId']))
 					{
 						if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
@@ -262,9 +273,40 @@ class SiteController extends Controller
 					));
 				}
 				else {
+					$app = Yii::app();
+					$language = 'tr';
+					
+					if (isset($app->session['_lang']))
+					{
+						$language = $app->session['_lang'];
+					
+						//echo 'Session VAR';
+					}
+					else
+					{
+						$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+					}	
+
+					if(strcmp($preferredLanguage, $language) != 0)
+					{
+						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
+					}					
+					
 					//echo 'Model NOT valid in SiteController';
-					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+					
 					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);
 				}
 
@@ -304,8 +346,19 @@ class SiteController extends Controller
 				else {
 					//echo 'Model NOT valid in SiteController';
 
-					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
 					
 					//Complete solution for blinking problem at FireFox
 					if (Yii::app()->request->getIsAjaxRequest()) {
@@ -403,8 +456,19 @@ class SiteController extends Controller
 			}
 		}
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
 		
 		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
@@ -555,8 +619,19 @@ class SiteController extends Controller
 		}
 		else
 		{
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			if (Yii::app()->request->isAjaxRequest)
+			{
+				if (YII_DEBUG)
+				{
+					Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+				}
+				else
+				{
+					Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				}
+			}
 			
 			//Complete solution for blinking problem
 			if (Yii::app()->request->getIsAjaxRequest()) {
@@ -618,8 +693,19 @@ class SiteController extends Controller
 				//Fb::warn("model NOT valid", "SiteController - actionResetPassword()");												
 			}
 			
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			if (Yii::app()->request->isAjaxRequest)
+			{
+				if (YII_DEBUG)
+				{
+					Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+				}
+				else
+				{
+					Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				}
+			}
 
 			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
@@ -856,8 +942,19 @@ class SiteController extends Controller
 		}
 		else
 		{
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			if (Yii::app()->request->isAjaxRequest)
+			{
+				if (YII_DEBUG)
+				{
+					Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+				}
+				else
+				{
+					Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				}
+			}
 			
 			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
@@ -872,16 +969,25 @@ class SiteController extends Controller
 	public function actionRegister()
 	{
 		$model = new RegisterForm;
-		
-		$processOutput = true;
-		
+		$processOutput = true;		
 		$mobileLang = null;
-		$preferredLaguage = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-		
+
+		$app = Yii::app();
+		$preferredLanguage = null;
+			
+		if (isset($app->session['_lang']))
+		{
+			$preferredLanguage = $app->session['_lang'];
+		}
+		else
+		{
+			$preferredLanguage = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+		}
+
 		if(isset($_REQUEST['language']))
 		{
 			$mobileLang = $_REQUEST['language'];
-			$preferredLaguage = $_REQUEST['language'];
+			$preferredLanguage = $_REQUEST['language'];
 		}
 		
 		// collect user input data
@@ -912,8 +1018,12 @@ class SiteController extends Controller
 					$registrationMedium = 'Web';
 				}				
 		
-				if (isset($model->ac_id) && $model->ac_id != "0") {
-					if (Users::model()->saveFacebookUser($model->email, md5($model->password), $model->name, $model->ac_id, $model->account_type)) {
+				if (isset($model->account_type) && $model->account_type != "0") {
+					//Fb::warn("Before saveFacebookUser()", "SiteController");
+					
+					$registrationMedium = $registrationMedium.' FB';
+					
+					if (Users::model()->saveFacebookUser($model->email, md5($model->password), trim($model->name).' '.trim($model->lastName), $model->ac_id, $model->account_type, $registrationMedium, $preferredLanguage)) {
 						echo CJSON::encode(array("result"=>"1"));
 						Yii::app()->end();
 					}
@@ -922,8 +1032,10 @@ class SiteController extends Controller
 						Yii::app()->end();
 					}
 				}
-				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), trim($model->name).' '.trim($model->lastName), date('Y-m-d h:i:s'), $registrationMedium, $preferredLaguage))
+				else if (UserCandidates::model()->saveUserCandidates($model->email, md5($model->password), trim($model->name).' '.trim($model->lastName), date('Y-m-d h:i:s'), $registrationMedium, $preferredLanguage))
 				{
+					//Fb::warn("saveUserCandidates() called", "SiteController");
+					
 					$isTranslationRequired = false;
 
 					if($mobileLang != null)
@@ -984,12 +1096,12 @@ class SiteController extends Controller
 					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, trim($model->name).' '.trim($model->lastName), Yii::t('site', 'Traceper Activation'), $message))
 					{
 						echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
-						Yii::app()->end();					
+						//Yii::app()->end();					
 					}
 					else
 					{
 						echo CJSON::encode(array("result"=>"2"));
-						Yii::app()->end();						
+						//Yii::app()->end();						
 					}
 
 					//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
@@ -1003,7 +1115,9 @@ class SiteController extends Controller
 						{
 							Yii::app()->language = 'tr';
 						}
-					}					
+					}
+
+					Yii::app()->end();
 				}
 				else
 				{
@@ -1043,8 +1157,19 @@ class SiteController extends Controller
 				else
 				{
 					//echo 'RegisterForm not valid';
-					Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
 						
 					//Complete solution for blinks at FireFox
 					if (Yii::app()->request->getIsAjaxRequest()) {
@@ -1195,8 +1320,19 @@ class SiteController extends Controller
 			Yii::app()->end();
 		}
 		else {
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			if (Yii::app()->request->isAjaxRequest)
+			{
+				if (YII_DEBUG)
+				{
+					Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+				}
+				else
+				{
+					Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				}
+			}
 			
 			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
@@ -1287,8 +1423,19 @@ class SiteController extends Controller
 			Yii::app()->end();
 		}
 		else {
-			Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-			Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			if (Yii::app()->request->isAjaxRequest)
+			{
+				if (YII_DEBUG)
+				{
+					Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+				}
+				else
+				{
+					Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+					Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+				}
+			}
 			
 			//Complete solution for blinking problem at FireFox
 			if (Yii::app()->request->getIsAjaxRequest()) {
@@ -1313,33 +1460,51 @@ class SiteController extends Controller
 			// validate user input and if ok return json data and end application.
 			if($model->validate()) {
 
-				$emailArray= $this->splitEmails($model->emails);
+				$emailsList = trim($model->emails);
+				$emailArray= $this->splitEmails($emailsList);
 				$duplicateEmails = array();
 				$arrayLength = count($emailArray);
 				$invitationSentCount = 0;
+				
+				$inviterName = null;
+				$inviterEmail = null;
+				Users::model()->getUserInfo(Yii::app()->user->id, $inviterName, $inviterEmail);
+								
 				for ($i = 0; $i < $arrayLength; $i++)
 				{					
-					 $dt = date("Y-m-d H:m:s");
+					$dt = date("Y-m-d H:m:s");
+					$inviteeEmail = trim($emailArray[$i]);
 
 					try
 					{
-						if(InvitedUsers::model()->saveInvitedUsers($emailArray[$i], $dt))
+						if(InvitedUsers::model()->saveInvitedUsers($inviteeEmail, $dt))
 						{
-							$key = md5($emailArray[$i].$dt);
+							$key = md5($inviteeEmail.$dt);
 							//send invitation mail
 							$invitationSentCount++;
 						
-							$message = Yii::t('site', 'Hi').',<br/>'.Yii::t('site', 'You have been invited to traceper by one of your friends').'. '.Yii::t('site', 'Your friend\'s message:').'<br/><br/>';
-							$message .= $model->invitationMessage;
+							$message = Yii::t('site', 'Hi').',<br/><br/>'.Yii::t('site', 'You have been invited to Traceper by {name} ({email}).', array('{name}'=>$inviterName, '{email}'=>$inviterEmail));
+							
+							if($model->invitationMessage != null)
+							{
+								$message .= ' '.Yii::t('site', 'Your friend\'s message:').'<br/><br/>';
+								$message .= '"'.$model->invitationMessage.'"';
+							}
+													
 							$message .= '<br/><br/>';
 
-							$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'">';
-							
-							$message .= Yii::t('site', 'Click here to register to traceper');
+							$message .= '<a href="'.'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'">';					
+							$message .= Yii::t('site', 'Click here to sign up for Traceper');
 							$message .= '</a>';
 							
+							$message .= '<br/><br/>';
+
+							$message .= '<a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0.">';
+							$message .= Yii::t('site', 'Click here to download and install the mobile application at Google Play');
+							$message .= '</a>'.' '.Yii::t('site', '(Registration could also be done by mobile application)');
+							
 							//echo $message;
-							$this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $emailArray[$i], '', Yii::t('site', 'Traceper Invitation'), $message);
+							$this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $inviteeEmail, '', Yii::t('site', 'Traceper Invitation'), $message);
 						}						
 					} 
 					catch (Exception $e)
@@ -1347,7 +1512,7 @@ class SiteController extends Controller
 						if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
 						{
 							//echo CJSON::encode(array("result"=> "Duplicate Entry"));
-							$duplicateEmails[] = $emailArray[$i];
+							$duplicateEmails[] = $inviteeEmail;
 						}
 						else
 						{
@@ -1371,8 +1536,19 @@ class SiteController extends Controller
 			}
 		}
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
 		
 		//Complete solution for blinking problem at FireFox
 		if (Yii::app()->request->getIsAjaxRequest()) {
@@ -1419,8 +1595,19 @@ class SiteController extends Controller
 					$result = "Sorry, there is a problem in activating the user";
 					if(Users::model()->saveUser($userCandidate->email, $userCandidate->password, $userCandidate->realname, UserType::RealUser/*userType*/, 0/*accountType*/, $userCandidate->registrationMedium, $userCandidate->preferredLanguage))
 					{
+						if(strcmp($userCandidate->registrationMedium, 'Web') == 0)
+						{
+							$result = Yii::t('site', 'Your account has been activated successfully, you can login now. You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');
+						}
+						else
+						{
+							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
+							$result .= Yii::t('site', 'You should login at mobile app in order to provide your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.');
+							
+						}
+						
 						$userCandidate->delete();
-						$result = Yii::t('site', 'Your account has been activated successfully, you can login now');
+						
 						//echo CJSON::encode(array("result"=> "1"));
 					}
 				}
@@ -1453,6 +1640,8 @@ class SiteController extends Controller
 		{
 			$app->language = $_GET['lang'];
 			$app->session['_lang'] = $_GET['lang'];
+			
+			//Fb::warn("actionChangeLanguage() called", "SiteController");
 		}
 	}
 
@@ -1463,8 +1652,19 @@ class SiteController extends Controller
 	{
 		$processOutput = true;
 	
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
 	
 		$this->renderPartial('aboutUs',array(), false, $processOutput);
 	}
@@ -1476,8 +1676,19 @@ class SiteController extends Controller
 	{
 		$processOutput = true;
 	
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-		Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
 	
 		$this->renderPartial('terms',array(), false, $processOutput);
 	}	

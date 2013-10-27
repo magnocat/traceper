@@ -156,7 +156,28 @@ return array(
 		
         'fixture'=>array(
             'class'=>'system.test.CDbFixtureManager',
-        ),		
+        ),
+
+		'clientScript'=>array(				
+				'packages'=>array(
+						'jquery'=>array(
+								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jquery/1.7/',
+								'js'=>YII_DEBUG ? array('jquery.js') : array('jquery.min.js'),
+								'coreScriptPosition'=>CClientScript::POS_HEAD
+						),												
+						'jquery.ui'=>array(
+								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jqueryui/1.7/',
+								'js'=>YII_DEBUG ? array('jquery-ui.js') : array('jquery-ui.min.js'),
+						        'depends'=>array('jquery'),
+						        'coreScriptPosition'=>CClientScript::POS_BEGIN
+						),						
+// 						'validate'=>array(
+// 								'baseUrl'=>'//ajax.microsoft.com/ajax/jquery.validate/1.8/',
+// 								'js'=>array('jquery.validate.min.js'),
+// 								'coreScriptPosition'=>CClientScript::POS_HEAD
+// 						),						
+				),
+		),			
 	),
 
 	// application-level parameters that can be accessed
