@@ -183,7 +183,8 @@ class Upload extends CActiveRecord
     					),
     			),
     			'pagination'=>array(
-    					'pageSize'=>Yii::app()->params->uploadCountInOnePage,
+    					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
+    					'pageSize'=>($_SESSION['screen_height'] - 155)/45
     			),
     	));
     

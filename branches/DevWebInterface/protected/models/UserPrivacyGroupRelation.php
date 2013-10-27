@@ -144,6 +144,55 @@ class UserPrivacyGroupRelation extends CActiveRecord
 		}
 		return $returnResult;
 	}
+		
+	public function deleteMemberByGroupOwner($ownerId, $userId) {
+	
+		$relationQueryResult = UserPrivacyGroupRelation::model()->deleteAll(array('condition'=>'groupOwner=:groupOwner AND userId=:userId',
+				'params'=>array(':groupOwner'=>$ownerId, ':userId'=>$userId
+				)
+		)
+		);
+
+		return $relationQueryResult; //Returns the number of rows deleted
+	}
+	
+	public function deleteMemberByGroupOwnerExceptThisGroup($ownerId, $userId, $groupId) {
+	
+		$relationQueryResult = UserPrivacyGroupRelation::model()->deleteAll(array('condition'=>'groupOwner=:groupOwner AND userId=:userId AND groupId<>:groupId',
+				'params'=>array(':groupOwner'=>$ownerId, ':userId'=>$userId, ':groupId'=>$groupId
+				)
+		)
+		);
+	
+		return $relationQueryResult; //Returns the number of rows deleted
+	}
+
+	public function updateGroupMembershipIfExists($ownerId, $userId, $groupId) {
+		
+		$relation = UserPrivacyGroupRelation::model()->find(array('condition'=>'groupOwner=:groupOwner AND userId=:userId AND groupId<>:groupId',
+				'params'=>array(':groupOwner'=>$ownerId, ':userId'=>$userId, ':groupId'=>$groupId
+				)
+		)
+		);
+		
+		$result = false; //No membership found
+		
+		if($relation != null)
+		{
+			$relation->groupId = $groupId;
+			$relation->save();
+			$result = true;	//Membership updated		
+		}		
+	
+		return $result;
+	}	
+
+	public function deleteMemberFromAllGroups($userId) {
+	
+		$relationQueryResult = UserPrivacyGroupRelation::model()->deleteAll(array('condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
+	
+		return $relationQueryResult; //Returns the number of rows deleted
+	}	
 	
 	
 }

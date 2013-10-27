@@ -192,7 +192,27 @@ class Users extends CActiveRecord
 		));
 	}
 	
-	public function updateLocation($latitude, $longitude, $altitude, $address, $calculatedTime, $userId){
+	public function updateLocation($latitude, $longitude, $altitude, $calculatedTime, $userId){
+	
+		$sql = sprintf('UPDATE '
+				. $this->tableName() .'
+				SET
+				latitude = %f , '
+				.'	longitude = %f , '
+				.'	altitude = %f ,	'
+				.'	dataArrivedTime = NOW(), '
+				.'  dataCalculatedTime = "%s" '
+				.' WHERE '
+				.' 	Id = %d '
+				.' LIMIT 1;',
+				$latitude, $longitude, $altitude, $calculatedTime, $userId);
+	
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		//$effectedRows = 0;
+		return $effectedRows;
+	}	
+	
+	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, $userId){
 	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
@@ -277,10 +297,11 @@ class Users extends CActiveRecord
 		return $name;
 	}
 	
-	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType){
+	public function saveFacebookUser($email, $password, $realname, $fb_id, $accountType, $registrationMedium, $preferredLanguage){
 		if ($fb_id == null || $fb_id == 0) {
 			return false;
 		}
+		
 		$users=new Users;
 	
 		$users->email = $email;
@@ -288,6 +309,8 @@ class Users extends CActiveRecord
 		$users->password = $password;
 		$users->fb_id = $fb_id;
 		$users->account_type = $accountType;
+		$users->registrationMedium = $registrationMedium;
+		$users->preferredLanguage = $preferredLanguage;		
 	
 		$result = $users->save();
 		return $result;
@@ -441,10 +464,12 @@ class Users extends CActiveRecord
 						),
 				),
 				'pagination'=>array(
-						'pageSize'=>$itemCount,
+						'pageSize'=>($_SESSION['screen_height'] - 155)/42,
 				),
 		));
-	
+		
+		//echo ($_SESSION['screen_height'] - 140)/45;
+		
 		return $dataProvider;
 	}
 	

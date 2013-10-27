@@ -21,7 +21,8 @@ class InviteUsersForm extends CFormModel
 			// username and password are required
 			array('emails', 'required', 'message'=>Yii::t('site', 'Please, enter the field')),
 			array('emails', 'ext.MultiEmailValidator', 'delimiter'=>',', 'min'=>1, 'max'=>10),
-			array('invitationMessage', 'length', 'max'=>500), //Bu alanýn alanýn düzgün çalýþmasý en azýndan bir rule tanýmlamak gerekiyor
+			array('emails', 'isRegisteredOrInvited'),			
+			array('invitationMessage', 'length', 'max'=>500), //Bu alanin duzgun calismasi icin bir rule tanimlamak gerekiyor
 		);
 	}
 
@@ -34,5 +35,38 @@ class InviteUsersForm extends CFormModel
 			'emails'=>Yii::t('site', 'E-mails'),
 			'invitationMessage'=>Yii::t('site', 'Message for your friends'),
 		);
+	}
+
+	public function isRegisteredOrInvited($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			$values = trim($this->emails);
+			$values = str_replace(array(" ",",","\r","\n"),array(",",",",",",","),$values);
+			$values = str_replace(",,", ",",$values);
+			$values = explode(",", $values);
+			
+			foreach($values as $value)
+			{
+				$value = trim($value);
+			
+				$criteria=new CDbCriteria;
+				$criteria->select='email';
+				$criteria->condition='email=:email';		
+				$criteria->params=array(':email'=>$value);
+				//$data = Users::model()->find($criteria);
+					
+				if(Users::model()->find($criteria) != null)
+				{
+					//$this->addError('emails',$value);
+					$this->addError('emails',Yii::t('site', '"{value}" is already registered. You could search by name and add as friend at "Users" tab.', array('{value}'=>$value)));
+				}
+				else if(InvitedUsers::model()->find($criteria) != null)
+				{
+					//$this->addError('emails',$value);
+					$this->addError('emails',Yii::t('site', '"{value}" has been invited before', array('{value}'=>$value)));
+				}				
+			}						
+		}
 	}	
 }
