@@ -8,7 +8,8 @@
 					'autoOpen'=>false,
 					'modal'=>true,
 					'resizable'=>false,
-					'width'=> '550px'
+					'width'=> '550px',
+					'close' => 'js:function(){ showFormErrorsIfExist(); }'
 			),
 	));	
 

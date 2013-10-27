@@ -7,13 +7,36 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '380px'      
+			'width'=> '380px',
+	    	'close' => 'js:function(){ $("#InviteUsersForm_emails").tooltipster("hide"); }'
 	    ),
 	));
+
+Yii::app()->clientScript->registerScript('emailsListTooltip',
+		'
+		$("#InviteUsersForm_emails").tooltipster({
+			theme: ".tooltipster-info",
+			trigger: "custom",
+			maxWidth: 300,
+			onlyOne: false,
+			position: "right",
+			interactive: true
+		});
+
+	 	$("#InviteUsersForm_emails").focus(function ()	{
+	 		$("#InviteUsersForm_emails").tooltipster("update", TRACKER.langOperator.invitedEmailsNotificationMessage);
+	 		$("#InviteUsersForm_emails").tooltipster("show"); 		
+		});
+
+	 	$("#InviteUsersForm_emails").blur(function ()	{
+	 		$("#InviteUsersForm_emails").tooltipster("hide"); 		
+		});
+		',
+		CClientScript::POS_HEAD);
 ?>
 	<div class="form">
 	<?php $form=$this->beginWidget('CActiveForm', array(
-		'id'=>'register-form',
+		'id'=>'inviteUsers-form',
 		'enableClientValidation'=>true,
 		'clientOptions'=> array(
 							'validateOnSubmit'=> true,
@@ -73,7 +96,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																if (obj.result && obj.result == "1")
 																{
 																	$("#inviteUsersWindow").dialog("close");
-																	TRACKER.showMessageDialog("'.Yii::t('site', 'Invitations sent successfully...').'");
+																	TRACKER.showLongMessageDialog("'.Yii::t('site', 'Invitations sent successfully...').'<br/><br/>'.Yii::t('site', 'E-mails may sometimes not reach to inbox of the recipients but spam/junk box. Therefore we recommend you to contact with the invitees thereafter in order to assure that they have received your invitation.').'");
 																}
 																else if(obj.result && obj.result == "Duplicate Entry")
 																{

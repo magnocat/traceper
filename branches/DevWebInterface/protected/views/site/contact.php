@@ -7,7 +7,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '650px'      
+			'width'=> '650px',
+	    	'close' => 'js:function(){ showFormErrorsIfExist(); }'
 	    ),
 	));
 ?>
@@ -78,7 +79,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			
 					
 			<div style="height:60px;">
-			<?php $this->widget('CCaptcha', array('id'=>'captchaWidget')); //Her widget'a id vermeyi unutma, yoksa default 'yw0' id'si alýyor!?>
+			<?php $this->widget('CCaptcha', array('id'=>'captchaWidget')); //Her widget'a id vermeyi unutma, yoksa default 'yw0' id'si alï¿½yor!?>
 			<?php echo $form->textField($model,'verifyCode'); ?>
 			</div>
 			<?php $errorMessage = $form->error($model,'verifyCode'); 

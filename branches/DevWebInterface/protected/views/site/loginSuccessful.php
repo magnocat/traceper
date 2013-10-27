@@ -2,6 +2,8 @@
 	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
 	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
 
+	resetAllFormErrors();
+
 	$('#topBar').css('height', '60px');
 	$('#sideBar').css('top', '60px');
 	$('#sideBar').css('width', '380px');
@@ -108,8 +110,9 @@
 	$("#loginBlock").hide();
 	$("#userBlock").load();
 	$("#userBlock").show();
-	$("#appLinkBlock").hide();		
+	$("#appLinkBlock").hide();
+	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
 	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
-	TRACKER.getImageList();
+	TRACKER.getImageList(true);
 </script>		
 

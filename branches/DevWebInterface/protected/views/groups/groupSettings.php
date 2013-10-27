@@ -7,8 +7,9 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '500px'      
+			'width'=> '600px',
 	    ),
+		//'htmlOptions'=>array('style'=>'height:500px; overflow: auto;'),
 	));
 ?>
 
@@ -23,21 +24,27 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 
-		<div class="row" style="padding-top:2em;padding-left:10px">
+		<div class="row" style="padding-top:1em;padding-left:10px">
 			<?php			
-				if(empty($groupsOfUser))
+				if(empty($friendsOfUser))
 				{
-					echo Yii::t('groups', 'Unfortunately, you have no groups to show yet. You can create new group(s) using the top menu, and then you can enroll your friend(s) into the groups you want.');
+					echo Yii::t('groups', 'Unfortunately, you have no friends to show yet. You should add some friends first in order to group them.');
 				}
 				else
-				{
-					echo Yii::t('groups', 'You can enroll your friend to the selected group(s) just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friend from the membership of a group, just remove the tick on the corresponding checkbox and save the operation again:').'</br></br>';
-					
+				{		
+					echo Yii::t('groups', 'Since each group has its own privacy settings, the same person cannot be enrolled to more than one group in order to prevent potetial conflicts. Therefore if a selected friend belongs to another group that membership will be cancelled and your this choice will be applied.').'</br></br>';
+					echo Yii::t('groups', 'You can enroll your friends to this group just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friends from the membership of this group, just remove the tick on the corresponding checkbox and save the operation again:').'</br></br>';
+					?>
+					<div style="max-height:300px; overflow:auto;">
+					<?php
 					echo CHtml::activeCheckboxList(
 					  $model, 'groupStatusArray', 
-					  CHtml::listData($groupsOfUser, 'id', 'name'),
+					  CHtml::listData($friendsOfUser, 'Id', 'realname'),
 					  array()
-					);	
+					);
+					?>
+					</div>
+					<?php
 					
 //					$form->dropDownList($model,'groupStatusArray', CHtml::listData($groupsOfUser, 'id', 'name'), array('empty'=>'Select Group'));
 //					
@@ -54,13 +61,13 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		
 		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
-				if(!empty($groupsOfUser))
+				if(!empty($friendsOfUser))
 				{
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxUpdateGroup',
 							'caption'=>Yii::t('common', 'Save'),
 							'id'=>'updateGroupAjaxButton',
-							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('friendId'=>$friendId, 'groupType'=>$groupType)),
+							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('groupId'=>$groupId)),
 									'success'=> 'function(result)
 												{
 													try 
@@ -99,7 +106,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			?>
 												
 			<?php 
-				if(!empty($groupsOfUser))
+				if(!empty($friendsOfUser))
 				{
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'updateGroupCancel',

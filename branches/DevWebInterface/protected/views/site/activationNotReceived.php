@@ -8,7 +8,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '600px'      
+			'width'=>'600px',
+	    	'close'=>'js:function(){ showFormErrorsIfExist(); }' 	
 	    ),
 	));
 ?>
@@ -23,7 +24,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	
 	)); ?>
 	
-		<div class="row" style="padding-top:1em">
+		<div class="row" style="padding-top:1em;">
 			<?php echo Yii::t('site', 'If you have not received our account activation e-mail although you sent the regisration form, please enter your registration e-mail address into the field below and we will send you a link to activate your account again:'); ?>
 		</div>	
 		
