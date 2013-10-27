@@ -149,11 +149,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 	};
 
-	this.getImageList = function(callback){
+	this.getImageList = function(updateAll, callback){
 		var params = "r=upload/getUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&"; 
 
-		if (TRACKER.allImagesFetched == true) {
+		if((typeof updateAll !== 'undefined') && (updateAll == true))
+		{
+			//Do not add "list=onlyUpdated"
+		}
+		else if (TRACKER.allImagesFetched == true) {
 			params += "list=onlyUpdated";
+			
+			//alert("onlyUpdated");
+		}
+		else
+		{
+			//alert("All");
 		}
 		
 		TRACKER.showImagesOnTheMapJustToggled = false;
@@ -328,6 +338,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		MAP.zoomPoint(point);
 	}
+	
+	this.zoomOutPoint = function (latitude, longitude) {
+		var point = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		MAP.zoomOutPoint(point);
+	}	
 
 	this.zoomMaxPoint = function(latitude, longitude)
 	{

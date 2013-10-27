@@ -18,6 +18,7 @@ LAN_OPERATOR.addIndexes({
 			aboutus:'traceper is a GPS tracking system for mobile users, it is free, it is open source, it is simple. You can track and see your friends\' positions online.<br/><br/><div class=\"title\">Support</div>If you need support to modify and use this software, We can share all information we have, so feel free to contact us.<br/><br/><div class=\"title\">License</div>This software is free. It can be modified and distributed without notification.<br/><br/><div class=\"title\">Disclaimer</div>This software guarantees nothing, use it with your own risk. No responsilibity is taken for any situation.<br/><br/><div class=\"title\">Contact</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Project Team</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oguz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Eren Alp Celik - erenalpcelik@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>',
 			termsofuse:'termsofuse',
 			zoom:'Zoom in',
+			zoomOut:'Zoom out',
 			zoomMax:'Zoom max',
 			drawTraceLine:'Draw trace lines',
 			wasHere:'was here.',
@@ -76,5 +77,11 @@ LAN_OPERATOR.addIndexes({
 			invitationSentPartial:'Invitations has been sent, but wrong-formatted e-mail address found',
 			mailEntranceRule:'Please separate e-mail addresses with semicolon(;)',
 			registerLabel:'Register',
-			unauthorizedCommentDeletion:'You are not allowed to delete this comment.'
+			unauthorizedCommentDeletion:'You are not allowed to delete this comment.',
+			didYouMean:'Did you mean',
+			ifSoClickOnSuggestedEmail:'If so, click on the suggested e-mail for correcting the entry. If not, please ignore this message.',
+			registerEmailNotificationMessage:'After you send the sign up form by filling it correctly, an account activation e-mail message will be sent to the e-mail adress specified at this field. When you click the account activation link at this message, you will have completed the registration process successfully. Therefore please enter a valid e-mail address that you use into this field.',
+			userSearchNotificationMessage:'It is enough to type your friend\'s name and click on the "Search" button in order to search your friends at Traceper. If your friend is a member of Traceper, he/she will be listed. If not listed, you could invite your friends to Traceper via the link <img src="images/invite.png"/>(Invite Friends) at the top menu.',
+			uploadSearchNotificationMessage:'It is enough to type a keyword and click on the "Search" button in order to search the photos that you and your friends shared or the ones that are shared publicly. We shall list all the photos that meet your search criteria.',
+			invitedEmailsNotificationMessage:'Please enter your friends\' e-mails into this field separated by the <b>space</b>, <b>comma</b> or <b>ENTER</b> characters in order to invite them to Traceper.'
 	});

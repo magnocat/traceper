@@ -139,6 +139,7 @@ function processUsers(MAP, users, deletedFriendId) {
 		var realname = value.realname;
 		var latitude = value.latitude;
 		var longitude = value.longitude;
+		var address = value.address;
 		var locationCalculatedTime = value.calculatedTime
 		var status_message = value.status_message;
 		var fb_id = value.fb_id;
@@ -155,9 +156,12 @@ function processUsers(MAP, users, deletedFriendId) {
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
+			var personPhoto;
 			if(fb_id != 0){
+				personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";
 				var userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible);
 			}else{
+				personPhoto = "images/Friend.png";
 				var userMarker = MAP.putMarker(location, "images/person.png", visible);
 			}
 	
@@ -167,6 +171,7 @@ function processUsers(MAP, users, deletedFriendId) {
 				realname:realname,
 				latitude:latitude,
 				longitude:longitude,
+				address:address,
 				friendshipStatus:isFriend,
 				//time:time,
 				time:dataArrivedTime,
@@ -177,41 +182,62 @@ function processUsers(MAP, users, deletedFriendId) {
 				mapMarker:new Array(markerInfo),
 				locationCalculatedTime:locationCalculatedTime
 			});
-		
-			var content =  '<div>'														   
-				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + TRACKER.users[userId].time
-				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
-
-				+'</div>'
-				+'<div>'
-				+ '<ul class="sf-menu"> '
-				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
-				+ TRACKER.langOperator.previousPoint 
-				+'</a>'+ '</li>'
-				+ '<li>'+ '<a class="infoWinOperations" href="#">'
-				+ TRACKER.langOperator.operations
-				+'</a>'
-				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoom
-				+'</a>'+ '</li>'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
-				+ TRACKER.langOperator.zoomMax
-				+'</a>'+'</li>'
-				+'</ul>'
-				+'</li>'
-				+ '</ul>'
+						
+			var content = '<div style="width:200px; height:180px;">'
+				+ '<div><div style="display:inline-block;vertical-align:middle;"><img src="'+ personPhoto +'"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+				+ '</br>'
+				+ '<div>' + TRACKER.users[userId].time + '</div>'
+				+ '<div>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + '</div>'
+				+ '<div>' + TRACKER.users[userId].address + '</div>'
+				+ '<div>' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
+				+ '</br>'				
+				+ '<div style="position:absolute;bottom:5px;">'				
+				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
+				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
+				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
 				+ '</div>';
-
+				+ '</div>';			
+					
+//			var content = '<div style="height:200px;">'
+//				+ '<img src="images/Friend.png"/>'
+//				+ '<br/>' + TRACKER.users[userId].realname  
+//				+ '<br/>' + TRACKER.users[userId].time
+//				+ '<br/>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude
+//
+//				+'</div>'
+//				+'<div>'
+//				+ '<ul class="sf-menu"> '
+//				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
+//				+ TRACKER.langOperator.previousPoint 
+//				+'</a>'+ '</li>'
+//				+ '<li>'
+//				+ TRACKER.langOperator.operations
+//				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
+//				+ TRACKER.langOperator.zoom
+//				+'</a>'+ '</li>'
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
+//				+ TRACKER.langOperator.zoomMax
+//				+'</a>'+'</li>'
+//				
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'
+//				+ TRACKER.langOperator.zoomOut
+//				+'</a>'+'</li>'				
+//				
+//				+'</ul>'
+//				+'</li>'
+//				+ '</ul>'
+//				+ '</div>';
+				
 			TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 			
 			MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
-			
-			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);						
+
+			//MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, (userId==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);						
 			
 			//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
 			//pencerenin yeni konumda da açık olmasının sağlanması
@@ -228,7 +254,8 @@ function processUsers(MAP, users, deletedFriendId) {
 			{
 				// if they have just become friend, there are no latitude and longitude data 
 				// so this statement will run and we update latitude and longitude
-				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);						
+				//MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, (userId==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);						
 			}
 
 			if ((TRACKER.users[userId].latitude != latitude ||
@@ -270,32 +297,51 @@ function processUsers(MAP, users, deletedFriendId) {
 					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].time != time))){
 				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
 
-				var content =  '<div>'														   
-				+ '<br/>' + TRACKER.users[userId].realname  
-				+ '<br/>' + time //TRACKER.users[userId].time
-				+ '<br/>' + latitude + ", " + longitude
-
-				+'</div>'
-				+'<div>'
-				+ '<ul class="sf-menu"> '
-				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
-				+ TRACKER.langOperator.previousPoint 
-				+'</a>'+ '</li>'
-				+ '<li>'+ '<a class="infoWinOperations" href="#">'
-				+ TRACKER.langOperator.operations
-				+'</a>'
-				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
-				+ TRACKER.langOperator.zoom
-				+'</a>'+ '</li>'
-				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
-				+ TRACKER.langOperator.zoomMax
-				+'</a>'+'</li>'
-				+'</ul>'
-				+'</li>'
-				+ '</ul>'
-				+ '</div>';
-				
+//				var content =  '<div>'														   
+//				+ '<br/>' + TRACKER.users[userId].realname  
+//				+ '<br/>' + time //TRACKER.users[userId].time
+//				+ '<br/>' + latitude + ", " + longitude
+//
+//				+'</div>'
+//				+'<div>'
+//				+ '<ul class="sf-menu"> '
+//				//+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'
+//				+ TRACKER.langOperator.previousPoint 
+//				+'</a>'+ '</li>'
+//				+ '<li>'
+//				+ TRACKER.langOperator.operations
+//				+'<ul>' + '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'
+//				+ TRACKER.langOperator.zoom
+//				+'</a>'+ '</li>'
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'
+//				+ TRACKER.langOperator.zoomMax
+//				+'</a>'+'</li>'
+//				
+//				+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'
+//				+ TRACKER.langOperator.zoomOut
+//				+'</a>'+'</li>'				
+//				
+//				+'</ul>'
+//				+'</li>'
+//				+ '</ul>'
+//				+ '</div>';
+								
+				var content = '<div style="width:200px; height:180px;">'
+					+ '<div><div style="display:inline-block;vertical-align:middle;"><img src="images/Friend.png"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+					+ '</br>'
+					+ '<div>' + time + '</div>'
+					+ '<div>' + latitude + ", " + longitude + '</div>'
+					+ '<div>' + address + '</div>'
+					+ '<div>' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
+					+ '</br>'				
+					+ '<div style="position:absolute;bottom:5px;">'				
+					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
+					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
+					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
+					+ '</div>';
+					+ '</div>';				
+								
 				if (isWindowOpen == true) {
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
 					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow,content);			
@@ -323,9 +369,11 @@ function processUsers(MAP, users, deletedFriendId) {
 			
 	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
 			
-			MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+	    	//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+	    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
 			
-			if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+	    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+	    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
 			{
 				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
 			}
@@ -366,6 +414,8 @@ function processImageXML(MAP, xml){
 		}
 		
 		if (typeof TRACKER.images[imageId] == "undefined") {
+			
+			//alert("images["+ imageId +"] is undefined!");
 				
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			var userMarker = MAP.putMarker(location, image, false);
@@ -441,6 +491,8 @@ function processImageXML(MAP, xml){
 		}
 		else
 		{
+			//alert("images["+ imageId +"] is already defined");
+			
 			//alert("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
 			
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN		
