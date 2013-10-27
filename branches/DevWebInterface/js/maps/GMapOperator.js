@@ -1,6 +1,6 @@
 //Map class
 
-function MapOperator() {
+function MapOperator(lang) {
 
 	MAP_OPERATOR = this;
 	var newGeofence = null;	
@@ -12,7 +12,7 @@ function MapOperator() {
 	/*
 	 * this loads the gmap js file and css file
 	 */
-	document.write("<script type='text/javascript' src='http://maps.google.com/maps/api/js?sensor=false'></script>");
+	document.write("<script type='text/javascript' src='http://maps.google.com/maps/api/js?sensor=false&language=" + lang + "'></script>");
 	document.write("<link href='http://code.google.com/apis/maps/documentation/javascript/examples/default.css' rel='stylesheet' type='text/css' />");
 
 	/*
@@ -83,7 +83,7 @@ function MapOperator() {
 				;
 		} 
 		var infowindow = new google.maps.InfoWindow({
-			content: contentString
+			content: contentString		
 		});
 		return infowindow;
 	}
@@ -437,27 +437,47 @@ function MapOperator() {
 
 		var zoomlevel = MAP_OPERATOR.map.getZoom();
 		var incZoomlevel;
-		if (zoomlevel < 6) {
-			incZoomlevel = 5;
-		}
-		else if (zoomlevel < 10) {
-			incZoomlevel = 4;
-		}
-		else if (zoomlevel < 13) {
-			incZoomlevel = 3;
-		}
-		else if (zoomlevel < 15) {
-			incZoomlevel = 2;
-		}
-		else {
-			incZoomlevel = 1;
-		}
-
-		zoomlevel += incZoomlevel;
+		
+		//alert("Zoom:"+zoomlevel);
+				
+//		if (zoomlevel < 6) {
+//			incZoomlevel = 5;
+//		}
+//		else if (zoomlevel < 10) {
+//			incZoomlevel = 4;
+//		}
+//		else if (zoomlevel < 13) {
+//			incZoomlevel = 3;
+//		}
+//		else if (zoomlevel < 15) {
+//			incZoomlevel = 2;
+//		}
+//		else {
+//			incZoomlevel = 1;
+//		}
+//
+//		zoomlevel += incZoomlevel;
+		
+		zoomlevel += 1;
 
 		var position = new google.maps.LatLng(point.latitude, point.longitude);
 		MAP_OPERATOR.map.setCenter(position);
 		MAP_OPERATOR.map.setZoom(zoomlevel);
-	}					
+	}
+	
+	/*
+	 * This function provides zooming out at given point
+	 */
+	MAP_OPERATOR.zoomOutPoint = function(point) {
+
+		var zoomlevel = MAP_OPERATOR.map.getZoom();
+		var incZoomlevel;
+		
+		zoomlevel -= 1;
+
+		var position = new google.maps.LatLng(point.latitude, point.longitude);
+		MAP_OPERATOR.map.setCenter(position);
+		MAP_OPERATOR.map.setZoom(zoomlevel);
+	}	
 }
 

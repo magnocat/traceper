@@ -17,6 +17,7 @@ LAN_OPERATOR.addIndexes({
 			searchStringIsTooShort:'L\u00FCtfen aranmas\u0131 i\u00E7in daha uzun kelime giriniz.',
 		    aboutus:'<div class=\"logo\"></div>traceper akıllı telefonları kullanıcıları için bir GPS takip sistemidir, traceper ücretsiz, açık kaynak kodlu ve kullanımı basit bir yazılımdır. Traceper ile arkadaşlarınızın nerede olduklarını görebilirsiniz.<br/><br/><div class=\"title\">Destek</div>Bu yazılımı kullanmak veya değiştirmek isterseniz sahip olduğumuz tüm bilgiyi paylaşmaya hazırız, bu yüzden lütfen iletişime geçmek için tereddüt yaşamayınız.<br/><br/><div class=\"title\">Lisans</div>Bu yazılım ücretsizdir, haber vermeden değiştirilebilir veya dağıtılabilir.<br/><br/><div class=\"title\">Tekzip</div>Bu yazılım hiç bir şeyi garanti etmez, yazılımı kullanırken bütün sorumluluk kullanana aittir. Herhangi bir durumda kesinlikle sorumluluk kabul edilmez.<br/><br/><div class=\"title\">İletişim</div><a href=\"mailto:contact@mekya.com\">contact@mekya.com</a><br/><br/><div class=\"title\">Proje Ekibi</div><div id=\"projectteam\">Adnan Kalay - adnankalay@gmail.com <br/> Ahmet Oğuz Mermerkaya - ahmetmermerkaya@gmail.com <br/> Eren Alp Çelik - erenalpcelik@gmail.com <br/> Murat Salman - salman.murat@gmail.com </div>',
 			zoom:'Yakınlaştır',
+			zoomOut:'Uzaklaştır',
 			zoomMax:'En yakın',
 			drawTraceLine:'İz doğrularını çiz',
 			wasHere:'burdaydı.',
@@ -75,5 +76,11 @@ LAN_OPERATOR.addIndexes({
 			invitationSentPartial:'Davetiyeler gönderildi yalnız uygun formatta olmayan e-posta adresleri bulundu',
 			mailEntranceRule:'Lütfen e-posta adreslerini noktalı virgül(;) ile ayırınız.',
 			registerLabel:'Kayıt Ol',
-			unauthorizedCommentDeletion:'Bu yorumu silmeye yetkiniz yoktur.'
+			unauthorizedCommentDeletion:'Bu yorumu silmeye yetkiniz yoktur.',
+			didYouMean:'mu demek istediniz',
+			ifSoClickOnSuggestedEmail:'Öyleyse girişi düzeltmek için önerilen e-postaya tıklayınız. Girişinizin doğru olduğunu düşünüyorsanız lütfen bu mesajı önemsemeyin.',
+			registerEmailNotificationMessage:'Kayıt formunu hatasızca doldurup gönderdiğinizde, bu alanda belirttiğiniz e-posta adresine hesap aktivasyon e-postası gönderilecektir. Bu e-postadaki bağlantıya tıklayarak hesabınızı etkinleştirdiğinizde kayıt işlemini başarıyla tamamlamış olacaksınız. Bu nedenle lütfen bu alana geçerli ve kullandığınız bir e-posta adresi giriniz.',
+			userSearchNotificationMessage:'Arkadaşlarınızı Traceper\'da aramak için arkadaşınızın ismini bu alana yazıp "Ara" butonuna tıklamanız yeterli. Eğer arkadaşınız Traceper üyesiyse listede çıkacaktır. Eğer arkadaşınız listede çıkmazsa kendisini Traceper\'a davet etmek için üst menüdeki <img src="images/inviteSmall.png"/>(Arkadaşlarını Davet Et) bağlantısını kullanabilirsiniz.',
+			uploadSearchNotificationMessage:'Sizin ve arkadaşlarınızın paylaştıkları veya herkese açık olarak paylaşılan fotoğrafları aramak için bu alana bir anahtar kelime yazmanız ve "Ara" butonuna basmanız yeterli. Aradığınız kritere uyan tüm fotoğrafları sizin için listeleyeceğiz.',
+			invitedEmailsNotificationMessage:'Traceper\'a davet etmek istediğiniz arkadaşlarınızın e-posta adreslerini lütfen <b>boşluk</b>, <b>virgül</b> veya <b>ENTER</b> karakaterleri ile ayırarak bu alana giriniz.'
 		});

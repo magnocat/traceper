@@ -1,20 +1,257 @@
+
+var bRegisterFormNameErrorExists = false;
+var bRegisterFormLastNameErrorExists = false;
+var bRegisterFormEmailErrorExists = false;
+var bRegisterFormEmailAgainErrorExists = false;
+var bRegisterFormPasswordErrorExists = false;
+var bRegisterFormPasswordAgainErrorExists = false;
+var bLoginFormEmailErrorExists = false;
+var bLoginFormPasswordErrorExists = false;
+
+function resetAllFormErrors()
+{	
+	$("#RegisterForm_name").tooltipster('update', "");
+	$("#RegisterForm_name").tooltipster("hide");
+	
+	$("#RegisterForm_lastName").tooltipster('update', "");
+	$("#RegisterForm_lastName").tooltipster("hide");
+	
+	$("#RegisterForm_email").tooltipster('update', "");
+	$("#RegisterForm_email").tooltipster("hide");
+
+	$("#RegisterForm_emailAgain").tooltipster('update', "");
+	$("#RegisterForm_emailAgain").tooltipster("hide");
+	
+	$("#RegisterForm_password").tooltipster('update', "");
+	$("#RegisterForm_password").tooltipster("hide");
+	
+	$("#RegisterForm_passwordAgain").tooltipster('update', "");
+	$("#RegisterForm_passwordAgain").tooltipster("hide");
+
+	$("#LoginForm_email").tooltipster('update', "");
+	$("#LoginForm_email").tooltipster("hide");
+	
+	$("#LoginForm_password").tooltipster('update', "");
+	$("#LoginForm_password").tooltipster("hide");	
+}
+
+function hideRegisterFormErrorsIfExist()
+{
+  	if(bRegisterFormNameErrorExists)
+	{
+		$("#RegisterForm_name").tooltipster("hide");
+	}
+
+  	if(bRegisterFormLastNameErrorExists)
+	{
+		$("#RegisterForm_lastName").tooltipster("hide");
+	}
+
+  	if(bRegisterFormEmailErrorExists)
+	{
+		$("#RegisterForm_email").tooltipster("hide");
+	}
+
+  	if(bRegisterFormEmailAgainErrorExists)
+	{
+		$("#RegisterForm_emailAgain").tooltipster("hide");
+	}
+
+  	if(bRegisterFormPasswordErrorExists)
+	{
+		$("#RegisterForm_password").tooltipster("hide");
+	}
+
+  	if(bRegisterFormPasswordAgainErrorExists)
+	{
+		$("#RegisterForm_passwordAgain").tooltipster("hide");
+	}	
+}
+
+function hideLoginFormErrorsIfExist()
+{
+  	if(bLoginFormEmailErrorExists)
+	{
+		$("#LoginForm_email").tooltipster("hide");
+	}
+  	
+  	if(bLoginFormPasswordErrorExists)
+	{
+		$("#LoginForm_password").tooltipster("hide");
+	}	
+}
+
+function hideFormErrorsIfExist() 
+{
+	hideRegisterFormErrorsIfExist();
+	hideLoginFormErrorsIfExist();
+}
+
+function showRegisterFormErrorsIfExist()
+{
+	if(bRegisterFormNameErrorExists)
+	{
+		$("#RegisterForm_name").tooltipster("show");
+	}
+
+	if(bRegisterFormLastNameErrorExists)
+	{
+		$("#RegisterForm_lastName").tooltipster("show");
+	}
+
+	if(bRegisterFormEmailErrorExists)
+	{
+		$("#RegisterForm_email").tooltipster("show");
+	}
+
+	if(bRegisterFormEmailAgainErrorExists)
+	{
+		$("#RegisterForm_emailAgain").tooltipster("show");
+	}
+
+	if(bRegisterFormPasswordErrorExists)
+	{
+		$("#RegisterForm_password").tooltipster("show");
+	}
+
+	if(bRegisterFormPasswordAgainErrorExists)
+	{
+		$("#RegisterForm_passwordAgain").tooltipster("show");
+	}	
+}
+
+function showLoginFormErrorsIfExist()
+{
+  	if(bLoginFormEmailErrorExists)
+	{
+		$("#LoginForm_email").tooltipster("show");
+	}
+  	
+  	if(bLoginFormPasswordErrorExists)
+	{
+		$("#LoginForm_password").tooltipster("show");
+	}	
+}
+
+function showFormErrorsIfExist() 
+{
+	showRegisterFormErrorsIfExist();
+	showLoginFormErrorsIfExist();
+}
+
+function bindTooltipActions() 
+{
+ 	$("#RegisterForm_email").blur(function ()	{
+ 		var enteredEmail = document.getElementById("RegisterForm_email").value;
+ 		var enteredDomain = enteredEmail.replace(/.*@/, "");
+ 		var correctedEmail = "";
+ 		var domainPartsArray = enteredDomain.split(".");
+ 		var tooltipMessage = "";
+ 		var bCorrectionRequired = false;
+ 		
+ 		if(domainPartsArray.length >= 2)
+ 		{
+ 	 		if((domainPartsArray[0].toLowerCase() === "gmial") || (domainPartsArray[0].toLowerCase() === "gmil") || (domainPartsArray[0].toLowerCase() === "gmal") || (domainPartsArray[0].toLowerCase() === "glail"))
+ 	 		{
+ 	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"gmail");			
+ 	 		}
+ 	 		else if((domainPartsArray[0].toLowerCase() === "yaho") || (domainPartsArray[0].toLowerCase() === "yhao") || (domainPartsArray[0].toLowerCase() === "yhaoo") || (domainPartsArray[0].toLowerCase() === "yhoo"))
+ 	 		{
+ 	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"yahoo");
+ 	 		}
+ 	 		else if((domainPartsArray[0].toLowerCase() === "hotmial") || (domainPartsArray[0].toLowerCase() === "hotmal") || (domainPartsArray[0].toLowerCase() === "hotmil") || (domainPartsArray[0].toLowerCase() === "htmail") || (domainPartsArray[0].toLowerCase() === "hotma"))
+ 	 		{
+ 	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"hotmail");
+ 	 		}
+ 	 		else if((domainPartsArray[0].toLowerCase() === "myet") || (domainPartsArray[0].toLowerCase() === "mynt") || (domainPartsArray[0].toLowerCase() === "mymet"))
+ 	 		{
+ 	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"mynet");
+ 	 		}
+ 	 		else if((domainPartsArray[1].toLowerCase() === "con") || (domainPartsArray[1].toLowerCase() === "co"))
+ 	 		{
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
+ 	 			bCorrectionRequired = true;
+ 	 		}
+ 	 			 		
+ 	 		if(bCorrectionRequired)
+ 	 		{
+ 	 	 		domainPartsArray = correctedEmail.split(".");
+ 	 	 		
+ 	 	 		if(domainPartsArray[1].toLowerCase() === "com") //These domains all have "com" extension
+ 	 	 		{
+ 	 	 			//Nothig to do
+ 	 	 		}
+ 	 	 		else
+ 	 	 		{
+ 	 	 			correctedEmail = correctedEmail.replace(domainPartsArray[1],"com");
+ 	 	 		}
+ 	 	 		
+ 				if(LAN_OPERATOR.lang === "en")
+ 				{
+ 					tooltipMessage = TRACKER.langOperator.didYouMean + " <a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#RegisterForm_email\").tooltipster(\"hide\");'>" + correctedEmail + "</a> ? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;
+ 				}
+ 				else
+ 				{
+ 					tooltipMessage = "<a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#RegisterForm_email\").tooltipster(\"hide\");'>" + correctedEmail + "</a> " + TRACKER.langOperator.didYouMean + "? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;	
+ 				}
+ 	 		}			
+ 		}
+ 		
+ 		//var correctedEmail = enteredEmail.replace(domainPartsArray[0],"gmail");
+ 				
+ 		if(bCorrectionRequired)
+ 		{
+ 	 		$("#RegisterForm_email").tooltipster('update', tooltipMessage);
+ 	 		$("#RegisterForm_email").tooltipster('show'); 			
+ 		}
+ 		else
+ 		{
+ 			if(bRegisterFormEmailErrorExists === false)
+ 			{
+ 				$("#RegisterForm_email").tooltipster('hide');
+ 			} 						 			 
+ 		}
+
+//		$("#RegisterForm_email").tooltipster({
+//   	 theme: ".tooltipster-noir",
+//   	 }); 				
+	
+	//$("#RegisterForm_email").tooltipster('hide');
+	//$("#RegisterForm_email").tooltipster('destroy');
+//	$("#RegisterForm_email").tooltipster({
+//   	 theme: ".tooltipster-default",
+//   	 position: "right",
+//   	 trigger: "custom",
+//   	 maxWidth: 540,
+//   	 onlyOne: false,
+//		 interactive: true,
+//   	 });	
+	
+	//$("#RegisterForm_email").tooltipster('disable');
+ 		
+	});
+}
+
 function bindElements(langOperator, trackerOp) 
 {	 		
 	/**
 	 * binding operation to search user
 	 */	
-	
-//	$(document).ready(function() {
-//		   $('.tooltip').tooltipster();
-//		});	
-	
-// 	$("#registerEmailField").click(function ()	{
-// 		$("#registerEmailField").tooltipster('show');
-// 		//$('.tooltip').tooltipster('show');
-// 		
-// 		//alert("Deneme");
-//	});
+
+ 	$("#RegisterForm_email").focus(function ()	{
+ 		//$("#RegisterForm_email").tooltipster('update', '<div id="registerEmailNotificationMessageId">' + TRACKER.langOperator.registerEmailNotificationMessage + '</div>');
+ 		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
+ 		$("#RegisterForm_email").tooltipster('show'); 		
+	});
  	
+// 	$("#RegisterForm_email").blur(function ()	{
+// 		$("#RegisterForm_email").tooltipster('hide');
+//	});
+
 	$("#bar").click(function ()	{
 		
 		//alert("Deneme");
@@ -28,6 +265,8 @@ function bindElements(langOperator, trackerOp)
 		
 		if ($('#sideBar > #content').css('display') == "none")
 		{					
+			showRegisterFormErrorsIfExist();
+			
 			//If logged in and top bar height decreased
 			if(document.getElementById('topBar').style.height == "60px")
 			{
@@ -52,6 +291,8 @@ function bindElements(langOperator, trackerOp)
 		}	
 		else 
 		{
+			hideRegisterFormErrorsIfExist();
+			
 			var offsetLeft = 16;
 			
 			//$('.logo_inFullMap').fadeIn().animate({left:'80px'});
@@ -74,8 +315,12 @@ function bindElements(langOperator, trackerOp)
 
 	$(window).resize(function () {
 	    var h = $(window).height(), offsetTop = 0; // Calculate the top offset	    
-	    var w = $(window).width(), offsetLeft = 0; // Calculate the left offset	
-
+	    var w = $(window).width(), offsetLeft = 0; // Calculate the left offset
+	    
+	    var usersCount = 5;
+	    
+	    //alert('Javascript');
+	    
 	    //alert('Height:'+(h)+' Width:'+(w));
 	    
 	    if(h > 720)
@@ -118,10 +363,30 @@ function bindElements(langOperator, trackerOp)
 				
 				//alert('Narrow');
 			}
+			
+			$("#users_tab").css("min-height", (485 + 100 - 60 - 81)); $("#users_tab").css("height", (h - offsetTop - 81));
+			$("#photos_tab").css("min-height", (485 + 100 - 60 - 81)); $("#photos_tab").css("height", (h - offsetTop - 81));
+			$("#groups_tab").css("min-height", (485 + 100 - 60 - 81)); $("#groups_tab").css("height", (h - offsetTop - 81));
+			
+			var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+			
+			$("#usersGridView").css("height", userListHeight - 50);
+			$("#uploadsGridView").css("height", userListHeight - 50);
+			$("#groupsGridView").css("height", userListHeight - 50);
+			
+		    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+		        if(json.outcome == 'success') {
+		        	//alert('OKKKKK');
+		            // do something with the knowledge possibly?
+		        } else {
+		            alert('Unable to let PHP know what the screen resolution is!');
+		        }
+		    },'json');	    
+			
 		}
 		else
 		{			
-			offsetTop = 100;
+			offsetTop = 85;
 			offsetLeft = 396;
 			
 			if ($('#sideBar > #content').css('display') == "none")
@@ -173,9 +438,7 @@ function bindElements(langOperator, trackerOp)
 	    	 break;
     	 }     	 
      });
-     
-     
-		
+	
 //	$("#bar").click(function ()	{	
 //				if ($('#sideBar > #content').css('display') == "none")
 //				{					
