@@ -33,7 +33,8 @@ T�rk�e UTF-8
 �		&#351;
 */
 return array(
-	'No users found' => 'Kullanıcı bulunamadı',
+	'No users found registered by this name unfortunately. You should invite your friend to Traceper first by the link {inviteIcon} at the top menu or by {inviteByHere}. After he/she joins Traceper, you could be friends.' => 'Maalesef bu isme uygun kayıtlı kullanıcı bulunamadı. Arkadaşınızı üst menüdeki {inviteIcon} bağlantısından veya {inviteByHere} öncelikle Traceper\'a üye olmaya davet etmelisiniz. Kendisi Traceper\'a katıldıktan sonra arkadaş olabilirsiniz.',
+	'You do not have any friend at the moment. In order to add new friends, you could search them by name and choose from the list. If you could not find your friends by search, you could invite them to Traceper first by the link {inviteIcon} at the top menu or by {inviteByHere}.' => 'Şu an için hiç arkadaşınız yok. Yeni arkadaşlar eklemek için, yukarıdaki arama alanına isimlerini yazarak arayabilir ve çıkan listeden seçim yaparak ekleyebilirsiniz. Arama sonucunda arkadaşlarınızı bulamadığınız takdirde, üst menüdeki {inviteIcon} bağlantısından veya {inviteByHere} öncelikle onları Traceper\'a davet edebilirsiniz.',		
 	'Do you really want to delete this user from your friend list?' => 'Bu kullanıcıyı arkadaş listenizden gerçekten çıkarmak istiyor musunuz?',
 	'Do you want to add this user as a friend?' => 'Bu kullanıcıyı arkadaş olarak eklemek istiyor musunuz?',	
 	'Do you want to reject this user\'s friend request?' => 'Bu kullanıcının arkadaşlık isteğini reddetmek istiyor musunuz?',
@@ -59,7 +60,8 @@ return array(
 	'If you wish you could accept or reject this friendship request using the "Friendship Requests" menu of your mobile application or at address www.traceper.com.' => 'Dilerseniz mobil uygulamanızın veya www.traceper.com adresindeki "Arkadaşlık İstekleri" menüsünden bu arkadaşlık isteğini kabul ya da reddedebilirsiniz.',
 	'new' => 'yeni',
 	' totally ' => ' toplamda ',
-	' friendship request(s) you have' => ' arkadaşlık isteğiniz var'
+	' friendship request(s) you have' => ' arkadaşlık isteğiniz var',
+	'Type a friend\'s name' => 'Arkadaşınızın adını girin'
 	
 	
 	

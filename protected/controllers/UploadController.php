@@ -80,8 +80,20 @@ class UploadController extends Controller
 		{
 			$dataProvider = null;
 		}
+		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+		}		
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType), false, true);
@@ -110,7 +122,20 @@ class UploadController extends Controller
 				$dataProvider = null;
 			}			
 		}
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+		}
+				
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		$this->renderPartial('searchUploadResults', array('model'=>$model, 'dataProvider'=>$dataProvider, 'fileType'=>$fileType), false, true);

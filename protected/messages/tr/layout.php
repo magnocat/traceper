@@ -5,32 +5,32 @@
 
 /*
  * Use the below corresponding Utf-8 characters, if you have problems with Turkish characters
-T�rk�e UTF-8
-  � 	İ
-  � 	ı
-  � 	Ö
-  � 	ö
-  � 	Ü
-  � 	ü
-  � 	Ç
-  � 	ç
-  � 	ğ
-  � 	ğ
-  � 	�
-  � 	ş
+T�rk�e UTF-8
+  � 	İ
+  � 	ı
+  � 	Ö
+  � 	ö
+  � 	Ü
+  � 	ü
+  � 	Ç
+  � 	ç
+  � 	ğ
+  � 	ğ
+  � 	�
+  � 	ş
   
-�		&#304;
-�		&#305;
-�		&#214;	
-�		&#246;
-�		&#220;
-�		&#252;
-�		&#199;
-�		&#231;
-�		&#286;
-�		&#287;
-�		&#350;
-�		&#351;
+�		&#304;
+�		&#305;
+�		&#214;	
+�		&#246;
+�		&#220;
+�		&#252;
+�		&#199;
+�		&#231;
+�		&#286;
+�		&#287;
+�		&#350;
+�		&#351;
 */
 return array(
 	'Message' => 'Mesaj',
@@ -64,7 +64,10 @@ return array(
 	'Please enter a keyword to search...' => 'Lütfen arama için anahtar kelime giriniz...',
 	'Sign in with Facebook' => 'Facebook ile giriş yap',
 	'Contact' => '&#304;leti&#351;im',
-	'Download the application at Google Play' => 'Uygulamay&#305; Google Play\'den indirin',
+	'Download the application at Google Play' => 'Uygulamayı Google Play\'den indirin',
+	'Terms of Use' => 'Kullanım Koşullarımızı',
+	'By sending the Sign Up form, you agree to our {terms of use}' => 'Kayıt formunu göndererek, {terms of use} kabul etmiş olursunuz',
+	'<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link and you could enroll your friends into the related group at the tab \"Friends\". Moreover, you could adjust the privacy settings of your groups at the tab \"Groups\".' => '<b>Yeni Grup Oluştur</b> </br></br> Traceper arkadaşlarınızı gruplamanıza olanak sağlar. Bu bağlantı ile yeni gruplar oluşturabilir ve \"Arkadaşlar\" sekmesinde arkadaşlarınızı ilgili gruba dahil edebilirsiniz. \"Gruplar\" sekmesinde ise oluşturduğunuz grupların gizlilik ayarlarını yapabilirsiniz.'
 );
 
 

@@ -75,7 +75,18 @@ class UsersController extends Controller
 		return $distance;
 	}	
 
-
+	private function getaddress($lat,$lng)
+	{
+		$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false';
+		$json = @file_get_contents($url);
+		$data=json_decode($json);
+		$status = $data->status;
+		if($status=="OK")
+			return $data->results[0]->formatted_address;
+		else
+			return null;
+	}
+	
 	/*
 	 * this action is used by mobile clients
 	*/
@@ -94,18 +105,7 @@ class UsersController extends Controller
 			$longitude = (float) $_REQUEST['longitude'];
 			$altitude = (float) $_REQUEST['altitude'];
 			$deviceId = $_REQUEST['deviceId'];
-			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
-			$address = null;
-			
-			//Adres bilgisi opsiyonel. Geliyorsa al, gelmiyorsa null de�er ata
-			if(isset($_REQUEST['address']) && $_REQUEST['address'] != NULL)
-			{
-				$address = $_REQUEST['address'];
-			}
-			else 
-			{
-				$address = null;
-			}
+			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);			
 
 			if (Yii::app()->user->id != false)
 			{
@@ -121,19 +121,21 @@ class UsersController extends Controller
 				$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 				$distanceInMs = $distanceInKms * 1000;
 				
-				//Users table is always updated whether the distance difference is high enough or not
-				if (Users::model()->updateLocation($latitude, $longitude, $altitude, $address, $calculatedTime, Yii::app()->user->id) == 1)
-				{
-					$result = "1"; //Location updated successfully
-				}
-				else
-				{
-					$result = "0"; //Error occured in save operation
-				}
-
 				//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table 
 				if($distanceInMs > $minDistanceInterval)
 				{
+					$address = $this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude']);
+					
+					//Address info is also updated with location info if the distance difference is high enough
+					if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, Yii::app()->user->id) == 1)
+					{
+						$result = "1"; //Location updated successfully
+					}
+					else
+					{
+						$result = "0"; //Error occured in save operation
+					}					
+					
 					//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 
 					if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
@@ -147,6 +149,18 @@ class UsersController extends Controller
 						//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
 						
 						//$result = "0"; //Error occured in save operation
+					}					
+				}
+				else
+				{
+					//Only location info (without address info) is updated if the distance difference is smaller than the threshold
+					if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, Yii::app()->user->id) == 1)
+					{
+						$result = "1"; //Location updated successfully
+					}
+					else
+					{
+						$result = "0"; //Error occured in save operation
 					}					
 				}				
 			}
@@ -277,13 +291,26 @@ class UsersController extends Controller
 		{
 			$dataProvider = null;
 		}
+		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+		}		
 
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 
 		if(($userType == UserType::RealStaff) || ($userType == UserType::GPSStaff))
 		{
 			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		}
+						
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, true);
 	}
 
@@ -369,7 +396,7 @@ class UsersController extends Controller
 
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 		
-		//Webde kullan�c�n�n kendi ismine t�klad���nda kendini konumunu g�rebilmesi i�in
+		//Webde kullanicinin kendi ismine tikladiginda kendini konumunu gorebilmesi icin
 		$friendCount = $this->getFriendCount() + 1; // +1 is for herself
 		//$friendCount = $this->getFriendCount();
 			
@@ -444,8 +471,22 @@ class UsersController extends Controller
 				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");
 			}
 		}
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+		}
+				
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		
 		$this->renderPartial('searchResults',array('model'=>$model, 'dataProvider'=>$dataProvider), false, true);
 	}
 
@@ -488,6 +529,9 @@ class UsersController extends Controller
 			
 			if ($actionResult == 1) {
 				$this->unsetFriendIdList();
+				
+				//When deleting this friend, also all of the group memberships for the current owner should be deleted
+				UserPrivacyGroupRelation::model()->deleteMemberByGroupOwner(Yii::app()->user->id, $friendId);
 			}
 		}
 
@@ -508,6 +552,12 @@ class UsersController extends Controller
 			if (Users::model()->deleteUser($userId)){
 				$result = 1;
 				$this->unsetFriendIdList();
+				
+				//Delete all relations of this user in the Friends table
+				Friends::model()->deleteAllFriendShipRelations($userId);
+				
+				//Delete all relations of this user in the UserPrivacyGroupRelation table
+				UserPrivacyGroupRelation::model()->deleteMemberFromAllGroups($userId);
 			}
 		}
 
@@ -525,7 +575,19 @@ class UsersController extends Controller
 		Friends::model()->updateAll(array('isNew' => 0), 'friend2 = '.Yii::app()->user->id.' AND status = 0 AND isNew = 1');
 		$dataProvider = Friends::model()->getFriendRequestDataProvider(Yii::app()->user->id, Yii::app()->params->itemCountInOnePage);
 			
-		Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+		}		
+		
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		
 		//Complete solution for blinking problem at FireFox
