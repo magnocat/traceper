@@ -6,12 +6,16 @@
 <meta name="keywords" content="" />
 <meta name="description" content="Location-based social network and GPS tracking system" />
 <link rel="stylesheet" type="text/css"
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/cssreset-min.css" />
+<link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css"
 	media="screen, projection" />
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
+<link rel="stylesheet" type="text/css"
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/tooltipster.css" />				
 <link rel="shortcut icon"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png"
 	type="image/x-icon" />
@@ -28,15 +32,51 @@
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
 <script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery.tooltipster.min.js"></script>	
+	
+<script>
+   $(document).ready(function() {
+       	 //$('#register-form-main input[type="text"]').tooltipster({
+         //	 theme: '.tooltipster-noir',
+         //	 position: 'right',
+         //	 trigger: 'custom',
+         //	 maxWidth: 540,
+         //	 onlyOne: false,
+         //	 interactive: true,
+         //});
 
-<!--	
-    <script>
-        $(document).ready(function() {
-            $('.tooltip').tooltipster();
-        });
-    </script>
--->    	
+         //$('#login-form-main input[type="text"]').tooltipster({
+         // 	 theme: '.tooltipster-noir',
+         //  	 position: 'right',
+         //  	 trigger: 'custom',
+         //  	 maxWidth: 540,
+         //  	 onlyOne: false,
+         //  	 interactive: true,
+         //  });
+
+		$("#RegisterForm_email").tooltipster({
+        	 theme: ".tooltipster-info",
+        	 position: "right",
+        	 trigger: "custom",
+        	 maxWidth: 500,
+        	 onlyOne: false,
+			 interactive: true,
+        	 });
+
+		$("#createGroup").tooltipster({
+	       	 theme: ".tooltipster-info",
+	       	 content: "<?php echo Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link and you could enroll your friends into the related group at the tab \"Friends\". Moreover, you could adjust the privacy settings of your groups at the tab \"Groups\".'); ?>",
+	       	 position: "bottom",
+	       	 trigger: "hover",
+	       	 maxWidth: 300,
+       	 });
+
+        bindTooltipActions();                    	         
+   });
+</script>
+    
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>       	
 
 <!-- <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet"> -->
 <!-- <script src="http://vjs.zencdn.net/c/video.js"></script> -->
@@ -46,11 +86,20 @@
 <!-- <link href="http://localhost/traceper/branches/DevWebInterface/js/video-js/video-js.css" rel="stylesheet"> -->
 <!-- <script src="http://localhost/traceper/branches/DevWebInterface/js/video-js/video.js"></script>		 -->
 
-<?php 
+<?php
+
+$userId = 0;
+
+if(Yii::app()->user->isGuest == false)
+{
+	$userId = Yii::app()->user->id;
+}
+
+Yii::app()->clientScript->registerCoreScript('yiiactiveform');
 
 Yii::app()->clientScript->registerScript('appStart',"var checked = false;
-		try
-		{
+	try
+	{
 		var mapStruct = new MapStruct();
 		var initialLoc = new MapStruct.Location({latitude:39.504041,
 		longitude:35.024414});
@@ -61,11 +110,11 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 5000, 30000);
 		trackerOp.setLangOperator(langOp);
 		bindElements(langOp, trackerOp);
-}
-		catch (e) {
+		trackerOp.userId = ".$userId.";
+	}
+	catch (e) {
 
-}
-
+	}
 		",
 		CClientScript::POS_READY);
 
@@ -94,108 +143,106 @@ $createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
 		)).
 		"}";
 
-
 Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 		$createGeofenceFormJSFunction,
 		CClientScript::POS_BEGIN);
-?>
 
+$app = Yii::app();
+$language = 'tr';
+
+if (isset($app->session['_lang']))
+{
+	$language = $app->session['_lang'];
+
+	//echo 'Session VAR';
+}
+else
+{
+	$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+	//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+
+	//echo 'Session YOK - pref. lang: '.substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+}
+
+$app->language = $language;
+?>
 <script type="text/javascript">		
 	var langOp = new LanguageOperator();
 	var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
 	
-	langOp.load("tr");  //TODO: itshould be parametric
+	langOp.load("<?php echo $language;?>");  //TODO: itshould be parametric
 	
-	var mapOperator = new MapOperator();
+	var mapOperator = new MapOperator("<?php echo $language;?>");	
 </script>
-
-
 </head>
 <body>
 
+<script type="text/javascript">
+	//TRACKER.userId = <?php //if (Yii::app()->user->isGuest == false){echo Yii::app()->user->id;}else{echo '0';} ?>;
+
+	//alert("main TRACKER.userId:" + TRACKER.userId);	
+</script>
+
 	<?php
 	//Yii::app()->session['_lang'] = 'en';
+
+	//echo 'Yii version:'.Yii::getVersion();
+	//echo 'YII_DEBUG:'.YII_DEBUG;
+	//echo 'http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl();
 	
-	$app = Yii::app();
-	$language = 'tr';
-	
-	if (isset($app->session['_lang']))
-	{
-		$language = $app->session['_lang'];
-		
-		//echo 'Session VAR';
-	}
-	else
-	{
-		$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-		//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-		
-		//echo 'Session YOK - pref. lang: '.substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-	}
-	
-	if($language == 'tr')
-	{
-		$app->language = 'tr';
-		?>
-		<script type="text/javascript">		
-			langOp.load("tr");
-		</script>		
-		<?php          
-	}
-	else
-	{
-		$app->language = 'en';
-		?>
-		<script type="text/javascript">		
-			langOp.load("en");
-		</script>		
-		<?php
-	}
-		
+// 	$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim('36.852160').','.trim('30.757322').'&sensor=false&language=tr';
+// 	$json = @file_get_contents($url);
+// 	$data=json_decode($json);
+// 	$status = $data->status;
+// 	if($status=="OK")
+// 		echo $data->results[0]->formatted_address;
+// 	else
+// 		echo "No address info";
+
 	///////////////////////////// About Us Window///////////////////////////
-	echo '<div id="aboutUsWindow" style="display:none;"></div>';	
+	echo '<div id="aboutUsWindow" style="display:none;font-family:Helvetica;"></div>';	
 	///////////////////////////// Terms Window ///////////////////////////
-	echo '<div id="termsWindow" style="display:none;"></div>';
+	echo '<div id="termsWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Contact Window ///////////////////////////
-	echo '<div id="contactWindow" style="display:none;"></div>';			
+	echo '<div id="contactWindow" style="display:none;font-family:Helvetica;"></div>';			
 	///////////////////////////// User Login Window ///////////////////////////
-	echo '<div id="userLoginWindow" style="display:none;"></div>';
+	echo '<div id="userLoginWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register Window ///////////////////////////
-	echo '<div id="registerWindow" style="display:none;"></div>';
+	echo '<div id="registerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
-	echo '<div id="registerGPSTrackerWindow" style="display:none;"></div>';
+	echo '<div id="registerGPSTrackerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
-	echo '<div id="registerNewStaffWindow" style="display:none;"></div>';
+	echo '<div id="registerNewStaffWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// GeoFence Window ///////////////////////////
-	echo '<div id="geoFenceWindow" style="display:none;"></div>';
+	echo '<div id="geoFenceWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Change Password Window ///////////////////////////
-	echo '<div id="changePasswordWindow" style="display:none;"></div>';
+	echo '<div id="changePasswordWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Forget Password Window ///////////////////////////
-	echo '<div id="forgotPasswordWindow" style="display:none;"></div>';
+	echo '<div id="forgotPasswordWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Reset Password Window ///////////////////////////
-	echo '<div id="resetPasswordWindow" style="display:none;"></div>';
+	echo '<div id="resetPasswordWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Activation Not Received Window ///////////////////////////
-	echo '<div id="activationNotReceivedWindow" style="display:none;"></div>';	
+	echo '<div id="activationNotReceivedWindow" style="display:none;font-family:Helvetica;"></div>';	
 	///////////////////////////// Invite User Window ///////////////////////////
-	echo '<div id="inviteUsersWindow" style="display:none;"></div>';
+	echo '<div id="inviteUsersWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Friend Request Window ///////////////////////////
-	echo '<div id="friendRequestsWindow" style="display:none;"></div>';
+	echo '<div id="friendRequestsWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Create Group Window ///////////////////////////
-	echo '<div id="createGroupWindow" style="display:none;"></div>';
+	echo '<div id="createGroupWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Group Settings Window ///////////////////////////
-	echo '<div id="groupSettingsWindow" style="display:none;"></div>';
+	echo '<div id="groupSettingsWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Group Privacy Settings Window ///////////////////////////
-	echo '<div id="groupPrivacySettingsWindow" style="display:none;"></div>';
+	echo '<div id="groupPrivacySettingsWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Group Members Window ///////////////////////////
-	echo '<div id="groupMembersWindow" style="display:none;"></div>';
+	echo '<div id="groupMembersWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Geofence Settings Window ///////////////////////////
-	echo '<div id="geofenceSettingsWindow" style="display:none;"></div>';
+	echo '<div id="geofenceSettingsWindow" style="display:none;font-family:Helvetica;"></div>';
 	////////// Create Geofence Window ///////////////////////////
-	echo '<div id="createGeofenceWindow" style="display:none;"></div>';
+	echo '<div id="createGeofenceWindow" style="display:none;font-family:Helvetica;"></div>';
 	////////// User Search Results Window ///////////////////////////
-	echo '<div id="userSearchResults" style="display:none;"></div>';
+	echo '<div id="userSearchResults" style="display:none;font-family:Helvetica;"></div>';
 	////////// Upload Search Results Window ///////////////////////////
-	echo '<div id="uploadSearchResults" style="display:none;"></div>';
+	echo '<div id="uploadSearchResults" style="display:none;font-family:Helvetica;"></div>';
 	
 	///////////////////////////// Photo Comment Window ///////////////////////////
 // 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -269,7 +316,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			),
 	));
 	//echo '</br>';
-	echo '<div align="center" id="messageDialogText"></div>';
+	echo '<div align="center" id="messageDialogText" style="font-family:Helvetica;"></div>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 
 	// this is a long generic message dialog
@@ -291,7 +338,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			),
 	));
 	//echo '</br>';
-	echo '<div align="justified" id="longMessageDialogText"></div>';
+	echo '<div align="justified" id="longMessageDialogText" style="font-family:Helvetica;"></div>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 	
 	/*
@@ -313,7 +360,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 }"
 					)),
 	));
-	echo '<div id="question"></div>';
+	echo '<div id="question" style="font-family:Helvetica;"></div>';
 	$this->endWidget('zii.widgets.jui.CJuiDialog');
 
 	?>
@@ -345,7 +392,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 				{
 					echo CHtml::link('<div id="logo" style="width:246px;"></div>', '#', array(
 							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
-					));
+					));				
 					
 					echo CHtml::link('<div id="logoMini" style="display:none"></div>', '#', array(
 							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
@@ -369,24 +416,34 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 					<div id="forAjaxRefresh">
 						<div class="form">
-							<?php 
+							<?php 							
 							$form=$this->beginWidget('CActiveForm', array(
 									'id'=>'login-form-main',
 									'enableClientValidation'=>true,
+									'clientOptions'=> array(
+											'validateOnSubmit'=> true,
+											'validateOnChange'=>false,
+									),									
 							));
 
 							$model = new LoginForm;
+							//$model->validate();
 							?>
 
 							<div class="upperMenu">
 								<div style="height:3.3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'email'); ?>
 									<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
+									<?php 
+// 										  $errorMessage = $form->error($model,'email'); 
+// 										  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+// 										  else { echo $errorMessage; }
+									?>									
 								</div>
 								
-								<div style="margin-top:18px;padding:0px;">
+								<div style="margin-top:0px;padding:0px;">
 									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>4)); ?>
-									<?php echo $form->label($model,'rememberMe'); ?>
+									<?php echo $form->label($model,'rememberMe',array('style'=>'font-weight:normal;')); ?>
 								</div>									
 							</div>
 
@@ -394,14 +451,24 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 								<div style="height:3.3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'password'); ?>
 									<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
+									<?php 
+										  //$errorMessage = $form->error($model,'password'); 
+// 										  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
+// 										  else { echo $errorMessage; }
+									?>									
 								</div>
 								
-			 					<div style="margin-top:18px;padding:0px;">
+			 					<div style="margin-top:2px;padding:0px;">
 									<?php
 									echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 														'</div>', $this->createUrl('site/forgotPassword'),
 											array(
-													'complete'=> 'function() { $("#forgotPasswordWindow").dialog("open"); return false;}',
+													'complete'=> 'function() 
+																  { 
+																	hideFormErrorsIfExist();																														
+																	$("#forgotPasswordWindow").dialog("open"); 
+																	return false;
+																  }',
 													'update'=> '#forgotPasswordWindow',
 											),
 											array(
@@ -410,7 +477,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			 					</div>								
 							</div>						
 														
-							<div class="upperMenu" style="margin-top:0.7em;width:10%;min-width:5em;">
+							<div class="upperMenu" style="margin-top:0.7em;width:50px;">
 								<div style="height:3.3em;top:0%;padding:0px;">								
 									<?php																											
 									$this->widget('zii.widgets.jui.CJuiButton', array(											
@@ -418,7 +485,33 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 											'caption'=>Yii::t('site', 'Log in'),
 											'id'=>'loginAjaxButton',
 											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
-									));															
+									));
+
+// 									$this->widget('zii.widgets.jui.CJuiButton', array(
+// 											'name'=>'ajaxLogin',
+// 											'caption'=>Yii::t('site', 'Log in'),
+// 											'id'=>'loginAjaxButton',
+// 											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),
+// 																	'success'=> 'function(msg){
+// 																				try
+// 																				{
+// 																					var obj = jQuery.parseJSON(msg);
+		
+// 																					if (obj.result)
+// 																						{
+// 																							if (obj.result == "1")
+// 																								{
+// 																									TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+// 																								}
+// 																							}
+// 																						}
+// 																						catch (error)
+// 																						{
+// 																							$("#forAjaxRefresh").html(msg);
+// 																						}
+// 																			}',
+// 													))
+// 											));									
 									?>
 								</div>																					
 							</div>													
@@ -545,9 +638,8 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 									'update'=> '#createGroupWindow',
 							),
 							array(
-									'id'=>'showCreateGroupWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')));
-														
-
+									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/));
+			
 					if(Yii::app()->params->featureGPSDeviceEnabled)
 					{
 						echo CHtml::ajaxLink('<div class="userOperations" id="registerGPSTracker">
@@ -691,154 +783,211 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo "style='height:85%;min-height:420px;'";
 				}				
 				?>>						
-					<div id="forRegisterRefresh" style='height:100%;'>
+					<div id="forRegisterRefresh" style='height:100%;'>						
 						<div class="form" style='height:100%;'>
 							<?php
 							$form=$this->beginWidget('CActiveForm', array(
 									'id'=>'register-form-main',
 									'enableClientValidation'=>true,
+									'clientOptions'=> array(
+											'validateOnSubmit'=> true,
+											'validateOnChange'=>false,
+									),									
 									'htmlOptions'=>array('style'=>'height:100%;'),
 							));
 
 							$model = new RegisterForm;
-							?>
-
+							?>		
+													
 							<div style="padding-left:15px;font-size:3em;">
 								<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
 							</div>
 							
 							<div class="sideMenu">
 								<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
-								<?php echo $form->labelEx($model,'name'); ?>
-								<?php echo $form->textField($model,'name', array('size'=>'22%','maxlength'=>128,'tabindex'=>7)); ?>
-								<?php $errorMessage = $form->error($model,'name');  
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+								<?php //echo $form->labelEx($model,'name'); ?>
+								<?php echo $form->textField($model,'name', array('size'=>'22%','maxlength'=>128,'tabindex'=>7,'placeholder'=>Yii::t('site', 'First Name'),'class'=>'registerFormField','style'=>'width:145px;')); ?>																				 											 
+								<?php 
+// 								    $errorMessage = $form->error($model,'name');  
+// 									if (strip_tags($errorMessage) == '') {
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+// 									}
 								?>
 								</div>
 								
 								<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
-								<?php echo $form->labelEx($model,'lastName'); ?>
-								<?php echo $form->textField($model,'lastName', array('size'=>'22%','maxlength'=>128,'tabindex'=>8)); ?>
-								<?php $errorMessage = $form->error($model,'lastName');  
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+								<?php //echo $form->labelEx($model,'lastName'); ?>
+								<?php echo $form->textField($model,'lastName', array('size'=>'22%','maxlength'=>128,'tabindex'=>8,'placeholder'=>Yii::t('site', 'Last Name'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
+								<?php 
+// 									$errorMessage = $form->error($model,'lastName');  
+// 									if (strip_tags($errorMessage) == '') {
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { 
+// 										echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';										
+// 									}
 								?>
 								</div>																
 							</div>							
 							
 							<div class="sideMenu">
-								<?php echo $form->labelEx($model,'email'); ?>
+								<?php //echo $form->labelEx($model,'email'); ?>
+								<?php echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9,'placeholder'=>Yii::t('site', 'Your E-mail Address'),'class'=>'registerFormField','style'=>'width:321px;')); ?>
 								<?php 
-// 									$this->widget('ext.tooltipster.tooltipster',
-// 											array(
-// 													'options'=>array('position'=>'right',
-// 															'trigger'=>'custom',
-// 															'theme'=>'.tooltipster-noir')
-// 											));
-																
-// 									echo $form->textField($model,'email', array('id'=>'registerEmailField', 'class'=>'tooltip', 'title'=>'Deneme', 'size'=>'50%','maxlength'=>128,'tabindex'=>9));								
-									
-									echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9));
-								?>
-								<?php $errorMessage = $form->error($model,'email'); 
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+// 									$errorMessage = $form->error($model,'email'); 
+// 									if (strip_tags($errorMessage) == '') {
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+// 									}
 								?>								
 							</div>
 
 							<div class="sideMenu">
-								<?php echo $form->labelEx($model,'emailAgain'); ?>
-								<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10)); ?>
-								<?php $errorMessage = $form->error($model,'emailAgain'); 
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+								<?php //echo $form->labelEx($model,'emailAgain'); ?>
+								<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10,'placeholder'=>Yii::t('site', 'Your E-mail Address (Again)'),'class'=>'registerFormField','style'=>'width:321px;')); ?>
+								<?php 
+// 									$errorMessage = $form->error($model,'emailAgain'); 
+// 									if (strip_tags($errorMessage) == '') {
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+// 									}
 								?>								
 							</div>							
 
 							<div class="sideMenu">
 								<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
-								<?php echo $form->labelEx($model,'password'); ?>
-								<?php echo $form->passwordField($model,'password', array('size'=>'22%','maxlength'=>128,'tabindex'=>11)); ?>
-								<?php $errorMessage = $form->error($model,'password');
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+								<?php //echo $form->labelEx($model,'password'); ?>
+								<?php echo $form->passwordField($model,'password', array('size'=>'22%','maxlength'=>128,'tabindex'=>11,'placeholder'=>Yii::t('site', 'Password'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
+								<?php 
+// 									$errorMessage = $form->error($model,'password');
+// 									if (strip_tags($errorMessage) == '') {
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+// 									}
 								?>
 								</div>
 								
 								<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
-								<?php echo $form->labelEx($model,'passwordAgain'); ?>
-								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'22%','maxlength'=>128,'tabindex'=>12)); ?>
-								<?php $errorMessage = $form->error($model,'passwordAgain'); 
-									if (strip_tags($errorMessage) == '') {
-										echo '<div class="errorMessage">&nbsp;</div>';
-									}
-									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-									}
+								<?php //echo $form->labelEx($model,'passwordAgain'); ?>
+								<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'22%','maxlength'=>128,'tabindex'=>12,'placeholder'=>Yii::t('site', 'Password (Again)'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
+								<?php 
+// 									$errorMessage = $form->error($model,'passwordAgain');
+// 									if (strip_tags($errorMessage) == '') 
+// 									{
+// 										echo '<div class="errorMessage">&nbsp;</div>';
+// 									}
+// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+// 									}
 								?>
 								</div>																
 							</div>
-
+							
+							<div class="sideMenu" style="height:25px;font-size:12px;margin-left:0.3em;">
+							<?php	
+								echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
+										CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
+												array(
+														'complete'=> 'function() {
+														$("#termsWindow").dialog("open"); return false;
+								}',
+														'update'=> '#termsWindow',
+												),
+												array(
+														'id'=>'showTermsWindow','tabindex'=>15))
+								));
+							?>
+							</div>							
+							
 							<div class="sideMenu">
-								<div style="position:absolute;display:inline-block;vertical-align:top;width:40%;">
-								<?php
-								$this->widget('zii.widgets.jui.CJuiButton', array(
-										'name'=>'ajaxRegister',
-										'caption'=>Yii::t('site', 'Sign Up'),
-										'id'=>'registerAjaxButton',
-										'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/register'),
-																'success'=> 'function(msg){
-																			try
-																			{																								
-																				var obj = jQuery.parseJSON(msg);
+								<div style="position:absolute;display:inline-block;vertical-align:top;width:50%;">
+								<?php																
+// 								$this->widget('zii.widgets.jui.CJuiButton', array(
+// 										'name'=>'ajaxRegister',
+// 										'caption'=>Yii::t('site', 'Sign Up'),
+// 										'id'=>'registerAjaxButton',
+// 										'htmlOptions'=>array('type'=>'submit','onmouseover'=>'this.style.cursor="none";','onmouseout'=>'this.style.cursor="default";','ajax'=>array('type'=>'POST','url'=>array('site/register'),
+// 																'success'=> 'function(msg){
+// 																			try
+// 																			{																								
+// 																				var obj = jQuery.parseJSON(msg);
 																					
-																				if (obj.result)
-																				{
-																					if (obj.result == "1") 
-																					{
-																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-																					}
-																					else if (obj.result == "2")
-																					{
-																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-																					}
-																					else if (obj.result == "0")
-																					{
-																						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
-																					}																													
-																				}
-																			}
-																			catch (error)
-																			{
-																				$("#forRegisterRefresh").html(msg);
-																			}																															
-																}',
-										))																		
-								));								
+// 																				if (obj.result)
+// 																				{
+// 																					if (obj.result == "1") 
+// 																					{
+// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+// 																					}
+// 																					else if (obj.result == "2")
+// 																					{
+// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+// 																					}
+// 																					else if (obj.result == "0")
+// 																					{
+// 																						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
+// 																					}																													
+// 																				}
+// 																			}
+// 																			catch (error)
+// 																			{																																											
+// 																				$("#forRegisterRefresh").html(msg);
+
+// 																				//alert(msg);
+// 																			}																															
+// 																}',
+// 										))																		
+// 								));
+								
+								echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
+										array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
+												'success'=> 'function(msg){
+												try
+												{
+												var obj = jQuery.parseJSON(msg);
+													
+												if (obj.result)
+												{
+												if (obj.result == "1")
+												{
+												TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+								}
+												else if (obj.result == "2")
+												{
+												TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+								}
+												else if (obj.result == "0")
+												{
+												TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+								}
+								}
+								}
+												catch (error)
+												{
+												$("#forRegisterRefresh").html(msg);
+								
+												//alert("Deneme");
+												
+												
+								}
+								}',
+										),'onmouseover'=>'this.src="images/signup_button_mouseover_'.Yii::app()->language.'.png";',
+												'onmouseout'=>'this.src="images/signup_button_default_'.Yii::app()->language.'.png";$("#registerButton").css("margin-top", "0px");',
+												'onmousedown'=>'$("#registerButton").css("margin-top", "2px");',
+												'onmouseup'=>'$("#registerButton").css("margin-top", "0px");',
+										));								
 								?>
 								</div>
 								
-								<div style="position:absolute;left:9em;top:1.2em;display:inline-block;vertical-align:top;width:60%;">
-																<?php
+								<div style="position:absolute;left:11em;top:1.2em;display:inline-block;vertical-align:top;width:50%;">
+								<?php
 								echo CHtml::ajaxLink('<div id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
 													'</div>', $this->createUrl('site/activationNotReceived'),
 										array(
-												'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
+												'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
 												'update'=> '#activationNotReceivedWindow',
 										),
 										array(
@@ -978,11 +1127,11 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 			            <a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0." tabindex="6"><img src="images/GooglePlay.png" style="position:absolute;bottom:0;"/></a>  			
 			        </div>				
 				
-			        <div id="appQRCode" style="position:relative;top:3.6em;left:10em;">
+			        <div id="appQRCode" style="position:relative;top:3.6em;left:9.5em;">
 			            <img id="androidBubbleTr" src="images/AndroidBubble_tr.png" style="<?php if(Yii::app()->language != 'tr') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_tr.png';this.style.cursor='default';"/>  			
 			        </div>
 			        
-			        <div id="appQRCode" style="position:relative;top:3.6em;left:10em;">
+			        <div id="appQRCode" style="position:relative;top:3.6em;left:9em;">
 			            <img id="androidBubbleEn" src="images/AndroidBubble_en.png" style="<?php if(Yii::app()->language != 'en') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_en.png';this.style.cursor='default';"/>  			
 			        </div>			        									
 				</div>
@@ -998,7 +1147,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 
 						if(Yii::app()->params->featureFriendManagementEnabled)
 						{
-							$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))), 'id'=>'users_tab');
+							$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))), 'id'=>'users_tab', 'style'=>'width:8.4em;');
 							//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
 						}
 
@@ -1035,9 +1184,16 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 										'collapsible' => false,
 										'cache'=>true,
 										'selected' => 0,
+										'load' => 'js:function(){ 
+																	var h = $(window).height(), offsetTop = 60; 
+																	$("#users_tab").css("min-height", (485 + 100 - 60 - 81)); $("#users_tab").css("height", (h - offsetTop - 81));
+																	$("#photos_tab").css("min-height", (485 + 100 - 60 - 81)); $("#photos_tab").css("height", (h - offsetTop - 81));
+																	$("#groups_tab").css("min-height", (485 + 100 - 60 - 81)); $("#groups_tab").css("height", (h - offsetTop - 81));
+
+																}'									
 								),
-								'htmlOptions'=>array(
-										'style'=>'width:345px;',
+								'htmlOptions'=>array(										
+										'style'=>'width:345px; overflow-y:hidden;',
 								),								
 						));
 					?>
@@ -1054,7 +1210,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo CHtml::ajaxLink('<div id="aboutUs">'.Yii::t('layout', 'About Us').
 							'</div>', $this->createUrl('site/aboutUs'),
 							array(
-									'complete'=> 'function() { $("#aboutUsWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { hideFormErrorsIfExist(); $("#aboutUsWindow").dialog("open"); return false;}',
 									'update'=> '#aboutUsWindow',
 							),
 							array(
@@ -1064,20 +1220,20 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					?>
 				</div>
 				
-<!-- 				<div class="bottomMenu">	 -->
+ 				<div class="bottomMenu">
 					<?php
-// 					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Terms').
-// 							'</div>', $this->createUrl('site/terms'),
-// 							array(
-// 									'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
-// 									'update'=> '#termsWindow',
-// 							),
-// 							array(
-// 									'id'=>'showTermsWindow','tabindex'=>15));
+					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Terms').
+							'</div>', $this->createUrl('site/terms'),
+							array(
+									'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
+									'update'=> '#termsWindow',
+							),
+							array(
+									'id'=>'showTermsWindow','tabindex'=>15));
 
-// 					//echo 'BBB';
-// 					?>
-<!-- 				</div> -->
+					//echo 'BBB';
+ 					?>
+ 				</div>
 				
 				<div class="bottomMenu">	
 					<a href= "http://traceper.blogspot.com" tabindex="17">Blog</a>
@@ -1088,7 +1244,7 @@ Yii::app()->clientScript->registerScript('getGeofenceInBackground',
 					echo CHtml::ajaxLink('<div id="contact">'.Yii::t('layout', 'Contact').
 							'</div>', $this->createUrl('site/contact'),
 							array(
-									'complete'=> 'function() { $("#contactWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { hideFormErrorsIfExist(); $("#contactWindow").dialog("open"); return false;}',
 									'update'=> '#contactWindow',
 							),
 							array(
