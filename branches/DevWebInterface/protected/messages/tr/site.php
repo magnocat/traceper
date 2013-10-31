@@ -147,6 +147,7 @@ return array(
 	'Allow the HTML browser to view this message!' => 'Bu mesajı görebilmek için HTML tarayıcıya izin verin!',
 	'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.' => 'Hesabınız başarıyla oluşturuldu, fakat hesap etkinleştirme e-postanız gönderilirken bir hata oluştu. Kayıt formunun hemen altında yer alan \"Aktivasyon E-Postamız Size Ulaşmadı mı?\" bağlantısına tıklayarak hesabınızı etkinleştirebilmek için gerekli e-postanın gönderilmesini isteyebilirsiniz. Hata hala devam ederse, lütfen sorun hakkında bizimle iletişime geçiniz.',
 	'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.' => 'E-posta gönderilirken bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse lütfen bizimle iletişime geçiniz.',
+	'Terms of Use' => 'Kullanım Şartları',
 	
 );
 
