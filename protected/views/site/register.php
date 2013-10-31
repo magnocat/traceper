@@ -268,9 +268,7 @@
 		echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 				CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
 						array(
-								'complete'=> 'function() {
-								$("#termsWindow").dialog("open"); return false;
-		}',
+								'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
 								'update'=> '#termsWindow',
 						),
 						array(
@@ -317,7 +315,7 @@
 // 			));
 
 			echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
-					array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
+					array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
 							'success'=> 'function(msg){
 							try
 							{

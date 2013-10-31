@@ -318,7 +318,7 @@ function bindElements(langOperator, trackerOp)
 	    var w = $(window).width(), offsetLeft = 0; // Calculate the left offset
 	    
 	    var usersCount = 5;
-	    
+
 	    //alert('Javascript');
 	    
 	    //alert('Height:'+(h)+' Width:'+(w));
@@ -381,8 +381,7 @@ function bindElements(langOperator, trackerOp)
 		        } else {
 		            alert('Unable to let PHP know what the screen resolution is!');
 		        }
-		    },'json');	    
-			
+		    },'json');	    			
 		}
 		else
 		{			

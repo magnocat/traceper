@@ -20,7 +20,7 @@ class NewGroupForm extends CFormModel
 	{
 		return array(
 			// username and password are required
-			array('name', 'required','message'=>Yii::t('common', 'Field cannot be blank!')),
+			array('name', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			array('groupType', 'required','message'=>Yii::t('groups', 'Please select a group type')),
 			array('description', 'length', 'max'=>500),
 			array('groupType', 'safe') //marks the associated attributes to be safe for massive assignments
