@@ -127,9 +127,9 @@ if (Yii::app()->user->isGuest == false)
 }
 else
 {
-	Yii::app()->clientScript->registerScript('getDataInBackground',
-			'trackerOp.getImageList(); ',
-			CClientScript::POS_READY);	
+// 	Yii::app()->clientScript->registerScript('getDataInBackground',
+// 			'trackerOp.getImageList(); ',
+// 			CClientScript::POS_READY);	
 }
 
 $createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
@@ -431,7 +431,7 @@ $app->language = $language;
 							?>
 
 							<div class="upperMenu">
-								<div style="height:3.3em;top:0%;padding:0px;">
+								<div style="height:3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'email'); ?>
 									<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
 									<?php 
@@ -448,7 +448,7 @@ $app->language = $language;
 							</div>
 
 							<div class="upperMenu">
-								<div style="height:3.3em;top:0%;padding:0px;">
+								<div style="height:3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'password'); ?>
 									<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
 									<?php 
@@ -892,9 +892,7 @@ $app->language = $language;
 								echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 										CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
 												array(
-														'complete'=> 'function() {
-														$("#termsWindow").dialog("open"); return false;
-								}',
+														'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
 														'update'=> '#termsWindow',
 												),
 												array(
@@ -943,7 +941,7 @@ $app->language = $language;
 // 								));
 								
 								echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
-										array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
+										array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
 												'success'=> 'function(msg){
 												try
 												{
@@ -1225,7 +1223,7 @@ $app->language = $language;
 					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Terms').
 							'</div>', $this->createUrl('site/terms'),
 							array(
-									'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
 									'update'=> '#termsWindow',
 							),
 							array(

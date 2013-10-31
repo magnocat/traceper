@@ -415,6 +415,7 @@ class SiteController extends Controller
 	public function actionLogout()
 	{
 		Yii::app()->user->logout(false);
+		session_destroy();
 		if (isset($_REQUEST['client']) && $_REQUEST['client'] == 'mobile') {
 			// if mobile client end the app, no need to redirect...
 			echo CJSON::encode(array(

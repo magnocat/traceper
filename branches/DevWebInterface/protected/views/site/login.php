@@ -33,7 +33,7 @@
 	?>
 		
 			<div class="upperMenu">
-				<div style="height:3.3em;top:0%;padding:0px;">
+				<div style="height:3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'email'); ?>
 					<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
 					<?php $errorMessage = $form->error($model,'email'); 
@@ -88,7 +88,7 @@
 			</div>
 
 			<div class="upperMenu">
-				<div style="height:3.3em;top:0%;padding:0px;">
+				<div style="height:3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'password'); ?>
 					<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
 					<?php $errorMessage = $form->error($model,'password'); 
