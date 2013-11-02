@@ -65,7 +65,7 @@
 
 		$("#createGroup").tooltipster({
 	       	 theme: ".tooltipster-info",
-	       	 content: "<?php echo Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link and you could enroll your friends into the related group at the tab \"Friends\". Moreover, you could adjust the privacy settings of your groups at the tab \"Groups\".'); ?>",
+	       	 content: "<?php echo Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".'); ?>",
 	       	 position: "bottom",
 	       	 trigger: "hover",
 	       	 maxWidth: 300,

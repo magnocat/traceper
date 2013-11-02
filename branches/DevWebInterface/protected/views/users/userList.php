@@ -34,6 +34,10 @@ if ($dataProvider != null) {
 										'id'=>'showInviteUsersWindowAtUserSearch'))			
 			));
 	
+	
+	
+	$friendshipRequestsEmptyText = Yii::t('users', 'You have no pending friendship requests at the moment.');
+	
 	// if $ajaxUrl is null in cgridview, it sends its data the route but in search we need to add
 	// keyword parameter
 	$ajaxUrl = null;
@@ -169,7 +173,7 @@ if ($dataProvider != null) {
 	 		'id'=>$viewId,
 			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
-			'emptyText'=>$isFriendList?$emptyText:$userSearchEmptyText,
+			'emptyText'=>$isFriendList?$emptyText:($isFriendRequestList?$friendshipRequestsEmptyText:$userSearchEmptyText),
 			'pager'=>array(
 				 'id'=>'UsersPager',	 
 				 'header'=>'',

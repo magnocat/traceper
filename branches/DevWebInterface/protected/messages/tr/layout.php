@@ -80,7 +80,7 @@ return array(
 	'Download the application at Google Play' => 'Uygulamayı Google Play\'den indirin',
 	'Terms of Use' => 'Kullanım Şartlarımızı',
 	'By sending the Sign Up form, you agree to our {terms of use}' => 'Kayıt formunu göndererek, {terms of use} kabul etmiş olursunuz',
-	'<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link and you could enroll your friends into the related group at the tab \"Friends\". Moreover, you could adjust the privacy settings of your groups at the tab \"Groups\".' => '<b>Yeni Grup Oluştur</b> </br></br> Traceper arkadaşlarınızı gruplamanıza olanak sağlar. Bu bağlantı ile yeni gruplar oluşturabilir ve \"Arkadaşlar\" sekmesinde arkadaşlarınızı ilgili gruba dahil edebilirsiniz. \"Gruplar\" sekmesinde ise oluşturduğunuz grupların gizlilik ayarlarını yapabilirsiniz.',
+	'<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".' => '<b>Yeni Grup Oluştur</b> </br></br> Traceper arkadaşlarınızı gruplamanıza olanak sağlar. Bu bağlantı ile yeni gruplar oluşturabilirsiniz. Ayrıca \"Gruplar\" sekmesinde arkadaşlarınızı ilgili gruba dahil edebilir ve oluşturduğunuz grupların gizlilik ayarlarını düzenleyebilirsiniz.',
 	
 	'Traceper Terms' =>
 	'<b>Son Güncelleme: 28 Ekim 2013</b> </br></br>
