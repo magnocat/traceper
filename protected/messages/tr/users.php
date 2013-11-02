@@ -61,7 +61,8 @@ return array(
 	'new' => 'yeni',
 	' totally ' => ' toplamda ',
 	' friendship request(s) you have' => ' arkadaşlık isteğiniz var',
-	'Type a friend\'s name' => 'Arkadaşınızın adını girin'
+	'Type a friend\'s name' => 'Arkadaşınızın adını girin',
+	'You have no pending friendship requests at the moment.' => 'Şu an için bekleyen arkadaşlık isteğiniz bulunmuyor.'
 	
 	
 	

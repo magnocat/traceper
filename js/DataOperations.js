@@ -183,19 +183,27 @@ function processUsers(MAP, users, deletedFriendId) {
 				locationCalculatedTime:locationCalculatedTime
 			});
 						
-			var content = '<div style="width:200px; height:180px;">'
-				+ '<div><div style="display:inline-block;vertical-align:middle;"><img src="'+ personPhoto +'"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
-				+ '</br>'
-				+ '<div>' + TRACKER.users[userId].time + '</div>'
-				+ '<div>' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + '</div>'
-				+ '<div>' + TRACKER.users[userId].address + '</div>'
-				+ '<div>' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
-				+ '</br>'				
-				+ '<div style="position:absolute;bottom:5px;">'				
-				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
-				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
-				+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
-				+ '</div>';
+			var content = 
+				  '<div style="width:280px; height:180px;">'
+				+ 	'<div><div style="display:inline-block;vertical-align:middle;"><img src="'+ personPhoto +'"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+				+ 	'</br>'
+				+ 	'<div>' + TRACKER.users[userId].time + ' - (' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + ')' + '</div>'
+				+ 	'<div>' + TRACKER.users[userId].address + '</div>'				
+				+ 	'</br>'				
+				+ 	'<div style="position:absolute;bottom:5px;">'
+				+ 		'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'
+				+ 		'<a class="infoWinOperations" style="margin-left:45px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>'
+				+ 		'<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>'
+				+ 		'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>'
+												
+//				+ '<div style="display:inline-block;vertical-align:middle;width:60%;">' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
+//				+ '<div style="display:inline-block;vertical-align:middle;width:40%;">'
+//				+ 	'<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
+//				+ 	'<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
+//				+ 	'<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
+//				+ '</div>';	
+			
+				+ 	'</div>';				
 				+ '</div>';			
 					
 //			var content = '<div style="height:200px;">'
@@ -327,19 +335,26 @@ function processUsers(MAP, users, deletedFriendId) {
 //				+ '</ul>'
 //				+ '</div>';
 								
-				var content = '<div style="width:200px; height:180px;">'
-					+ '<div><div style="display:inline-block;vertical-align:middle;"><img src="images/Friend.png"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
-					+ '</br>'
-					+ '<div>' + time + '</div>'
-					+ '<div>' + latitude + ", " + longitude + '</div>'
-					+ '<div>' + address + '</div>'
-					+ '<div>' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
-					+ '</br>'				
-					+ '<div style="position:absolute;bottom:5px;">'				
-					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
-					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
-					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
-					+ '</div>';
+				var content = 
+					  '<div style="width:280px; height:180px;">'
+					+ 	'<div><div style="display:inline-block;vertical-align:middle;"><img src="images/Friend.png"/></div><div style="display:inline-block;vertical-align:middle;padding-left:5px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+					+ 	'</br>'
+					+ 	'<div>' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
+					+ 	'<div>' + address + '</div>'
+					+ 	'</br>'				
+					+ 	'<div style="position:absolute;bottom:5px;">'
+					+ 		'<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'
+					+ 		'<a class="infoWinOperations" style="margin-left:45px;" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>'
+					+ 		'<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>'
+					+ 		'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>'
+					
+					
+//					+ '<div>' + '<a class="infoWinOperations" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ TRACKER.langOperator.previousPoint +'</a>'  + '</div>'
+//					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoom + '" src="images/Zoom-In.png"/>' + '</a>' + '</div>'				
+//					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<img class="vtip" title="' + TRACKER.langOperator.zoomOut + '" src="images/Zoom-Out.png"/>' + '</a>' + '</div>'
+//					+ '<div style="display:inline-block;vertical-align:middle;">' + '<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ TRACKER.langOperator.zoomMax +'</a>' + '</div>'
+					
+					+ 	'</div>';
 					+ '</div>';				
 								
 				if (isWindowOpen == true) {
