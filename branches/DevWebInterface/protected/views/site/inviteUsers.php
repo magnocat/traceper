@@ -86,7 +86,7 @@ Yii::app()->clientScript->registerScript('emailsListTooltip',
 			$this->widget('zii.widgets.jui.CJuiButton', array(
 					'name'=>'ajaxInviteUsers',
 					'caption'=>Yii::t('site', 'Invite'),
-					'id'=>'inviteUsersAjaxButton',
+					'id'=>'inviteUsersAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 					'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/inviteUsers'),
 							'success'=> 'function(result){
 															try 

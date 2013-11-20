@@ -66,7 +66,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxUpdateGroup',
 							'caption'=>Yii::t('common', 'Save'),
-							'id'=>'updateGroupAjaxButton',
+							'id'=>'updateGroupAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('groupId'=>$groupId)),
 									'success'=> 'function(result)
 												{

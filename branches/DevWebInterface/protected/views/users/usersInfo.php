@@ -28,7 +28,7 @@
 		});
 
 	 	$("#userSearchField").blur(function ()	{
-	 		$("#userSearchField").tooltipster("hide"); 		
+			$("#userSearchField").tooltipster("hide"); 		
 		});			
 			
 			', CClientScript::POS_HEAD);	
@@ -49,7 +49,7 @@
 				$this->widget('zii.widgets.jui.CJuiButton', array(
 						'name'=>'ajaxUserSearch',
 						'caption'=>Yii::t('common', 'Search'),
-						'id'=>'userSearchAjaxButton',
+						'id'=>'userSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 						'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>array('users/search'),
 																			'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
 																			'update'=> '#userSearchResults',

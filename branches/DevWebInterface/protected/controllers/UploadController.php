@@ -3,7 +3,7 @@
 class UploadController extends Controller
 {
 	const thumbSuffix = '_thumb';
-	
+
  	public function filters()
     {
         return array(
@@ -15,8 +15,7 @@ class UploadController extends Controller
     {
         return array(
         	array('deny',
-                'actions'=>array('delete', 'search', 'upload', 
-                				 'get','getUploadListXML'),
+                'actions'=>array('delete', 'search', 'upload', 'getUploadListXML'),
         		'users'=>array('?'),
             )
         );
@@ -95,9 +94,59 @@ class UploadController extends Controller
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
-		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType), false, true);
+		//Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
+	
+	public function actionGetPublicList()
+	{
+		//Fb::warn("actionGetPublicList() called", "UploadController");
+		$app = Yii::app();
+
+		if (isset($_GET['fileType']) && $_GET['fileType'] != NULL)
+		{
+			$fileType = $_GET['fileType'];
+
+			$dataProvider = Upload::model()->getPublicRecordList($fileType);
+		}
+		else
+		{
+			$dataProvider = null;
+		}
+	
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+			
+// 			//Hep ajaxla gosterildigi icin sadece ilk render'da bu dosyalar yuklensin, sonraki render'larda (page refresh'e kadarki) yuklenmesin
+// 			if($app->session['publicListRendered'])
+// 			{
+// 				Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+				
+// 				if (YII_DEBUG)
+// 				{
+// 					Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
+// 				}
+// 				else
+// 				{
+// 					Yii::app()->clientScript->scriptMap['jquery.ba-bbq.min.js'] = false;
+// 				}	
+// 			}
+		}
+	
+		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+		//TODO: added below line because gridview.js is loaded before.
+		//Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+
+		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType, 'isPublicList'=>true), false, false /*Multiple ajax sorgusu olmaması icin*/);
+	}	
 
 	public function actionSearch() {
 		$model = new SearchForm();
@@ -167,7 +216,7 @@ class UploadController extends Controller
 				$thumb = true;
 			}
 			
-			if ($thumb == true) {
+			if ($thumb == true) {	
 				$fileName = $this->getFileName($uploadId, $fileType, true);
 				
 				if (file_exists($fileName) === false) {
@@ -400,42 +449,102 @@ class UploadController extends Controller
 		
 		$dataReader = NULL;
 		
-		if (isset($_REQUEST['list'])) {
-			if ($_REQUEST['list'] == "onlyUpdated")
+		$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+		$uploadCount = Upload::model()->getUploadCount($fileType, Yii::app()->user->id, $friendList);
+		//$uploadCount = Upload::model()->getUploadPageCount($fileType, Yii::app()->user->id, $friendList, NULL);
+	
+		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
+		{
+			//Fb::warn("onlyUpdated", "actionGetUploadListXML()");
+			
+			$time = Yii::app()->session[$dataFetchedTimeKey];
+			if ($time !== false && $time != "")
 			{
-				$time = Yii::app()->session[$dataFetchedTimeKey];
-				if ($time !== false && $time != "")
-				{
-					$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-					
-					$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,$time);
-					
-					if ($pageCount >= $pageNo && $pageCount != 0) {
-						$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
-					}
-					
-					$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "userList");
+				$pageCount=Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,$time);
+				
+				if ($pageCount >= $pageNo && $pageCount != 0) {
+					$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
 				}
+				
+				$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
 			}
 		}
 		else {
+			//Fb::warn("ALL", "actionGetUploadListXML()");
 
-			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-			$pageCount=Upload::model()->getUploadCount($fileType,Yii::app()->user->id,$friendList,NULL);
+			$pageCount=Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
 			if ($pageCount >= $pageNo && $pageCount != 0) {
 				$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
 			}
-			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "uploadList");
+			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
 		}
+		
 		echo $out;
+		
 		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->session['uploadCount'] = $uploadCount;
 		Yii::app()->end();
 	}
+	
+	public function actionGetPublicUploadListXML()
+	{
+		$pageNo = 1;
+		
+		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+			$pageNo = (int) $_REQUEST['pageNo'];
+		}
+	
+		if(isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
+		{
+			$fileType = (int)$_REQUEST['fileType'];
+		}
+	
+		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+		$out = '';
+		$dataFetchedTimeKey = "uploadController.dataFetchedTime";
+	
+		$dataReader = NULL;
+		$publicUploadCount = Upload::model()->getPublicUploadCount($fileType);
+	
+		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($publicUploadCount == Yii::app()->session['publicUploadCount']))
+		{
+			//Fb::warn("onlyUpdated", "actionGetPublicUploadListXML()");
+			
+			$time = Yii::app()->session[$dataFetchedTimeKey];
+			
+			if ($time !== false && $time != "")
+			{	
+				$pageCount=Upload::model()->getPublicUploadPageCount($fileType,$time);
+					
+				if ($pageCount >= $pageNo && $pageCount != 0) {
+					$dataReader=Upload::model()->getPublicUploadList($fileType,$time,$offset);
+				}
+					
+				$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+			}
+		}
+		else {
+			//Fb::warn("ALL", "actionGetPublicUploadListXML()");
+			
+			$pageCount=Upload::model()->getPublicUploadPageCount($fileType,NULL);
+			
+			if ($pageCount >= $pageNo && $pageCount != 0) {
+				$dataReader=Upload::model()->getPublicUploadList($fileType,NULL,$offset);
+			}
+			
+			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+		}
+		
+		echo $out;
+		
+		Yii::app()->session[$dataFetchedTimeKey] = time();
+		Yii::app()->session['publicUploadCount'] = $publicUploadCount;
+		Yii::app()->end();
+	}	
 
 	//private function prepareXML($sql, $pageNo, $pageCount, $type="userList")
-	private function prepareXML($dataReader, $pageNo, $pageCount, $type="userList")
+	private function prepareXML($dataReader, $pageNo, $pageCount, $updateType="onlyUpdated")
 	{
-
 		$str = NULL;
 		$userId = NULL;
 		if ($dataReader != NULL )
@@ -445,7 +554,11 @@ class UploadController extends Controller
 				$str .= $this->getUploadXMLItem($row);
 			}
 		}
-		$extra = "thumbSuffix=\"thumb=ok\"";
+		
+		//$extra = "thumbSuffix=\"thumb=ok\"";
+		$extra = 'thumbSuffix="thumb=ok" updateType="'.$updateType.'"';
+		//$extra = 'thumbSuffix="thumb=ok"';
+		
 		$pageNo = $pageCount == 0 ? 0 : $pageNo;
 		return $this->addXMLEnvelope($pageNo, $pageCount, $str, $extra);
 	}

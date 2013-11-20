@@ -21,7 +21,8 @@ if ($dataProvider != null) {
 										'update'=> '#inviteUsersWindow',
 								),
 								array(
-										'id'=>'showInviteUsersWindowAtUserList'))			
+										'id'=>'inviteUsersByHereAjaxLink-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+										))			
 			));
 			
 	$userSearchEmptyText = Yii::t('users', 'No users found registered by this name unfortunately. You should invite your friend to Traceper first by the link {inviteIcon} at the top menu or by {inviteByHere}. After he/she joins Traceper, you could be friends.', array('{inviteIcon}'=>CHtml::image("images/inviteSmall.png"), 
@@ -31,7 +32,8 @@ if ($dataProvider != null) {
 										'update'=> '#inviteUsersWindow',
 								),
 								array(
-										'id'=>'showInviteUsersWindowAtUserSearch'))			
+										'id'=>'inviteUsersByHereAtUserSearchAjaxLink'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+										))			
 			));
 	
 	
@@ -171,11 +173,12 @@ if ($dataProvider != null) {
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
-			'ajaxUrl'=>$ajaxUrl,
+			'ajaxUrl'=>$ajaxUrl,			
 			'summaryText'=>'',
 			'emptyText'=>$isFriendList?$emptyText:($isFriendRequestList?$friendshipRequestsEmptyText:$userSearchEmptyText),
+			'htmlOptions'=>array('style'=>'font-size:14px;'),				
 			'pager'=>array(
-				 'id'=>'UsersPager',	 
+				 'id'=>'UsersPager-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
@@ -185,8 +188,8 @@ if ($dataProvider != null) {
 				    				'name'=>Yii::t('users', ''),
 				    				'type' => 'raw',				    					
 				    				'value'=>'CHtml::image("images/Friend.png")',				    		
-				    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;'),
-				    				'visible'=>$isFriendList
+				    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;')
+				    				//'visible'=>$isFriendList || $isFriendRequestList
 				    		),		    		
 		    		
 // 		array(            // display 'create_time' using an expression
@@ -233,10 +236,15 @@ if ($dataProvider != null) {
 				    'name'=>Yii::t('common', 'Name'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
-		            'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' : 
-								'(isset($data[\'status\']) && $data[\'status\'] == 1) ? 
-								CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):
-								$data["Name"]',	
+		            'value'=> $isFriendList ? '($data["isVisible"] == 1)?CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : 
+								'(isset($data["status"]) && $data["status"] == 1) ? 
+								(($data["isVisible"] == 1)?CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "This user does not share his/her location info at the moment")))):
+								$data["Name"]',
+
+// 					'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' :
+// 					'(isset($data[\'status\']) && $data[\'status\'] == 1) ?
+// 					CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):
+// 					$data["Name"]',				
 		),
 		//below line is the first line of onClick...
 		//it is deleted due to refactoring on model and controller side

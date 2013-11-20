@@ -184,12 +184,45 @@ class Upload extends CActiveRecord
     			),
     			'pagination'=>array(
     					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
-    					'pageSize'=>($_SESSION['screen_height'] - 155)/45
+    					'pageSize'=>(int)(($_SESSION['screen_height'] - 155)/45),
+    					'itemCount'=>$count
     			),
     	));
     
     	return $dataProvider;
     }
+    
+    public function getPublicRecordList($fileType) {
+    
+    	//if the upload is mine or my friends's upload or public.
+    	$sqlCount = 'SELECT count(*)
+    	FROM '. Upload::model()->tableName() . ' u
+    	WHERE (fileType = '.$fileType.') AND (publicData = 1)';
+    
+    	$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+    
+    	$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
+    	FROM '. Upload::model()->tableName() . ' u
+    	LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+    	WHERE (fileType = '.$fileType.') AND (publicData = 1)
+    	ORDER BY u.Id DESC';
+       
+    	$dataProvider = new CSqlDataProvider($sql, array(
+    			'totalItemCount'=>$count,
+    			'sort'=>array(
+    					'attributes'=>array(
+    							'id',
+    					),
+    			),
+    			'pagination'=>array(
+    					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
+    					'pageSize'=>(int)(($_SESSION['screen_height'] - 100)/45),
+    					'itemCount'=>$count
+    			),
+    	));
+    
+    	return $dataProvider;
+    }    
     
     
     public function getSearchResult($fileType,$userID,$friendList,$keyword,$keywordAttributes) {
@@ -240,7 +273,19 @@ class Upload extends CActiveRecord
     	return $dataProvider;
     }
     
-    public function getUploadCount($fileType,$userID,$friendList,$time) {
+    public function getUploadCount($fileType,$userID,$friendList) {
+    	$sqlCount = 'SELECT count(*)
+    	FROM '. Upload::model()->tableName() . ' u
+    	WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
+    	userId = '. $userID .' OR
+    	publicData = 1)';
+    
+    	$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+    	    
+    	return $count;
+    }    
+    
+    public function getUploadPageCount($fileType,$userID,$friendList,$time) {
     
     	if ($time != NULL)
     	{
@@ -265,6 +310,37 @@ class Upload extends CActiveRecord
     
     	return $pageCount;
     }
+    
+    public function getPublicUploadCount($fileType) {
+    	$sqlCount = 'SELECT count(*)
+    	FROM '. Upload::model()->tableName() . ' u
+    	WHERE (fileType = '.$fileType.') AND (publicData = 1)';
+    
+    	$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+    		
+    	return $count;
+    }    
+    
+    public function getPublicUploadPageCount($fileType,$time) {
+    
+    	if ($time != NULL)
+    	{
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		FROM '. Upload::model()->tableName() . ' u
+    		WHERE (fileType = '.$fileType.') AND (publicData = 1)
+    		AND unix_timestamp(u.uploadTime) >= '. $time;
+    	}
+    	else
+    	{
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		FROM '. Upload::model()->tableName() . ' u
+    		WHERE (fileType = '.$fileType.') AND (publicData = 1)';
+    	}
+    
+    	$pageCount=Yii::app()->db->createCommand($sqlCount)->queryScalar();    	 
+    
+    	return $pageCount;
+    }    
     
     public function getUploadList($fileType,$userID,$friendList,$time,$offset) {
     	if ($time != NULL)
@@ -295,4 +371,30 @@ class Upload extends CActiveRecord
     
     	return $dataReader;
     }
+    
+    public function getPublicUploadList($fileType,$time,$offset) {
+    	if ($time != NULL)
+    	{
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		FROM '. Upload::model()->tableName() . ' u
+    		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+    		WHERE (fileType = '.$fileType.') AND (publicData = 1)
+    		AND unix_timestamp(u.uploadTime) >= '. $time . '
+    		ORDER BY u.Id DESC
+    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+    	}
+    	else
+    	{
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		FROM '. Upload::model()->tableName() . ' u
+    		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+    		WHERE (fileType = '.$fileType.') AND (publicData = 1)
+    		ORDER BY u.Id DESC
+    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+    	}
+    
+    	$dataReader = Yii::app()->db->createCommand($sql)->query();
+    
+    	return $dataReader;
+    }    
 }

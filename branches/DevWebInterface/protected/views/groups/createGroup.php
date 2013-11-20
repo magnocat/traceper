@@ -103,7 +103,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				$this->widget('zii.widgets.jui.CJuiButton', array(
 						'name'=>'ajaxCreateGroup',
 						'caption'=>Yii::t('common', 'Create'),
-						'id'=>'createGroupAjaxButton',
+						'id'=>'createGroupAjaxButton-'.uniqid(), //Unique ID oluÅŸturmayÄ±nca her ajaxta bir Ã¶nceki sorgular da tekrarlanÄ±yor
 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('groups/createGroup'),
 																			'success'=> 'function(result){ 
 																											try {
@@ -117,7 +117,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 																													if(obj.groupType == '.GroupType::FriendGroup.')
 																													{
-																														//"#friendGroupsListView" elemaný yuklu degilse JS hata veriyor ve asagidaki mesaj gözükmüyor
+																														//"#friendGroupsListView" elemanï¿½ yuklu degilse JS hata veriyor ve asagidaki mesaj gï¿½zï¿½kmï¿½yor
 																														if($("#friendGroupsListView").length)
 																														{
 																															$.fn.yiiGridView.update("friendGroupsListView");
@@ -125,7 +125,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																													}
 																													else if(obj.groupType == '.GroupType::StaffGroup.')
 																													{
-																														//"#staffGroupsListView" elemaný yuklu degilse JS hata veriyor ve asagidaki mesaj gözükmüyor
+																														//"#staffGroupsListView" elemanï¿½ yuklu degilse JS hata veriyor ve asagidaki mesaj gï¿½zï¿½kmï¿½yor
 																														if($("#staffGroupsListView").length)
 																														{
 																															$.fn.yiiGridView.update("staffGroupsListView");

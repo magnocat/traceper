@@ -48,7 +48,7 @@
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxUploadSearch',
 							'caption'=>Yii::t('common', 'Search'),
-							'id'=>'uploadSearchAjaxButton',
+							'id'=>'uploadSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 							'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>$this->createUrl('upload/search', array('fileType'=>$fileType)),
 									'complete'=> 'function() { $("#uploadSearchResults").dialog("open"); return false;}',
 									'update'=> '#uploadSearchResults',
@@ -66,6 +66,11 @@
 		if (isset($uploadList) && $uploadList == true) {
 			$params = array_merge($params, array('uploadList'=>true));
 		}
+		
+		if (isset($isPublicList) && $isPublicList == true) {
+			$params = array_merge($params, array('isPublicList'=>true));
+		}
+				
 		$this->renderPartial('getList', $params, false, true);
 	}
 	else

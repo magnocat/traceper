@@ -45,7 +45,7 @@
 		$this->widget('zii.widgets.jui.CJuiButton', array(
 				'name'=>'ajaxResetPassword',
 				'caption'=>Yii::t('site', 'Update'),
-				'id'=>'resetPasswordAjaxButton',
+				'id'=>'resetPasswordAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 				'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)),
 																				  'success'=> 'function(msg){
 																									try

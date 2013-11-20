@@ -550,7 +550,7 @@ class GroupsController extends Controller
 				
 		//TODO: added below line because gridview.js is loaded before.
 		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;		
-		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'groupType'=>$groupType), false, true);
+		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'groupType'=>$groupType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
 	
 	//Gets the list of the selected froup members

@@ -47,7 +47,7 @@ return array(
 	<div class=\"title\"><b><font size="3">Sorumluluk Reddi</font></b></div>
 	Bu servis hiçbir şeyi garanti etmez, kendi riskinizi göze alarak kullanırsınız. Hiçbir durumda sorumluluk kabul edilmez. Detaylı bilgi için lütfen Kullanım Şartlarımızı okuyunuz. <br/><br/>
 	<div class=\"title\"><b><font size="3">Blog Adresi</font></b></div>
-	<a href="http://traceper.blogspot.com"><font color="blue">http://traceper.blogspot.com</font></a> <br/><br/>
+	<a href="http://traceper.blogspot.com"><font color="#6261D8">http://traceper.blogspot.com</font></a> <br/><br/>
 	<div class=\"title\"><b><font size="3">İletişim</font></b></div>
 	contact@traceper.com <br/><br/>',
 	
@@ -81,13 +81,16 @@ return array(
 	'Terms of Use' => 'Kullanım Şartlarımızı',
 	'By sending the Sign Up form, you agree to our {terms of use}' => 'Kayıt formunu göndererek, {terms of use} kabul etmiş olursunuz',
 	'<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".' => '<b>Yeni Grup Oluştur</b> </br></br> Traceper arkadaşlarınızı gruplamanıza olanak sağlar. Bu bağlantı ile yeni gruplar oluşturabilirsiniz. Ayrıca \"Gruplar\" sekmesinde arkadaşlarınızı ilgili gruba dahil edebilir ve oluşturduğunuz grupların gizlilik ayarlarını düzenleyebilirsiniz.',
+	'Click here to view the list of photos shared publicly' => 'Herkese açık olarak paylaşılan fotoğrafların listesini görüntülemek için buraya tıklayınız',
+	'Click here to view the registration form again' => 'Kayıt formunu yeniden görüntülemek için buraya tıklayınız',
+	'Public Photos' => 'Genel Paylaşımlar',
 	
 	'Traceper Terms' =>
 	'<b>Son Güncelleme: 28 Ekim 2013</b> </br></br>
 	<b><font size="5">TRACEPER KULLANIM ŞARTLARI</font></b> </br></br>
-	TRACEPER TARAFINDAN SUNULAN HİZMETLERİ KULLANMADAN ÖNCE LÜTFEN BU KULLANIM ŞARTLARINI DİKKATLE OKUYUN. BU KULLANIM ŞARTLARI, <a href="http://www.traceper.com"><font color="blue">HTTP://TRACEPER.COM</font></a> ADRESİNDEKİ İNTERNET SİTESİNİ VE TRACEPER TARAFINDAN SUNULAN TÜM HİZMET VE UYGULAMALARI KULLANMANIZ İÇİN HUKUKİ BAĞLAYICI ŞART VE KOŞULLARI ORTAYA KOYAR. </br></br>
+	TRACEPER TARAFINDAN SUNULAN HİZMETLERİ KULLANMADAN ÖNCE LÜTFEN BU KULLANIM ŞARTLARINI DİKKATLE OKUYUN. BU KULLANIM ŞARTLARI, <a href="http://www.traceper.com"><font color="#6261D8">HTTP://TRACEPER.COM</font></a> ADRESİNDEKİ İNTERNET SİTESİNİ VE TRACEPER TARAFINDAN SUNULAN TÜM HİZMET VE UYGULAMALARI KULLANMANIZ İÇİN HUKUKİ BAĞLAYICI ŞART VE KOŞULLARI ORTAYA KOYAR. </br></br>
 	<b><font size="3">Şartların Kabulü</font></b> </br></br>
-	Hizmete kaydolarak veya hizmeti herhangi bir şekilde kullanarak burada yer alan Kullanım Şartlarını kabul etmiş olursunuz. </br></br>
+	Hizmete kaydolarak veya hizmeti herhangi bir şekilde kullanarak burada yer alan Kullanım Şartlarını kabul etmiş olursunuz. 28 Ekim 2013 tarihinden önce kayıt olmuş kullanıcılar için bir defaya mahsus olmak üzere, oturum açma işlemi sırasında Kullanım Şartlarımızın kabul edilmesi talebi yapılacaktır. Oturum açma işlemine devam eden kullanıcılar Kullanım Şartlarımızı kabul etmiş olacaklardır. </br></br>
 	<b><font size="3">Erişim</font></b> </br></br>
 	Bu Kullanım Şartlarına tabi olarak sunulan Hizmet herhangi bir üçüncü şahıs kullanımı veya yararı için değil sadece sizin kullanımınız için teklif edilebilir. </br></br>
 	<b><font size="3">Kayıt ve Uygunluk</font></b> </br></br>

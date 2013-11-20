@@ -55,30 +55,38 @@ if ($dataProvider != null)
 	 		'id'=>'groupMembersListView',
 			'summaryText'=>'',
 			'emptyText'=>Yii::t('groups','You have not added any friend into this group yet.'),
+			'htmlOptions'=>array('style'=>'font-size:14px;'),
 			'pager'=>array( 
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
 			       ),
 		    'columns'=>array(
-		array(            // display 'create_time' using an expression
-				    'name'=>Yii::t('common', 'Name'),
-					'type' => 'raw',		
-					'sortable'=>true,	
-					'value'=>'$data["Name"]',	
-		),
-		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
-					'type' => 'raw',
-            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
-								array("onclick"=>"$(\"#groupMemberId\").text(".$data[\'userId\'].");
-												  $(\"#groupId\").text(".$data[\'groupId\'].");
-												  $(\"#groupMemberDeleteConfirmation\").dialog(\"open\");", 
-										"class"=>"vtip", 
-										"title"=>'.("Yii::t('groups', 'Remove Group Member')").'))',
-
-					'htmlOptions'=>array('width'=>'16px')
-		),
+		    		array(            // display 'create_time' using an expression
+		    				'name'=>Yii::t('users', ''),
+		    				'type' => 'raw',
+		    				'value'=>'CHtml::image("images/Friend.png")',
+		    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;'),
+		    		),		    		
+		    		
+					array(            // display 'create_time' using an expression
+							    'name'=>Yii::t('common', 'Name'),
+								'type' => 'raw',		
+								'sortable'=>true,	
+								'value'=>'$data["Name"]',	
+					),
+					array(            // display 'create_time' using an expression
+				//    'name'=>'realname',
+								'type' => 'raw',
+			            'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
+											array("onclick"=>"$(\"#groupMemberId\").text(".$data[\'userId\'].");
+															  $(\"#groupId\").text(".$data[\'groupId\'].");
+															  $(\"#groupMemberDeleteConfirmation\").dialog(\"open\");", 
+													"class"=>"vtip", 
+													"title"=>'.("Yii::t('groups', 'Remove Group Member')").'))',
+			
+								'htmlOptions'=>array('width'=>'16px')
+					),
 	),
 	));
 						

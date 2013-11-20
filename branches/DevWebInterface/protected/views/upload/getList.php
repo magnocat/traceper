@@ -20,6 +20,7 @@ if ($dataProvider != null) {
 										if (obj.result && obj.result == "1") 
 										{
 											$.fn.yiiGridView.update("uploadListView");
+											//$.fn.yiiGridView.update("uploadListView",{ complete: function(){ alert("upladListView updated"); } });
 										}
 										else 
 										{
@@ -38,23 +39,32 @@ if ($dataProvider != null) {
 				$deleteUploadJSFunction,
 				CClientScript::POS_READY);		
 	}
+	
+	if (isset($isPublicList) && $isPublicList == true) {
+		//OK
+	}
+	else
+	{
+		$isPublicList = false;
+	}	
 	?>
 	<div id="uploadsGridView" style="overflow:auto;">
 	<?php	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
-	 		'id'=>'uploadListView',
+	 		'id'=>$isPublicList?'publicUploadListView':'uploadListView',
+			//'ajaxUrl'=>null,
 			'summaryText'=>'',
 			'emptyText'=>$isSearchResult?$uploadSearchEmptyText:$emptyText,
+			'htmlOptions'=>array('style'=>'font-size:14px;'),
 			'pager'=>array( 
-				 'id'=>'UploadsPager',
+				 'id'=>'UploadsPager-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
 			       ),
 		    'columns'=>array(
-				array(            // display 'create_time' using an expression
-		          
+				array(            // display 'create_time' using an expression		          
 					'type' => 'raw',
 		            'value'=>'CHtml::link("<img src=\"".Yii::app()->createUrl("upload/get", array(
 														 "id"=>$data["id"],
@@ -76,9 +86,10 @@ if ($dataProvider != null) {
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Sender'),
 					'type' => 'raw',
-		            'value'=>'CHtml::link($data["realname"], "#", array(
+		            'value'=>$isPublicList?'$data["realname"]':'CHtml::link($data["realname"], "#", array(
     										"onclick"=>"TRACKER.trackUser(".$data["userId"].");",
 										))',
+					'htmlOptions'=>array('width'=>'120px', 'style'=>'text-align: center;'),
 					//'htmlOptions'=>array('style'=>'width:160px;'),	
 				),
 				array(           
@@ -93,8 +104,8 @@ if ($dataProvider != null) {
 		            						))
 		            			: ""; ',
 					'htmlOptions'=>array('width'=>'16px'),
+					'visible'=>$isPublicList?false:true
 				),
-
 			),
 	));
 	?>

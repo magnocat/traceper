@@ -8,7 +8,8 @@ if ($dataProvider != null) {
 																'update'=> '#createGroupWindow',
 														),
 														array(
-																'id'=>'showCreateGroupWindowAtGroupList'))
+																'id'=>'showCreateGroupWindowAtGroupList-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+																))
 			));
 	
 	
@@ -29,6 +30,7 @@ if ($dataProvider != null) {
 	$deleteGroupJSFunction = "function deleteGroup() { "
 									.CHtml::ajax(
 											array(
+													'id'=>'deleteGroupAjaxLink-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor														
 													'url'=>Yii::app()->createUrl('groups/deleteGroup'),
 													'data'=> array('groupId'=>"js:$('#groupId').html()"),
 													'success'=> 'function(result) { 	
@@ -63,6 +65,7 @@ if ($dataProvider != null) {
 			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
 			'emptyText'=>$emptyText,
+			'htmlOptions'=>array('style'=>'font-size:14px;'),
 			'pager'=>array( 
 				 'id'=>'GroupsPager',
 				 'header'=>'',
