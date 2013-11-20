@@ -14,15 +14,14 @@ return array(
 	<div class=\"title\"><b><font size="3">Blog Address</font></b></div>
 	<a href="http://traceper.blogspot.com"><font color="blue">http://traceper.blogspot.com</font></a> <br/><br/>
 	<div class=\"title\"><b><font size="3">Contact</font></b></div>
-	contact@traceper.com <br/><br/>',
-	
+	contact@traceper.com <br/><br/>',	
 	
 	'Traceper Terms' =>
 	'<b>Last Updated: October 28, 2013</b> </br></br>
 	<b><font size="5">TRACEPER TERMS OF USE</font></b> </br></br>
 	PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY TRACEPER. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT <a href="http://www.traceper.com"><font color="blue">HTTP://TRACEPER.COM</font></a> AND ALL OF THE SERVICES AND APPLICATIONS OFFERED BY TRACEPER. </br></br>
 	<b><font size="3">Acceptance of Terms</font></b> </br></br>
-	By registering for or using the Service in any manner you agree to all of the terms of use contained herein. </br></br>
+	By registering for or using the Service in any manner you agree to all of the Terms of Use contained herein. For the users those registered before October 28 2013, an approval action for our Terms of Use will be requested for once before the login process. By continuing to log in, those users agree to all of the Terms of Use contained herein. </br></br>
 	<b><font size="3">Access</font></b> </br></br>
 	Subject to these Terms of Use, Traceper may offer to provide the service solely for your own use, and not for the use or benefit of any third party. </br></br>
 	<b><font size="3">Registration and Eligibility</font></b> </br></br>

@@ -56,7 +56,8 @@
 						  					'update'=> '#activationNotReceivedWindow'
 						  			),
 						  			array(
-						  					'id'=>'showActivationNotReceivedWindowClickHere'));
+						  					'id'=>'activationNotReceivedClickHereLink'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+						  					));
 						  	?>
 		  					<script type="text/javascript">
 		  						bLoginFormEmailErrorExists = true;	
@@ -132,7 +133,8 @@
 									'update'=> '#forgotPasswordWindow',
 							),
 							array(
-									'id'=>'showForgotPasswordWindow','tabindex'=>5));							
+									'id'=>'forgotPasswordAjaxLink-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+									'tabindex'=>5));							
 					?>	 					
  				</div>								
 			</div>							
@@ -140,12 +142,40 @@
 			<div class="upperMenu" style="margin-top:0.7em;width:50px;">
 				<div style="height:3.3em;top:0%;padding:0px;">								
 					<?php																											
+// 					$this->widget('zii.widgets.jui.CJuiButton', array(
+// 							'name'=>'ajaxLogin',
+// 							'caption'=>Yii::t('site', 'Log in'),
+// 							'id'=>'loginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
+// 					));
+
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxLogin',
 							'caption'=>Yii::t('site', 'Log in'),
 							'id'=>'loginAjaxButton',
-							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
-					));															
+							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),
+									'success'=> 'function(msg){
+													if(msg.search("acceptTermsForLoginWindow") !== -1)
+													{
+														var opt = {
+																autoOpen: false,
+																modal: true,
+																resizable: false,
+																width: 600,
+																title: "'.Yii::t('site', 'Accept Terms to continue').'"
+														};
+									
+														$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
+														$("#acceptTermsForLoginWindow").html(msg);
+													}
+													else
+													{
+														//Form error veya successful durumu icin
+														$("#forAjaxRefresh").html(msg);
+													}
+												}',
+							))
+					));				
 					?>
 				</div>																					
 			</div>				

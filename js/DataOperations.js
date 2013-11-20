@@ -115,7 +115,7 @@ function processUserPastLocations(MAP, locations, userId){
  * this function process users array returned when actions are search user, get user list, update list,
  * updated list...
  */	
-function processUsers(MAP, users, deletedFriendId) {
+function processUsers(MAP, users, par_updateType, deletedFriendId) {
 	
 	//alert("processUsers(), start - TRACKER.users.length:" + TRACKER.users.length);
 	//alert('processUsers() called');
@@ -130,11 +130,25 @@ function processUsers(MAP, users, deletedFriendId) {
 		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
 		
 		TRACKER.users.splice(deletedFriendId, 1);			
+	}
+	
+	var updateType = 'all';
+	
+	if(typeof par_updateType !== 'undefined')
+	{
+		updateType = par_updateType;
 	}	
+	
+	//alert("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
+	
+	var userIdArray = new Array();
+	var newFriend = false;
 
 	$.each(users, function(index, value)
 	{
 		var userId = value.user;
+		userIdArray.push(userId);
+		
 		var isFriend =  1;
 		var realname = value.realname;
 		var latitude = value.latitude;
@@ -153,11 +167,15 @@ function processUsers(MAP, users, deletedFriendId) {
 		if (isFriend == "1") {
 			visible = true;
 		}
+		
+		//alert("userId:" + userId);
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
+			newFriend = true;
+			
 			var personPhoto;
-			if(fb_id != 0){
+			if((fb_id != 0) && (typeof fb_id != "undefined")){
 				personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";
 				var userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible);
 			}else{
@@ -253,6 +271,8 @@ function processUsers(MAP, users, deletedFriendId) {
 		}
 		else
 		{						
+			//alert("else");
+			
 			var time = dataArrivedTime;
 			var deviceId = deviceId;
 			var userType = userType;
@@ -375,6 +395,8 @@ function processUsers(MAP, users, deletedFriendId) {
 	});
 	
 	//alert("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
+	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
+	//alert('TRACKER.users.size:' + size);
 	
 	for (key in TRACKER.users) {
 	    if (TRACKER.users.hasOwnProperty(key)  &&        // These are explained
@@ -383,17 +405,60 @@ function processUsers(MAP, users, deletedFriendId) {
 	        ) {
 			
 	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
-			
-	    	//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
-	    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
-			
-	    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
-	    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
-			{
-				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
-			}
+	    			
+	    	if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
+	    	{
+	    		//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+	    		//Kullanicinin kendisi her zaman haritada gosterilsin
+		    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
+				
+		    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+		    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
+				{
+					MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
+				}	
+
+		    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
+		    	{
+		    		//alert('userId:' + key + 'deleted');
+		    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
+		    		
+		    		if(TRACKER.users[key].infoWindowIsOpened)
+		    		{
+		    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
+		    		}
+
+		    		if(typeof $.fn.yiiGridView != "undefined")
+		    		{
+			    		$.fn.yiiGridView.update("userListView");
+			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
+		    		}		    		
+		    		
+//		            var myElem = document.getElementById('uploadListView');
+//		            if(myElem == null)
+//		            {
+//		           	 alert('userListView YOK!');
+//		            }
+//		            else
+//		            {
+//		           	 alert('userListView VAR');
+//		            }		    		
+		    		
+		    		delete TRACKER.users[key];
+		    	}
+	    	}	    		    	
 	    }
+	}
+	
+	if(newFriend === true)
+	{
+		if(typeof $.fn.yiiGridView != "undefined")
+		{
+			$.fn.yiiGridView.update("userListView");
+		}		    		
 	}	
+	
+	delete userIdArray;
 }
 
 /**
@@ -405,6 +470,13 @@ function processImageXML(MAP, xml){
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	
 	//alert("processImageXML(), start - TRACKER.images.length:" + TRACKER.images.length);
+
+	var updateType = decodeURIComponent($(xml).find("page").attr("updateType"));
+	
+	//alert("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
+	
+	var uploadIdArray = new Array();
+	var newUpload = false;	
 	
 	$(xml).find("page").find("upload").each(function(){
 		
@@ -412,6 +484,8 @@ function processImageXML(MAP, xml){
 		
 		var image = $(this);
 		var imageId = $(image).attr('id');
+		uploadIdArray.push(imageId);
+		
 		var imageURL =  decodeURIComponent($(image).attr('url'));
 		var realname = $(image).attr("byRealName");
 		var userId = $(image).attr("byUserId");
@@ -430,9 +504,12 @@ function processImageXML(MAP, xml){
 		
 		if (typeof TRACKER.images[imageId] == "undefined") {
 			
+			newUpload = true;
+			
 			//alert("images["+ imageId +"] is undefined!");
-				
+	
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
+			//image = imageURL + "&fileType=0&thumb=ok";
 			var userMarker = MAP.putMarker(location, image, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
@@ -526,14 +603,46 @@ function processImageXML(MAP, xml){
 	        ) {
 			//alert("processUsers(), TRACKER.images[" + key + "]: false");
 
-			MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
-			
-			if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
 			{
-				MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
-			}			
+		    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+				
+				if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+				{
+					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+				}
+				
+		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
+		    	{
+		    		//alert('uploadId:' + key + 'deleted');
+		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
+		    		
+		    		if(TRACKER.images[key].infoWindowIsOpened)
+		    		{
+		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
+		    		}
+
+		    		if(typeof $.fn.yiiGridView != "undefined")
+		    		{
+			    		$.fn.yiiGridView.update(uploadsGridViewId);
+			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+		    		}		    		
+
+		    		delete TRACKER.images[key];
+		    	}				
+			}	    				
 	    }
+	}
+	
+	if(newUpload === true)
+	{
+		if(typeof $.fn.yiiGridView != "undefined")
+		{
+			$.fn.yiiGridView.update(uploadsGridViewId);
+		}		    		
 	}	
+	
+	delete uploadIdArray;
 	
 	//alert("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
 	

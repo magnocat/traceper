@@ -94,7 +94,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				$this->widget('zii.widgets.jui.CJuiButton', array(
 						'name'=>'ajaxContact',
 						'caption'=>Yii::t('site', 'Submit'),
-						'id'=>'contactAjaxButton',
+						'id'=>'contactAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/contact'),
 										'success'=> 'function(result)
 													{

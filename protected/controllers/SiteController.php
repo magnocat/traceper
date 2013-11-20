@@ -215,102 +215,197 @@ class SiteController extends Controller
 			$preferredLanguage = null;
 
 			$isRecordUpdateRequired = false;
+			
+			//*** Valid degilken bunları gondermeden de olabiliyorsa mobile bunları gondermeyelim?
+			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
 
-			if($model->validate() && $model->login()) {
-				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+			if($model->validate()) {								
 				
-				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-				{													
-					if (isset($_REQUEST['deviceId']))
+				if(Users::model()->isTermsAccepted($model->email) === true)
+				{
+					if($model->login())
 					{
-						if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
-							$deviceId = $_REQUEST['deviceId'];
-							$isRecordUpdateRequired = true;
+							if (isset($_REQUEST['deviceId']))
+							{
+								if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
+								{
+									$deviceId = $_REQUEST['deviceId'];
+									$isRecordUpdateRequired = true;
+								}
+							}
+								
+							if (isset($_REQUEST['androidVer']))
+							{
+								if(strcmp($androidVer, $_REQUEST['androidVer']) != 0)
+								{
+									$androidVer = $_REQUEST['androidVer'];
+									$isRecordUpdateRequired = true;
+								}
+							}
+								
+							if (isset($_REQUEST['appVer']))
+							{
+								if(strcmp($appVer, $_REQUEST['appVer']) != 0)
+								{
+									$appVer = $_REQUEST['appVer'];
+									$isRecordUpdateRequired = true;
+								}
+							}
+								
+							if (isset($_REQUEST['language']))
+							{
+								if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
+								{
+									$preferredLanguage = $_REQUEST['language'];
+									$isRecordUpdateRequired = true;
+								}
+							}
+						
+							if($isRecordUpdateRequired == true)
+							{
+								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
+							}
+						
+							echo CJSON::encode(array(
+									"result"=> "1",
+									"id"=>Yii::app()->user->id,
+									"realname"=> $model->getName(),
+									"minDataSentInterval"=> $minDataSentInterval,
+									"minDistanceInterval"=> $minDistanceInterval,
+									"facebookId"=> $facebookId,
+									"autoSend"=> $autoSend
+							));
 						}
-					}					
+						else {
+							$app = Yii::app();
+							$language = 'tr';
+								
+							if (isset($app->session['_lang']))
+							{
+								$language = $app->session['_lang'];
 					
-					if (isset($_REQUEST['androidVer']))
-					{
-						if(strcmp($androidVer, $_REQUEST['androidVer']) != 0)
-						{
-							$androidVer = $_REQUEST['androidVer'];
-							$isRecordUpdateRequired = true;
-						}						
-					}
+								//echo 'Session VAR';
+							}
+							else
+							{
+								$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+							}
 					
-					if (isset($_REQUEST['appVer']))
-					{
-						if(strcmp($appVer, $_REQUEST['appVer']) != 0)
-						{
-							$appVer = $_REQUEST['appVer'];
-							$isRecordUpdateRequired = true;
+							if(strcmp($preferredLanguage, $language) != 0)
+							{
+								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
+							}
+								
+							//echo 'Model NOT valid in SiteController';
+							if (Yii::app()->request->isAjaxRequest)
+							{
+								if (YII_DEBUG)
+								{
+									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+								}
+								else
+								{
+									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+								}
+							}
+								
+							$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);							
 						}
-					}
-					
-					if (isset($_REQUEST['language']))
-					{
-						if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
-						{
-							$preferredLanguage = $_REQUEST['language'];
-							$isRecordUpdateRequired = true;
-						}
-					}
-
-					if($isRecordUpdateRequired == true)
-					{
-						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
-					}
-
-					echo CJSON::encode(array(
-							"result"=> "1",
-							"id"=>Yii::app()->user->id,
-							"realname"=> $model->getName(),
-							"minDataSentInterval"=> $minDataSentInterval,
-							"minDistanceInterval"=> $minDistanceInterval,							
-							"facebookId"=> $facebookId,
-							"autoSend"=> $autoSend
-					));
-				}
-				else {
-					$app = Yii::app();
-					$language = 'tr';
-					
-					if (isset($app->session['_lang']))
-					{
-						$language = $app->session['_lang'];
-					
-						//echo 'Session VAR';
+						
+						Yii::app()->end();						
 					}
 					else
 					{
-						$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							$result = "-2"; //Unknown login error
+
+							echo CJSON::encode(array(
+									"result"=> $result,
+									"id"=>Yii::app()->user->id,
+									"realname"=> $model->getName(),
+									"minDataSentInterval"=> $minDataSentInterval,
+									"minDistanceInterval"=> $minDistanceInterval,
+									"facebookId"=> $facebookId,
+									"autoSend "=> $autoSend
+							));
+						}
+						else {
+							//echo 'Model NOT valid in SiteController';
+						
+							if (Yii::app()->request->isAjaxRequest)
+							{
+								if (YII_DEBUG)
+								{
+									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+								}
+								else
+								{
+									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+								}
+							}
+								
+							//Complete solution for blinking problem at FireFox
+							if (Yii::app()->request->getIsAjaxRequest()) {
+								Yii::app()->clientScript->scriptMap['*.js'] = false;
+								Yii::app()->clientScript->scriptMap['*.css'] = false;
+							}
+								
+							$this->renderPartial('login',array('model'=>$model), false, $processOutput);
+						}
+						
+						Yii::app()->end();						
 					}	
-
-					if(strcmp($preferredLanguage, $language) != 0)
-					{
-						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
-					}					
-					
-					//echo 'Model NOT valid in SiteController';
-					if (Yii::app()->request->isAjaxRequest)
-					{
-						if (YII_DEBUG)
-						{
-							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-						}
-						else
-						{
-							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						}
-					}
-					
-					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);
 				}
-
-				Yii::app()->end();
+				else
+				{
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+					{
+						//Mobil icin termsNotAccepted gibi bir kod gonderip, oradan OK demnesi ile continueLogin cagirilmali?
+						
+						$result = "-3"; //Terms not accepted
+						
+						echo CJSON::encode(array(
+								"result"=> $result,
+								"id"=>Yii::app()->user->id,
+								"realname"=> $model->getName(),
+								"minDataSentInterval"=> $minDataSentInterval,
+								"minDistanceInterval"=> $minDistanceInterval,
+								"facebookId"=> $facebookId,
+								"autoSend "=> $autoSend
+						));						
+					}
+					else
+					{
+						if (Yii::app()->request->isAjaxRequest)
+						{
+							if (YII_DEBUG)
+							{
+								Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+								Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+							}
+							else
+							{
+								Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+								Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+							}
+						}
+						
+						//Complete solution for blinking problem
+						if (Yii::app()->request->getIsAjaxRequest()) {
+							Yii::app()->clientScript->scriptMap['*.js'] = false;
+							Yii::app()->clientScript->scriptMap['*.css'] = false;
+						}
+							
+						$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), false, true);						
+					}										
+				}											
 			}
 			else
 			{
@@ -378,6 +473,151 @@ class SiteController extends Controller
 			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 		}
 	}
+	
+	//Kullanim sartlari degisiminden once kaydolmus biri login olmaya calistiginda sartları kabul ederse bu fonksiyon ile isleme devam eder
+	public function actionContinueLogin() {
+		$model = new LoginForm;
+
+		// collect user input data
+		if(isset($_REQUEST['LoginForm']) && $_REQUEST['LoginForm'] != NULL)
+		{
+			$model->attributes = $_REQUEST['LoginForm'];
+			
+			$minDataSentInterval = Yii::app()->params->minDataSentInterval;
+			$minDistanceInterval = Yii::app()->params->minDistanceInterval;
+			$facebookId = 0;
+			$autoSend = 0;
+				
+			$deviceId = null;
+			$androidVer = null;
+			$appVer = null;
+			$preferredLanguage = null;
+			
+			$isRecordUpdateRequired = false;
+				
+			//*** Valid degilken bunları gondermeden de olabiliyorsa mobile bunları gondermeyelim, zaten daha login olunmadigi icin dogru degerler alinamayacak?
+			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);			
+			
+			Users::model()->setTermsAccepted($model->email);
+			
+			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
+			if($model->login())
+			{
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					if (isset($_REQUEST['deviceId']))
+					{
+						if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
+						{
+							$deviceId = $_REQUEST['deviceId'];
+							$isRecordUpdateRequired = true;
+						}
+					}
+			
+					if (isset($_REQUEST['androidVer']))
+					{
+						if(strcmp($androidVer, $_REQUEST['androidVer']) != 0)
+						{
+							$androidVer = $_REQUEST['androidVer'];
+							$isRecordUpdateRequired = true;
+						}
+					}
+			
+					if (isset($_REQUEST['appVer']))
+					{
+						if(strcmp($appVer, $_REQUEST['appVer']) != 0)
+						{
+							$appVer = $_REQUEST['appVer'];
+							$isRecordUpdateRequired = true;
+						}
+					}
+			
+					if (isset($_REQUEST['language']))
+					{
+						if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
+						{
+							$preferredLanguage = $_REQUEST['language'];
+							$isRecordUpdateRequired = true;
+						}
+					}
+			
+					if($isRecordUpdateRequired == true)
+					{
+						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
+					}
+			
+					echo CJSON::encode(array(
+							"result"=> "1",
+							"id"=>Yii::app()->user->id,
+							"realname"=> $model->getName(),
+							"minDataSentInterval"=> $minDataSentInterval,
+							"minDistanceInterval"=> $minDistanceInterval,
+							"facebookId"=> $facebookId,
+							"autoSend"=> $autoSend
+					));
+				}
+				else {
+					$app = Yii::app();
+					$language = 'tr';
+			
+					if (isset($app->session['_lang']))
+					{
+						$language = $app->session['_lang'];
+							
+						//echo 'Session VAR';
+					}
+					else
+					{
+						$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+					}
+						
+					if(strcmp($preferredLanguage, $language) != 0)
+					{
+						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
+					}
+			
+					//echo 'Model NOT valid in SiteController';
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+			
+					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, true);
+				}
+			
+				Yii::app()->end();
+			}
+			else
+			{
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					$result = "-2"; //Unknown login error
+			
+					echo CJSON::encode(array(
+							"result"=> $result,
+							"id"=>Yii::app()->user->id,
+							"realname"=> $model->getName(),
+							"minDataSentInterval"=> $minDataSentInterval,
+							"minDistanceInterval"=> $minDistanceInterval,
+							"facebookId"=> $facebookId,
+							"autoSend "=> $autoSend
+					));
+				}
+				else {
+					Yii::app()->end();
+				}			
+			}
+		}						
+	}	
 
 	/**
 	 *
@@ -1092,7 +1332,7 @@ class SiteController extends Controller
 					$message .= '<br/><br/>';
 					$message .= Yii::t('site', 'Your Password is').':'.$model->password;										
 		
-					//echo $message;
+					echo $message;
 
 					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, trim($model->name).' '.trim($model->lastName), Yii::t('site', 'Traceper Activation'), $message))
 					{
@@ -1598,13 +1838,15 @@ class SiteController extends Controller
 					{
 						if(strcmp($userCandidate->registrationMedium, 'Web') == 0)
 						{
-							$result = Yii::t('site', 'Your account has been activated successfully, you can login now. You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');
+							//$result = Yii::t('site', 'Your account has been activated successfully, you can login now. You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');
+							
+							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
+							$result .= Yii::t('site', 'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');							
 						}
 						else
 						{
 							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
-							$result .= Yii::t('site', 'You should login at mobile app in order to provide your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.');
-							
+							$result .= Yii::t('site', 'You should login at mobile app in order to provide your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.');							
 						}
 						
 						$userCandidate->delete();
@@ -1630,7 +1872,11 @@ class SiteController extends Controller
 			}
 		}
 
-		$this->renderPartial('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false, true);	
+		//$this->redirect(Yii::app()->homeUrl);
+		//$this->renderPartial('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false, true);
+		
+		//Bununla tum site render ediliyor sonra da $content degiskeninde tutulan messageDialoh view'ı render ediliyor
+		$this->render('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false);
 	}
 	
 	public function actionChangeLanguage()

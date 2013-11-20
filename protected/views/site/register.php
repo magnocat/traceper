@@ -71,11 +71,11 @@
 			',			
 		 CClientScript::POS_HEAD);	
 	?>
-
 	
-
-	<div style="padding-left:15px;font-size:3em;">
-		<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
+	<div class="sideMenu">
+		<div style="font-size:3em;">
+			<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
+		</div>
 	</div>
 
 	<div class="sideMenu">
@@ -135,7 +135,7 @@
 	
 	<div class="sideMenu">
 		<?php //echo $form->labelEx($model,'email'); ?>
-		<?php echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9,'placeholder'=>Yii::t('site', 'Your E-mail Address'),'class'=>'registerFormField','style'=>'width:321px;')); ?>		
+		<?php echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9,'placeholder'=>Yii::t('site', 'Your E-mail Address'),'class'=>'registerFormField','style'=>'width:324px;')); ?>		
 		<?php $errorMessage = $form->error($model,'email'); 
 			if (strip_tags($errorMessage) == '') {
 				//echo '<div class="errorMessage">&nbsp;</div>';
@@ -155,10 +155,13 @@
 								'update'=> '#activationNotReceivedWindow'
 						),
 						array(
-								'id'=>'showActivationNotReceivedWindowClickHere'));
+								'id'=>'activationNotReceivedClickHereLink'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+								));
 				?>
   				<script type="text/javascript">
-  					bRegisterFormEmailErrorExists = true;	
+  					bRegisterFormEmailErrorExists = true;
+
+  					alert("Your registration incomplete");	
   		            	
   		            $("#RegisterForm_email").tooltipster('update', '<?php echo Yii::t('site', 'Your registration incomplete, please first complete it by clicking the link at the activation e-mail. If you have not received our activation e-mail, click {activationNotReceivedClickHere} to request a new one.', array('{activationNotReceivedClickHere}' => $link)); ?>');		  		            	
   			        $("#RegisterForm_email").tooltipster('show');					
@@ -182,7 +185,7 @@
 
 	<div class="sideMenu">
 		<?php //echo $form->labelEx($model,'emailAgain'); ?>
-		<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10,'placeholder'=>Yii::t('site', 'Your E-mail Address (Again)'),'class'=>'registerFormField','style'=>'width:321px;')); ?>
+		<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10,'placeholder'=>Yii::t('site', 'Your E-mail Address (Again)'),'class'=>'registerFormField','style'=>'width:324px;')); ?>
 		<?php $errorMessage = $form->error($model,'emailAgain'); 
 			if (strip_tags($errorMessage) == '') {
 				//echo '<div class="errorMessage">&nbsp;</div>';
@@ -272,7 +275,8 @@
 								'update'=> '#termsWindow',
 						),
 						array(
-								'id'=>'showTermsWindow','tabindex'=>15))
+								'id'=>'termsAjaxLink-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+								'tabindex'=>15))
 		));
 	?>
 	</div>	
@@ -315,7 +319,8 @@
 // 			));
 
 			echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
-					array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
+					array('id'=>'registerButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor 
+						  'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
 							'success'=> 'function(msg){
 							try
 							{
@@ -356,14 +361,14 @@
 		
 		<div style="position:absolute;left:11em;top:1.2em;display:inline-block;vertical-align:top;width:50%;">
 										<?php
-		echo CHtml::ajaxLink('<div id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
-							'</div>', $this->createUrl('site/activationNotReceived'),
-				array(
+		echo CHtml::ajaxLink(Yii::t('site', 'Not Received Our Activation E-Mail?'), $this->createUrl('site/activationNotReceived'),
+				array(						
 						'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
 						'update'=> '#activationNotReceivedWindow',
 				),
 				array(
-						'id'=>'showActivationNotReceivedWindow','tabindex'=>14));							
+						'id'=>'activationNotReceivedLink-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+						'tabindex'=>14));							
 		?>
 		</div>
 	</div>	

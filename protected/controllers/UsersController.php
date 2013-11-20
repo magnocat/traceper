@@ -282,10 +282,17 @@ class UsersController extends Controller
 		{
 			$userType = $_GET['userType'];
 		}
+		
+// 		if (isset($_GET['ajax']) && $_GET['ajax'] != NULL)
+// 		{
+// 			Fb::warn($_GET['ajax'], "actionGetFriendList - ajax");
+// 		}				
+		//Fb::warn($userType, "actionGetFriendList - userType");
+		//Fb::warn($this->getFriendIdList(false/*$par_onlyVisible*/, $userType), "actionGetFriendList - getFriendIdList");
 
 		if(Yii::app()->user->id != null)
 		{
-			$dataProvider = Users::model()->getListDataProvider($this->getFriendIdList(), $userType);
+			$dataProvider = Users::model()->getListDataProvider($this->getFriendIdList(false/*$par_onlyVisible*/, $userType), $userType);
 		}
 		else
 		{
@@ -311,34 +318,42 @@ class UsersController extends Controller
 			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		}
 						
-		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, true);
+		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
 
 	private function unsetFriendIdList() {
 		unset(Yii::app()->session['friendList']);
 	}
 
-	private function getFriendCount() {
-		if (isset(Yii::app()->session['friendList'])== false) {
-			$this->getFriendIdList();
+	private function getFriendCount($par_onlyVisible = false, $par_friendUserType = null) {
+		if (true/*isset(Yii::app()->session['friendList'])== false*/) {
+			$this->getFriendIdList($par_onlyVisible, $par_friendUserType);			
 		}
 
 		return Yii::app()->session['friendCount'];
 	}
 
-	private function getFriendArray() {
-		if (isset(Yii::app()->session['friendList'])== false) {
-			$this->getFriendIdList();
+	private function getFriendArray($par_onlyVisible = false, $par_friendUserType = null) {
+		if (true/*isset(Yii::app()->session['friendList'])== false*/) {
+			$this->getFriendIdList($par_onlyVisible, $par_friendUserType);
 		}
 
 		return Yii::app()->session['friendArray'];
 	}
 
 
-	private function getFriendIdList() {
+	private function getFriendIdList($par_onlyVisible = false, $par_friendUserType = null) {
 		//if (isset(Yii::app()->session['friendList']) == false) {
 		if (true) {
-			$friendsResult = Users::model()->getFriendList(Yii::app()->user->id);
+			if($par_onlyVisible === true)	
+			{
+				$friendsResult = Users::model()->getVisibleFriendList(Yii::app()->user->id, $par_friendUserType);
+			}
+			else
+			{
+				$friendsResult = Users::model()->getFriendList(Yii::app()->user->id, $par_friendUserType);
+			}
+						
 			$length = count($friendsResult);
 			Yii::app()->session['friendCount'] = $length;
 			$friends = array();
@@ -353,7 +368,8 @@ class UsersController extends Controller
 			Yii::app()->session['friendList'] = $result;
 		}		
 		 
-		return Yii::app()->session['friendList'];
+		//return Yii::app()->session['friendList'];
+		return $result;
 	}
 
 	public function actionGetUserInfoJSON()
@@ -362,7 +378,7 @@ class UsersController extends Controller
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 
 			$userId = (int) $_REQUEST['userId'];
-			$friendArray = $this->getFriendArray();
+			$friendArray = $this->getFriendArray(true/*$par_onlyVisible*/, null/*userTypes*/); //Burası direk true degil mobilde gelen istekle guncellenmeli
 			$out = "No permission to get this user location";
 			
 			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) !== false)
@@ -397,10 +413,14 @@ class UsersController extends Controller
 		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
 		
 		//Webde kullanicinin kendi ismine tikladiginda kendini konumunu gorebilmesi icin
-		$friendCount = $this->getFriendCount() + 1; // +1 is for herself
+		
+		//Burası direk true degil mobilde gelen istekle guncellenmeli
+		$friendCount = $this->getFriendCount(true/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
 		//$friendCount = $this->getFriendCount();
 			
-		$friendIdList = $this->getFriendIdList();
+		$friendIdList = $this->getFriendIdList(true/*$par_onlyVisible*/, $userTypes);
+		
+		//Fb::warn($userTypes, "userTypes");
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
@@ -413,13 +433,26 @@ class UsersController extends Controller
 			}
 			else {
 				$friendIdList = Yii::app()->user->id;
-			}			
+			}
+
+			//Fb::warn($friendIdList, "friendIdList");
 		}
 				
 		$time = null;
+		$updateType = null;
 		
-		if (isset($_REQUEST['list']) && $_REQUEST['list'] == "onlyUpdated") {
+		//Sadece zamansal olarak update olmuslar istendiginde ve visible arkadas sayisi degismediyse onlyUpdated yoksa ALL
+		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($friendCount == Yii::app()->session['visibleFriendCount'])) {
 			$time = Yii::app()->session[$this->dataFetchedTimeKey];
+			$updateType = 'onlyUpdated';
+
+			//Fb::warn("onlyUpdated", "actionGetUserListJson()");
+		}
+		else
+		{
+			$updateType = 'all';
+			
+			//Fb::warn("ALL, friendCount:".$friendCount." - sessionCount:".Yii::app()->session['visibleFriendCount'], "actionGetUserListJson()");
 		}
 
 		$newFriendId = null;
@@ -432,10 +465,13 @@ class UsersController extends Controller
 
 		$dataProvider = Users::model()->getListDataProvider($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
 		
-		$out = $this->prepareJson($dataProvider);	
+		//$dataProvider = Users::model()->getListDataProvider($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
+
+		$out = $this->prepareJson($dataProvider, $updateType);	
 
 		echo $out;
 		Yii::app()->session[$this->dataFetchedTimeKey] = time();
+		Yii::app()->session['visibleFriendCount'] = $friendCount;
 		Yii::app()->end();
 
 	}
@@ -799,27 +835,80 @@ class UsersController extends Controller
 				"result"=>$result,
 		));
 		Yii::app()->end();
-	}	
+	}
+
+// 	private function prepareJson($dataProvider){
 	
-	private function prepareJson($dataProvider){
-
-		$rows = $dataProvider->getData();
-		$itemCount = count($rows);
-
-		$str = '';
-		for ($i = 0; $i < $itemCount; $i++) {
-			if ($i > 0)  {
-				$str .= ",";
-			}
-			$str .= $this->getUserJsonItem($rows[$i]);
-			
-		}
+// 		$rows = $dataProvider->getData();
+// 		$itemCount = count($rows);
+	
+// 		Fb::warn($itemCount, "itemCount");
+	
+// 		$str = '';
+// 		for ($i = 0; $i < $itemCount; $i++) {
+// 			if ($i > 0)  {
+// 				$str .= ",";
+// 			}
+// 			$str .= $this->getUserJsonItem($rows[$i]);
+// 		}
+	
+// 		$pagination = $dataProvider->getPagination();
+// 		//$pagination->setCurrentPage(1);
+	
+// 		$currentPage = $pagination->currentPage + 1;
+// 		Fb::warn($currentPage, "currentPage");
+// 		Fb::warn($pagination->pageCount, "pageCount");
+// 		$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
+	
+// 		return $str;
+// 	}	
+		
+	
+	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
+		
 		$pagination = $dataProvider->getPagination();
-		$currentPage = $pagination->currentPage + 1;
-		$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
+		//Fb::warn($pagination->pageCount, "pageCount");
+		$currentPage = $pagination->currentPage;
+		
+		$str = '';
+		
+		for ($k = $currentPage; $k < $pagination->pageCount; $k++) {
+			//Fb::warn($k, "k");
+			$pagination->setCurrentPage($k);
+			//Fb::warn($pagination->currentPage, "currentPage");
+			
+			$rows = $dataProvider->getData(true);
+			$itemCount = count($rows);
+			
+			//Fb::warn($itemCount, "itemCount");
+						
+			for ($i = 0; $i < $itemCount; $i++) {
+				if (($i > 0) || ($k > 0))  {
+					$str .= ",";
+				}
+				$str .= $this->getUserJsonItem($rows[$i]);
+			}			
+		}
+
+		//$pagination->setCurrentPage(1);		
+		
+		//$currentPage = $pagination->currentPage + 1;
+		///Fb::warn($currentPage, "currentPage");
+				
+		//$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
+				
+		if($par_updateType != null)
+		{
+			$str = '{"updateType":"'.$par_updateType.'", "userlist": ['.$str.'], "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+		}
+		else
+		{
+			$str = '{"userlist": ['.$str.'], "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+		}
 
 		return $str;
 	}
+
 	
 	private function prepareSearchUserResultJson($dataProvider) {
 		$row = $dataProvider->getData();
@@ -925,6 +1014,8 @@ class UsersController extends Controller
 		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : "";
 		$row['g_id'] = "";
 		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";
+		
+		//Fb::warn($row['id'], "user");
 		
 		if(Yii::app()->language == 'tr')
 		{

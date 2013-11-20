@@ -22,12 +22,13 @@
 	$('#bar').css('top', offsetTop);
 	$('#bar').css('height', (h - offsetTop));
 	$('#bar').css('left', '380px');
+	$('#bar').css('background-image','url("images/left.png")');
 	$('#bar').css('min-height', (485 + 100 - 60));		
 	$('#map').css('height', (h - offsetTop)); //$("#map").css('height', '94%');
 	$('#map').css('width', (w - offsetLeft));
 	$('#map').css('min-width', (735 + 260 - 380));
 	$('#map').css('min-height', (485 + 100 - 60));
-		
+
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	
 	$("#tab_view").tabs("load",0);
@@ -111,18 +112,24 @@
 <script type="text/javascript">
 	$("#logo").hide();
 	$("#logoMini").load();
-	$("#logoMini").show();
-	$("#registerBlock").hide();
-	$("#passwordResetBlock").hide();
-	$("#languageBlock").hide();	
-	$("#lists").load();
-	$("#lists").show();
+	$("#logoMini").show();	
 	$("#loginBlock").hide();
+	$("#formContent").hide();
+	$("#publicUploadsContent").hide();
+	$("#showPublicPhotosLink").hide();
+	$("#showCachedPublicPhotosLink").hide();	
+	$("#showRegisterFormLink").hide();		
 	$("#userBlock").load();
 	$("#userBlock").show();
-	$("#appLinkBlock").hide();
+	$("#lists").load();
+	$("#lists").show();	
+	//$("#content").load();
+	$("#content").show();
+	
+	TRACKER.showImagesOnTheMap = false;
+	TRACKER.showUsersOnTheMap = true;
 	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
 	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
-	TRACKER.getImageList(true);
+	TRACKER.getImageList(false, true);
 </script>		
 

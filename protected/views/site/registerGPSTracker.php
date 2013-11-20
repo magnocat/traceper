@@ -81,7 +81,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 				$this->widget('zii.widgets.jui.CJuiButton', array(
 						'name'=>'ajaxRegisterGPSTracker',
 						'caption'=>Yii::t('site', 'Register'),
-						'id'=>'registerGPSTrackerAjaxButton',
+						'id'=>'registerGPSTrackerAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>array('site/registerGPSTracker'),
 								'success'=> 'function(result)
 											{

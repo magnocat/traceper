@@ -8,6 +8,9 @@ var bRegisterFormPasswordAgainErrorExists = false;
 var bLoginFormEmailErrorExists = false;
 var bLoginFormPasswordErrorExists = false;
 
+var bShowPublicPhotosLinkActive = true;
+var uploadsGridViewId = 'publicUploadListView';
+
 function resetAllFormErrors()
 {	
 	$("#RegisterForm_name").tooltipster('update', "");
@@ -151,7 +154,7 @@ function bindTooltipActions()
  		
  		if(domainPartsArray.length >= 2)
  		{
- 	 		if((domainPartsArray[0].toLowerCase() === "gmial") || (domainPartsArray[0].toLowerCase() === "gmil") || (domainPartsArray[0].toLowerCase() === "gmal") || (domainPartsArray[0].toLowerCase() === "glail"))
+ 	 		if((domainPartsArray[0].toLowerCase() === "gmial") || (domainPartsArray[0].toLowerCase() === "gmil") || (domainPartsArray[0].toLowerCase() === "gmal") || (domainPartsArray[0].toLowerCase() === "glail") || (domainPartsArray[0].toLowerCase() === "gamil"))
  	 		{
  	 			bCorrectionRequired = true;
  	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"gmail");			
@@ -166,6 +169,11 @@ function bindTooltipActions()
  	 			bCorrectionRequired = true;
  	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"hotmail");
  	 		}
+ 	 		else if((domainPartsArray[0].toLowerCase() === "oulook") || (domainPartsArray[0].toLowerCase() === "outlok") || (domainPartsArray[0].toLowerCase() === "outloo") || (domainPartsArray[0].toLowerCase() === "otlook"))
+ 	 		{
+ 	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"outlook");
+ 	 		} 	 		
  	 		else if((domainPartsArray[0].toLowerCase() === "myet") || (domainPartsArray[0].toLowerCase() === "mynt") || (domainPartsArray[0].toLowerCase() === "mymet"))
  	 		{
  	 			bCorrectionRequired = true;
@@ -176,7 +184,12 @@ function bindTooltipActions()
  	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
  	 			bCorrectionRequired = true;
  	 		}
- 	 			 		
+ 	 		else if(((domainPartsArray[0].toLowerCase() === "gmail") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "yahoo") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "hotmail") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "mynet") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "outlook") && (domainPartsArray[1].toLowerCase() !== "com")))
+ 	 		{
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
+ 	 			bCorrectionRequired = true;	 			
+ 	 		}
+ 	 				 			 		
  	 		if(bCorrectionRequired)
  	 		{
  	 	 		domainPartsArray = correctedEmail.split(".");
@@ -247,7 +260,7 @@ function bindElements(langOperator, trackerOp)
  		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
  		$("#RegisterForm_email").tooltipster('show'); 		
 	});
- 	
+
 // 	$("#RegisterForm_email").blur(function ()	{
 // 		$("#RegisterForm_email").tooltipster('hide');
 //	});
@@ -261,11 +274,20 @@ function bindElements(langOperator, trackerOp)
 	    if(w < 1007)
 	    {
 	    	w = 1007;
-	    }	
+	    }	    
 		
 		if ($('#sideBar > #content').css('display') == "none")
 		{					
 			showRegisterFormErrorsIfExist();
+
+			if(bShowPublicPhotosLinkActive === true)
+			{
+				$("#showPublicPhotosLink").fadeIn('slow');
+			}
+			else
+			{
+				$("#showRegisterFormLink").fadeIn('slow');
+			}			
 			
 			//If logged in and top bar height decreased
 			if(document.getElementById('topBar').style.height == "60px")
@@ -294,6 +316,15 @@ function bindElements(langOperator, trackerOp)
 			hideRegisterFormErrorsIfExist();
 			
 			var offsetLeft = 16;
+
+			if(bShowPublicPhotosLinkActive === true)
+			{
+				$("#showPublicPhotosLink").fadeOut('slow');
+			}
+			else
+			{
+				$("#showRegisterFormLink").fadeOut('slow');
+			}	
 			
 			//$('.logo_inFullMap').fadeIn().animate({left:'80px'});
 			$('#sideBar > #content').fadeOut('slow');
@@ -308,10 +339,46 @@ function bindElements(langOperator, trackerOp)
 		}
 	});
 	
+	$("#showRegisterFormLink").click(function (){
+		//$('#sideBar > #formContent').fadeIn('slow');
+		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); $("#showRegisterFormLink").hide(); $("#publicUploadsContent").hide(); $("#showCachedPublicPhotosLink").show(); bShowPublicPhotosLinkActive = true;});
+		//$('#formContent').animate({height:'100%', marginTop:'0'}, function(){ $('#formContent').show(); $("#showRegisterFormLink").hide(); $("#publicUploads").hide(); $("#showPublicPhotosLink").show();});		
+	});
+	
+	$("#showCachedPublicPhotosLink").click(function (){
+		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); $("#showCachedPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
+	});	
+	
 	function changeSrcBack(elementid, imgSrc)
 	{
 	  document.getElementById(elementid).src = imgSrc;
 	}
+	
+	$( document ).ready(function() {		
+		var h = $(window).height();
+		var w = $(window).width();
+		var offsetTop = 0;
+		
+		if(document.getElementById('topBar').style.height == "60px")
+		{
+			offsetTop = 60;
+		}
+		else
+		{
+			offsetTop = 85;
+		}
+		    
+		var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+		
+		$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+	        if(json.outcome == 'success') {
+	        	//alert('OKKKKK');
+	            // do something with the knowledge possibly?
+	        } else {
+	            alert('Unable to let PHP know what the screen resolution is!');
+	        }
+	    },'json');
+	});	
 
 	$(window).resize(function () {
 	    var h = $(window).height(), offsetTop = 0; // Calculate the top offset	    
@@ -374,19 +441,22 @@ function bindElements(langOperator, trackerOp)
 			$("#uploadsGridView").css("height", userListHeight - 50);
 			$("#groupsGridView").css("height", userListHeight - 50);
 			
-		    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
-		        if(json.outcome == 'success') {
-		        	//alert('OKKKKK');
-		            // do something with the knowledge possibly?
-		        } else {
-		            alert('Unable to let PHP know what the screen resolution is!');
-		        }
-		    },'json');	    			
+//		    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+//		        if(json.outcome == 'success') {
+//		        	//alert('OKKKKK');
+//		            // do something with the knowledge possibly?
+//		        } else {
+//		            alert('Unable to let PHP know what the screen resolution is!');
+//		        }
+//		    },'json');	    			
 		}
 		else
 		{			
 			offsetTop = 85;
 			offsetLeft = 396;
+			
+			var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+			$("#uploadsGridView").css("height", userListHeight - 40);
 			
 			if ($('#sideBar > #content').css('display') == "none")
 			{

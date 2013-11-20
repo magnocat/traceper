@@ -62,7 +62,8 @@ return array(
 	' totally ' => ' toplamda ',
 	' friendship request(s) you have' => ' arkadaşlık isteğiniz var',
 	'Type a friend\'s name' => 'Arkadaşınızın adını girin',
-	'You have no pending friendship requests at the moment.' => 'Şu an için bekleyen arkadaşlık isteğiniz bulunmuyor.'
+	'You have no pending friendship requests at the moment.' => 'Şu an için bekleyen arkadaşlık isteğiniz bulunmuyor.',
+	'This user does not share his/her location info at the moment' => 'Bu kullanıcı şu an için konum bilgilerini paylaşmıyor'
 	
 	
 	
