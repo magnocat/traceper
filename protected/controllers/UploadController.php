@@ -15,7 +15,7 @@ class UploadController extends Controller
     {
         return array(
         	array('deny',
-                'actions'=>array('delete', 'search', 'upload', 'getUploadListXML'),
+                'actions'=>array('delete', 'search', 'upload', 'getList', 'getUploadListJson'),
         		'users'=>array('?'),
             )
         );
@@ -35,25 +35,68 @@ class UploadController extends Controller
 				if ($upload->user->Id == Yii::app()->user->id )
 				{
 					$result = "An error occured 1";
+					
 					if ($upload->delete()) {
+						DeletedUploads::model()->saveDeletion($uploadId, $upload->publicData, $upload->user->Id, date('Y-m-d h:i:s'));
+						
 						$result = 1;
 						if (file_exists($this->getFileName($uploadId, $upload->fileType))) {
 							$result = "An error occured 2";
 							if (unlink($this->getFileName($uploadId, $upload->fileType))) {
 								$result = 1;
+								//Fb::warn("File deleted - 1");
+								
 								if (file_exists($this->getFileName($uploadId, $upload->fileType))) {
 									$result = "An error occured 3";
 									if (unlink($this->getFileName($uploadId, $upload->fileType))) {
 										$result = 1;
+										
+										//Fb::warn("File deleted - 2");
+										
+										if (file_exists($this->getFileName($uploadId, $upload->fileType,true/*isThumb*/)))
+										{
+											if (unlink($this->getFileName($uploadId, $upload->fileType,true/*isThumb*/))) {
+										
+												//Fb::warn("Thumb file deleted - 2");
+											}
+											else
+											{
+												//Fb::warn("Thumb file CANNOT BE deleted - 2");
+											}
+										}										
+									}
+									else
+									{
+										//Fb::warn("File CANNOT BE deleted - 1");
+									}
+								}
+								else
+								{
+									//Fb::warn("File not exist anymore");
+									
+									if (file_exists($this->getFileName($uploadId, $upload->fileType,true/*isThumb*/)))
+									{
+										if (unlink($this->getFileName($uploadId, $upload->fileType,true/*isThumb*/))) {
+
+											//Fb::warn("Thumb file deleted");
+										}
+										else
+										{
+											//Fb::warn("Thumb file CANNOT BE deleted");
+										}										
 									}
 								}
 							}
-						}
-							
+							else
+							{
+								//Fb::warn("File CANNOT BE deleted - 1");
+							}
+						}							
 					}
 				}
 			}
 		}
+		
 		echo CJSON::encode(array("result"=> $result));
 		Yii::app()->end();
 	}
@@ -90,11 +133,13 @@ class UploadController extends Controller
 			{
 				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
 			}
-		}		
+			
+			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		}
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.
-		//Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+		
 		$this->renderPartial('uploadsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(),'uploadList'=>true, 'fileType'=>$fileType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
 	
@@ -113,6 +158,20 @@ class UploadController extends Controller
 		{
 			$dataProvider = null;
 		}
+		
+		$pageNo = null;
+		
+// 		if (isset($_GET['ajax']) && $_GET['ajax'] === 'publicUploadListView')
+// 		{
+// 			Fb::warn($_GET['ajax'], "actionGetPublicList - ajax");
+
+// 			if (isset($_GET['page']) && $_GET['page'] != NULL)
+// 			{
+// 				$pageNo = $_GET['page'];
+				
+// 				Fb::warn($_GET['page'], "actionGetPublicList - ajax - pageNo");
+// 			}	
+// 		}		
 	
 		if (Yii::app()->request->isAjaxRequest)
 		{
@@ -428,14 +487,24 @@ class UploadController extends Controller
 		}
 	}
 
-	public function actionGetUploadListXML()
+	//public function actionGetUploadListXML()
+	public function actionGetUploadListJson()
 	{
 		if (Yii::app()->user->isGuest) {
 			return;
 		}
+		
+		if(isset(Yii::app()->session['uploadCount']) == false)
+		{
+			Yii::app()->session['uploadCount'] = 0;
+		}		
+		
 		$pageNo = 1;
+		
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int) $_REQUEST['pageNo'];
+			
+			//Fb::warn($pageNo, "pageNo");
 		}
 		
 		if(isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
@@ -443,15 +512,24 @@ class UploadController extends Controller
 			$fileType = (int)$_REQUEST['fileType'];
 		}	
 		
-		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+		$offset = ($pageNo - 1) * Yii::app()->session['uploadsPageSize'];
 		$out = '';
 		$dataFetchedTimeKey = "uploadController.dataFetchedTime";
-		
+
 		$dataReader = NULL;
 		
 		$friendList = AuxiliaryFriendsOperator::getFriendIdList();
 		$uploadCount = Upload::model()->getUploadCount($fileType, Yii::app()->user->id, $friendList);
 		//$uploadCount = Upload::model()->getUploadPageCount($fileType, Yii::app()->user->id, $friendList, NULL);
+		
+		if(isset(Yii::app()->session[$dataFetchedTimeKey]) === false)
+		{
+			Yii::app()->session[$dataFetchedTimeKey] = time();
+		}		
+		
+		//$deletedDataReader = NULL;
+		//Upload'lari aldiktan sonra silinmis olanlar varsa bunlari haritadan kaldirmak icin kontrol et
+		$deletedDataReader = DeletedUploads::model()->getDeletedList($friendList, Yii::app()->session[$dataFetchedTimeKey]);
 	
 		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
 		{
@@ -460,23 +538,30 @@ class UploadController extends Controller
 			$time = Yii::app()->session[$dataFetchedTimeKey];
 			if ($time !== false && $time != "")
 			{
-				$pageCount=Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,$time);
+				$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,$time);
 				
 				if ($pageCount >= $pageNo && $pageCount != 0) {
-					$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
+					$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
 				}
 				
-				$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+				//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+				$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, "onlyUpdated");				
 			}
 		}
 		else {
 			//Fb::warn("ALL", "actionGetUploadListXML()");
 
-			$pageCount=Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
+			$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
+			
 			if ($pageCount >= $pageNo && $pageCount != 0) {
-				$dataReader=Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
+				$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
 			}
-			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+			
+			//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+			$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount,"all");
+			
+			//Fb::warn($out, "Json()");
+			//Fb::warn($out, "XML");
 		}
 		
 		echo $out;
@@ -486,12 +571,20 @@ class UploadController extends Controller
 		Yii::app()->end();
 	}
 	
-	public function actionGetPublicUploadListXML()
+	//public function actionGetPublicUploadListXML()
+	public function actionGetPublicUploadListJson()
 	{
+		if(isset(Yii::app()->session['publicUploadCount']) == false)
+		{
+			Yii::app()->session['publicUploadCount'] = 0;
+		}
+
 		$pageNo = 1;
 		
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int) $_REQUEST['pageNo'];
+			
+			//Fb::warn($pageNo, "pageNo");
 		}
 	
 		if(isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
@@ -499,12 +592,21 @@ class UploadController extends Controller
 			$fileType = (int)$_REQUEST['fileType'];
 		}
 	
-		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+		$offset = ($pageNo - 1) * Yii::app()->session['publicUploadsPageSize'];
 		$out = '';
-		$dataFetchedTimeKey = "uploadController.dataFetchedTime";
+		$dataFetchedTimeKey = "uploadController.publicDataFetchedTime";
 	
 		$dataReader = NULL;
 		$publicUploadCount = Upload::model()->getPublicUploadCount($fileType);
+		
+		if(isset(Yii::app()->session[$dataFetchedTimeKey]) === false)
+		{
+			Yii::app()->session[$dataFetchedTimeKey] = time();
+		}
+		
+		//$deletedDataReader = NULL;
+		//Upload'lari aldiktan sonra silinmis olanlar varsa bunlari haritadan kaldirmak icin kontrol et
+		$deletedDataReader = DeletedUploads::model()->getDeletedList(null, Yii::app()->session[$dataFetchedTimeKey]);
 	
 		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($publicUploadCount == Yii::app()->session['publicUploadCount']))
 		{
@@ -514,27 +616,30 @@ class UploadController extends Controller
 			
 			if ($time !== false && $time != "")
 			{	
-				$pageCount=Upload::model()->getPublicUploadPageCount($fileType,$time);
+				$pageCount = Upload::model()->getPublicUploadPageCount($fileType,$time);
 					
 				if ($pageCount >= $pageNo && $pageCount != 0) {
-					$dataReader=Upload::model()->getPublicUploadList($fileType,$time,$offset);
+					$dataReader = Upload::model()->getPublicUploadList($fileType,$time,$offset);
 				}
 					
-				$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+				//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+				$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, "onlyUpdated");
 			}
 		}
 		else {
 			//Fb::warn("ALL", "actionGetPublicUploadListXML()");
 			
-			$pageCount=Upload::model()->getPublicUploadPageCount($fileType,NULL);
+			$pageCount = Upload::model()->getPublicUploadPageCount($fileType,NULL);
 			
 			if ($pageCount >= $pageNo && $pageCount != 0) {
-				$dataReader=Upload::model()->getPublicUploadList($fileType,NULL,$offset);
+				$dataReader = Upload::model()->getPublicUploadList($fileType,NULL,$offset);
 			}
 			
-			$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+			//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+			$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, "all");
 		}
 		
+		//Fb::warn($out, "Json()");
 		echo $out;
 		
 		Yii::app()->session[$dataFetchedTimeKey] = time();
@@ -575,6 +680,63 @@ class UploadController extends Controller
 
 		return $out;
 	}
+	
+	private function prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, $par_updateType = null){ //Multisent prepareJson()
+		$deletedListStr = '';
+		
+		if ($deletedDataReader != NULL)
+		{
+			$rowCount = $deletedDataReader->count();
+			$i = 1;
+				
+			while($row = $deletedDataReader->read())
+			{
+				$deletedListStr .= CJSON::encode(array('uploadId'=>$row['uploadId']));
+
+				if($i < $rowCount)
+				{
+					$deletedListStr .= ",";
+				}
+		
+				$i++;
+			}
+		}
+
+		//Fb::warn($deletedListStr, "deletedListStr");
+
+		$str = '';
+		
+		if ($dataReader != NULL)
+		{
+			$rowCount = $dataReader->count();
+			$i = 1;
+			
+			while($row = $dataReader->read())
+			{
+				$str .= $this->getUploadJsonItem($row);
+				
+				if($i < $rowCount)
+				{
+					$str .= ",";
+				}
+
+				$i++;
+			}
+		}		
+				
+		if($par_updateType != null)
+		{
+			//$str = '{"updateType":"'.$par_updateType.'", "uploadlist": ['.$str.'], "thumbSuffix":"thumb=ok", "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+			$str = '{"updateType":"'.$par_updateType.'", "deletedlist": ['.$deletedListStr.'], "uploadlist": ['.$str.'], "thumbSuffix":"thumb=ok", "pageNo":"'.$pageNo.'", "pageCount":"'.$pageCount.'"}'; //Simdilik tek sayfada hepsi gonderiliyor
+		}
+		else
+		{
+			//$str = '{"uploadlist": ['.$str.'], "thumbSuffix":"thumb=ok", "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+			$str = '{"deletedlist": ['.$deletedListStr.'], "uploadlist": ['.$str.'], "thumbSuffix":"thumb=ok", "pageNo":"'.$pageNo.'", "pageCount":"'.$pageCount.'"}'; //Simdilik tek sayfada hepsi gonderiliyor
+		}
+	
+		return $str;
+	}	
 
 	private function getUploadXMLItem($row)
 	{
@@ -592,6 +754,35 @@ class UploadController extends Controller
 
 		return $str;
 	}
+	
+	private function getUploadJsonItem($row) {
+		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : null;
+		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : null;
+		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : null;
+		$row['uploadTime'] = isset($row['uploadTime']) ? $row['uploadTime'] : null;
+		$row['id'] = isset($row['id']) ? $row['id'] : null;
+		$row['userId'] = isset($row['userId']) ? $row['userId'] : null;
+		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
+		$row['rating'] = isset($row['rating']) ? $row['rating'] : null;
+		$row['description'] = isset($row['description']) ? $row['description'] : null;
+		
+		//Fb::warn(Yii::app()->homeUrl .urlencode('?r=upload/get&id='. $row['id']), "url()");
+	
+		$bsk=   CJSON::encode(array(
+				'description'=>$row['description'],
+				'url'=>Yii::app()->homeUrl .urlencode('?r=upload/get&id='. $row['id']),
+				'id'=>$row['id'],
+				'byUserId'=>$row['userId'],
+				'byRealName'=>$row['realname'],
+				'altitude'=>$row['altitude'],
+				'latitude'=>$row['latitude'],
+				'longitude'=>$row['longitude'],
+				'rating'=>$row['rating'],
+				'time'=>$row['uploadTime']				
+		));
+	
+		return $bsk;
+	}	
 
 	// Uncomment the following methods and override them if needed
 	/*

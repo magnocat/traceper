@@ -309,15 +309,17 @@ class UsersController extends Controller
 			{
 				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
 			}
+			
+			if(($userType == UserType::RealStaff) || ($userType == UserType::GPSStaff))
+			{
+				Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
+			}			
 		}		
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 
-		if(($userType == UserType::RealStaff) || ($userType == UserType::GPSStaff))
-		{
-			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		}
-						
+
+				
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
 
@@ -467,7 +469,9 @@ class UsersController extends Controller
 		
 		//$dataProvider = Users::model()->getListDataProvider($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
 
-		$out = $this->prepareJson($dataProvider, $updateType);	
+		$out = $this->prepareJson($dataProvider, $updateType);
+
+		//Fb::warn($out, "Json()");
 
 		echo $out;
 		Yii::app()->session[$this->dataFetchedTimeKey] = time();
@@ -1045,12 +1049,6 @@ class UsersController extends Controller
 				'g_id'=>$row['g_id'],
 				'account_type'=>$row['account_type'],
 		));
-		
-		if($row['id'] == 2)
-		{
-			//setlocale(LC_TIME, 'Turkish');
-			//Fb::warn(strftime("%d %b %Y %H:%M:%S", strtotime($row['dataArrivedTime'])), "getUserJsonItem() - dataCalculatedTime");
-		}
 
 		return $bsk;
 	}	

@@ -367,10 +367,15 @@ function bindElements(langOperator, trackerOp)
 		{
 			offsetTop = 85;
 		}
+		
+		$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+		$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+		$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 		    
 		var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
 		
-		$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
 	        if(json.outcome == 'success') {
 	        	//alert('OKKKKK');
 	            // do something with the knowledge possibly?
@@ -431,9 +436,9 @@ function bindElements(langOperator, trackerOp)
 				//alert('Narrow');
 			}
 			
-			$("#users_tab").css("min-height", (485 + 100 - 60 - 81)); $("#users_tab").css("height", (h - offsetTop - 81));
-			$("#photos_tab").css("min-height", (485 + 100 - 60 - 81)); $("#photos_tab").css("height", (h - offsetTop - 81));
-			$("#groups_tab").css("min-height", (485 + 100 - 60 - 81)); $("#groups_tab").css("height", (h - offsetTop - 81));
+			$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+			$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+			$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 			
 			var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
 			
@@ -484,29 +489,75 @@ function bindElements(langOperator, trackerOp)
 	    $('#sideBar').css('height', (h - offsetTop));		
 	    
 	}).resize();
+//     
+//     $('#tab_view').bind('tabsselect', function(event, ui) {
+//    	 switch (ui.index)
+//    	 {
+//	    	 case 0: //Friends
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//	    	   
+//	    	 case 1: //Uploads
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//	    	   
+//	    	 case 2: //Groups
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//    	 }     	 
+//     });
      
-     $('#tab_view').bind('tabsselect', function(event, ui) {
-    	 switch (ui.index)
-    	 {
-	    	 case 0: //Friends
-	    	 {
-	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-	    	 }
-	    	 break;
-	    	   
-	    	 case 1: //Uploads
-	    	 {
-	    		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-	    	 }
-	    	 break;
-	    	   
-	    	 case 2: //Groups
-	    	 {
-	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-	    	 }
-	    	 break;
-    	 }     	 
-     });
+//     $('#tab_view').bind('easytabs:after', function(event, ui) {
+//    	 switch (ui.index)
+//    	 {
+//	    	 case 0: //Friends
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//	    	   
+//	    	 case 1: //Uploads
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//	    	   
+//	    	 case 2: //Groups
+//	    	 {
+//	    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+//	    	 }
+//	    	 break;
+//    	 }     	 
+//     });
+     
+	$('#tab_view').bind('easytabs:before', function(e, $clicked, $targetPanel, settings){
+        switch($targetPanel.get(0).id)
+        {
+		   	 case "users_tab": //Friends
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;
+		   	   
+		   	 case "photos_tab": //Uploads
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;
+		   	   
+		   	 case "groups_tab": //Groups
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;       
+        }
+	});    
 	
 //	$("#bar").click(function ()	{	
 //				if ($('#sideBar > #content').css('display') == "none")

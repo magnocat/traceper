@@ -1,6 +1,7 @@
 	<div class="form">
 	<?php $form=$this->beginWidget('CActiveForm', array(
 		'id'=>'login-form',
+		'enableAjaxValidation'=>false, //Yii 1.1.11'den itibaren "yii Session object destruction failed" hatasi aliniyor, forumda biri bu false olursa alinmadigini belirtmis
 		'enableClientValidation'=>true,
 		'clientOptions'=> array(
 				'validateOnSubmit'=> true,
@@ -152,25 +153,39 @@
 					$this->widget('zii.widgets.jui.CJuiButton', array(
 							'name'=>'ajaxLogin',
 							'caption'=>Yii::t('site', 'Log in'),
-							'id'=>'loginAjaxButton',
+							'id'=>'loginAjaxButton-'.uniqid(),
 							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),
 									'success'=> 'function(msg){
-													if(msg.search("acceptTermsForLoginWindow") !== -1)
+													try
 													{
-														var opt = {
-																autoOpen: false,
-																modal: true,
-																resizable: false,
-																width: 600,
-																title: "'.Yii::t('site', 'Accept Terms to continue').'"
-														};
+														var obj = jQuery.parseJSON(msg);
+														
+														if (obj.result)
+														{
+															if (obj.result == "1")
+															{
+																$("#tabViewList").html(obj.renderedTabView);
+																$("#forAjaxRefresh").html(obj.loginSuccessfulActions);
+															}									
+															else if (obj.result == "-3")
+															{
+																$("#forAjaxRefresh").html(obj.loginView);
 									
-														$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
-														$("#acceptTermsForLoginWindow").html(msg);
+																var opt = {
+															        autoOpen: false,
+															        modal: true,
+																	resizable: false,
+															        width: 600,
+															        title: "'.Yii::t('site', 'Accept Terms to continue').'"
+																};													
+					
+																$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
+																$("#acceptTermsForLoginWindow").html(obj.renderedView);
+															}
+														}
 													}
-													else
+													catch (error)
 													{
-														//Form error veya successful durumu icin
 														$("#forAjaxRefresh").html(msg);
 													}
 												}',

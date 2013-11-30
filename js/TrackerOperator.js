@@ -152,64 +152,106 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}, true);
 		
 	};
-
+	
 	this.getImageList = function(isPublic, updateAll, callback){
-		var params; 
+		var jsonparams;
 		
+		//alert("getImageList() called");
+		
+		//alert("TRACKER.bgImageListPageNo:" + TRACKER.bgImageListPageNo);
+
 		if((typeof isPublic !== 'undefined') && (isPublic == true))
 		{
-			params = "r=upload/getPublicUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&";
+			jsonparams = "r=upload/getPublicUploadListJson&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0";
 		}
 		else
 		{
-			params = "r=upload/getUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&"; 
+			jsonparams = "r=upload/getUploadListJson&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0"; 
 		}
-
+		
 		if((typeof updateAll !== 'undefined') && (updateAll == true))
 		{
 			//Do not add "list=onlyUpdated"
+			TRACKER.bgImageListPageNo = 1;
+			TRACKER.allImagesFetched = false;
 		}
 		else if (TRACKER.allImagesFetched == true) {
-			params += "list=onlyUpdated";
+			jsonparams += "&list=onlyUpdated";
 			
 			//alert("onlyUpdated");
 		}
 		else
 		{
 			//alert("All");
-		}
-		
+		}		
+
 		TRACKER.showImagesOnTheMapJustToggled = false;
 		
-		//alert("getImageList() called");
+		//alert("getImageList(), jsonparams: " + jsonparams);
 
-		TRACKER.ajaxReq(params, function(result){	
-			if (result != "") {
-				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
-				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
+		TRACKER.ajaxReq(jsonparams, function(result){
+			
+			//alert("result: " + result);
+			
+			//alert("Before parseJSON()");
+			var obj = $.parseJSON(result);
+			//alert("After parseJSON()");
+			
+			TRACKER.bgImageListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
+			TRACKER.bgImageListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
+			
+			//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+
+			processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix);
+			
+			//alert("processImageXML() called");
+			
+			if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+				TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+				clearTimeout(TRACKER.imageTimer);
+				TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.getUserListInterval);
+			}	
+			else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+			{
+				TRACKER.bgImageListPageNo = 1;
+				TRACKER.allImagesFetched = true;
+				//alert('allImagesFetched');
+				clearTimeout(TRACKER.imageTimer);
+				TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.queryUpdatedUserInterval);
 				
-				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
-	
-				processImageXML(MAP, result);
-				
-				//alert("processImageXML() called");
-				
-				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
-					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
-					clearTimeout(TRACKER.imageTimer);
-					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.getUserListInterval);
-				}	
-				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
-				{
-					TRACKER.bgImageListPageNo = 1;
-					TRACKER.allImagesFetched = true;
-					clearTimeout(TRACKER.imageTimer);
-					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.queryUpdatedUserInterval);
-				}
-				if (typeof callback == 'function'){
-					callback();					
-				}
-			}		
+				//alert("allImagesFetched: " + TRACKER.allImagesFetched);
+			}
+			
+			if (typeof callback == 'function'){
+				callback();					
+			}			
+			
+//			if (result != "") {
+//				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
+//				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
+//				
+//				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+//	
+//				processImageXML(MAP, result);
+//				
+//				//alert("processImageXML() called");
+//				
+//				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+//					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+//					clearTimeout(TRACKER.imageTimer);
+//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.getUserListInterval);
+//				}	
+//				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+//				{
+//					TRACKER.bgImageListPageNo = 1;
+//					TRACKER.allImagesFetched = true;
+//					clearTimeout(TRACKER.imageTimer);
+//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.queryUpdatedUserInterval);
+//				}
+//				if (typeof callback == 'function'){
+//					callback();					
+//				}
+//			}		
 		}, 
 		
 //		_V_("my_video_2", {}, function(){
@@ -220,7 +262,76 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			});	
 		
 		true);	
-	}
+	}	
+
+//	this.getImageList = function(isPublic, updateAll, callback){
+//		var params; 
+//		
+//		if((typeof isPublic !== 'undefined') && (isPublic == true))
+//		{
+//			params = "r=upload/getPublicUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&";
+//		}
+//		else
+//		{
+//			params = "r=upload/getUploadListXML&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0&"; 
+//		}
+//
+//		if((typeof updateAll !== 'undefined') && (updateAll == true))
+//		{
+//			//Do not add "list=onlyUpdated"
+//		}
+//		else if (TRACKER.allImagesFetched == true) {
+//			params += "list=onlyUpdated";
+//			
+//			//alert("onlyUpdated");
+//		}
+//		else
+//		{
+//			//alert("All");
+//		}
+//		
+//		TRACKER.showImagesOnTheMapJustToggled = false;
+//		
+//		//alert("getImageList() called");
+//
+//		TRACKER.ajaxReq(params, function(result){	
+//			if (result != "") {
+//				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
+//				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
+//				
+//				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+//	
+//				processImageXML(MAP, result);
+//				
+//				//alert("processImageXML() called");
+//				
+//				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+//					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+//					clearTimeout(TRACKER.imageTimer);
+//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.getUserListInterval);
+//				}	
+//				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+//				{
+//					TRACKER.bgImageListPageNo = 1;
+//					TRACKER.allImagesFetched = true;
+//					clearTimeout(TRACKER.imageTimer);
+//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.queryUpdatedUserInterval);
+//				}
+//				if (typeof callback == 'function'){
+//					callback();					
+//				}
+//			}		
+//		}, 
+//		
+////		_V_("my_video_2", {}, function(){
+////			  // Player (this) is initialized and ready.
+////			
+////				//var player = this;
+////				//player.play();
+////			});	
+//		
+//		true);	
+//	}
 
 	this.trackUser = function(userId){
 		
@@ -348,9 +459,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			TRACKER.getImageList(function(){
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
 			});
+			
+			//alert("showMediaWindow 111");
 		}
 		else {		
-			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
+			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');
+			
+			//alert("showMediaWindow 222");
 		}		
 	};
 	this.closeMarkerInfoWindow = function (userId) {
@@ -463,7 +578,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			error: function(par1, par2, par3){
 				//alert(par1.responseText);		
 				$("#loading").hide();
-				alert("Error in ajax..")
+				alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
 			}
 		});
 	};	

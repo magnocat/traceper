@@ -411,13 +411,13 @@ display: none;
   padding-right:3px;
 }
 #lists li a:hover{
-	background-color:#EEE;
+/* 	background-color:#F3FBFC; */
 }
 .search{
 	margin-top:10px;
 }
 .searchBox{
-	width:66%;
+	width:65%;
 	height:20px;
 	color:#666;	
 }

@@ -311,9 +311,15 @@ class SiteController extends Controller
 									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
 									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 								}
-							}
+							}						
+							
+							echo CJSON::encode(array(
+									"result"=> "1",
+									"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
+									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, $processOutput),
+							));							
 								
-							$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);							
+							//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);							
 						}
 						
 						Yii::app()->end();						
@@ -402,14 +408,22 @@ class SiteController extends Controller
 							Yii::app()->clientScript->scriptMap['*.js'] = false;
 							Yii::app()->clientScript->scriptMap['*.css'] = false;
 						}
+						
+						echo CJSON::encode(array(
+								"result"=> "-3",
+								"renderedView"=>$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), true/*return instead of being displayed to end users*/, true),
+								"loginView"=>$this->renderPartial('login',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput),
+						));
 							
-						$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), false, true);						
+						//$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), false, true);						
 					}										
 				}											
 			}
 			else
 			{
 				//echo 'model NOT valid';
+				
+				//Fb::warn("model NOT valid", "actionLogin()");
 
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
@@ -496,8 +510,7 @@ class SiteController extends Controller
 			$isRecordUpdateRequired = false;
 				
 			//*** Valid degilken bunları gondermeden de olabiliyorsa mobile bunları gondermeyelim, zaten daha login olunmadigi icin dogru degerler alinamayacak?
-			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);			
-			
+			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
 			Users::model()->setTermsAccepted($model->email);
 			
 			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
@@ -655,7 +668,7 @@ class SiteController extends Controller
 	public function actionLogout()
 	{
 		Yii::app()->user->logout(false);
-		session_destroy();
+
 		if (isset($_REQUEST['client']) && $_REQUEST['client'] == 'mobile') {
 			// if mobile client end the app, no need to redirect...
 			echo CJSON::encode(array(
@@ -1332,16 +1345,35 @@ class SiteController extends Controller
 					$message .= '<br/><br/>';
 					$message .= Yii::t('site', 'Your Password is').':'.$model->password;										
 		
-					echo $message;
+					//echo $message;
 
 					if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, trim($model->name).' '.trim($model->lastName), Yii::t('site', 'Traceper Activation'), $message))
 					{
-						echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=>"1", 
+													 "email"=>$model->email,
+													 "registerView"=>$this->renderPartial('register',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput)
+													));
+						}						
 						//Yii::app()->end();					
 					}
 					else
 					{
-						echo CJSON::encode(array("result"=>"2"));
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							echo CJSON::encode(array("result"=>"2"));
+						}
+						else
+						{
+							echo CJSON::encode(array("result"=>"2",
+													 "registerView"=>$this->renderPartial('register',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput)
+													));
+						}
 						//Yii::app()->end();						
 					}
 
@@ -1362,7 +1394,17 @@ class SiteController extends Controller
 				}
 				else
 				{
-					echo JSON::encode(array("result"=>"0")); //Error in saving
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+					{
+						echo JSON::encode(array("result"=>"0")); //Error in saving
+					}
+					else
+					{
+						echo JSON::encode(array("result"=>"0",
+												"registerView"=>$this->renderPartial('register',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput)
+												)); //Error in saving
+					}
+					
 					Yii::app()->end();
 				}
 		
@@ -1938,6 +1980,90 @@ class SiteController extends Controller
 		}
 	
 		$this->renderPartial('terms',array(), false, $processOutput);
+	}
+	
+	/**
+	 * Returns the HTML formatted Terms of Use for mobile
+	 */
+	public function actionGetTermsOfUse()
+	{
+		//Fb::warn("actionGetTermsOfUse() called", "SiteController");
+		
+		$mobileLang = null;
+		$isTranslationRequired = false;
+		
+		if(isset($_REQUEST['language']))
+		{
+			$mobileLang = $_REQUEST['language'];
+		}
+
+		if($mobileLang == 'tr')
+		{
+			if(Yii::app()->language == 'tr')
+			{
+				$isTranslationRequired = false;
+			}
+			else
+			{
+				$isTranslationRequired = true;
+			}
+		}
+		else
+		{
+			if(Yii::app()->language == 'tr')
+			{
+				$isTranslationRequired = true;
+			}
+			else
+			{
+				$isTranslationRequired = false;
+			}
+		}
+		
+		if($isTranslationRequired == true)
+		{
+			if($mobileLang == 'tr')
+			{
+				Yii::app()->language = 'tr';
+			}
+			else
+			{
+				Yii::app()->language = 'en';
+			}
+		}
+
+		$htmlStr = "<html><head>\n\t</head>\n\t<body>\n\t".Yii::t('layout', 'Traceper Terms')."\n\t</body>\n</html>";
+		
+		if($isTranslationRequired == true) //Recover the language if needed for mobile
+		{
+			if($mobileLang == 'tr')
+			{
+				Yii::app()->language = 'en';
+			}
+			else
+			{
+				Yii::app()->language = 'tr';
+			}
+		}
+
+		echo $htmlStr;
+	}	
+
+	public function actionGetWinDimensions()
+	{
+// 		Fb::warn("actionGetWinDimensions() called", "SiteController");
+// 		Fb::warn($_POST['width'], "width");
+// 		Fb::warn($_POST['height'], "height");
+		
+		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
+		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/45);
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 155)/42);		
+		
+// 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");
+// 		Fb::warn(Yii::app()->session['uploadsPageSize'], "uploadsPageSize");
+//		Fb::warn(Yii::app()->session['usersPageSize'], "usersPageSize");
+		
+		echo json_encode(array('outcome'=>'success'));		
 	}	
 }
 
