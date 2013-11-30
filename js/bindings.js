@@ -278,54 +278,57 @@ function bindElements(langOperator, trackerOp)
 		
 		if ($('#sideBar > #content').css('display') == "none")
 		{					
-			showRegisterFormErrorsIfExist();
-
-			if(bShowPublicPhotosLinkActive === true)
-			{
-				$("#showPublicPhotosLink").fadeIn('slow');
-			}
-			else
-			{
-				$("#showRegisterFormLink").fadeIn('slow');
-			}			
+			var offsetLeft = 396;
 			
 			//If logged in and top bar height decreased
 			if(document.getElementById('topBar').style.height == "60px")
 			{
-				var offsetLeft = 396;
-				
-				//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
-				$('#sideBar > #content').fadeIn('slow');
-				$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
-				$('#map').animate({width:(w - offsetLeft)});
-				$('#bar').animate({left:'380px'});
+
 			}
-			else
+			else //If not logged in
 			{
-				var offsetLeft = 396;
+				showRegisterFormErrorsIfExist();
 				
-				//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
-				$('#sideBar > #content').fadeIn('slow');
-				$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
-				$('#map').animate({width:(w - offsetLeft)});
-				$('#bar').animate({left:'380px'});
+				if(bShowPublicPhotosLinkActive === true)
+				{
+					$("#showPublicPhotosLink").fadeIn('slow');
+				}
+				else
+				{
+					$("#showRegisterFormLink").fadeIn('slow');
+				}				
 			}
+			
+			//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
+			$('#sideBar > #content').fadeIn('slow');
+			$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
+			$('#map').animate({width:(w - offsetLeft)});
+			$('#bar').animate({left:'380px'});			
 		}	
 		else 
 		{
-			hideRegisterFormErrorsIfExist();
-			
 			var offsetLeft = 16;
-
-			if(bShowPublicPhotosLinkActive === true)
-			{
-				$("#showPublicPhotosLink").fadeOut('slow');
-			}
-			else
-			{
-				$("#showRegisterFormLink").fadeOut('slow');
-			}	
 			
+			//If logged in and top bar height decreased
+			if(document.getElementById('topBar').style.height == "60px")
+			{
+
+			}
+			else //If not logged in
+			{
+				hideRegisterFormErrorsIfExist();
+				
+				if(bShowPublicPhotosLinkActive === true)
+				{
+					$("#showPublicPhotosLink").fadeOut('slow');
+					$("#showCachedPublicPhotosLink").fadeOut('slow');
+				}
+				else
+				{
+					$("#showRegisterFormLink").fadeOut('slow');
+				}				
+			}			
+
 			//$('.logo_inFullMap').fadeIn().animate({left:'80px'});
 			$('#sideBar > #content').fadeOut('slow');
 			$('#sideBar').animate({width:'0px'}, 
@@ -372,7 +375,7 @@ function bindElements(langOperator, trackerOp)
 		$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
 		$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 		    
-		var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+		var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 		
 		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
 		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
@@ -440,7 +443,7 @@ function bindElements(langOperator, trackerOp)
 			$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
 			$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 			
-			var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+			var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 			
 			$("#usersGridView").css("height", userListHeight - 50);
 			$("#uploadsGridView").css("height", userListHeight - 50);
@@ -460,7 +463,7 @@ function bindElements(langOperator, trackerOp)
 			offsetTop = 85;
 			offsetLeft = 396;
 			
-			var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+			var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 			$("#uploadsGridView").css("height", userListHeight - 40);
 			
 			if ($('#sideBar > #content').css('display') == "none")

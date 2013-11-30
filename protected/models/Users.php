@@ -469,6 +469,11 @@ class Users extends CActiveRecord
 		if ($count == null) {
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		}
+		
+		if(isset(Yii::app()->session['usersPageSize']) == false)
+		{
+			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
+		}		
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,

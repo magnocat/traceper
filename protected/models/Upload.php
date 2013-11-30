@@ -187,7 +187,12 @@ class Upload extends CActiveRecord
     	publicData = 1)
     	ORDER BY userId = '. $userID .' DESC,
     	userId in ('. $friendList .') DESC,
-    	publicData = 1 DESC';    	
+    	publicData = 1 DESC';
+
+    	if(isset(Yii::app()->session['uploadsPageSize']) == false)
+    	{
+    		Yii::app()->session['uploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+    	}    	
 
     	$dataProvider = new CSqlDataProvider($sql, array(
     			'totalItemCount'=>$count,
@@ -220,6 +225,11 @@ class Upload extends CActiveRecord
     	LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     	WHERE (fileType = '.$fileType.') AND (publicData = 1)
     	ORDER BY u.Id DESC';
+    	
+    	if(isset(Yii::app()->session['publicUploadsPageSize']) == false)
+    	{
+    		Yii::app()->session['publicUploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+    	}    	
        
     	$dataProvider = new CSqlDataProvider($sql, array(
     			'totalItemCount'=>$count,

@@ -401,6 +401,11 @@ class UsersController extends Controller
 	{	
 		$pageNo = 1;
 		$userTypes = array();
+		
+		if(isset(Yii::app()->session['visibleFriendCount']) == false)
+		{
+			Yii::app()->session['visibleFriendCount'] = 0;
+		}		
 
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 			$pageNo = (int)$_REQUEST['pageNo'];
@@ -442,6 +447,11 @@ class UsersController extends Controller
 				
 		$time = null;
 		$updateType = null;
+		
+		if(isset(Yii::app()->session[$this->dataFetchedTimeKey]) === false)
+		{
+			Yii::app()->session[$this->dataFetchedTimeKey] = time();
+		}		
 		
 		//Sadece zamansal olarak update olmuslar istendiginde ve visible arkadas sayisi degismediyse onlyUpdated yoksa ALL
 		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($friendCount == Yii::app()->session['visibleFriendCount'])) {

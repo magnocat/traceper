@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
 	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
-	var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
+	var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 	
     //$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
     $.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {    
@@ -11,7 +11,49 @@
         } else {
             alert('Unable to let PHP know what the screen resolution is!');
         }
-    },'json');	
+    },'json');
+
+	if ($('#sideBar > #content').css('display') == "none")
+	{					
+		var offsetLeft = 396;
+
+		//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
+		$('#sideBar > #content').fadeIn('slow');
+		$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
+		$('#map').animate({width:(w - offsetLeft)});
+		$('#bar').animate({left:'380px'});			
+	}    
+
+	$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+	$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+	$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+	
+	$("#usersGridView").css("height", userListHeight - 50);
+	$("#uploadsGridView").css("height", userListHeight - 50);
+	$("#groupsGridView").css("height", userListHeight - 50);
+
+	$('#tab_view').bind('easytabs:before', function(e, $clicked, $targetPanel, settings){
+        switch($targetPanel.get(0).id)
+        {
+		   	 case "users_tab": //Friends
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;
+		   	   
+		   	 case "photos_tab": //Uploads
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;
+		   	   
+		   	 case "groups_tab": //Groups
+		   	 {
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   	 }
+		   	 break;       
+        }
+	});	    
 
 	resetAllFormErrors();
 
