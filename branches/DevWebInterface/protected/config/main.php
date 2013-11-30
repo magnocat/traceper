@@ -208,8 +208,8 @@ return array(
 		'contactEmail'=>'contact@traceper.com',
 		'noreplyEmail'=>'noreply@traceper.com',
 		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
-		'uploadCountInOnePage'=> 5, // this is the number of images that are shown in a page	
-		'itemCountInDataListPage'=> 7,
+		'uploadCountInOnePage'=> 10, // this is the number of images that are shown in a page	
+		'itemCountInDataListPage'=> 10,
 		'minDistanceInterval'=> 500, //meters
 		'minDataSentInterval'=> 300000, //milliseconds
 		'duplicateEntryDbExceptionCode' => 23000,

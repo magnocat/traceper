@@ -497,8 +497,13 @@ class UploadController extends Controller
 		if(isset(Yii::app()->session['uploadCount']) == false)
 		{
 			Yii::app()->session['uploadCount'] = 0;
-		}		
+		}
 		
+		if(isset(Yii::app()->session['uploadsPageSize']) == false)
+		{
+			Yii::app()->session['uploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+		}		
+
 		$pageNo = 1;
 		
 		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
@@ -578,6 +583,11 @@ class UploadController extends Controller
 		{
 			Yii::app()->session['publicUploadCount'] = 0;
 		}
+		
+		if(isset(Yii::app()->session['publicUploadsPageSize']) == false)
+		{
+			Yii::app()->session['publicUploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+		}		
 
 		$pageNo = 1;
 		
