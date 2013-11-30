@@ -3,7 +3,8 @@
 	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
 	var userListHeight = ((h - offsetTop - 80) > 445)?(h - offsetTop - 80):445;
 	
-    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+    //$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+    $.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {    
         if(json.outcome == 'success') {
         	//alert('OKKKKK');
             // do something with the knowledge possibly?
