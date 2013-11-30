@@ -157,24 +157,38 @@ class Upload extends CActiveRecord
     
     public function getRecordList($fileType,$userID,$friendList) {
     
-    	//if the upload is mine or my friends's upload or public.
+    	//if the upload is mine or my friends' upload or public.
     	$sqlCount = 'SELECT count(*)
     	FROM '. Upload::model()->tableName() . ' u
     	WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
     	OR userId = '. $userID .' OR
     	publicData = 1)';
-    
+
     	$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+
+		//$sqlCount = 'SELECT COUNT(*) FROM (SELECT 1 FROM '.Upload::model()->tableName() .' LIMIT 10) t';   	  	
+    	//$count=Yii::app()->db->createCommand($sqlCount)->query()->readColumn(0);
+    	
+    	//Fb::warn($count, "count");
     
+//     	$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
+//     	FROM '. Upload::model()->tableName() . ' u
+//     	LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
+//     	WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
+//     	userId = '. $userID .' OR
+//     	publicData = 1)
+//     	ORDER BY u.Id DESC';
+    	
     	$sql = 'SELECT u.Id as id, u.description, u.fileType, s.realname, s.Id as userId
     	FROM '. Upload::model()->tableName() . ' u
     	LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     	WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
     	userId = '. $userID .' OR
     	publicData = 1)
-    	ORDER BY u.Id DESC';
-    
-    
+    	ORDER BY userId = '. $userID .' DESC,
+    	userId in ('. $friendList .') DESC,
+    	publicData = 1 DESC';    	
+
     	$dataProvider = new CSqlDataProvider($sql, array(
     			'totalItemCount'=>$count,
     			'sort'=>array(
@@ -184,7 +198,7 @@ class Upload extends CActiveRecord
     			),
     			'pagination'=>array(
     					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
-    					'pageSize'=>(int)(($_SESSION['screen_height'] - 155)/45),
+    					'pageSize'=>Yii::app()->session['uploadsPageSize'],
     					'itemCount'=>$count
     			),
     	));
@@ -216,7 +230,7 @@ class Upload extends CActiveRecord
     			),
     			'pagination'=>array(
     					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
-    					'pageSize'=>(int)(($_SESSION['screen_height'] - 100)/45),
+    					'pageSize'=>Yii::app()->session['publicUploadsPageSize'],
     					'itemCount'=>$count
     			),
     	));
@@ -289,7 +303,7 @@ class Upload extends CActiveRecord
     
     	if ($time != NULL)
     	{
-    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->session['uploadsPageSize'] .')
     		FROM '. Upload::model()->tableName() . ' u
     		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
     		OR userId = '. $userID .'
@@ -298,7 +312,7 @@ class Upload extends CActiveRecord
     	}
     	else
     	{
-    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->session['uploadsPageSize'] .')
     		FROM '. Upload::model()->tableName() . ' u
     		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
     		userId = '. $userID .' OR
@@ -325,14 +339,14 @@ class Upload extends CActiveRecord
     
     	if ($time != NULL)
     	{
-    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->session['publicUploadsPageSize'] .')
     		FROM '. Upload::model()->tableName() . ' u
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)
     		AND unix_timestamp(u.uploadTime) >= '. $time;
     	}
     	else
     	{
-    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->params->itemCountInDataListPage .')
+    		$sqlCount = 'SELECT ceil(count(*)/'. Yii::app()->session['publicUploadsPageSize'] .')
     		FROM '. Upload::model()->tableName() . ' u
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)';
     	}
@@ -352,8 +366,10 @@ class Upload extends CActiveRecord
     		OR userId = '. $userID .'
     		OR publicData = 1)
     		AND unix_timestamp(u.uploadTime) >= '. $time . '
-    		ORDER BY u.Id DESC
-    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+	    	ORDER BY userId = '. $userID .' DESC,
+	    	userId in ('. $friendList .') DESC,
+	    	publicData = 1 DESC     		
+    		LIMIT '. $offset . ' , ' . Yii::app()->session['uploadsPageSize'] ;
     	}
     	else
     	{
@@ -363,8 +379,10 @@ class Upload extends CActiveRecord
     		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
     		userId = '. $userID .' OR
     		publicData = 1)
-    		ORDER BY u.Id DESC
-    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+	    	ORDER BY userId = '. $userID .' DESC,
+	    	userId in ('. $friendList .') DESC,
+	    	publicData = 1 DESC    		
+    		LIMIT '. $offset . ' , ' . Yii::app()->session['uploadsPageSize'] ;
     	}
     
     	$dataReader = Yii::app()->db->createCommand($sql)->query();
@@ -381,7 +399,7 @@ class Upload extends CActiveRecord
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)
     		AND unix_timestamp(u.uploadTime) >= '. $time . '
     		ORDER BY u.Id DESC
-    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+    		LIMIT '. $offset . ' , ' . Yii::app()->session['publicUploadsPageSize'] ;
     	}
     	else
     	{
@@ -390,7 +408,7 @@ class Upload extends CActiveRecord
     		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)
     		ORDER BY u.Id DESC
-    		LIMIT '. $offset . ' , ' . Yii::app()->params->itemCountInDataListPage ;
+    		LIMIT '. $offset . ' , ' . Yii::app()->session['publicUploadsPageSize'] ;
     	}
     
     	$dataReader = Yii::app()->db->createCommand($sql)->query();

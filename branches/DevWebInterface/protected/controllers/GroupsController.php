@@ -539,17 +539,24 @@ class GroupsController extends Controller
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		
-		if (YII_DEBUG)
+		if (Yii::app()->request->isAjaxRequest)
 		{
-			Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+			}
+
+			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
 		}
-		else
-		{
-			Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-		}
+		
+
 				
 		//TODO: added below line because gridview.js is loaded before.
-		Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;		
+				
 		$this->renderPartial('groupsInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'groupType'=>$groupType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
 	

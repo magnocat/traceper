@@ -322,35 +322,35 @@
 					array('id'=>'registerButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor 
 						  'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
 							'success'=> 'function(msg){
-							try
-							{
-							var obj = jQuery.parseJSON(msg);
-								
-							if (obj.result)
-							{
-							if (obj.result == "1")
-							{
-							TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-			}
-							else if (obj.result == "2")
-							{
-							TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-			}
-							else if (obj.result == "0")
-							{
-							TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
-			}
-			}
-			}
-							catch (error)
-							{
-							$("#forRegisterRefresh").html(msg);
-			
-							//alert("Deneme");
-			
-			
-			}
-			}',
+											try
+											{
+												var obj = jQuery.parseJSON(msg);
+												
+												if (obj.result)
+												{
+													$("#forRegisterRefresh").html(obj.registerView);
+						  		
+						  							if (obj.result == "1")
+													{
+														TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+													}
+													else if (obj.result == "2")
+													{
+														TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+													}
+													else if (obj.result == "0")
+													{
+														TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+													}
+												}
+											}
+											catch (error)
+											{
+												$("#forRegisterRefresh").html(msg);
+							
+												//alert("Deneme");
+											}
+										}',
 					),'onmouseover'=>'this.src="images/signup_button_mouseover_'.Yii::app()->language.'.png";',
 							'onmouseout'=>'this.src="images/signup_button_default_'.Yii::app()->language.'.png";$("#registerButton").css("margin-top", "0px");',
 							'onmousedown'=>'$("#registerButton").css("margin-top", "2px");',

@@ -88,7 +88,7 @@ class Users extends CActiveRecord
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted', 'safe', 'on'=>'search'),
-		);
+		);		
 	}
 
 	/**
@@ -269,7 +269,7 @@ class Users extends CActiveRecord
 		$users->account_type = $accountType;
 		$users->registrationMedium = $registrationMedium;
 		$users->preferredLanguage = $preferredLanguage;
-		$users->termsAccepted = true;
+		$users->termsAccepted = 1;
 	
 		return $users->save();
 	}
@@ -315,7 +315,7 @@ class Users extends CActiveRecord
 		$users->account_type = $accountType;
 		$users->registrationMedium = $registrationMedium;
 		$users->preferredLanguage = $preferredLanguage;
-		$users->termsAccepted = true;
+		$users->termsAccepted = 1;
 
 		$result = $users->save();
 		return $result;
@@ -478,7 +478,7 @@ class Users extends CActiveRecord
 						),
 				),
 				'pagination'=>array(
-						'pageSize'=>(int)(($_SESSION['screen_height'] - 155)/42),
+						'pageSize'=>Yii::app()->session['usersPageSize'], //(int)(($_SESSION['screen_height'] - 155)/42),
 						'itemCount'=>$count
 				),
 		));
@@ -688,7 +688,7 @@ class Users extends CActiveRecord
 	
 		if($user != null)
 		{
-			if($user->termsAccepted == true)
+			if($user->termsAccepted == 1)
 			{
 				$result = true;
 			}
@@ -708,8 +708,8 @@ class Users extends CActiveRecord
 	public function setTermsAccepted($email)
 	{
 		$user = Users::model()->find('email=:email', array(':email'=>$email));		
-		$user->termsAccepted = true;
-	
+		$user->termsAccepted = 1;
+
 		return $user->save();
 	}	
 	

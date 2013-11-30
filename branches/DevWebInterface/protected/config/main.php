@@ -131,7 +131,8 @@ return array(
 			'emulatePrepare' => true,
 			'username' => 'root',
 			'password' => '',
-			'charset' => 'utf8',				
+			'charset' => 'utf8',
+			'schemaCachingDuration'=>3600 // turn on schema caching to improve performance								
 		),
 		
 		'errorHandler'=>array(
@@ -161,16 +162,35 @@ return array(
 		'clientScript'=>array(				
 				'packages'=>array(
 						'jquery'=>array(
-								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jquery/1.8.3/',
+								//'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jquery/1.8.3/',
+								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jquery/2.0.2/',
 								'js'=>YII_DEBUG ? array('jquery.js') : array('jquery.min.js'),
 								'coreScriptPosition'=>CClientScript::POS_HEAD
 						),												
 						'jquery.ui'=>array(
-								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/',
+								//'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/',
+								'baseUrl'=>'//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/',
 								'js'=>YII_DEBUG ? array('jquery-ui.js') : array('jquery-ui.min.js'),
 						        'depends'=>array('jquery'),
 						        'coreScriptPosition'=>CClientScript::POS_BEGIN
-						),						
+						),
+						
+// 						'tooltipster'=>array(
+// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
+// 								'js'=>array('jquery.tooltipster.min.js'),
+// 								'coreScriptPosition'=>CClientScript::POS_HEAD
+// 						),
+// 						'DataOperations'=>array(
+// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
+// 								'js'=>array('DataOperations.js'),
+// 								'coreScriptPosition'=>CClientScript::POS_HEAD
+// 						),
+// 						'TrackerOperator'=>array(
+// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
+// 								'js'=>array('TrackerOperator.js'),
+// 								'coreScriptPosition'=>CClientScript::POS_HEAD
+// 						),
+																												
 // 						'validate'=>array(
 // 								'baseUrl'=>'//ajax.microsoft.com/ajax/jquery.validate/1.8/',
 // 								'js'=>array('jquery.validate.min.js'),
@@ -189,7 +209,7 @@ return array(
 		'noreplyEmail'=>'noreply@traceper.com',
 		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
 		'uploadCountInOnePage'=> 5, // this is the number of images that are shown in a page	
-		'itemCountInDataListPage'=> 20,
+		'itemCountInDataListPage'=> 7,
 		'minDistanceInterval'=> 500, //meters
 		'minDataSentInterval'=> 300000, //milliseconds
 		'duplicateEntryDbExceptionCode' => 23000,

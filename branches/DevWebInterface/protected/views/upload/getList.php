@@ -37,7 +37,20 @@ if ($dataProvider != null) {
 
 		Yii::app()->clientScript->registerScript('uploadFunctions',
 				$deleteUploadJSFunction,
-				CClientScript::POS_READY);		
+				CClientScript::POS_READY);
+
+		Yii::app()->clientScript->registerScript('recursiveCheckFunction',
+					'function checkImageListCallRequired(isPublicList, selectedPage) { 
+						if((TRACKER.allImagesFetched === false) && (selectedPage > (TRACKER.bgImageListPageNo - 1)))
+						{
+							TRACKER.getImageList(isPublicList, false, function() {checkImageListCallRequired(isPublicList, selectedPage);});
+						}
+						else
+						{
+							//Recursive call ended
+						}
+					}',
+					CClientScript::POS_READY);		
 	}
 	
 	if (isset($isPublicList) && $isPublicList == true) {
@@ -46,19 +59,41 @@ if ($dataProvider != null) {
 	else
 	{
 		$isPublicList = false;
-	}	
+	}
+	
 	?>
 	<div id="uploadsGridView" style="overflow:auto;">
 	<?php	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$isPublicList?'publicUploadListView':'uploadListView',
-			//'ajaxUrl'=>null,
+			'ajaxUrl'=>null,
+			'ajaxUpdate'=>true,
+			//'beforeAjaxUpdate'=>'function(id,options){alert(unescape(options.url)) }',
+			'afterAjaxUpdate'=>'function(id, data){ 
+									var elems = document.getElementById("'.(($isPublicList === true)?'PublicUploadsPager':'UploadsPager').'").getElementsByTagName("li");
+									var selectedPage = 0;
+			
+								    for (i in elems) {
+										if(elems[i].className == "page selected")
+										{
+											//alert(elems[i].getElementsByTagName("a")[0].innerHTML);
+											selectedPage = elems[i].getElementsByTagName("a")[0].innerHTML;
+											break;
+										}
+								    }
+			
+									//alert("bgImageListPageNo:" + (TRACKER.bgImageListPageNo - 1) + " - selectedPage:" + selectedPage);
+
+									//Kullanicinin sectigi sayfadaki uploadlar icin henüz sorgulama yapilmadiysa gerekli sorgulamalari hemen recursive olarak yap
+									checkImageListCallRequired('.(($isPublicList === true)?'true':'false').', selectedPage);			
+								}',
 			'summaryText'=>'',
 			'emptyText'=>$isSearchResult?$uploadSearchEmptyText:$emptyText,
 			'htmlOptions'=>array('style'=>'font-size:14px;'),
 			'pager'=>array( 
-				 'id'=>'UploadsPager-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+				 //'id'=>'UploadsPager-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+				 'id'=>($isPublicList === true)?'PublicUploadsPager':'UploadsPager',  //'UploadsPager'.$isPublicList?'-public':'',
 				 'header'=>'',
 		         'firstPageLabel'=>'',
 		         'lastPageLabel'=>'',
@@ -108,6 +143,23 @@ if ($dataProvider != null) {
 				),
 			),
 	));
+	
+// 	Yii::app()->clientScript->registerScript('pageClicked',
+// 			'
+// function getEventTarget(e) {
+//     e = e || window.event;
+//     return e.target || e.srcElement; 
+// }
+
+// var ul = document.getElementById("UploadsPager");
+// ul.onclick = function(event) {
+//     var target = getEventTarget(event);
+//     alert(target.innerHTML);
+// 			};
+						
+			
+// 			',
+// 			CClientScript::POS_READY);	
 	?>
 	</div>
 	<?php	

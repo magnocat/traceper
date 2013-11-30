@@ -398,6 +398,8 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
 	//alert('TRACKER.users.size:' + size);
 	
+	var anyDeletedFriend = false;
+	
 	for (key in TRACKER.users) {
 	    if (TRACKER.users.hasOwnProperty(key)  &&        // These are explained
 	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
@@ -428,11 +430,11 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 		    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
 		    		}
 
-		    		if(typeof $.fn.yiiGridView != "undefined")
-		    		{
-			    		$.fn.yiiGridView.update("userListView");
-			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
-		    		}		    		
+//		    		if(typeof $.fn.yiiGridView != "undefined")
+//		    		{
+//			    		$.fn.yiiGridView.update("userListView");
+//			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
+//		    		}		    		
 		    		
 //		            var myElem = document.getElementById('uploadListView');
 //		            if(myElem == null)
@@ -445,12 +447,15 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 //		            }		    		
 		    		
 		    		delete TRACKER.users[key];
+		    		
+		    		anyDeletedFriend = true;
 		    	}
 	    	}	    		    	
 	    }
 	}
 	
-	if(newFriend === true)
+	//if(newFriend === true)
+	if((anyDeletedFriend === true) || ((updateType === 'onlyUpdated') && (newFriend === true)))
 	{
 		if(typeof $.fn.yiiGridView != "undefined")
 		{
@@ -459,6 +464,235 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 	}	
 	
 	delete userIdArray;
+}
+
+//var uploadIdArray = new Array();
+
+function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbSuffix){
+	
+	//alert("processUploads() called");
+	var updateType = 'all';
+	
+	if(typeof par_updateType !== 'undefined')
+	{
+		updateType = par_updateType;
+	}	
+	
+	if(typeof par_thumbSuffix !== 'undefined')
+	{
+		TRACKER.imageThumbSuffix = par_thumbSuffix;
+	}
+
+	var newUpload = false;
+	
+	//alert("uploads.length:" + uploads.length);
+	
+	//$(xml).find("page").find("upload").each(function(){
+	$.each(uploads, function(index, value)
+	{				
+		//alert("processImageXML(), find-each");
+
+		var imageId = value.id;
+		//alert("imageId:" + imageId);
+		
+		//uploadIdArray.push(imageId);
+		
+		var imageURL = decodeURIComponent(value.url); //decodeURIComponent($(image).attr('url'));
+		
+		//alert("value.url: " + value.url);
+		//alert("decodeURIComponent(value.url): " + decodeURIComponent(value.url));
+		
+		var realname = value.byRealName;
+		var userId = value.byUserId;
+		var latitude = value.latitude;
+		var longitude = value.longitude;
+		var time = value.time;
+		var rating = value.rating;
+		var description = ""; //value.description; //$(image).attr('description');
+		
+		//alert(value.description);
+		
+		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
+		
+		if ($.inArray(imageId, TRACKER.imageIds) == -1)
+		{
+			TRACKER.imageIds.push(imageId);
+		}
+		
+		if (typeof TRACKER.images[imageId] == "undefined") {
+			
+			newUpload = true;
+			
+			//alert("images["+ imageId +"] is undefined!");
+	
+			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
+			//image = imageURL + "&fileType=0&thumb=ok";
+			var userMarker = MAP.putMarker(location, image, false);
+			var iWindow = MAP.initializeInfoWindow();
+			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+			
+			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
+				imageURL:imageURL,
+				userId:userId,
+				realname:realname,
+				latitude:latitude,
+				longitude:longitude,
+				time:time,
+				rating:rating,
+				mapMarker:markerInfoWindow,
+				description:description,
+			});
+			
+			//alert("MAP.setMarkerVisible(true)");
+						
+			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN					
+			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
+				var image = new Image();
+
+				image.src= TRACKER.images[imageId].imageURL + "&fileType=0"; // + TRACKER.imageOrigSuffix;
+				$("#loading").show();
+				$(image).load(function(){
+					$("#loading").hide();
+					
+					var content = "<div class='origImageContainer'>"
+						+ "<div>"
+						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+						+ "</div>"
+						+ "<div>"
+						+ TRACKER.images[imageId].description + "<br/>"
+						+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ "<br/>"
+						+ TRACKER.images[imageId].time + "<br/>"
+						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+						+ "</div>"
+						+ '<ul class="sf-menu"> '
+						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+						+ TRACKER.langOperator.zoom
+						+'</a>'+ '</li>'
+						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+						+ TRACKER.langOperator.zoomMax
+						+'</a>'+'</li>'
+						+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+						+'</a>'+'</li>'
+						+'</li>'
+						+ '</ul>'
+						+ "</div>";
+					
+					
+					//var content = "<video id='my_video_2' class='video-js vjs-default-skin' controls preload='auto' width='320' height='264'><source src='http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4' type='video/mp4'></video>";
+					
+					//var content = "<div> Deneme </div>";
+					
+					//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
+
+					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
+					
+					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
+					TRACKER.images[imageId].infoWindowIsOpened = true;	
+					
+					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
+						if ($('#showPhotosOnMap').attr('checked') == false){
+							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
+						}				
+					});
+				});				
+			});		
+		}
+		else
+		{
+			//alert("images["+ imageId +"] is already defined");
+			
+			//alert("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
+			
+			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN		
+		}
+
+	});
+	
+//	for (var i = 0; i < TRACKER.images.length; i++) {
+//		MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+//	}
+	
+	for (key in TRACKER.images) {
+	    if (TRACKER.images.hasOwnProperty(key)  &&        // These are explained
+	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
+	        key <= 4294967294                // away below
+	        ) {
+			//alert("processUsers(), TRACKER.images[" + key + "]: false");
+
+			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
+			{
+		    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+				
+				if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+				{
+					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+				}
+				
+//		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
+//		    	{
+//		    		//alert('uploadId:' + key + 'deleted');
+//		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
+//		    		
+//		    		if(TRACKER.images[key].infoWindowIsOpened)
+//		    		{
+//		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
+//		    		}
+//
+//		    		if(typeof $.fn.yiiGridView != "undefined")
+//		    		{
+//			    		$.fn.yiiGridView.update(uploadsGridViewId);
+//			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+//		    		}		    		
+//
+//		    		delete TRACKER.images[key];
+//		    	}				
+			}	    				
+	    }
+	}
+	
+	var anyDeletedUpload = false;
+	
+	$.each(deletedUploads, function(index, value)
+	{				
+		var uploadId = value.uploadId;
+
+    	//alert('uploadId:' + uploadId + ' deleted');
+    	
+    	if((typeof TRACKER.images[uploadId] !== "undefined") && (TRACKER.images[uploadId] !== null))
+    	{
+    		anyDeletedUpload = true;
+    		
+    		MAP.setMarkerVisible(TRACKER.images[uploadId].mapMarker.marker, false);	
+    		
+    		if(TRACKER.images[uploadId].infoWindowIsOpened)
+    		{
+    			MAP.closeInfoWindow(TRACKER.images[uploadId].mapMarker.infoWindow);
+    		}
+
+//    		if(typeof $.fn.yiiGridView != "undefined")
+//    		{
+//	    		$.fn.yiiGridView.update(uploadsGridViewId);
+//	    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+//    		}		    		
+
+    		delete TRACKER.images[uploadId];   		
+    	}						
+	});				
+	
+	if((anyDeletedUpload === true) || ((updateType === 'onlyUpdated') && (newUpload === true)))
+	{
+		if(typeof $.fn.yiiGridView != "undefined")
+		{
+			$.fn.yiiGridView.update(uploadsGridViewId);
+		}
+		
+		//alert("Deleted or New Upload");
+	}	
+	
+	//delete uploadIdArray;
+	
+	//alert("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
 }
 
 /**
@@ -648,6 +882,7 @@ function processImageXML(MAP, xml){
 	
 	return list;
 }
+
 //TODO: latitude longitude -> location a cevrilsin
 function getPastPointInfoContent(userId, time, deviceId, userType, previousGMarkerIndex, latitude, longitude, nextGMarkerIndex) {
 

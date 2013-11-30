@@ -139,7 +139,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		//TODO: ../index.php should be changed
 		//TODO: updateUserListInterval
 		//TODO: queryIntervalForChangedUsers
-		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 10000 /*Users query period*/ /*5000*/, 5000 /*Uploads query period*/ /*30000*/);
+		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 10000 /*Users query period*/ /*5000*/, 30000 /*Uploads query period*/ /*30000*/);
 		trackerOp.setLangOperator(langOp);
 		bindElements(langOp, trackerOp);
 		trackerOp.userId = ".$userId.";
@@ -153,14 +153,16 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 if (Yii::app()->user->isGuest == false)
 {
 	Yii::app()->clientScript->registerScript('getDataInBackground',
-			'//trackerOp.getFriendList(1, 0/*UserType::RealUser*/);
-			//trackerOp.getImageList(); ',
+			'TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true;
+			trackerOp.getFriendList(1, 0/*UserType::RealUser*/);
+			trackerOp.getImageList();',
 			CClientScript::POS_READY);
 }
 else
 {
 	Yii::app()->clientScript->registerScript('getDataInBackground',
-			'trackerOp.getImageList(true, false); ',
+			'TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false;
+			trackerOp.getImageList(true, false);',
 			CClientScript::POS_READY);	
 }
 
@@ -240,11 +242,6 @@ $app->language = $language;
 	echo '<div id="contactWindow" style="display:none;font-family:Helvetica;"></div>';			
 	///////////////////////////// User Login Window ///////////////////////////
 	echo '<div id="acceptTermsForLoginWindow" style="display:none;font-family:Helvetica;"></div>';
-	
-
-	
-	
-	
 	///////////////////////////// Register Window ///////////////////////////
 	echo '<div id="registerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
@@ -419,7 +416,6 @@ $app->language = $language;
 
 		<div id='topBar'>
 			<div id='topContent'>
-
 				<?php
 				if (Yii::app()->user->isGuest == false) {
 					echo CHtml::link('<div id="logo" style="display:none"></div>', '#', array(
@@ -594,38 +590,38 @@ $app->language = $language;
 // 													'update'=> '#forgotPasswordWindow',
 									
 													'success'=> 'function(result){
-													try
-													{
-													var obj = jQuery.parseJSON(result);
-													
-													if (obj.result)
-													{
-													if (obj.result == "1")
-													{
-													$("#forgotPasswordWindow").dialog("close");
-													TRACKER.showLongMessageDialog("'.Yii::t('site', 'We have sent the password reset link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-													}
-													else if (obj.result == "0")
-													{
-													$("#forgotPasswordWindow").dialog("close");
-													TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.').'");
-													}
-													}
-													}
-													catch (error)
-													{
-													var opt = {
-													        autoOpen: false,
-													        modal: true,
-															resizable: false,
-													        width: 600,
-													        title: "'.Yii::t('site', 'Forgot Password?').'"
-													};													
-													
-													$("#forgotPasswordWindow").dialog(opt).dialog("open");
-													$("#forgotPasswordWindow").html(result);
-													}
-													}',													
+																	try
+																	{
+																		var obj = jQuery.parseJSON(result);
+																		
+																		if (obj.result)
+																		{
+																			if (obj.result == "1")
+																			{
+																				$("#forgotPasswordWindow").dialog("close");
+																				TRACKER.showLongMessageDialog("'.Yii::t('site', 'We have sent the password reset link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																			}
+																			else if (obj.result == "0")
+																			{
+																				$("#forgotPasswordWindow").dialog("close");
+																				TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.').'");
+																			}
+																		}
+																	}
+																	catch (error)
+																	{
+																		var opt = {
+																	        autoOpen: false,
+																	        modal: true,
+																			resizable: false,
+																	        width: 600,
+																	        title: "'.Yii::t('site', 'Forgot Password?').'"
+																		};													
+																	
+																		$("#forgotPasswordWindow").dialog(opt).dialog("open");
+																		$("#forgotPasswordWindow").html(result);
+																	}
+																}',													
 											),
 											array(
 													'id'=>'showForgotPasswordWindow','tabindex'=>5));									
@@ -648,25 +644,58 @@ $app->language = $language;
 											'caption'=>Yii::t('site', 'Log in'),
 											'id'=>'loginAjaxButton',
 											'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),
-																	'success'=> 'function(msg){													
-																					if(msg.search("acceptTermsForLoginWindow") !== -1)
+																	'success'=> 'function(msg){
+																					try
 																					{
-																						var opt = {
-																						        autoOpen: false,
-																						        modal: true,
-																								resizable: false,
-																						        width: 600,
-																						        title: "'.Yii::t('site', 'Accept Terms to continue').'"
-																						};													
+																						var obj = jQuery.parseJSON(msg);
 																						
-																						$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
-																						$("#acceptTermsForLoginWindow").html(msg);																																		
+																						if (obj.result)
+																						{
+																							if (obj.result == "1")
+																							{
+																								$("#tabViewList").html(obj.renderedTabView);
+																								$("#forAjaxRefresh").html(obj.loginSuccessfulActions);
+																							}
+																							else if (obj.result == "-3")
+																							{
+																								$("#forAjaxRefresh").html(obj.loginView);
+													
+																								var opt = {
+																							        autoOpen: false,
+																							        modal: true,
+																									resizable: false,
+																							        width: 600,
+																							        title: "'.Yii::t('site', 'Accept Terms to continue').'"
+																								};													
+													
+																								$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
+																								$("#acceptTermsForLoginWindow").html(obj.renderedView);																								
+																							}
+																						}
 																					}
-																					else
+																					catch (error)
 																					{
-																						//Form error veya successful durumu icin
 																						$("#forAjaxRefresh").html(msg);
-																					}													
+																					}
+													
+// 																					if((msg.search("LoginForm_email") === -1) && (msg.search("acceptTermsForLoginWindow") !== -1)) //Form hatasi yoksa ve acceptTerms formu ise
+// 																					{
+// 																						var opt = {
+// 																					        autoOpen: false,
+// 																					        modal: true,
+// 																							resizable: false,
+// 																					        width: 600,
+// 																					        title: "'.Yii::t('site', 'Accept Terms to continue').'"
+// 																						};													
+																						
+// 																						$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
+// 																						$("#acceptTermsForLoginWindow").html(msg);																																		
+// 																					}
+// 																					else //Aksi halde gelen mesaji oldugu gibi isle
+// 																					{
+// 																						//Form error veya successful durumu icin
+// 																						$("#forAjaxRefresh").html(msg);
+// 																					}													
 																				}',
 													))
 											));									
@@ -797,7 +826,7 @@ $app->language = $language;
 							),
 							array(
 									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/));
-			
+											
 					if(Yii::app()->params->featureGPSDeviceEnabled)
 					{
 						echo CHtml::ajaxLink('<div class="userOperations" id="registerGPSTracker">
@@ -1112,35 +1141,35 @@ $app->language = $language;
 									echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
 											array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
 													'success'=> 'function(msg){
-													try
-													{
-													var obj = jQuery.parseJSON(msg);
-														
-													if (obj.result)
-													{
-													if (obj.result == "1")
-													{
-													TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-									}
-													else if (obj.result == "2")
-													{
-													TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-									}
-													else if (obj.result == "0")
-													{
-													TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
-									}
-									}
-									}
-													catch (error)
-													{
-													$("#forRegisterRefresh").html(msg);
-									
-													//alert("Deneme");
+																	try
+																	{
+																		var obj = jQuery.parseJSON(msg);
+																		
+																		if (obj.result)
+																		{
+																			$("#forRegisterRefresh").html(obj.registerView);
 													
+																			if (obj.result == "1")
+																			{
+																				TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																			}
+																			else if (obj.result == "2")
+																			{
+																				TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+																			}
+																			else if (obj.result == "0")
+																			{
+																				TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																			}
+																		}
+																	}
+																	catch (error)
+																	{
+																		$("#forRegisterRefresh").html(msg);
 													
-									}
-									}',
+																		//alert("Deneme");
+																	}
+																}',
 											),'onmouseover'=>'this.src="images/signup_button_mouseover_'.Yii::app()->language.'.png";',
 													'onmouseout'=>'this.src="images/signup_button_default_'.Yii::app()->language.'.png";$("#registerButton").css("margin-top", "0px");',
 													'onmousedown'=>'$("#registerButton").css("margin-top", "2px");',
@@ -1325,102 +1354,167 @@ $app->language = $language;
 					</div>								
 				</div>
 				
-				<div id="lists"
-				<?php
-				if (Yii::app()->user->isGuest == true) {
-					echo "style='display:none'";
-				}?>>				
-					<div class='titles'>
+				<div id="lists">				
+					<div id="tabViewList" class='titles' style='width:355px; overflow-y:hidden;'>
 					<?php
-						$tabs = array();
+// 						$tabs = array();
 
-						if(Yii::app()->params->featureFriendManagementEnabled)
-						{
-							$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser/*, UserType::GPSDevice*/))), 
-																	  //'id'=>'users_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor 
-																	  'id'=>'users_tab', //Unique ID verince sonradan style degisimi zor oluyor
-																	  'style'=>'width:8.4em;');
-							//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
-						}
+// 						if(Yii::app()->params->featureFriendManagementEnabled)
+// 						{
+// 							$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser/*, UserType::GPSDevice*/))), 
+// 																	  //'id'=>'users_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor 
+// 																	  'id'=>'users_tab',//Unique ID verince sonradan style degisimi zor oluyor
+// 																	  'style'=>'width:8.4em;');
+// 							//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
+// 						}
 
-						if(Yii::app()->params->featureStaffManagementEnabled)
-						{
-							$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 
-																	  //'id'=>'staff_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-																	  'id'=>'staff_tab' //Unique ID verince sonradan style degisimi zor oluyor
-																	 );
-						}
+// 						if(Yii::app()->params->featureStaffManagementEnabled)
+// 						{
+// 							$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))), 
+// 																	  //'id'=>'staff_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 																	  'id'=>'staff_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 																	 );
+// 						}
 						
-						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 
-																  //'id'=>'photos_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-																  'id'=>'photos_tab' //Unique ID verince sonradan style degisimi zor oluyor
-																 ); //0:image 'id'=>'photos_tab');
+// 						$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), 
+// 																  //'id'=>'photos_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 																  'id'=>'photos_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 																 ); //0:image 'id'=>'photos_tab');
 
-						if(Yii::app()->params->featureFriendManagementEnabled)
-						{
-							$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 
-																	  //'id'=>'groups_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-																	  'id'=>'groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
-																	 );
-						}
+// 						if(Yii::app()->params->featureFriendManagementEnabled)
+// 						{
+// 							$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)), 
+// 																	  //'id'=>'groups_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 																	  'id'=>'groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 																	 );
+// 						}
 							
-						if(Yii::app()->params->featureStaffManagementEnabled)
-						{
-							$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 
-																			//'id'=>'staff_groups_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-																		  	'id'=>'staff_groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
-																		   );
-						}	
+// 						if(Yii::app()->params->featureStaffManagementEnabled)
+// 						{
+// 							$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)), 
+// 																			//'id'=>'staff_groups_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 																		  	'id'=>'staff_groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 																		   );
+// 						}	
 
-						$this->widget('zii.widgets.jui.CJuiTabs', array(
-								// 											    'tabs' => array(
-										// 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'),
-												// 																	 'id'=>'users_tab'),
-										// 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image
-												// 											        				  'id'=>'photos_tab'),
-										// 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'),
-												// 											        				  'id'=>'groups_tab'),
-										// 											    ),
-								'tabs' => $tabs,
+// 						$this->widget('zii.widgets.jui.CJuiTabs', array(
+// 								// 											    'tabs' => array(
+// 										// 													Yii::t('layout', 'Users') => array('ajax' => $this->createUrl('users/getFriendList'),
+// 												// 																	 'id'=>'users_tab'),
+// 										// 											        Yii::t('layout', 'Photos') => array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)), //0:image
+// 												// 											        				  'id'=>'photos_tab'),
+// 										// 											        Yii::t('layout', 'Groups') => array('ajax' => $this->createUrl('groups/getGroupList'),
+// 												// 											        				  'id'=>'groups_tab'),
+// 										// 											    ),
+// 								'tabs' => $tabs,
+// 								'id'=>"tab_view",
+// 								// additional javascript options for the tabs plugin
+// 								'options' => array(
+// 										'collapsible' => false,
+// 										'cache'=>true,
+// 										'selected' => 0,
+// 										'load' => 'js:function(){
+// 														uploadsGridViewId = \'uploadListView\';
+// 														var h = $(window).height(), offsetTop = 60;
+// 														$("#users_tab").css("min-height", (485 + 100 - 60 - 81)); $("#users_tab").css("height", (h - offsetTop - 81));
+// 														$("#photos_tab").css("min-height", (485 + 100 - 60 - 81)); $("#photos_tab").css("height", (h - offsetTop - 81));
+// 														$("#groups_tab").css("min-height", (485 + 100 - 60 - 81)); $("#groups_tab").css("height", (h - offsetTop - 81));
+// 														'.((Yii::app()->user->isGuest == false)?
+// 														'switch ($("#tab_view").tabs("option", "selected"))
+// 												    	 {
+// 													    	 case 0: //Friends
+// 													    	 {
+// 													    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+// 													    	 }
+// 													    	 break;
+													    	   
+// 													    	 case 1: //Uploads
+// 													    	 {
+// 													    		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+// 													    	 }
+// 													    	 break;
+													    	   
+// 													    	 case 2: //Groups
+// 													    	 {
+// 													    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+// 													    	 }
+// 													    	 break;
+// 												    	 }':'').
+// 														'}'									
+// 								),
+// 								'htmlOptions'=>array(										
+// 										'style'=>'width:345px; overflow-y:hidden;'
+// 								),								
+// 						));
+
+// 					if(Yii::app()->params->featureFriendManagementEnabled)
+// 					{
+// 						$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser/*, UserType::GPSDevice*/))),
+// 								//'id'=>'users_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 								'id'=>'users_tab',//Unique ID verince sonradan style degisimi zor oluyor
+// 								'style'=>'width:8.4em;');
+// 						//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
+// 					}
+					
+// 					if(Yii::app()->params->featureStaffManagementEnabled)
+// 					{
+// 						$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
+// 								//'id'=>'staff_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 								'id'=>'staff_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 						);
+// 					}
+					
+// 					$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)),
+// 							//'id'=>'photos_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 							'id'=>'photos_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 					); //0:image 'id'=>'photos_tab');
+					
+// 					if(Yii::app()->params->featureFriendManagementEnabled)
+// 					{
+// 						$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
+// 								//'id'=>'groups_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 								'id'=>'groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 						);
+// 					}
+						
+// 					if(Yii::app()->params->featureStaffManagementEnabled)
+// 					{
+// 						$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
+// 								//'id'=>'staff_groups_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 								'id'=>'staff_groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
+// 						);
+// 					}					
+
+					if (Yii::app()->user->isGuest == false)
+					{
+						$this->widget('ext.EasyTabs.EasyTabs', array(
 								'id'=>"tab_view",
-								// additional javascript options for the tabs plugin
-								'options' => array(
-										'collapsible' => false,
-										'cache'=>true,
-										'selected' => 0,
-										'load' => 'js:function(){
-														uploadsGridViewId = \'uploadListView\';
-														var h = $(window).height(), offsetTop = 60;
-														$("#users_tab").css("min-height", (485 + 100 - 60 - 81)); $("#users_tab").css("height", (h - offsetTop - 81));
-														$("#photos_tab").css("min-height", (485 + 100 - 60 - 81)); $("#photos_tab").css("height", (h - offsetTop - 81));
-														$("#groups_tab").css("min-height", (485 + 100 - 60 - 81)); $("#groups_tab").css("height", (h - offsetTop - 81));
-														'.((Yii::app()->user->isGuest == false)?
-														'switch ($("#tab_view").tabs("option", "selected"))
-												    	 {
-													    	 case 0: //Friends
-													    	 {
-													    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-													    	 }
-													    	 break;
-													    	   
-													    	 case 1: //Uploads
-													    	 {
-													    		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-													    	 }
-													    	 break;
-													    	   
-													    	 case 2: //Groups
-													    	 {
-													    		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
-													    	 }
-													    	 break;
-												    	 }':'').
-														'}'									
+								'tabs'=>array(
+										array(
+												'id'=>'users_tab',
+												'title' => Yii::t('layout', 'Users'),
+												'contentTitle' => '',
+												'url' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser/*, UserType::GPSDevice*/))),
+										),
+										array(
+												'id'=>'photos_tab',
+												'title' => Yii::t('layout', 'Photos'),
+												'contentTitle' => '',
+												'url' => $this->createUrl('upload/getList', array('fileType'=>0)),
+										),
+										array(
+												'id'=>'groups_tab',
+												'title' => Yii::t('layout', 'Groups'),
+												'contentTitle' => '',
+												'url' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
+										),
 								),
-								'htmlOptions'=>array(										
-										'style'=>'width:345px; overflow-y:hidden;',
-								),								
-						));
+								'options' => array(
+										'updateHash' => false,
+										'cache' => true,
+								),
+						));						
+					}					
 					?>
 					</div>
 				</div>									
