@@ -13,9 +13,7 @@
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 <link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/tooltipster.css" />				
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />				
 <link rel="shortcut icon"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png"
 	type="image/x-icon" />
@@ -31,12 +29,47 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/TrackerOperator.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery.tooltipster.min.js"></script>	
 	
-<script>
-   $(document).ready(function() {
-       	 //$('#register-form-main input[type="text"]').tooltipster({
+<?php
+
+$token = null;
+$tokenExists = false;
+
+if (isset($_GET['tok'])  && ($_GET['tok'] != null))
+{
+	//Fb::warn("in main", "main");
+
+	$token = $_GET['tok'];
+
+	if(ResetPassword::model()->tokenExists($token))
+	{
+		$tokenExists = true;
+		
+		if(ResetPassword::model()->isRequestTimeValid($token))
+		{
+			$passwordResetRequestStatus = PasswordResetStatus::RequestValid;
+		}
+		else
+		{
+			$passwordResetRequestStatus = PasswordResetStatus::RequestInvalid;
+		}
+	}
+	else
+	{
+		$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
+	}
+}
+else
+{
+	$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
+}
+	
+Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl.'/css/tooltipster.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/jquery.tooltipster.min.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerScript('formTooltips',
+		"
+       	 //$(\"#register-form-main input[type=\"text\"]\").tooltipster({
          //	 theme: '.tooltipster-noir',
          //	 position: 'right',
          //	 trigger: 'custom',
@@ -45,7 +78,7 @@
          //	 interactive: true,
          //});
 
-         //$('#login-form-main input[type="text"]').tooltipster({
+         //$(\"#login-form-main input[type=\"text\"]\").tooltipster({
          // 	 theme: '.tooltipster-noir',
          //  	 position: 'right',
          //  	 trigger: 'custom',
@@ -55,61 +88,85 @@
          //  });
          
 		//Bunu silme, e-mail field'inin tooltip'inin cikmasini sagliyor
-		$("#RegisterForm_email").tooltipster({
-        	 theme: ".tooltipster-info",
-        	 position: "right",
-        	 trigger: "custom",
+		$(\"#RegisterForm_email\").tooltipster({
+        	 theme: \".tooltipster-info\",
+        	 position: \"right\",
+        	 trigger: \"custom\",
         	 maxWidth: 500,
         	 onlyOne: false,
 			 interactive: true,
         	 });        
 
-		$("#createGroup").tooltipster({
-	       	 theme: ".tooltipster-info",
-	       	 content: "<?php echo Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".'); ?>",
-	       	 position: "bottom",
-	       	 trigger: "hover",
+		$(\"#createGroup\").tooltipster({
+	       	 theme: \".tooltipster-info\",
+	       	 content: \"".Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".')."\",
+	       	 position: \"bottom\",
+	       	 trigger: \"hover\",
 	       	 maxWidth: 300,
          	 onlyOne: false,       	 
        	 });
 
-		$("#showPublicPhotosLink").tooltipster({
-	       	 theme: ".tooltipster-info",
-	       	 content: "<?php echo Yii::t('layout', 'Click here to view the list of photos shared publicly'); ?>",
-	       	 position: "bottom",
-	       	 trigger: "hover",
+		$(\"#showPublicPhotosLink\").tooltipster({
+	       	 theme: \".tooltipster-info\",
+	       	 content: \"".Yii::t('layout', 'Click here to view the list of photos shared publicly')."\",
+	       	 position: \"bottom\",
+	       	 trigger: \"hover\",
 	       	 maxWidth: 260,
 	       	 offsetX: -25,
 	       	 onlyOne: false,       	 
       	 }); 
 
-		$("#showCachedPublicPhotosLink").tooltipster({
-	       	 theme: ".tooltipster-info",
-	       	 content: "<?php echo Yii::t('layout', 'Click here to view the list of photos shared publicly'); ?>",
-	       	 position: "bottom",
-	       	 trigger: "hover",
+		$(\"#showCachedPublicPhotosLink\").tooltipster({
+	       	 theme: \".tooltipster-info\",
+	       	 content: \"".Yii::t('layout', 'Click here to view the list of photos shared publicly')."\",
+	       	 position: \"bottom\",
+	       	 trigger: \"hover\",
 	       	 maxWidth: 260,
 	       	 offsetX: -25,
 	       	 onlyOne: false,       	 
      	 });
 
-		$("#showRegisterFormLink").tooltipster({
-	       	 theme: ".tooltipster-info",
-	       	 content: "<?php echo Yii::t('layout', 'Click here to view the registration form again'); ?>",
-	       	 position: "bottom",
-	       	 trigger: "hover",
+		$(\"#showRegisterFormLink\").tooltipster({
+	       	 theme: \".tooltipster-info\",
+	       	 content: \"".Yii::t('layout', ($tokenExists === true)?'Click here to view the password reset form again':'Click here to view the registration form again')."\",
+	       	 position: \"bottom\",
+	       	 trigger: \"hover\",
 	       	 maxWidth: 220,
 	       	 offsetX: -25,
 	       	 onlyOne: false,       	 
-     	 });    	    	 
+     	 });
 
-        bindTooltipActions();                    	         
-   });
-</script>
+        bindTooltipActions();			
+		",
+		CClientScript::POS_READY);
+
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/bindings.js', CClientScript::POS_END);
+
+if (Yii::app()->user->isGuest == false)
+{
+	Yii::app()->clientScript->registerScript('loggedInStyle',
+			"
+			var h = $(window).height(), offsetTop = 60; // Calculate the top offset
+			var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
+
+			$('#topBar').css('height', '60px');
+			$('#sideBar').css('top', '60px');
+			//$('#sideBar').css('width', '380px');
+			$('#sideBar').css('height', (h - offsetTop));
+			$('#sideBar').css('min-height', (485 + 100 - 60));
+			$('#bar').css('top', offsetTop);
+			$('#bar').css('height', (h - offsetTop));
+			//$('#bar').css('left', '380px');
+			$('#bar').css('min-height', (485 + 100 - 60));
+			$('#map').css('height', (h - offsetTop)); //$('#map').css('height', '94%');
+			$('#map').css('width', (w - offsetLeft));
+			$('#map').css('min-width', (735 + 260 - 380));
+			$('#map').css('min-height', (485 + 100 - 60));
+			",
+			CClientScript::POS_READY);
+}
+?>
     
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/bindings.js"></script>       	
-
 <!-- <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet"> -->
 <!-- <script src="http://vjs.zencdn.net/c/video.js"></script> -->
 
@@ -126,6 +183,25 @@ if(Yii::app()->user->isGuest == false)
 {
 	$userId = Yii::app()->user->id;
 }
+
+$app = Yii::app();
+$language = 'tr';
+
+if (isset($app->session['_lang']))
+{
+	$language = $app->session['_lang'];
+
+	//echo 'Session VAR';
+}
+else
+{
+	$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+	//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+
+	//echo 'Session YOK - pref. lang: '.substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+}
+
+$app->language = $language;
 
 Yii::app()->clientScript->registerCoreScript('yiiactiveform');
 
@@ -166,40 +242,20 @@ else
 			CClientScript::POS_READY);	
 }
 
-$createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
-.CHtml::ajax(
-		array(
-				'url'=>Yii::app()->createUrl('geofence/createGeofence'),
-				'complete'=> 'function(result) {
-				$("#createGeofenceWindow").dialog("open"); return false;
-}',
-				'update'=> '#createGeofenceWindow',
-		)).
-		"}";
+// $createGeofenceFormJSFunction = "function createGeofenceForm(geoFence){"
+// .CHtml::ajax(
+// 		array(
+// 				'url'=>Yii::app()->createUrl('geofence/createGeofence'),
+// 				'complete'=> 'function(result) {
+// 				$("#createGeofenceWindow").dialog("open"); return false;
+// }',
+// 				'update'=> '#createGeofenceWindow',
+// 		)).
+// 		"}";
 
-Yii::app()->clientScript->registerScript('getGeofenceInBackground',
-		$createGeofenceFormJSFunction,
-		CClientScript::POS_BEGIN);
-
-$app = Yii::app();
-$language = 'tr';
-
-if (isset($app->session['_lang']))
-{
-	$language = $app->session['_lang'];
-
-	//echo 'Session VAR';
-}
-else
-{
-	$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-	//$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-
-	//echo 'Session YOK - pref. lang: '.substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-}
-
-$app->language = $language;
-
+// Yii::app()->clientScript->registerScript('getGeofenceInBackground',
+// 		$createGeofenceFormJSFunction,
+// 		CClientScript::POS_BEGIN);
 ?>
 <script type="text/javascript">		
 	var langOp = new LanguageOperator();
@@ -212,13 +268,7 @@ $app->language = $language;
 </head>
 <body>
 
-<script type="text/javascript">
-	//TRACKER.userId = <?php //if (Yii::app()->user->isGuest == false){echo Yii::app()->user->id;}else{echo '0';} ?>;
-
-	//alert("main TRACKER.userId:" + TRACKER.userId);	
-</script>
-
-	<?php
+<?php
 	//Yii::app()->session['_lang'] = 'en';
 
 	//echo 'Yii version:'.Yii::getVersion();
@@ -305,36 +355,7 @@ $app->language = $language;
 // 	</div>';
 
 // 	$this->endWidget('zii.widgets.jui.CJuiDialog');
-	/////////////////////////////////////////////////////////////////////////////////////////////////
-		
-	$token = null;
-	
-	if (isset($_GET['tok'])  && ($_GET['tok'] != null))
-	{
-		//Fb::warn("in main", "main");
-		
-		$token = $_GET['tok'];
-		
-		if(ResetPassword::model()->tokenExists($token))
-		{
-			if(ResetPassword::model()->isRequestTimeValid($token))
-			{
-				$passwordResetRequestStatus = PasswordResetStatus::RequestValid;
-			}
-			else
-			{
-				$passwordResetRequestStatus = PasswordResetStatus::RequestInvalid;
-			}						
-		}
-		else
-		{
-			$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
-		}
-	}
-	else
-	{
-		$passwordResetRequestStatus = PasswordResetStatus::NoRequest;
-	}	
+	/////////////////////////////////////////////////////////////////////////////////////////////////			
 
 	// this is a generic message dialog
 	$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
@@ -349,9 +370,11 @@ $app->language = $language;
 					'height'=>'auto',
 					'buttons'=>array(
 							Yii::t('common', 'OK')=>"js:function(){
-							$(this).dialog('close');
-}"
+								$(this).dialog('close');
+							}"
 					),
+					'open' => 'js:function(){ hideFormErrorsIfExist(); }',
+					'close' => 'js:function(){ showFormErrorsIfExist(); }'
 			),
 	));
 	//echo '</br>';
@@ -371,9 +394,11 @@ $app->language = $language;
 					'height'=>'auto',
 					'buttons'=>array(
 							Yii::t('common', 'OK')=>"js:function(){
-							$(this).dialog('close');
-	}"
-					),	
+								$(this).dialog('close');
+							}"
+					),
+					'open' => 'js:function(){ hideFormErrorsIfExist(); }',
+					'close' => 'js:function(){ showFormErrorsIfExist(); }'
 			),
 	));
 	//echo '</br>';
@@ -395,8 +420,8 @@ $app->language = $language;
 					'buttons' =>array (
 							Yii::t('common', 'OK')=>'js:function(){}',
 							Yii::t('common', 'Cancel')=>"js:function() {
-							$(this).dialog( 'close' );
-}"
+								$(this).dialog( 'close' );
+							}"
 					)),
 	));
 	echo '<div id="question" style="font-family:Helvetica;"></div>';
@@ -455,7 +480,7 @@ $app->language = $language;
 													  {													  	
 														//$("#formContent").fadeToggle( "slow", "linear");
 														uploadsGridViewId = \'publicUploadListView\';
-														$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); $("#showPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
+														$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
 														//$("#formContent").animate({height:"0px", marginTop:$("#sideBar").height()}, function(){ $("#formContent").hide(); });
 														//$("#showPublicPhotosLink").hide();
 														//$("#showRegisterFormLink").show();	
@@ -610,6 +635,8 @@ $app->language = $language;
 																	}
 																	catch (error)
 																	{
+																		hideFormErrorsIfExist();
+													
 																		var opt = {
 																	        autoOpen: false,
 																	        modal: true,
@@ -1224,7 +1251,7 @@ $app->language = $language;
 								?>							
 								
 								<div style="padding:9%;font-size:3em;">
-									<?php echo $form->labelEx($model,'resetPassword'); ?>
+									<?php echo $form->labelEx($model, 'resetPassword', array('style'=>'cursor:text;')); ?>
 								</div>							
 								
 								<div class="sideMenu" style="margin-left:2em;">
@@ -1251,38 +1278,44 @@ $app->language = $language;
 																			'name'=>'ajaxResetPassword',
 																			'caption'=>Yii::t('site', 'Update'),
 																			'id'=>'resetPasswordAjaxButton',
-																			'htmlOptions'=>array('type'=>'submit','tabindex'=>9,'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 
-																																			  'success'=> 'function(msg){
-																																								try
-																																								{																								
-																																									var obj = jQuery.parseJSON(msg);
-																																										
-																																									if (obj.result)
-																																									{
-																																										if (obj.result == "1") 
-																																										{
-																																											//TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-																																											
-																																											TRACKER.showMessageDialog("'.Yii::t('site', 'Your password has been changed successfully, you can login now...').'");
-																																											$("#passwordResetBlock").hide();
-																																											$("#registerBlock").css("height", "85%");
-																																											$("#registerBlock").css("min-height", "420px");
-																																											$("#registerBlock").load();
-																																											$("#registerBlock").show();
-																																											$("#appLinkBlock").load();
-																																											$("#appLinkBlock").show();																																										
-																																										}
-																																										else if (obj.result == "0")
-																																										{
-																																											TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");																									
-																																										}																													
-																																									}
-																																								}
-																																								catch (error)
-																																								{
-																																									$("#forPasswordResetRefresh").html(msg);
-																																								}																															
-																																							}',																		
+																			'htmlOptions'=>array('type'=>'submit','tabindex'=>9,
+																								 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/resetPassword', array('token'=>$token)), 
+																											   'success'=> 'function(msg){
+																																try
+																																{																								
+																																	var obj = jQuery.parseJSON(msg);
+																																		
+																																	if (obj.result)
+																																	{
+																																		//$("#forPasswordResetRefresh").html(obj.resetPaswordView);
+																								 										//Yukaridaki gibi yapinca login error varken mesaj cikip geri kapandiginda errorlar tekrar gosterilmiyor. Muhtemelen yeniden dosya yukleme sonucu tooltipser bozuluyor
+																								 										resetResetPasswordFormErrors();
+																								 		
+																								 										if (obj.result == "1") 
+																																		{
+																																			//TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																																																																						
+																								 											TRACKER.showMessageDialog("'.Yii::t('site', 'Your password has been changed successfully, you can login now...').'");
+																																			$("#passwordResetBlock").hide();
+																																			$("#registerBlock").css("height", "85%");
+																																			$("#registerBlock").css("min-height", "420px");
+																																			$("#registerBlock").load();
+																																			$("#registerBlock").show();
+																																			$("#appLinkBlock").load();
+																																			$("#appLinkBlock").show();
+																								 											$("#showRegisterFormLink").tooltipster("update", "'.Yii::t('layout', 'Click here to view the registration form again').'");																																										
+																																		}
+																																		else if (obj.result == "0")
+																																		{																																			
+																								 											TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while changing your password!').'");																									
+																																		}																													
+																																	}
+																																}
+																																catch (error)
+																																{
+																																	$("#forPasswordResetRefresh").html(msg);
+																																}																															
+																															}',																		
 																			))
 									));								
 									?>
@@ -1302,11 +1335,11 @@ $app->language = $language;
 						<div id="forPasswordResetInvalidRefresh">
 							<div class="form">							
 								<div style="font-size:3em;padding:9%;color:#E41B17">
-									<?php echo CHtml::label(Yii::t('site', 'Reset Your Password'), false); ?>
+									<?php echo CHtml::label(Yii::t('site', 'Reset Your Password'), false, array('style'=>'cursor:text;')); ?>
 								</div>
 								
 								<div style="font-size:1em;padding:9%;color:#E41B17">
-									<?php echo CHtml::label(Yii::t('site', 'This link is not valid anymore. Did you forget your password, please try to reset your password again.'), false); ?>
+									<?php echo CHtml::label(Yii::t('site', 'This link is not valid anymore. Did you forget your password, please try to reset your password again.'), false, array('style'=>'cursor:text;')); ?>
 								</div>							
 							</div>
 								
@@ -1445,45 +1478,7 @@ $app->language = $language;
 // 								'htmlOptions'=>array(										
 // 										'style'=>'width:345px; overflow-y:hidden;'
 // 								),								
-// 						));
-
-// 					if(Yii::app()->params->featureFriendManagementEnabled)
-// 					{
-// 						$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser/*, UserType::GPSDevice*/))),
-// 								//'id'=>'users_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 								'id'=>'users_tab',//Unique ID verince sonradan style degisimi zor oluyor
-// 								'style'=>'width:8.4em;');
-// 						//$tabs[Yii::t('layout', 'Users')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>(UserType::RealUser Or UserType::GPSDevice))), 'id'=>'users_tab');
-// 					}
-					
-// 					if(Yii::app()->params->featureStaffManagementEnabled)
-// 					{
-// 						$tabs[Yii::t('layout', 'Staff')]  = array('ajax' => $this->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
-// 								//'id'=>'staff_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 								'id'=>'staff_tab' //Unique ID verince sonradan style degisimi zor oluyor
-// 						);
-// 					}
-					
-// 					$tabs[Yii::t('layout', 'Photos')] = array('ajax' => $this->createUrl('upload/getList', array('fileType'=>0)),
-// 							//'id'=>'photos_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 							'id'=>'photos_tab' //Unique ID verince sonradan style degisimi zor oluyor
-// 					); //0:image 'id'=>'photos_tab');
-					
-// 					if(Yii::app()->params->featureFriendManagementEnabled)
-// 					{
-// 						$tabs[Yii::t('layout', 'Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
-// 								//'id'=>'groups_tab-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 								'id'=>'groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
-// 						);
-// 					}
-						
-// 					if(Yii::app()->params->featureStaffManagementEnabled)
-// 					{
-// 						$tabs[Yii::t('layout', 'Staff Groups')] = array('ajax' => $this->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
-// 								//'id'=>'staff_groups_tab-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 								'id'=>'staff_groups_tab' //Unique ID verince sonradan style degisimi zor oluyor
-// 						);
-// 					}					
+// 						));					
 
 					if (Yii::app()->user->isGuest == false)
 					{
@@ -1618,35 +1613,8 @@ $app->language = $language;
 <!-- 				id="sendNewPassword" /> -->
 <!-- 		</div> -->
 <!-- 	</div> -->
-		
-	
+				
 </body>
 </html>
-
-<?php	
-	if (Yii::app()->user->isGuest == false)
-	{
-?>	
-<script type="text/javascript">
-	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
-	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset	
-
-	$('#topBar').css('height', '60px');
-	$('#sideBar').css('top', '60px');
-	$('#sideBar').css('width', '380px');
-	$('#sideBar').css('height', (h - offsetTop));
-	$('#sideBar').css('min-height', (485 + 100 - 60));
-	$('#bar').css('top', offsetTop);
-	$('#bar').css('height', (h - offsetTop));
-	$('#bar').css('left', '380px');
-	$('#bar').css('min-height', (485 + 100 - 60));		
-	$('#map').css('height', (h - offsetTop)); //$("#map").css('height', '94%');
-	$('#map').css('width', (w - offsetLeft));
-	$('#map').css('min-width', (735 + 260 - 380));
-	$('#map').css('min-height', (485 + 100 - 60));		
-</script>	
-<?php	
-	}
-?>
 
 

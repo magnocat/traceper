@@ -7,6 +7,8 @@ var bRegisterFormPasswordErrorExists = false;
 var bRegisterFormPasswordAgainErrorExists = false;
 var bLoginFormEmailErrorExists = false;
 var bLoginFormPasswordErrorExists = false;
+var bResetPasswordFormNewPasswordErrorExists = false;
+var bResetPasswordFormNewPasswordAgainErrorExists = false;
 
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
@@ -35,7 +37,25 @@ function resetAllFormErrors()
 	$("#LoginForm_email").tooltipster("hide");
 	
 	$("#LoginForm_password").tooltipster('update', "");
-	$("#LoginForm_password").tooltipster("hide");	
+	$("#LoginForm_password").tooltipster("hide");
+	
+	$("#ResetPasswordForm_newPassword").tooltipster('update', "");
+	$("#ResetPasswordForm_newPassword").tooltipster("hide");
+	
+	$("#ResetPasswordForm_newPasswordAgain").tooltipster('update', "");
+	$("#ResetPasswordForm_newPasswordAgain").tooltipster("hide");	
+}
+
+function resetResetPasswordFormErrors()
+{
+	bResetPasswordFormNewPasswordErrorExists = false;
+	bResetPasswordFormNewPasswordAgainErrorExists = false;	
+	
+	$("#ResetPasswordForm_newPassword").tooltipster('update', "");
+	$("#ResetPasswordForm_newPassword").tooltipster("hide");
+	
+	$("#ResetPasswordForm_newPasswordAgain").tooltipster('update', "");
+	$("#ResetPasswordForm_newPasswordAgain").tooltipster("hide");	
 }
 
 function hideRegisterFormErrorsIfExist()
@@ -84,10 +104,24 @@ function hideLoginFormErrorsIfExist()
 	}	
 }
 
+function hideResetPasswordFormErrorsIfExist()
+{
+  	if(bResetPasswordFormNewPasswordErrorExists)
+	{
+		$("#ResetPasswordForm_newPassword").tooltipster("hide");
+	}
+  	
+  	if(bResetPasswordFormNewPasswordAgainErrorExists)
+	{
+		$("#ResetPasswordForm_newPasswordAgain").tooltipster("hide");
+	}	
+}
+
 function hideFormErrorsIfExist() 
 {
 	hideRegisterFormErrorsIfExist();
 	hideLoginFormErrorsIfExist();
+	hideResetPasswordFormErrorsIfExist();
 }
 
 function showRegisterFormErrorsIfExist()
@@ -124,8 +158,8 @@ function showRegisterFormErrorsIfExist()
 }
 
 function showLoginFormErrorsIfExist()
-{
-  	if(bLoginFormEmailErrorExists)
+{	
+	if(bLoginFormEmailErrorExists)
 	{
 		$("#LoginForm_email").tooltipster("show");
 	}
@@ -136,10 +170,24 @@ function showLoginFormErrorsIfExist()
 	}	
 }
 
+function showResetPasswordFormErrorsIfExist()
+{
+	if(bResetPasswordFormNewPasswordErrorExists)
+	{
+		$("#ResetPasswordForm_newPassword").tooltipster("show");
+	}
+  	
+  	if(bResetPasswordFormNewPasswordAgainErrorExists)
+	{
+		$("#ResetPasswordForm_newPasswordAgain").tooltipster("show");
+	}	
+}
+
 function showFormErrorsIfExist() 
 {
 	showRegisterFormErrorsIfExist();
 	showLoginFormErrorsIfExist();
+	showResetPasswordFormErrorsIfExist();
 }
 
 function bindTooltipActions() 
@@ -287,7 +335,8 @@ function bindElements(langOperator, trackerOp)
 			}
 			else //If not logged in
 			{
-				showRegisterFormErrorsIfExist();
+//				showRegisterFormErrorsIfExist();
+//				showResetPasswordFormErrorsIfExist();
 				
 				if(bShowPublicPhotosLinkActive === true)
 				{
@@ -301,7 +350,7 @@ function bindElements(langOperator, trackerOp)
 			
 			//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
 			$('#sideBar > #content').fadeIn('slow');
-			$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
+			$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")'); showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); });
 			$('#map').animate({width:(w - offsetLeft)});
 			$('#bar').animate({left:'380px'});			
 		}	
@@ -317,6 +366,7 @@ function bindElements(langOperator, trackerOp)
 			else //If not logged in
 			{
 				hideRegisterFormErrorsIfExist();
+				hideResetPasswordFormErrorsIfExist();
 				
 				if(bShowPublicPhotosLinkActive === true)
 				{
@@ -344,12 +394,12 @@ function bindElements(langOperator, trackerOp)
 	
 	$("#showRegisterFormLink").click(function (){
 		//$('#sideBar > #formContent').fadeIn('slow');
-		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); $("#showRegisterFormLink").hide(); $("#publicUploadsContent").hide(); $("#showCachedPublicPhotosLink").show(); bShowPublicPhotosLinkActive = true;});
+		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); $("#showRegisterFormLink").hide(); $("#publicUploadsContent").hide(); $("#showCachedPublicPhotosLink").show(); bShowPublicPhotosLinkActive = true;});
 		//$('#formContent').animate({height:'100%', marginTop:'0'}, function(){ $('#formContent').show(); $("#showRegisterFormLink").hide(); $("#publicUploads").hide(); $("#showPublicPhotosLink").show();});		
 	});
 	
 	$("#showCachedPublicPhotosLink").click(function (){
-		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); $("#showCachedPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
+		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showCachedPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
 	});	
 	
 	function changeSrcBack(elementid, imgSrc)

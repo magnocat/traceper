@@ -159,9 +159,7 @@
 								));
 				?>
   				<script type="text/javascript">
-  					bRegisterFormEmailErrorExists = true;
-
-  					alert("Your registration incomplete");	
+  					bRegisterFormEmailErrorExists = true;	
   		            	
   		            $("#RegisterForm_email").tooltipster('update', '<?php echo Yii::t('site', 'Your registration incomplete, please first complete it by clicking the link at the activation e-mail. If you have not received our activation e-mail, click {activationNotReceivedClickHere} to request a new one.', array('{activationNotReceivedClickHere}' => $link)); ?>');		  		            	
   			        $("#RegisterForm_email").tooltipster('show');					

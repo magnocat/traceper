@@ -78,7 +78,6 @@ return array(
 		
 	),
 	
-
 	// application components
 	'components'=>array(
 		'user'=>array(
@@ -173,29 +172,7 @@ return array(
 								'js'=>YII_DEBUG ? array('jquery-ui.js') : array('jquery-ui.min.js'),
 						        'depends'=>array('jquery'),
 						        'coreScriptPosition'=>CClientScript::POS_BEGIN
-						),
-						
-// 						'tooltipster'=>array(
-// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
-// 								'js'=>array('jquery.tooltipster.min.js'),
-// 								'coreScriptPosition'=>CClientScript::POS_HEAD
-// 						),
-// 						'DataOperations'=>array(
-// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
-// 								'js'=>array('DataOperations.js'),
-// 								'coreScriptPosition'=>CClientScript::POS_HEAD
-// 						),
-// 						'TrackerOperator'=>array(
-// 								'baseUrl'=>'//localhost/traceper/branches/DevWebInterface/js/',
-// 								'js'=>array('TrackerOperator.js'),
-// 								'coreScriptPosition'=>CClientScript::POS_HEAD
-// 						),
-																												
-// 						'validate'=>array(
-// 								'baseUrl'=>'//ajax.microsoft.com/ajax/jquery.validate/1.8/',
-// 								'js'=>array('jquery.validate.min.js'),
-// 								'coreScriptPosition'=>CClientScript::POS_HEAD
-// 						),						
+						),						
 				),
 		),			
 	),
@@ -207,9 +184,9 @@ return array(
 		'adminEmail'=>'contact@traceper.com',
 		'contactEmail'=>'contact@traceper.com',
 		'noreplyEmail'=>'noreply@traceper.com',
-		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
-		'uploadCountInOnePage'=> 10, // this is the number of images that are shown in a page	
-		'itemCountInDataListPage'=> 10,
+		'itemCountInOnePage'=> 20,  // this is the number of users and groups that are shown in a page
+		'uploadCountInOnePage'=> 20, // this is the number of images that are shown in a page	
+		'itemCountInDataListPage'=> 20,
 		'minDistanceInterval'=> 500, //meters
 		'minDataSentInterval'=> 300000, //milliseconds
 		'duplicateEntryDbExceptionCode' => 23000,

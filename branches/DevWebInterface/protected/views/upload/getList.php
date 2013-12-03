@@ -107,7 +107,7 @@ if ($dataProvider != null) {
 														 "thumb"=>"ok"
 														)
 										  			)."\"  />", "#",
-										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].");")
+										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');")
 					  				  )',	
 					'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align:center;'),
 				),
@@ -115,7 +115,7 @@ if ($dataProvider != null) {
 		            'name'=>Yii::t('upload', 'Description'),
 					'type' => 'raw',
 		            'value'=>'CHtml::link($data["description"], "#", array(
-    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].");",
+    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');",
 										))',	
 				),
 				array(            // display 'create_time' using an expression

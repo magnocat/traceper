@@ -202,7 +202,6 @@ class Upload extends CActiveRecord
     					),
     			),
     			'pagination'=>array(
-    					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
     					'pageSize'=>Yii::app()->session['uploadsPageSize'],
     					'itemCount'=>$count
     			),
@@ -239,7 +238,6 @@ class Upload extends CActiveRecord
     					),
     			),
     			'pagination'=>array(
-    					//'pageSize'=>($_SESSION['screen_height'] - 140)/60//Yii::app()->params->uploadCountInOnePage,
     					'pageSize'=>Yii::app()->session['publicUploadsPageSize'],
     					'itemCount'=>$count
     			),
