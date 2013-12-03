@@ -483,12 +483,10 @@ class Users extends CActiveRecord
 						),
 				),
 				'pagination'=>array(
-						'pageSize'=>Yii::app()->session['usersPageSize'], //(int)(($_SESSION['screen_height'] - 155)/42),
+						'pageSize'=>Yii::app()->session['usersPageSize'],
 						'itemCount'=>$count
 				),
 		));
-	
-		//echo ($_SESSION['screen_height'] - 140)/45;
 	
 		return $dataProvider;
 	}

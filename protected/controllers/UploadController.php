@@ -135,7 +135,7 @@ class UploadController extends Controller
 			}
 			
 			Yii::app()->clientScript->scriptMap['jquery.yiigridview.js'] = false;
-		}
+		}		
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
 		//TODO: added below line because gridview.js is loaded before.

@@ -27,6 +27,8 @@ class ResetPasswordForm extends CFormModel
 			array('newPasswordAgain', 'compare', 'compareAttribute'=>'newPassword',
 			'message'=>Yii::t('site', 'Passwords not same!')),
 				
+			array('newPassword', 'length', 'min'=>5, 'message'=>Yii::t('site', 'Minimum 5 characters')),
+				
 			array('token', 'safe'),
 		);
 	}

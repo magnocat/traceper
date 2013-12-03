@@ -109,6 +109,11 @@ class PrivacyGroups extends CActiveRecord
 	}	
 
 	public function getGroupsList($ownerId, $type, $itemCountInOnePage) {
+		
+		if(isset(Yii::app()->session['groupsPageSize']) == false)
+		{
+			Yii::app()->session['groupsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+		}		
 	
 		$dataProvider=new CActiveDataProvider('PrivacyGroups', array(
 				'criteria'=>array(
@@ -118,7 +123,7 @@ class PrivacyGroups extends CActiveRecord
 						//'with'=>array('author'),
 				),
 				'pagination'=>array(
-						'pageSize'=>($_SESSION['screen_height'] - 100)/30//$itemCountInOnePage,
+						'pageSize'=>Yii::app()->session['groupsPageSize'],
 				),
 		));
 	

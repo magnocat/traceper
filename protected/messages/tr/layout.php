@@ -83,6 +83,7 @@ return array(
 	'<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".' => '<b>Yeni Grup Oluştur</b> </br></br> Traceper arkadaşlarınızı gruplamanıza olanak sağlar. Bu bağlantı ile yeni gruplar oluşturabilirsiniz. Ayrıca \"Gruplar\" sekmesinde arkadaşlarınızı ilgili gruba dahil edebilir ve oluşturduğunuz grupların gizlilik ayarlarını düzenleyebilirsiniz.',
 	'Click here to view the list of photos shared publicly' => 'Herkese açık olarak paylaşılan fotoğrafların listesini görüntülemek için buraya tıklayınız',
 	'Click here to view the registration form again' => 'Kayıt formunu yeniden görüntülemek için buraya tıklayınız',
+	'Click here to view the password reset form again' => 'Şifre belirleme formunu yeniden görüntülemek için buraya tıklayınız',
 	'Public Photos' => 'Genel Paylaşımlar',
 	
 	'Traceper Terms' =>

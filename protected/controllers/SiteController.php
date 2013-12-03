@@ -603,8 +603,14 @@ class SiteController extends Controller
 							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						}
 					}
+					
+					echo CJSON::encode(array(
+							"result"=> "1",
+							"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
+							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, true),
+					));					
 			
-					$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, true);
+					//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, true);
 				}
 			
 				Yii::app()->end();
@@ -919,7 +925,7 @@ class SiteController extends Controller
 			$model->attributes = $_POST['ResetPasswordForm'];
 			// validate user input and if ok return json data and end application.
 			
-			Fb::warn("token:".$token, "SiteController - actionResetPassword()");
+			//Fb::warn("token:".$token, "SiteController - actionResetPassword()");
 			
 			if($model->validate()) {
 				if(Users::model()->changePassword(Users::model()->getUserId(ResetPassword::model()->getEmailByToken($token)), $model->newPassword)) // save the change to database
@@ -932,14 +938,43 @@ class SiteController extends Controller
 					
 // 					Yii::app()->end();
 
-					echo CJSON::encode(array("result"=>"1"));
+					//echo CJSON::encode(array("result"=>"1"));
+					
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+					
+					//Complete solution for blinking problem at FireFox
+					if (Yii::app()->request->getIsAjaxRequest()) {
+						Yii::app()->clientScript->scriptMap['*.js'] = false;
+						Yii::app()->clientScript->scriptMap['*.css'] = false;
+					}					
+					
+					echo CJSON::encode(array("result"=>"1",
+											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
+					));				
 				}
 				else
 				{				
 					//Fb::warn("An error occured while changing your password!", "SiteController - actionResetPassword()");
 
-					echo CJSON::encode(array("result"=>"0"));
+					//echo CJSON::encode(array("result"=>"0"));
+					
+					echo CJSON::encode(array("result"=>"0",
+											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
+					));					
 				}
+				
 				Yii::app()->end();
 			}
 			else
@@ -1244,6 +1279,26 @@ class SiteController extends Controller
 			$preferredLanguage = $_REQUEST['language'];
 		}
 		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
+			
+		//Complete solution for blinks at FireFox
+		if (Yii::app()->request->getIsAjaxRequest()) {
+			Yii::app()->clientScript->scriptMap['*.js'] = false;
+			Yii::app()->clientScript->scriptMap['*.css'] = false;
+		}		
+		
 		// collect user input data
 		if(isset($_REQUEST['RegisterForm']))
 		{
@@ -1354,7 +1409,7 @@ class SiteController extends Controller
 							echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
 						}
 						else
-						{
+						{														
 							echo CJSON::encode(array("result"=>"1", 
 													 "email"=>$model->email,
 													 "registerView"=>$this->renderPartial('register',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput)
@@ -1438,28 +1493,7 @@ class SiteController extends Controller
 					));
 				}
 				else
-				{
-					//echo 'RegisterForm not valid';
-					if (Yii::app()->request->isAjaxRequest)
-					{
-						if (YII_DEBUG)
-						{
-							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-						}
-						else
-						{
-							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						}
-					}
-						
-					//Complete solution for blinks at FireFox
-					if (Yii::app()->request->getIsAjaxRequest()) {
-						Yii::app()->clientScript->scriptMap['*.js'] = false;
-						Yii::app()->clientScript->scriptMap['*.css'] = false;
-					}
-						
+				{	
 					$this->renderPartial('register',array('model'=>$model), false, $processOutput);
 				}
 		
@@ -2032,7 +2066,7 @@ class SiteController extends Controller
 			}
 		}
 
-		$htmlStr = "<html><head>\n\t</head>\n\t<body>\n\t".Yii::t('layout', 'Traceper Terms')."\n\t</body>\n</html>";
+		$htmlStr = "<html>\n\t<head>\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n\t</head>\n\t<body>\n\t".Yii::t('layout', 'Traceper Terms')."\n\t</body>\n</html>";
 		
 		if($isTranslationRequired == true) //Recover the language if needed for mobile
 		{
@@ -2057,7 +2091,8 @@ class SiteController extends Controller
 		
 		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
 		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/45);
-		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 155)/42);		
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 155)/42);
+		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/30);
 		
 // 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");
 // 		Fb::warn(Yii::app()->session['uploadsPageSize'], "uploadsPageSize");

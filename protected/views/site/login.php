@@ -125,13 +125,49 @@
 					echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 										'</div>', $this->createUrl('site/forgotPassword'),
 							array(
-									'complete'=> 'function() 
-												  { 
-													hideFormErrorsIfExist();																														
-													$("#forgotPasswordWindow").dialog("open"); 
-													return false;
-												  }',
-									'update'=> '#forgotPasswordWindow',
+// 									'complete'=> 'function() 
+// 												  { 
+// 													hideFormErrorsIfExist();																														
+// 													$("#forgotPasswordWindow").dialog("open"); 
+// 													return false;
+// 												  }',
+// 									'update'=> '#forgotPasswordWindow',
+					
+									'success'=> 'function(result){
+													try
+													{
+														var obj = jQuery.parseJSON(result);
+													
+														if (obj.result)
+														{
+															if (obj.result == "1")
+															{
+																$("#forgotPasswordWindow").dialog("close");
+																TRACKER.showLongMessageDialog("'.Yii::t('site', 'We have sent the password reset link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+															}
+															else if (obj.result == "0")
+															{
+																$("#forgotPasswordWindow").dialog("close");
+																TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.').'");
+															}
+														}
+													}
+													catch (error)
+													{
+														hideFormErrorsIfExist();
+														
+														var opt = {
+															autoOpen: false,
+															modal: true,
+															resizable: false,
+															width: 600,
+															title: "'.Yii::t('site', 'Forgot Password?').'"
+														};
+														
+														$("#forgotPasswordWindow").dialog(opt).dialog("open");
+														$("#forgotPasswordWindow").html(result);
+													}
+												}',									
 							),
 							array(
 									'id'=>'forgotPasswordAjaxLink-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor

@@ -31,13 +31,43 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 	<div class="row buttons" style="padding-bottom:1em;">
 		<?php
+// 		$this->widget('zii.widgets.jui.CJuiButton', array(
+// 				'name'=>'ajaxContinueLoginButton',
+// 				'caption'=>Yii::t('site', 'I accept, continue'),
+// 				'id'=>'continueLoginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 				'htmlOptions'=>array('type'=>'submit','ajax'=>array(/*'type'=>'POST',*/'url'=>$this->createUrl('site/continueLogin', array('LoginForm'=>$form)), 'complete'=> 'function() { $("#acceptTermsForLoginWindow").dialog("close");}', 'update'=>'#acceptTermsForLoginWindow'
+// 				))
+// 		));
+
 		$this->widget('zii.widgets.jui.CJuiButton', array(
 				'name'=>'ajaxContinueLoginButton',
 				'caption'=>Yii::t('site', 'I accept, continue'),
 				'id'=>'continueLoginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-				'htmlOptions'=>array('type'=>'submit','ajax'=>array(/*'type'=>'POST',*/'url'=>$this->createUrl('site/continueLogin', array('LoginForm'=>$form)), 'complete'=> 'function() { $("#acceptTermsForLoginWindow").dialog("close");}', 'update'=>'#acceptTermsForLoginWindow'
+				'htmlOptions'=>array('type'=>'submit',
+									 'ajax'=>array('url'=>$this->createUrl('site/continueLogin', array('LoginForm'=>$form)),
+												   'success'=>'function(msg){
+																try
+																{
+																	var obj = jQuery.parseJSON(msg);
+												
+																	if (obj.result)
+																	{
+																		if (obj.result == "1")
+																		{
+																			$("#acceptTermsForLoginWindow").dialog("close");
+									 										$("#tabViewList").html(obj.renderedTabView);
+																			$("#forAjaxRefresh").html(obj.loginSuccessfulActions);
+																		}
+																	}
+																}
+																catch (error)
+																{
+																	$("#forAjaxRefresh").html(msg);
+																}
+															}',
 				))
 		));		
+		
 		?>
 											
 		<?php			 

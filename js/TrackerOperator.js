@@ -454,9 +454,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 
 
-	this.showMediaWindow = function(uploadId){
+	this.showMediaWindow = function(uploadId, isPublic){
 		if (typeof TRACKER.images[uploadId] == "undefined") {
-			TRACKER.getImageList(function(){
+			TRACKER.getImageList(isPublic, true, function(){
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
 			});
 			
