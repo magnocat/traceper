@@ -24,6 +24,7 @@ html {
 	border: 3px solid #2c2c2c;
 	background: #fff;
 	color: #2c2c2c;
+	z-index: 9999999;	
 }
 .tooltipster-info .tooltipster-content {
 	font-family: 'Arial', serif;
@@ -86,7 +87,8 @@ html {
 	font-size: 0;
 	line-height: 0;
 	position: absolute;
-	z-index: 9999999;
+/* 	z-index: 9999999; */
+	z-index: 500;
 	pointer-events: none;
 	width: auto;
 	overflow: visible;
@@ -94,7 +96,6 @@ html {
 .tooltipster-base .tooltipster-content {
 	overflow: hidden;
 }
-
 
 /* These next classes handle the styles for the little arrow attached to the tooltip. By default, the arrow will inherit the same colors and border as what is set on the main tooltip itself. */
 .tooltipster-arrow {
