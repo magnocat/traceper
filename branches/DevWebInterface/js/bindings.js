@@ -13,6 +13,21 @@ var bResetPasswordFormNewPasswordAgainErrorExists = false;
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
 
+function changecss(myclass,element,value) {
+	var CSSRules
+	if (document.all) {
+		CSSRules = 'rules'
+	}
+	else if (document.getElementById) {
+		CSSRules = 'cssRules'
+	}
+	for (var i = 0; i < document.styleSheets[0][CSSRules].length; i++) {
+		if (document.styleSheets[0][CSSRules][i].selectorText == myclass) {
+			document.styleSheets[0][CSSRules][i].style[element] = value
+		}
+	}	
+}
+
 function resetAllFormErrors()
 {	
 	$("#RegisterForm_name").tooltipster('update', "");
@@ -309,9 +324,14 @@ function bindElements(langOperator, trackerOp)
  		$("#RegisterForm_email").tooltipster('show'); 		
 	});
 
-// 	$("#RegisterForm_email").blur(function ()	{
-// 		$("#RegisterForm_email").tooltipster('hide');
-//	});
+ 	$("#appQRCodeLink").focus(function ()	{
+ 		$("#appQRCodeLink").tooltipster('update', '<table><tr><td><img src="images/QR_code.png" width="130" height="130" style="cursor:none;"></td><td>' + TRACKER.langOperator.QRCodeNotificationMessage + '</td></tr></table>');
+ 		$("#appQRCodeLink").tooltipster('show'); 		
+	});
+ 	
+ 	$("#appQRCodeLink").blur(function ()	{
+ 		$("#appQRCodeLink").tooltipster('hide');
+ 	});
 
 	$("#bar").click(function ()	{
 		
@@ -329,23 +349,14 @@ function bindElements(langOperator, trackerOp)
 			var offsetLeft = 396;
 			
 			//If logged in and top bar height decreased
-			if(document.getElementById('topBar').style.height == "60px")
+			if(document.getElementById('topBar').style.height == "70px")
 			{
 
 			}
 			else //If not logged in
 			{
 //				showRegisterFormErrorsIfExist();
-//				showResetPasswordFormErrorsIfExist();
-				
-				if(bShowPublicPhotosLinkActive === true)
-				{
-					$("#showPublicPhotosLink").fadeIn('slow');
-				}
-				else
-				{
-					$("#showRegisterFormLink").fadeIn('slow');
-				}				
+//				showResetPasswordFormErrorsIfExist();				
 			}
 			
 			//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
@@ -359,24 +370,14 @@ function bindElements(langOperator, trackerOp)
 			var offsetLeft = 16;
 			
 			//If logged in and top bar height decreased
-			if(document.getElementById('topBar').style.height == "60px")
+			if(document.getElementById('topBar').style.height == "70px")
 			{
 
 			}
 			else //If not logged in
 			{
 				hideRegisterFormErrorsIfExist();
-				hideResetPasswordFormErrorsIfExist();
-				
-				if(bShowPublicPhotosLinkActive === true)
-				{
-					$("#showPublicPhotosLink").fadeOut('slow');
-					$("#showCachedPublicPhotosLink").fadeOut('slow');
-				}
-				else
-				{
-					$("#showRegisterFormLink").fadeOut('slow');
-				}				
+				hideResetPasswordFormErrorsIfExist();				
 			}			
 
 			//$('.logo_inFullMap').fadeIn().animate({left:'80px'});
@@ -394,14 +395,14 @@ function bindElements(langOperator, trackerOp)
 	
 	$("#showRegisterFormLink").click(function (){
 		//$('#sideBar > #formContent').fadeIn('slow');
-		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); $("#showRegisterFormLink").hide(); $("#publicUploadsContent").hide(); $("#showCachedPublicPhotosLink").show(); bShowPublicPhotosLinkActive = true;});
+		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").hide();});
 		//$('#formContent').animate({height:'100%', marginTop:'0'}, function(){ $('#formContent').show(); $("#showRegisterFormLink").hide(); $("#publicUploads").hide(); $("#showPublicPhotosLink").show();});		
 	});
 	
 	$("#showCachedPublicPhotosLink").click(function (){
-		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showCachedPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
-	});	
-	
+		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").show();});
+	});
+
 	function changeSrcBack(elementid, imgSrc)
 	{
 	  document.getElementById(elementid).src = imgSrc;
@@ -412,18 +413,18 @@ function bindElements(langOperator, trackerOp)
 		var w = $(window).width();
 		var offsetTop = 0;
 		
-		if(document.getElementById('topBar').style.height == "60px")
+		if(document.getElementById('topBar').style.height == "70px")
 		{
-			offsetTop = 60;
+			offsetTop = 70;
 		}
 		else
 		{
 			offsetTop = 85;
 		}
 		
-		$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-		$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-		$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+		$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+		$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+		$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 		    
 		var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 		
@@ -447,28 +448,11 @@ function bindElements(langOperator, trackerOp)
 	    //alert('Javascript');
 	    
 	    //alert('Height:'+(h)+' Width:'+(w));
-	    
-	    if(h > 720)
-	    {	   	
-	    	document.getElementById('androidBubbleTr').src = "images/AndroidBubble_big_tr.png";
-	    	document.getElementById('androidBubbleTr').onmouseout = function() {changeSrcBack('androidBubbleTr', 'images/AndroidBubble_big_tr.png')};
-	    	
-	    	document.getElementById('androidBubbleEn').src = "images/AndroidBubble_big_en.png";
-	    	document.getElementById('androidBubbleEn').onmouseout =  function() {changeSrcBack('androidBubbleEn', 'images/AndroidBubble_big_en.png')};	    	
-	    }
-	    else
-	    {
-	    	document.getElementById('androidBubbleTr').src = "images/AndroidBubble_tr.png";
-	    	document.getElementById('androidBubbleTr').onmouseout = function() {changeSrcBack('androidBubbleTr', 'images/AndroidBubble_tr.png')};
-	    	
-	    	document.getElementById('androidBubbleEn').src = "images/AndroidBubble_en.png";
-	    	document.getElementById('androidBubbleEn').onmouseout =  function() {changeSrcBack('androidBubbleEn', 'images/AndroidBubble_en.png')};		    	
-	    }
 
 	  //If logged in and top bar height decreased
-		if(document.getElementById('topBar').style.height == "60px")
+		if(document.getElementById('topBar').style.height == "70px")
 		{
-			offsetTop = 60;
+			offsetTop = 70;
 			offsetLeft = 396;
 			
 			if ($('#sideBar > #content').css('display') == "none")
@@ -489,9 +473,9 @@ function bindElements(langOperator, trackerOp)
 				//alert('Narrow');
 			}
 			
-			$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-			$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-			$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+			$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+			$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+			$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 			
 			var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 			
@@ -539,7 +523,7 @@ function bindElements(langOperator, trackerOp)
 		
 	    $('#map').css('height', (h - offsetTop));
 	    $('#bar').css('height', (h - offsetTop));
-	    $('#sideBar').css('height', (h - offsetTop));		
+	    //$('#sideBar').css('height', (h - offsetTop));
 	    
 	}).resize();
 //     

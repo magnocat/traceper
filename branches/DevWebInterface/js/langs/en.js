@@ -81,7 +81,8 @@ LAN_OPERATOR.addIndexes({
 			didYouMean:'Did you mean',
 			ifSoClickOnSuggestedEmail:'If so, click on the suggested e-mail for correcting the entry. If not, please ignore this message.',
 			registerEmailNotificationMessage:'After you send the sign up form by filling it correctly, an account activation e-mail message will be sent to the e-mail adress specified at this field. When you click the account activation link at this message, you will have completed the registration process successfully. Therefore please enter a valid e-mail address that you use into this field.',
-			userSearchNotificationMessage:'It is enough to type your friend\'s name and click on the "Search" button in order to search your friends at Traceper. If your friend is a member of Traceper, he/she will be listed. If not listed, you could invite your friends to Traceper via the link <img src="images/invite.png"/>(Invite Friends) at the top menu.',
+			userSearchNotificationMessage:'It is enough to type your friend\'s name and click on the "Search" button in order to search your friends at Traceper. If your friend is a member of Traceper, he/she will be listed. If not listed, you could invite your friends to Traceper via the link <div class="lo-icon-in-tooltip icon-inviteUsers"></div>(Invite Friends) at the top menu.',
 			uploadSearchNotificationMessage:'It is enough to type a keyword and click on the "Search" button in order to search the photos that you and your friends shared or the ones that are shared publicly. We shall list all the photos that meet your search criteria.',
-			invitedEmailsNotificationMessage:'Please enter your friends\' e-mails into this field separated by the <b>space</b>, <b>comma</b> or <b>ENTER</b> characters in order to invite them to Traceper.'
+			invitedEmailsNotificationMessage:'Please enter your friends\' e-mails into this field separated by the <b>space</b>, <b>comma</b> or <b>ENTER</b> characters in order to invite them to Traceper.',
+			QRCodeNotificationMessage:'You could download our mobile application to your phone in which Android 2.2 or above installed, by scanning the QR code on the left with any QR code scanner.',
 	});
