@@ -1,3 +1,10 @@
+<link rel="stylesheet" type="text/css"
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/svgAnim.css" />
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/snap.svg-min.js"></script>
+<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgicons-config.js"></script>
+<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgicons.js"></script>	
+
 <?php		
 if ($dataProvider != null) {
 	$isSearchResult = isset($searchResult) ? true : false;
@@ -86,7 +93,11 @@ if ($dataProvider != null) {
 									//alert("bgImageListPageNo:" + (TRACKER.bgImageListPageNo - 1) + " - selectedPage:" + selectedPage);
 
 									//Kullanicinin sectigi sayfadaki uploadlar icin henüz sorgulama yapilmadiysa gerekli sorgulamalari hemen recursive olarak yap
-									checkImageListCallRequired('.(($isPublicList === true)?'true':'false').', selectedPage);			
+									checkImageListCallRequired('.(($isPublicList === true)?'true':'false').', selectedPage);
+
+									[].slice.call( document.querySelectorAll( ".si-icons-hover > .si-icon" ) ).forEach( function( el ) {
+										var svgicon = new svgIcon( el, svgIconConfig, { easing : mina.elastic, speed: 600, evtoggle : "mouseover", size : { w : 32, h : 32 } } );
+									} );			
 								}',
 			'summaryText'=>'',
 			'emptyText'=>$isSearchResult?$uploadSearchEmptyText:$emptyText,
@@ -127,20 +138,36 @@ if ($dataProvider != null) {
 					'htmlOptions'=>array('width'=>'120px', 'style'=>'text-align: center;'),
 					//'htmlOptions'=>array('style'=>'width:160px;'),	
 				),
-				array(           
-		        //    'name'=>'realname',
-					'type' =>'raw',
-		            'value'=>' ($data["userId"] == Yii::app()->user->id) 
-		            			?
-		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
-		            						"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
-		            									TRACKER.showConfirmationDialog(\"'.Yii::t('upload', 'Do you really want to delete this file?').'\", deleteUpload);", 				
-											"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".'
-		            						))
-		            			: ""; ',
-					'htmlOptions'=>array('width'=>'16px'),
-					'visible'=>$isPublicList?false:true
-				),
+// 				array(           
+// 		        //    'name'=>'realname',
+// 					'type' =>'raw',
+// 		            'value'=>' ($data["userId"] == Yii::app()->user->id) 
+// 		            			?
+// 		            					CHtml::link("<img src=\"images/delete.png\"  />", "#", array(
+// 		            						"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
+// 		            									TRACKER.showConfirmationDialog(\"'.Yii::t('upload', 'Do you really want to delete this file?').'\", deleteUpload);", 				
+// 											"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".'
+// 		            						))
+// 		            			: ""; ',
+// 					'htmlOptions'=>array('width'=>'16px'),
+// 					'visible'=>$isPublicList?false:true
+// 				),
+	
+	    		array(
+	    				//    'name'=>'realname',
+	    				'type' =>'raw',
+	    				'value'=>' ($data["userId"] == Yii::app()->user->id)
+				    				?
+					    				CHtml::link("<span class=\"si-icon si-icon-trash\" data-icon-name=\"trash\"></span>", "#", array(
+						    				"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
+						    				TRACKER.showConfirmationDialog(\"'.Yii::t('upload', 'Do you really want to delete this file?').'\", deleteUpload);",
+						    				"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".', 
+						    				"class"=>"si-icons-hover"
+	    								))
+				    				: ""; ',
+	    				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;'),
+	    				'visible'=>$isPublicList?false:true
+	    		),		    		
 			),
 	));
 	
@@ -165,3 +192,13 @@ if ($dataProvider != null) {
 	<?php	
 }
 ?>
+<script>
+	(function() {
+		// initialize all
+		[].slice.call( document.querySelectorAll( '.si-icons-hover > .si-icon' ) ).forEach( function( el ) {
+			var svgicon = new svgIcon( el, svgIconConfig, { easing : mina.elastic, speed: 600, evtoggle : 'mouseover', size : { w : 32, h : 32 } } );
+		} );				
+
+		//new svgIcon( document.querySelector( '.si-icons-hover .si-icon-trash' ), svgIconConfig, { easing : mina.elastic, speed: 600, evtoggle : 'mouseover', size : { w : 32, h : 32 } } );
+	})();
+</script>

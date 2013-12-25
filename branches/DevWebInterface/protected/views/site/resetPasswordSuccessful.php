@@ -6,6 +6,4 @@ $('#registerBlock').css('height', '85%');
 $('#registerBlock').css('min-height', '420px');
 $("#registerBlock").load();
 $("#registerBlock").show();
-$("#appLinkBlock").load();
-$("#appLinkBlock").show();
 </script>

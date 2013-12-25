@@ -39,7 +39,7 @@ class SiteController extends Controller
 	{
 		return array(
 				array('deny',
-						'actions'=>array('changePassword', 'inviteUser', 'registerGPSTracker'),
+						'actions'=>array('changePassword', 'inviteUsers', 'registerGPSTracker'),
 						'users'=>array('?'),
 				),			
 		);
@@ -215,9 +215,6 @@ class SiteController extends Controller
 			$preferredLanguage = null;
 
 			$isRecordUpdateRequired = false;
-			
-			//*** Valid degilken bunları gondermeden de olabiliyorsa mobile bunları gondermeyelim?
-			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
 
 			if($model->validate()) {								
 				
@@ -225,6 +222,8 @@ class SiteController extends Controller
 				{
 					if($model->login())
 					{
+						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+						
 						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
 							if (isset($_REQUEST['deviceId']))
@@ -331,13 +330,7 @@ class SiteController extends Controller
 							$result = "-2"; //Unknown login error
 
 							echo CJSON::encode(array(
-									"result"=> $result,
-									"id"=>Yii::app()->user->id,
-									"realname"=> $model->getName(),
-									"minDataSentInterval"=> $minDataSentInterval,
-									"minDistanceInterval"=> $minDistanceInterval,
-									"facebookId"=> $facebookId,
-									"autoSend "=> $autoSend
+									"result"=> $result
 							));
 						}
 						else {
@@ -378,13 +371,7 @@ class SiteController extends Controller
 						$result = "-3"; //Terms not accepted
 						
 						echo CJSON::encode(array(
-								"result"=> $result,
-								"id"=>Yii::app()->user->id,
-								"realname"=> $model->getName(),
-								"minDataSentInterval"=> $minDataSentInterval,
-								"minDistanceInterval"=> $minDistanceInterval,
-								"facebookId"=> $facebookId,
-								"autoSend "=> $autoSend
+								"result"=> $result
 						));						
 					}
 					else
@@ -443,13 +430,7 @@ class SiteController extends Controller
 					}					
 
 					echo CJSON::encode(array(
-							"result"=> $result,
-							"id"=>Yii::app()->user->id,
-							"realname"=> $model->getName(),
-							"minDataSentInterval"=> $minDataSentInterval,
-							"minDistanceInterval"=> $minDistanceInterval,
-							"facebookId"=> $facebookId,
-							"autoSend "=> $autoSend
+							"result"=> $result
 					));
 				}
 				else {
@@ -508,14 +489,14 @@ class SiteController extends Controller
 			$preferredLanguage = null;
 			
 			$isRecordUpdateRequired = false;
-				
-			//*** Valid degilken bunları gondermeden de olabiliyorsa mobile bunları gondermeyelim, zaten daha login olunmadigi icin dogru degerler alinamayacak?
-			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+										
 			Users::model()->setTermsAccepted($model->email);
 			
 			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
 			if($model->login())
 			{
+				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+				
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
 					if (isset($_REQUEST['deviceId']))
@@ -622,13 +603,7 @@ class SiteController extends Controller
 					$result = "-2"; //Unknown login error
 			
 					echo CJSON::encode(array(
-							"result"=> $result,
-							"id"=>Yii::app()->user->id,
-							"realname"=> $model->getName(),
-							"minDataSentInterval"=> $minDataSentInterval,
-							"minDistanceInterval"=> $minDistanceInterval,
-							"facebookId"=> $facebookId,
-							"autoSend "=> $autoSend
+							"result"=> $result
 					));
 				}
 				else {
@@ -2091,8 +2066,8 @@ class SiteController extends Controller
 		
 		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
 		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/45);
-		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 155)/42);
-		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/30);
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 115)/42);
+		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/38);
 		
 // 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");
 // 		Fb::warn(Yii::app()->session['uploadsPageSize'], "uploadsPageSize");

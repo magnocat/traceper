@@ -9,7 +9,7 @@
 					'modal'=>true,
 					'resizable'=>false,
 					'width'=> '900px',
-					'close' => 'js:function(){ showFormErrorsIfExist(); }'					
+					//'close' => 'js:function(){ showFormErrorsIfExist(); }'					
 			),
 	));	
 

@@ -9,7 +9,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'modal'=>true, 
 			'resizable'=>false,
 			'width'=>'600px',
-	    	'close'=>'js:function(){ showFormErrorsIfExist(); }' 	
+	    	//'close'=>'js:function(){ showFormErrorsIfExist(); }' 	
 	    ),
 	));
 ?>

@@ -59,7 +59,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																				if (obj.result && obj.result == "1") 
 																				{
 																					$("#geofenceSettingsWindow").dialog("close");
-																					TRACKER.showMessageDialog("'.Yii::t('geofence', 'Your settings have been saved').'");
+																					TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
 																				}
 																				else if(obj.result && obj.result == "Duplicate Entry")
 																				{

@@ -53,7 +53,7 @@
 						  { 
 						  	$link = CHtml::ajaxLink(Yii::t('site', 'here'), $this->createUrl('site/activationNotReceived'),
 						  			array(
-						  					'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
+						  					'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
 						  					'update'=> '#activationNotReceivedWindow'
 						  			),
 						  			array(
@@ -82,11 +82,15 @@
 						  }
 					?>					
 				</div>
-				
-				<div style="margin-top:0px;padding:0px;">
+
+				<div id="rememberMeCheckbox" class="ac-custom ac-checkbox ac-checkmark" style="margin-top:0px;padding:0px;">
 					<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>4)); ?>
 					<?php echo $form->label($model,'rememberMe',array('style'=>'font-weight:normal;')); ?>
-				</div>									
+				</div>
+				
+				<script type="text/javascript">		
+				checkSVGElements("rememberMeCheckbox", false/*par_isForm*/);	
+				</script>													
 			</div>
 
 			<div class="upperMenu">
@@ -154,8 +158,6 @@
 													}
 													catch (error)
 													{
-														hideFormErrorsIfExist();
-														
 														var opt = {
 															autoOpen: false,
 															modal: true,

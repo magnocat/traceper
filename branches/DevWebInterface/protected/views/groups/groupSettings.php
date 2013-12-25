@@ -12,7 +12,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		//'htmlOptions'=>array('style'=>'height:500px; overflow: auto;'),
 	));
 ?>
-
+						
 <div>
 	<?php $form=$this->beginWidget('CActiveForm', array(
 		'id'=>'groupSettings-form',
@@ -21,7 +21,9 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 							'validateOnSubmit'=> true,
 							'validateOnChange'=>false,
 						 ),
-	
+		'htmlOptions'=>array(
+			'class'=>'ac-custom ac-checkbox ac-cross',
+		),					
 	)); ?>
 
 		<div class="row" style="padding-top:1em;padding-left:10px">
@@ -35,15 +37,17 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					echo Yii::t('groups', 'Since each group has its own privacy settings, the same person cannot be enrolled to more than one group in order to prevent potetial conflicts. Therefore if a selected friend belongs to another group that membership will be cancelled and your this choice will be applied.').'</br></br>';
 					echo Yii::t('groups', 'You can enroll your friends to this group just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friends from the membership of this group, just remove the tick on the corresponding checkbox and save the operation again:').'</br></br>';
 					?>
-					<div style="max-height:300px; overflow:auto;">
+					<div style="margin-left:40px; max-height:300px; overflow:auto;">
 					<?php
 					echo CHtml::activeCheckboxList(
 					  $model, 'groupStatusArray', 
 					  CHtml::listData($friendsOfUser, 'Id', 'realname'),
-					  array()
+					  array('template'=>'<li>{input} {label}</li>',
+					  		'separator'=>'' //separator belirtilmezse default br koyuyor
+					  	    )
 					);
 					?>
-					</div>
+					</div>					
 					<?php
 					
 //					$form->dropDownList($model,'groupStatusArray', CHtml::listData($groupsOfUser, 'id', 'name'), array('empty'=>'Select Group'));
@@ -77,7 +81,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														if (obj.result && obj.result == "1")
 														{
 															$("#groupSettingsWindow").dialog("close");
-															TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'")
+															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'")
 														}
 														else if(obj.result && obj.result == "Duplicate Entry")
 														{
@@ -119,7 +123,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>	
 		
 	<?php $this->endWidget(); ?>
-</div>				
+</div>
+
+<script type="text/javascript">		
+checkSVGElements('groupSettings-form', true/*par_isForm*/);	
+</script>				
 
 <?php 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');

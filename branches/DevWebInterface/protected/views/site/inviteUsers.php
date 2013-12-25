@@ -13,14 +13,15 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	));
 
 Yii::app()->clientScript->registerScript('emailsListTooltip',
-		'
+		'		
 		$("#InviteUsersForm_emails").tooltipster({
 			theme: ".tooltipster-info",
 			trigger: "custom",
 			maxWidth: 300,
 			onlyOne: false,
 			position: "right",
-			interactive: true
+			interactive: true,
+			zIndex:100000
 		});
 
 	 	$("#InviteUsersForm_emails").focus(function ()	{
