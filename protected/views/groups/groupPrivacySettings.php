@@ -7,7 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,
-			'width'=> '400px'      
+			'width'=> '600px'      
 	    ),
 	));
 ?>
@@ -20,7 +20,9 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 							'validateOnSubmit'=> true,
 							'validateOnChange'=>false,
 						 ),
-	
+			'htmlOptions'=>array(
+					'class'=>'ac-custom ac-checkbox ac-cross',
+			),	
 	)); ?>
 	
 		<div class="row" style="padding-top:1em">
@@ -31,7 +33,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php echo $form->checkBox($model,'allowToSeeMyPosition'); ?>
 			<?php echo $form->label($model,'allowToSeeMyPosition'); ?>
 			<?php echo $form->error($model,'allowToSeeMyPosition'); ?>
-		</div>	
+		</div>
 
 		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
@@ -43,7 +45,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 // 																			if (obj.result && obj.result == "1") 
 // 																			{
 // 																				$("#groupPrivacySettingsWindow").dialog("close");
-// 																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'");
+// 																				TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
 // 																			}
 // 																		}
 // 																		catch (error){
@@ -64,7 +66,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 																			if (obj.result && obj.result == "1") 
 																			{
 																				$("#groupPrivacySettingsWindow").dialog("close");
-																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Your settings have been saved').'");
+																				TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
 																			}
 																		}
 																		catch (error){
@@ -90,7 +92,11 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		</div>	
 		
 	<?php $this->endWidget(); ?>
-</div>				
+</div>
+
+<script type="text/javascript">		
+checkSVGElements('groupPrivacySettings-form', true/*par_isForm*/);	
+</script>
 
 <?php 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');

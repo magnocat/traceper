@@ -68,14 +68,73 @@
          	 onlyOne: false,
 			 interactive: true,
          	 });
+			
+			$("#showPublicPhotosLinkAtRegister").tooltipster({
+		       	 theme: ".tooltipster-info",
+		       	 content: "'.Yii::t('layout', 'Click here to view the list of photos shared publicly').'",
+		       	 position: "right",
+		       	 trigger: "hover",
+		       	 maxWidth: 260,
+		       	 offsetX: 10,
+		       	 onlyOne: false,       	 
+	     	 });			
+			
+			$("#showCachedPublicPhotosLinkAtRegister").tooltipster({
+		       	 theme: ".tooltipster-info",
+		       	 content: "'.Yii::t('layout', 'Click here to view the list of photos shared publicly').'",
+		       	 position: "right",
+		       	 trigger: "hover",
+		       	 maxWidth: 260,
+		       	 offsetX: 10,
+		       	 onlyOne: false,       	 
+	     	 });
+
+			$("#showCachedPublicPhotosLinkAtRegister").click(function (){
+				$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").show();});
+			});			
 			',			
 		 CClientScript::POS_HEAD);	
 	?>
 	
 	<div class="sideMenu">
-		<div style="font-size:3em;">
+		<div style="position:relative;display:inline-block;">									
+			<?php echo CHtml::label("", "#", array("class"=>"hi-icon-in-list icon-profile", "style"=>"color:#555555; cursor:default;")); ?>
+		</div>
+		
+		<div style="position:relative;left:0em;display:inline-block;font-size:2.5em;">									
 			<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
 		</div>
+		
+		<div id="showPublicPhotosLinkAtRegister" class="hi-icon-effect-1 hi-icon-effect-1a" style="position:relative;left:149px;bottom:6px;display:inline-block;">						
+		<?php					
+		echo CHtml::ajaxLink("<div id=\"publicPhotosCamera\" class=\"secondIcon icon-camera\"></div><div class=\"hi-icon icon-group\"></div>", $this->createUrl('upload/getPublicList', array('fileType'=>0)),
+				array(
+						'update'=> '#publicUploads',
+						'complete'=> 'function()
+						{
+							uploadsGridViewId = \'publicUploadListView\';
+							$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showPublicPhotosLinkAtRegister").hide(); $("#showCachedPublicPhotosLinkAtRegister").css("display", "inline-block"); $("#publicUploadsContent").show();});
+						}',
+				),
+				array(
+						'id'=>'publicUploadsAjaxLink-'.uniqid(),
+						'onMouseOver' => '$("#publicPhotosCamera").animate({color: "#D1D0CE"}, 200);',
+						'onMouseOut' => '$("#publicPhotosCamera").animate({color: "#848482"}, 200);',
+				));									
+		?>
+		</div>
+		
+		<div id="showCachedPublicPhotosLinkAtRegister" class="hi-icon-effect-1 hi-icon-effect-1a" style="position:relative;left:149px;bottom:6px;display:none;">
+		<?php 	
+		echo CHtml::label("<div id=\"publicPhotosCameraCachedAtRegister\" class=\"secondIcon icon-camera\"></div><div class=\"hi-icon icon-group\"></div>", "#",
+				array(
+						'id'=>'publicUploadsAjaxLink-'.uniqid(),
+						'onclick'=>'hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").show();',
+						'onMouseOver' => '$("#publicPhotosCameraCachedAtRegister").animate({color: "#D1D0CE"}, 200);',
+						'onMouseOut' => '$("#publicPhotosCameraCachedAtRegister").animate({color: "#848482"}, 200);',
+				));	
+		?>		
+		</div>																		
 	</div>
 
 	<div class="sideMenu">
@@ -151,7 +210,7 @@
 			{
 				$link = CHtml::ajaxLink(Yii::t('site', 'here'), $this->createUrl('site/activationNotReceived'),
 						array(
-								'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
+								'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
 								'update'=> '#activationNotReceivedWindow'
 						),
 						array(
@@ -269,7 +328,7 @@
 		echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 				CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
 						array(
-								'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
+								'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
 								'update'=> '#termsWindow',
 						),
 						array(
@@ -361,7 +420,7 @@
 										<?php
 		echo CHtml::ajaxLink(Yii::t('site', 'Not Received Our Activation E-Mail?'), $this->createUrl('site/activationNotReceived'),
 				array(						
-						'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
+						'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
 						'update'=> '#activationNotReceivedWindow',
 				),
 				array(

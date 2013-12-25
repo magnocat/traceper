@@ -9,7 +9,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'modal'=>true, 
 			'resizable'=>false,
 			'width'=> '600px',
-	    	'close' => 'js:function(){ showFormErrorsIfExist(); }'
+	    	//'close' => 'js:function(){ showFormErrorsIfExist(); }'
 	    ),
 	));
 ?>
@@ -18,7 +18,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 		echo Yii::t('site', 'We have updated our {terms of use} as of October 28, 2013. By continuing to log in, you agree to our Terms of Use.', array('{terms of use}'=>
 				CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
 						array(
-								'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
+								'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
 								'update'=> '#termsWindow',
 						),
 						array(

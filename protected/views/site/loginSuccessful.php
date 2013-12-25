@@ -1,5 +1,5 @@
 <script type="text/javascript">
-	var h = $(window).height(), offsetTop = 60; // Calculate the top offset
+	var h = $(window).height(), offsetTop = 70; // Calculate the top offset
 	var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
 	var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
 	
@@ -24,9 +24,9 @@
 		$('#bar').animate({left:'380px'});			
 	}    
 
-	$("#users_tab").css("min-height", (485 + 100 - 60 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-	$("#photos_tab").css("min-height", (485 + 100 - 60 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-	$("#groups_tab").css("min-height", (485 + 100 - 60 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+	$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
+	$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
+	$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
 	
 	$("#usersGridView").css("height", userListHeight - 50);
 	$("#uploadsGridView").css("height", userListHeight - 50);
@@ -57,20 +57,20 @@
 
 	resetAllFormErrors();
 
-	$('#topBar').css('height', '60px');
-	$('#sideBar').css('top', '60px');
+	$('#topBar').css('height', '70px');
+	$('#sideBar').css('top', '70px');
 	$('#sideBar').css('width', '380px');
 	$('#sideBar').css('height', (h - offsetTop));
-	$('#sideBar').css('min-height', (485 + 100 - 60));
+	$('#sideBar').css('min-height', (485 + 100 - 70));
 	$('#bar').css('top', offsetTop);
 	$('#bar').css('height', (h - offsetTop));
 	$('#bar').css('left', '380px');
 	$('#bar').css('background-image','url("images/left.png")');
-	$('#bar').css('min-height', (485 + 100 - 60));		
+	$('#bar').css('min-height', (485 + 100 - 70));		
 	$('#map').css('height', (h - offsetTop)); //$("#map").css('height', '94%');
 	$('#map').css('width', (w - offsetLeft));
 	$('#map').css('min-width', (735 + 260 - 380));
-	$('#map').css('min-height', (485 + 100 - 60));
+	$('#map').css('min-height', (485 + 100 - 70));
 
 	$("#username").html('<?php echo $realname ?>');
 	$("#userId").html('<?php echo $id ?>');	

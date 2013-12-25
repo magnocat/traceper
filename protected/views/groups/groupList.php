@@ -1,7 +1,7 @@
 <?php
 
 if ($dataProvider != null) {
-	$emptyText = Yii::t('groups', 'You do not have any groups at the moment. In order to group your friends, you could create new group(s) by the link {createGroupIcon} at the top menu or by {createGroupByHere}.', array('{createGroupIcon}'=>CHtml::image("images/createGroupSmall.png"), 
+	$emptyText = Yii::t('groups', 'You do not have any groups at the moment. In order to group your friends, you could create new group(s) by the link {createGroupIcon} at the top menu or by {createGroupByHere}.', array('{createGroupIcon}'=>'<div class="lo-icon-in-tooltip icon-users"></div>', 
 			'{createGroupByHere}'=>	CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('groups/createGroup'),
 														array(
 																'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
@@ -11,9 +11,7 @@ if ($dataProvider != null) {
 																'id'=>'showCreateGroupWindowAtGroupList-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
 																))
 			));
-	
-	
-	
+
 	$ajaxUrl = null;
 	$isSearchResult = isset($searchResult) ? true : false;
 	$deleteGroupQuestion = Yii::t('groups', 'Do you really want to delete this group?');
@@ -77,7 +75,7 @@ if ($dataProvider != null) {
 					'name'=>Yii::t('groups', 'Privacy Settings'),
 					'type' => 'raw',
 
-		            'value'=>'CHtml::link(\'<img src="images/PrivacySettings.png"  />\', \'#\',
+		            'value'=>'CHtml::link("Privacy Settings", \'#\',
 										array(\'onclick\'=>CHtml::ajax(
 											array(
 												\'url\'=>Yii::app()->createUrl(\'groups/setPrivacyRights\', array(\'groupId\'=>$data[\'id\'])),
@@ -85,28 +83,44 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupPrivacySettingsWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupPrivacySettingsWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the privacy settings of this group').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the privacy settings of this group').'\', \'class\'=>\'lo-icon icon-lock\')
 					  				 )',		
 		
-					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;')
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a')
 		),
 		    		
     		array(            // display 'create_time' using an expression
     				'name'=>Yii::t('users', 'Group Settings'),
-    				'type' => 'raw',   					
-    				'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
-    				array(\'onclick\'=>CHtml::ajax(
-    				array(
-    				\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'groupId\'=>$data[\'id\'])),
+    				'type' => 'raw',
+    				'value'=>'CHtml::link("Group Settings", "#",
+					    				array(\'onclick\'=>CHtml::ajax(
+						    				array(
+							    				\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'groupId\'=>$data[\'id\'])),
+							    		
+							    				\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
+							    				\'update\'=> \'#groupSettingsWindow\',   					
+								    		)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the members of this group').'\', \'class\'=>\'lo-icon icon-cog\')
+							    		)',
     		
-    				\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
-    				\'update\'=> \'#groupSettingsWindow\',
-    					
-    		)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the members of this group').'\')
-    		)',
-    		
-    				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;')
+    				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a')
     		),		    		
+		    		
+//     		array(            // display 'create_time' using an expression
+//     				'name'=>Yii::t('users', 'Group Settings'),
+//     				'type' => 'raw',   					
+//     				'value'=>'CHtml::link("<img src=\"images/GroupSettings.png\"  />", "#",
+//     				array(\'onclick\'=>CHtml::ajax(
+//     				array(
+//     				\'url\'=>Yii::app()->createUrl(\'groups/updateGroup\', array(\'groupId\'=>$data[\'id\'])),
+    		
+//     				\'complete\'=> \'function() { $("#groupSettingsWindow").dialog("open"); return false;}\',
+//     				\'update\'=> \'#groupSettingsWindow\',
+    					
+//     		)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the members of this group').'\')
+//     		)',
+    		
+//     				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;')
+//     		),		    		
 		       
 
 		array(            // display 'create_time' using an expression
@@ -127,22 +141,39 @@ if ($dataProvider != null) {
 		
 		
 		),
-		array(            // display 'create_time' using an expression
-	//    'name'=>'realname',
-					'type' => 'raw',				
-					'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
-										array("onclick"=>"
-												$(\"#groupId\").text(".$data[\'id\'].");
-												$(\"#gridViewId\").text(\"'.$viewId.'\");
-												TRACKER.showConfirmationDialog(\"'.$deleteGroupQuestion.'\", deleteGroup);
-												",
-												"class"=>"vtip",
-												"title"=>'.("Yii::t('groups', 'Delete Group')").
-												')
-										)',				
+// 		array(            // display 'create_time' using an expression
+// 	//    'name'=>'realname',
+// 					'type' => 'raw',				
+// 					'value'=>'CHtml::link("<img src=\"images/delete.png\"  />", "#",
+// 										array("onclick"=>"
+// 												$(\"#groupId\").text(".$data[\'id\'].");
+// 												$(\"#gridViewId\").text(\"'.$viewId.'\");
+// 												TRACKER.showConfirmationDialog(\"'.$deleteGroupQuestion.'\", deleteGroup);
+// 												",
+// 												"class"=>"vtip",
+// 												"title"=>'.("Yii::t('groups', 'Delete Group')").
+// 												')
+// 										)',				
 
-					'htmlOptions'=>array('width'=>'16px')
-		),
+// 					'htmlOptions'=>array('width'=>'16px')
+// 		),
+		    		
+		    		array(            // display 'create_time' using an expression
+		    				//    'name'=>'realname',
+		    				'type' => 'raw',
+		    				'value'=>'CHtml::link("Delete Group", "#",
+		    				array("onclick"=>"
+		    				$(\"#groupId\").text(".$data[\'id\'].");
+		    				$(\"#gridViewId\").text(\"'.$viewId.'\");
+		    				TRACKER.showConfirmationDialog(\"'.$deleteGroupQuestion.'\", deleteGroup);
+		    				",
+		    				"class"=>"vtip",
+		    				"title"=>'.("Yii::t('groups', 'Delete Group')").',
+		    				"class"=>"lo-icon icon-close")
+		    		)',
+		    				//'htmlOptions'=>array('width'=>'16px')
+		    				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red'),
+		    		),		    		
 	),
 	));
 	?>

@@ -6,7 +6,8 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'title'=>Yii::t('users', 'Friendship Requests'),
 	        'autoOpen'=>false,
 	        'modal'=>true, 
-			'resizable'=>false      
+			'resizable'=>false,
+	    	'width'=>isset($dataProvider)?'22em':'auto',
 	    ),
 	));
 

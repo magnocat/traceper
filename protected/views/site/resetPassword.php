@@ -143,8 +143,6 @@
 																												$("#registerBlock").css("min-height", "420px");
 																												$("#registerBlock").load();
 																												$("#registerBlock").show();
-																												$("#appLinkBlock").load();
-																												$("#appLinkBlock").show();
 																												$("#showRegisterFormLink").tooltipster("update", "'.Yii::t('layout', 'Click here to view the registration form again').'");
 																											}
 																											else if (obj.result == "0")

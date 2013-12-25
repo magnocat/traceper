@@ -7,8 +7,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	        'autoOpen'=>false,
 	        'modal'=>true, 
 			'resizable'=>false,    
-            'width'=>isset($dataProvider)?'20em':'auto',
-            'height'=>'auto',
+            'width'=>isset($dataProvider)?'22em':'auto',
 	    ),
 	));
 

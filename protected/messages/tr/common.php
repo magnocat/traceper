@@ -57,7 +57,8 @@ return array(
 	'Nov' => 'Kas',
 	'Dec' => 'Ara',
 	'here' => 'buradan',
-										
+	'Your settings have been saved.' => 'Ayarlarınız kaydedilmiştir.',
+											
 );
 
 

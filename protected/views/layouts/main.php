@@ -13,7 +13,10 @@
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 <link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />				
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />	
+<link rel="stylesheet" type="text/css"
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/iconfonts.css" />		
+					
 <link rel="shortcut icon"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png"
 	type="image/x-icon" />
@@ -29,6 +32,10 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/TrackerOperator.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgcheckbx.js"></script>
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/modernizr.custom.js"></script>			
 	
 <?php
 
@@ -95,46 +102,57 @@ Yii::app()->clientScript->registerScript('formTooltips',
         	 maxWidth: 500,
         	 onlyOne: false,
 			 interactive: true,
-        	 });        
+        	 });
 
-		$(\"#createGroup\").tooltipster({
+		$(\"#showCreateGroupWindow\").tooltipster({
 	       	 theme: \".tooltipster-info\",
 	       	 content: \"".Yii::t('layout', '<b>Create New Group</b> </br></br> Traceper lets you group your friends. You could create new groups by this link. Moreover, you could enroll your friends into the related group and adjust the privacy settings of your groups at the tab \"Groups\".')."\",
 	       	 position: \"bottom\",
 	       	 trigger: \"hover\",
 	       	 maxWidth: 300,
+			 offsetY: 10,
          	 onlyOne: false,       	 
        	 });
 
 		$(\"#showPublicPhotosLink\").tooltipster({
 	       	 theme: \".tooltipster-info\",
 	       	 content: \"".Yii::t('layout', 'Click here to view the list of photos shared publicly')."\",
-	       	 position: \"bottom\",
+	       	 position: \"right\",
 	       	 trigger: \"hover\",
 	       	 maxWidth: 260,
-	       	 offsetX: -25,
+	       	 offsetX: 10,
 	       	 onlyOne: false,       	 
       	 }); 
 
 		$(\"#showCachedPublicPhotosLink\").tooltipster({
 	       	 theme: \".tooltipster-info\",
 	       	 content: \"".Yii::t('layout', 'Click here to view the list of photos shared publicly')."\",
-	       	 position: \"bottom\",
+	       	 position: \"right\",
 	       	 trigger: \"hover\",
 	       	 maxWidth: 260,
-	       	 offsetX: -25,
+	       	 offsetX: 10,
 	       	 onlyOne: false,       	 
      	 });
 
 		$(\"#showRegisterFormLink\").tooltipster({
 	       	 theme: \".tooltipster-info\",
 	       	 content: \"".Yii::t('layout', ($tokenExists === true)?'Click here to view the password reset form again':'Click here to view the registration form again')."\",
-	       	 position: \"bottom\",
+	       	 position: \"right\",
 	       	 trigger: \"hover\",
 	       	 maxWidth: 220,
-	       	 offsetX: -25,
+	       	 offsetX: 10,
 	       	 onlyOne: false,       	 
      	 });
+		
+		$(\"#appQRCodeLink\").tooltipster({
+        	 theme: \".tooltipster-info\",
+        	 position: \"top-left\",
+        	 trigger: \"custom\",
+        	 maxWidth: 365,
+			 offsetX: 5,
+        	 onlyOne: false,
+			 interactive: true,
+        	 }); 		
 
         bindTooltipActions();			
 		",
@@ -146,22 +164,22 @@ if (Yii::app()->user->isGuest == false)
 {
 	Yii::app()->clientScript->registerScript('loggedInStyle',
 			"
-			var h = $(window).height(), offsetTop = 60; // Calculate the top offset
+			var h = $(window).height(), offsetTop = 70; // Calculate the top offset
 			var w = $(window).width(), offsetLeft = 396; // Calculate the left offset
 
-			$('#topBar').css('height', '60px');
-			$('#sideBar').css('top', '60px');
+			$('#topBar').css('height', '70px');
+			$('#sideBar').css('top', '70px');
 			//$('#sideBar').css('width', '380px');
 			$('#sideBar').css('height', (h - offsetTop));
-			$('#sideBar').css('min-height', (485 + 100 - 60));
+			$('#sideBar').css('min-height', (485 + 100 - 70));
 			$('#bar').css('top', offsetTop);
 			$('#bar').css('height', (h - offsetTop));
 			//$('#bar').css('left', '380px');
-			$('#bar').css('min-height', (485 + 100 - 60));
+			$('#bar').css('min-height', (485 + 100 - 70));
 			$('#map').css('height', (h - offsetTop)); //$('#map').css('height', '94%');
 			$('#map').css('width', (w - offsetLeft));
 			$('#map').css('min-width', (735 + 260 - 380));
-			$('#map').css('min-height', (485 + 100 - 60));
+			$('#map').css('min-height', (485 + 100 - 70));
 			",
 			CClientScript::POS_READY);
 }
@@ -373,8 +391,8 @@ else
 								$(this).dialog('close');
 							}"
 					),
-					'open' => 'js:function(){ hideFormErrorsIfExist(); }',
-					'close' => 'js:function(){ showFormErrorsIfExist(); }'
+					//'open' => 'js:function(){ hideFormErrorsIfExist(); }',
+					//'close' => 'js:function(){ showFormErrorsIfExist(); }'
 			),
 	));
 	//echo '</br>';
@@ -397,8 +415,8 @@ else
 								$(this).dialog('close');
 							}"
 					),
-					'open' => 'js:function(){ hideFormErrorsIfExist(); }',
-					'close' => 'js:function(){ showFormErrorsIfExist(); }'
+					//'open' => 'js:function(){ hideFormErrorsIfExist(); }',
+					//'close' => 'js:function(){ showFormErrorsIfExist(); }'
 			),
 	));
 	//echo '</br>';
@@ -465,75 +483,7 @@ else
 							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
 					)); 
 					?>
-					</div>
-
-					<div id="showPublicPhotosLink" style="position:absolute;cursor:pointer;left:19em;top:1em;display:inline-block;vertical-align:middle;width:100px;">
-					<?php 								
-						//echo CHtml::image('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png');
-
-						echo CHtml::ajaxLink('<div id="showPublicPhotos">
-								<img src="images/PublicPhotos.png"/><div></div>
-								</div>', $this->createUrl('upload/getPublicList', array('fileType'=>0)),
-								array(
-										'update'=> '#publicUploads',
-										'complete'=> 'function() 
-													  {													  	
-														//$("#formContent").fadeToggle( "slow", "linear");
-														uploadsGridViewId = \'publicUploadListView\';
-														$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showPublicPhotosLink").hide(); bShowPublicPhotosLinkActive = false; $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
-														//$("#formContent").animate({height:"0px", marginTop:$("#sideBar").height()}, function(){ $("#formContent").hide(); });
-														//$("#showPublicPhotosLink").hide();
-														//$("#showRegisterFormLink").show();	
-														//$("#publicUploads").show();
-													  }',										
-						
-// 										'success'=> 'function(msg)
-// 													 {
-// 														try
-// 														{
-// 															var obj = jQuery.parseJSON(msg);
-															
-// 															if (obj.result)
-// 															{
-// 																if (obj.result == "1")
-// 																{
-// 																	TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-// 																}
-// 																else if (obj.result == "2")
-// 																{
-// 																	TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-// 																}
-// 																else if (obj.result == "0")
-// 																{
-// 																	TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
-// 																}
-// 															}
-// 														}
-// 														catch (error)
-// 														{
-// 															$("#publicUploads").html(msg);
-														
-// 															//alert("Deneme");
-// 														}
-// 													}'										
-								),
-								array(
-										'id'=>'publicUploadsAjaxLink-'.uniqid() //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-										/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/));									
-					?>							  								
-					</div>
-					
-					<div id="showCachedPublicPhotosLink" style="position:absolute;cursor:pointer;left:19em;top:1em;display:none;vertical-align:middle;width:100px;">
-						<?php 	
-						echo CHtml::link('<img src="images/PublicPhotos.png" />');
-						?>		
-					</div>					
-					
-					<div id="showRegisterFormLink" style="position:absolute;cursor:pointer;left:19em;top:1em;display:none;vertical-align:middle;width:100px;">
-						<?php 	
-						echo CHtml::link('<img src="images/RegisterForm.png" />');
-						?>		
-					</div>
+					</div>										
 				</div>					
 				<?php	
 				}
@@ -566,7 +516,7 @@ else
 									'clientOptions'=> array(
 											'validateOnSubmit'=> true,
 											'validateOnChange'=>false,
-									),									
+									),																		
 							));
 
 							$model = new LoginForm;
@@ -584,10 +534,14 @@ else
 									?>									
 								</div>
 								
-								<div style="margin-top:0px;padding:0px;">
+								<div id="rememberMeCheckbox" class="ac-custom ac-checkbox ac-checkmark" style="margin-top:0px;padding:0px;">
 									<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>4)); ?>
 									<?php echo $form->label($model,'rememberMe',array('style'=>'font-weight:normal;')); ?>
-								</div>									
+								</div>
+								
+								<script type="text/javascript">		
+								checkSVGElements("rememberMeCheckbox", false/*par_isForm*/);	
+								</script>									
 							</div>
 
 							<div class="upperMenu">
@@ -635,8 +589,6 @@ else
 																	}
 																	catch (error)
 																	{
-																		hideFormErrorsIfExist();
-													
 																		var opt = {
 																	        autoOpen: false,
 																	        modal: true,
@@ -728,10 +680,9 @@ else
 											));									
 									?>
 								</div>																					
-							</div>													
-
+							</div>
 							<?php $this->endWidget(); ?>
-						</div>						
+						</div>																		
 					</div>										
 				</div>
 
@@ -751,41 +702,64 @@ else
 				}  ?>>
 
 					<div id='userarea'>
-						<div id="username"
+						<div id="username" class="hi-icon-effect-user hi-icon-effect-usera"
 							onclick="TRACKER.trackUser(<?php echo $userId; ?>)" class="vtip"
 							title="<?php echo Yii::t('layout', 'See your position on the map'); ?>">
+							<div class="hi-icon-in-list icon-user"></div>
 							<?php if (Yii::app()->user->isGuest == false){ 
 								echo Yii::app()->user->name;
 							}
 							?>
 						</div>
+						
+						
 					</div>
+
+					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">	
 					<?php
-					echo CHtml::link('<div  class="userOperations" id="signout">
-							<img src="images/signout.png"  /><div></div>
-							</div>', $this->createUrl('site/logout'), array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out')));					
+					echo CHtml::link('Signout', $this->createUrl('site/logout'), 
+							array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out'),
+								  'class'=>'hi-icon icon-switch'
+								 ));
+
+					?>
+					</div>
 					
-					echo CHtml::ajaxLink('<div style="float:right" id="changePassword" class="userOperations">
-							<img src="images/changePassword.png"  /><div></div>
-							</div>', $this->createUrl('site/changePassword'),
+					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">						
+					<?php					
+					
+					echo CHtml::ajaxLink('Change Password', $this->createUrl('site/changePassword'),
 							array(
 									'complete'=> 'function() { $("#changePasswordWindow").dialog("open"); return false;}',
 									'update'=> '#changePasswordWindow',
 							),
 							array(
-									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password')));										 
-
+									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'),
+									'class'=>'hi-icon icon-key'
+									));
+					?>
+					</div>
+					
+					<?php
 					if(Yii::app()->params->featureFriendManagementEnabled)
-					{
-						echo CHtml::ajaxLink('<div class="userOperations" id="inviteUser">
-								<img src="images/invite.png"  /><div></div>
-								</div>', $this->createUrl('site/inviteUsers'),
+					{						
+						?>																	
+						<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">						
+						<?php						
+						
+						echo CHtml::ajaxLink('Invite Users', $this->createUrl('site/inviteUsers'),
 								array(
 										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
 										'update'=> '#inviteUsersWindow',
 								),
 								array(
-										'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends')));
+										'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Friends'),
+										'class'=>'hi-icon icon-inviteUsers'
+									 ));
+						?>
+						</div>
+						
+						<?php						
 
 						$newRequestsCount = null;
 						$totalRequestsCount = null;
@@ -798,61 +772,87 @@ else
 						{
 							//Bir kullanıcı ID'si olmadığından sorgu yapma
 						}
-																
+						
 						if($newRequestsCount > 0)
-						{
-							//Fb::warn("newRequestsCount > 0", "main");
-							
+						{	
 							if($newRequestsCount <= 5)
 							{
-								echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
-										<img id="friendRequestsImage" src="images/friends_'.$newRequestsCount.'.png"/><div></div>
-										</div>', $this->createUrl('users/GetFriendRequestList'),
-										array(
-												'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); document.getElementById("friendRequestsImage").src = "images/friends.png"; document.getElementById("friendRequestsImage").title = "'.Yii::t('users', 'Friendship Requests').'"; return false;}',
-												'update'=> '#friendRequestsWindow',
-										),
-										array(
-												'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')'));								
+								$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
 							}
 							else
 							{
-								echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
-										<img id="friendRequestsImage" src="images/friends_many.png"/><div></div>
-										</div>', $this->createUrl('users/GetFriendRequestList'),
-										array(
-												'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); document.getElementById("friendRequestsImage").src = "images/friends.png"; document.getElementById("friendRequestsImage").title = "'.Yii::t('users', 'Friendship Requests').'"; return false;}',
-												'update'=> '#friendRequestsWindow',
-										),
-										array(
-												'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')'));								
-							}							
+								$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
+							}
 						}
 						else
 						{
-							//Fb::warn("newRequestsCount == 0", "main");
+							$friendReqTooltip = Yii::t('users', 'Friendship Requests');
+						}						
+						?>
+											
+						<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations" style="position: relative;"> <!-- Friend req sayisini buna gore konumlandırmak icin parent'in da position ozelligi set edilmeli  -->						
+							<?php
+							if($newRequestsCount > 0)
+							{
+								echo CHtml::ajaxLink($newRequestsCount, $this->createUrl('users/GetFriendRequestList'),
+										array(
+												'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
+												'update'=> '#friendRequestsWindow',
+										),
+										array(
+												'id'=>'friendReqCount','class'=>'vtip', 'title'=>$friendReqTooltip,
+												'class'=>'friendRequestCount',
+												'onMouseOver' => "$('#friendReqCount').css('background-color', '#F75D59');",
+												'onMouseOut' => "$('#friendReqCount').css('background-color', '#F62217');",
+										));
+							}							
 							
-							echo CHtml::ajaxLink('<div class="userOperations" id="friendRequests">
-									<img id="friendRequestsImage" src="images/friends.png"  /><div></div>
-									</div>', $this->createUrl('users/GetFriendRequestList'),
+							echo CHtml::ajaxLink('Friend Requests', $this->createUrl('users/GetFriendRequestList'),
 									array(
-											'complete'=> 'function() { $("#friendRequestsWindow").dialog("open"); return false;}',
+											'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
 											'update'=> '#friendRequestsWindow',
 									),
 									array(
-											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>Yii::t('users', 'Friendship Requests')));							
-						}						
+											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>$friendReqTooltip,
+											'class'=>'hi-icon icon-mail',
+											'onMouseOver' => "$('#friendReqCount').css('background-color', '#F75D59');",
+											'onMouseOut' => "$('#friendReqCount').css('background-color', '#F62217');",											
+									));							
+							?>
+						</div>	
+					<?php
 					}
 
-					echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
-							<img src="images/createGroup.png"  /><div></div>
-							</div>', $this->createUrl('groups/createGroup'),
+// 					echo CHtml::ajaxLink('<div class="userOperations" id="createGroup">
+// 							<img id="createGroupImg" src="images/createGroup.png"  /><div></div>
+// 							</div>', $this->createUrl('groups/createGroup'),
+// 							array(
+// 									'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
+// 									'update'=> '#createGroupWindow',
+// 							),
+// 							array(
+// 									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/,
+// 									'onMouseOver' => "document.createGroupImg.src = 'images/createGroup_hover.png';",
+// 									'onMouseOut' => "document.createGroupImg.src = 'images/createGroup.png';",
+// 									));
+					
+					?>
+					
+					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">
+					<?php
+					echo CHtml::ajaxLink('Create Group', $this->createUrl('groups/createGroup'),
 							array(
 									'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
 									'update'=> '#createGroupWindow',
 							),
 							array(
-									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/));
+									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/,
+									'class'=>'hi-icon icon-users'
+							));					
+					?>
+					</div>
+
+					<?php					
 											
 					if(Yii::app()->params->featureGPSDeviceEnabled)
 					{
@@ -1005,8 +1005,8 @@ else
 					else {
 						echo "style='height:85%;min-height:420px;'";
 					}				
-					?>>						
-						<div id="forRegisterRefresh" style='height:100%;'>						
+					?>>
+						<div id="forRegisterRefresh" style='height:100%;'>				
 							<div class="form" style='height:100%;'>
 								<?php
 								$form=$this->beginWidget('CActiveForm', array(
@@ -1018,14 +1018,49 @@ else
 										),									
 										'htmlOptions'=>array('style'=>'height:100%;'),
 								));
-	
+		
 								$model = new RegisterForm;
 								?>		
 														
 								<div class="sideMenu">
-									<div style="font-size:3em;">
-									<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
+									<div style="position:relative;display:inline-block;bottom:6px;">									
+										<?php echo CHtml::label("", "#", array("class"=>"hi-icon-in-list icon-profile", "style"=>"color:#555555; cursor:default;")); ?>
 									</div>
+									
+									<div style="position:relative;left:0em;bottom:6px;display:inline-block;font-size:2.5em;">									
+										<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
+									</div>
+									
+									<div id="showPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:inline-block;">						
+									<?php					
+									echo CHtml::ajaxLink("<div id=\"publicPhotosCamera\" class=\"secondIcon icon-camera\"></div><div class=\"sliding-icon icon-group\"></div>", $this->createUrl('upload/getPublicList', array('fileType'=>0)),
+											array(
+													'update'=> '#publicUploads',
+													'complete'=> 'function()
+													{
+														uploadsGridViewId = \'publicUploadListView\';
+														$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showPublicPhotosLink").hide(); $("#showCachedPublicPhotosLink").css("display", "inline-block"); $("#publicUploadsContent").show();});
+													}',
+											),
+											array(
+													'id'=>'publicUploadsAjaxLink-'.uniqid(),
+													'onMouseOver' => '$("#publicPhotosCamera").animate({color: "#D1D0CE"}, 200);',
+													'onMouseOut' => '$("#publicPhotosCamera").animate({color: "#848482"}, 200);',
+											));									
+									?>
+									</div>
+
+									<div id="showCachedPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:none;">
+									<?php 	
+									echo CHtml::label("<div id=\"publicPhotosCameraCached\" class=\"secondIcon icon-camera\"></div><div class=\"sliding-icon icon-group\"></div>", "#",
+											array(
+													'id'=>'publicUploadsAjaxLink-'.uniqid(),
+													'onclick'=>'hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").show();',
+													'onMouseOver' => '$("#publicPhotosCameraCached").animate({color: "#D1D0CE"}, 200);',
+													'onMouseOut' => '$("#publicPhotosCameraCached").animate({color: "#848482"}, 200);',
+											));	
+									?>		
+									</div>																		
 								</div>
 								
 								<div class="sideMenu">
@@ -1033,27 +1068,27 @@ else
 									<?php //echo $form->labelEx($model,'name'); ?>
 									<?php echo $form->textField($model,'name', array('size'=>'22%','maxlength'=>128,'tabindex'=>7,'placeholder'=>Yii::t('site', 'First Name'),'class'=>'registerFormField','style'=>'width:145px;')); ?>																				 											 
 									<?php 
-	// 								    $errorMessage = $form->error($model,'name');  
-	// 									if (strip_tags($errorMessage) == '') {
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-	// 									}
-									?>
+		// 								    $errorMessage = $form->error($model,'name');  
+		// 									if (strip_tags($errorMessage) == '') {
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+		// 									}
+										?>
 									</div>
 									
 									<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
 									<?php //echo $form->labelEx($model,'lastName'); ?>
 									<?php echo $form->textField($model,'lastName', array('size'=>'22%','maxlength'=>128,'tabindex'=>8,'placeholder'=>Yii::t('site', 'Last Name'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
 									<?php 
-	// 									$errorMessage = $form->error($model,'lastName');  
-	// 									if (strip_tags($errorMessage) == '') {
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { 
-	// 										echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';										
-	// 									}
-									?>
+		// 									$errorMessage = $form->error($model,'lastName');  
+		// 									if (strip_tags($errorMessage) == '') {
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { 
+		// 										echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';										
+		// 									}
+										?>
 									</div>																
 								</div>							
 								
@@ -1061,54 +1096,54 @@ else
 									<?php //echo $form->labelEx($model,'email'); ?>
 									<?php echo $form->textField($model,'email', array('size'=>'50%','maxlength'=>128,'tabindex'=>9,'placeholder'=>Yii::t('site', 'Your E-mail Address'),'class'=>'registerFormField','style'=>'width:324px;')); ?>
 									<?php 
-	// 									$errorMessage = $form->error($model,'email'); 
-	// 									if (strip_tags($errorMessage) == '') {
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-	// 									}
-									?>								
+		// 									$errorMessage = $form->error($model,'email'); 
+		// 									if (strip_tags($errorMessage) == '') {
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+		// 									}
+										?>								
 								</div>
-	
+		
 								<div class="sideMenu">
 									<?php //echo $form->labelEx($model,'emailAgain'); ?>
 									<?php echo $form->textField($model,'emailAgain', array('size'=>'50%','maxlength'=>128,'tabindex'=>10,'placeholder'=>Yii::t('site', 'Your E-mail Address (Again)'),'class'=>'registerFormField','style'=>'width:324px;')); ?>
 									<?php 
-	// 									$errorMessage = $form->error($model,'emailAgain'); 
-	// 									if (strip_tags($errorMessage) == '') {
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-	// 									}
-									?>								
+		// 									$errorMessage = $form->error($model,'emailAgain'); 
+		// 									if (strip_tags($errorMessage) == '') {
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+		// 									}
+										?>								
 								</div>							
-	
+		
 								<div class="sideMenu">
 									<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
 									<?php //echo $form->labelEx($model,'password'); ?>
 									<?php echo $form->passwordField($model,'password', array('size'=>'22%','maxlength'=>128,'tabindex'=>11,'placeholder'=>Yii::t('site', 'Password'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
 									<?php 
-	// 									$errorMessage = $form->error($model,'password');
-	// 									if (strip_tags($errorMessage) == '') {
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-	// 									}
-									?>
+		// 									$errorMessage = $form->error($model,'password');
+		// 									if (strip_tags($errorMessage) == '') {
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+		// 									}
+										?>
 									</div>
 									
 									<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
 									<?php //echo $form->labelEx($model,'passwordAgain'); ?>
 									<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'22%','maxlength'=>128,'tabindex'=>12,'placeholder'=>Yii::t('site', 'Password (Again)'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
 									<?php 
-	// 									$errorMessage = $form->error($model,'passwordAgain');
-	// 									if (strip_tags($errorMessage) == '') 
-	// 									{
-	// 										echo '<div class="errorMessage">&nbsp;</div>';
-	// 									}
-	// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
-	// 									}
-									?>
+		// 									$errorMessage = $form->error($model,'passwordAgain');
+		// 									if (strip_tags($errorMessage) == '') 
+		// 									{
+		// 										echo '<div class="errorMessage">&nbsp;</div>';
+		// 									}
+		// 									else { echo '<div class="errorMessage" style="font-size: 1.1em;">'.$errorMessage.'</div>';
+		// 									}
+										?>
 									</div>																
 								</div>
 								
@@ -1117,7 +1152,7 @@ else
 									echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 											CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
 													array(
-															'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
+															'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
 															'update'=> '#termsWindow',
 													),
 													array(
@@ -1129,88 +1164,88 @@ else
 								<div class="sideMenu">
 									<div style="position:absolute;display:inline-block;vertical-align:top;width:50%;">
 									<?php																
-	// 								$this->widget('zii.widgets.jui.CJuiButton', array(
-	// 										'name'=>'ajaxRegister',
-	// 										'caption'=>Yii::t('site', 'Sign Up'),
-	// 										'id'=>'registerAjaxButton',
-	// 										'htmlOptions'=>array('type'=>'submit','onmouseover'=>'this.style.cursor="none";','onmouseout'=>'this.style.cursor="default";','ajax'=>array('type'=>'POST','url'=>array('site/register'),
-	// 																'success'=> 'function(msg){
-	// 																			try
-	// 																			{																								
-	// 																				var obj = jQuery.parseJSON(msg);
-																						
-	// 																				if (obj.result)
-	// 																				{
-	// 																					if (obj.result == "1") 
-	// 																					{
-	// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-	// 																					}
-	// 																					else if (obj.result == "2")
-	// 																					{
-	// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-	// 																					}
-	// 																					else if (obj.result == "0")
-	// 																					{
-	// 																						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
-	// 																					}																													
-	// 																				}
-	// 																			}
-	// 																			catch (error)
-	// 																			{																																											
-	// 																				$("#forRegisterRefresh").html(msg);
-	
-	// 																				//alert(msg);
-	// 																			}																															
-	// 																}',
-	// 										))																		
-	// 								));
-									
-									echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
-											array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
-													'success'=> 'function(msg){
-																	try
-																	{
-																		var obj = jQuery.parseJSON(msg);
-																		
-																		if (obj.result)
+		// 								$this->widget('zii.widgets.jui.CJuiButton', array(
+		// 										'name'=>'ajaxRegister',
+		// 										'caption'=>Yii::t('site', 'Sign Up'),
+		// 										'id'=>'registerAjaxButton',
+		// 										'htmlOptions'=>array('type'=>'submit','onmouseover'=>'this.style.cursor="none";','onmouseout'=>'this.style.cursor="default";','ajax'=>array('type'=>'POST','url'=>array('site/register'),
+		// 																'success'=> 'function(msg){
+		// 																			try
+		// 																			{																								
+		// 																				var obj = jQuery.parseJSON(msg);
+																							
+		// 																				if (obj.result)
+		// 																				{
+		// 																					if (obj.result == "1") 
+		// 																					{
+		// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+		// 																					}
+		// 																					else if (obj.result == "2")
+		// 																					{
+		// 																						TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+		// 																					}
+		// 																					else if (obj.result == "0")
+		// 																					{
+		// 																						TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");																									
+		// 																					}																													
+		// 																				}
+		// 																			}
+		// 																			catch (error)
+		// 																			{																																											
+		// 																				$("#forRegisterRefresh").html(msg);
+		
+		// 																				//alert(msg);
+		// 																			}																															
+		// 																}',
+		// 										))																		
+		// 								));
+										
+										echo CHtml::imageButton('http://'.Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl().'/images/signup_button_default_'.Yii::app()->language.'.png',
+												array('id'=>'registerButton', 'type'=>'submit', 'style'=>'margin-top:0px;cursor:pointer;', 'ajax'=>array('type'=>'POST','url'=>array('site/register'),
+														'success'=> 'function(msg){
+																		try
 																		{
-																			$("#forRegisterRefresh").html(obj.registerView);
-													
-																			if (obj.result == "1")
+																			var obj = jQuery.parseJSON(msg);
+																			
+																			if (obj.result)
 																			{
-																				TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
-																			}
-																			else if (obj.result == "2")
-																			{
-																				TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
-																			}
-																			else if (obj.result == "0")
-																			{
-																				TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																				$("#forRegisterRefresh").html(obj.registerView);
+														
+																				if (obj.result == "1")
+																				{
+																					TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully. ').Yii::t('site', 'We have sent an account activation link to your mail address \"<b>').'" + obj.email + "'.Yii::t('site', '</b>\". </br></br>Please make sure you check the spam/junk folder as well. The links in a spam/junk folder may not work sometimes; so if you face such a case, mark our e-mail as \"Not Spam\" and reclick the link.').'");
+																				}
+																				else if (obj.result == "2")
+																				{
+																					TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.').'");
+																				}
+																				else if (obj.result == "0")
+																				{
+																					TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																				}
 																			}
 																		}
-																	}
-																	catch (error)
-																	{
-																		$("#forRegisterRefresh").html(msg);
-													
-																		//alert("Deneme");
-																	}
-																}',
-											),'onmouseover'=>'this.src="images/signup_button_mouseover_'.Yii::app()->language.'.png";',
-													'onmouseout'=>'this.src="images/signup_button_default_'.Yii::app()->language.'.png";$("#registerButton").css("margin-top", "0px");',
-													'onmousedown'=>'$("#registerButton").css("margin-top", "2px");',
-													'onmouseup'=>'$("#registerButton").css("margin-top", "0px");',
-											));								
-									?>
+																		catch (error)
+																		{
+																			$("#forRegisterRefresh").html(msg);
+														
+																			//alert("Deneme");
+																		}
+																	}',
+												),'onmouseover'=>'this.src="images/signup_button_mouseover_'.Yii::app()->language.'.png";',
+														'onmouseout'=>'this.src="images/signup_button_default_'.Yii::app()->language.'.png";$("#registerButton").css("margin-top", "0px");',
+														'onmousedown'=>'$("#registerButton").css("margin-top", "2px");',
+														'onmouseup'=>'$("#registerButton").css("margin-top", "0px");',
+												));								
+										?>
 									</div>
-									
+
 									<div style="position:absolute;left:11em;top:1.2em;display:inline-block;vertical-align:top;width:50%;">
 									<?php
 									echo CHtml::ajaxLink('<div id="activationNotReceived">'.Yii::t('site', 'Not Received Our Activation E-Mail?').
 														'</div>', $this->createUrl('site/activationNotReceived'),
 											array(
-													'complete'=> 'function() { hideFormErrorsIfExist(); $("#activationNotReceivedWindow").dialog("open"); return false;}',
+													'complete'=> 'function() { $("#activationNotReceivedWindow").dialog("open"); return false;}',
 													'update'=> '#activationNotReceivedWindow',
 											),
 											array(
@@ -1218,12 +1253,18 @@ else
 													'tabindex'=>14));							
 									?>
 									</div>
-								</div>
+								</div>																
 																						
 								<?php $this->endWidget(); ?>
 							</div>
-						</div>
+						</div>							
 					</div>
+					
+					<script type="text/javascript">		
+					checkSVGElements("mainCustomForm");	
+					</script>					
+					
+				
 				
 <!-- VIDEO WORK	 -->
 								
@@ -1300,10 +1341,7 @@ else
 																																			$("#registerBlock").css("height", "85%");
 																																			$("#registerBlock").css("min-height", "420px");
 																																			$("#registerBlock").load();
-																																			$("#registerBlock").show();
-																																			$("#appLinkBlock").load();
-																																			$("#appLinkBlock").show();
-																								 											$("#showRegisterFormLink").tooltipster("update", "'.Yii::t('layout', 'Click here to view the registration form again').'");																																										
+																																			$("#registerBlock").show();																																									
 																																		}
 																																		else if (obj.result == "0")
 																																		{																																			
@@ -1341,30 +1379,9 @@ else
 								<div style="font-size:1em;padding:9%;color:#E41B17">
 									<?php echo CHtml::label(Yii::t('site', 'This link is not valid anymore. Did you forget your password, please try to reset your password again.'), false, array('style'=>'cursor:text;')); ?>
 								</div>							
-							</div>
-								
-								
+							</div>																
 						</div>
-					</div>
-											
-					<div id="appLinkBlock"
-					<?php
-					if (($passwordResetRequestStatus == PasswordResetStatus::RequestValid) || ($passwordResetRequestStatus == PasswordResetStatus::RequestInvalid)) {
-						echo "style='display:none'";
-					}
-					?>>
-				        <div id="appLink" style="position:relative;top:3em;left:1em;" class="vtip" title="<?php echo Yii::t('layout', 'Download the application at Google Play'); ?>">
-				            <a href="https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0." tabindex="6"><img src="images/GooglePlay.png" style="position:absolute;bottom:0;"/></a>  			
-				        </div>				
-					
-				        <div id="appQRCode" style="position:relative;top:3.6em;left:9.5em;">
-				            <img id="androidBubbleTr" src="images/AndroidBubble_tr.png" style="<?php if(Yii::app()->language != 'tr') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_tr.png';this.style.cursor='default';"/>  			
-				        </div>
-				        
-				        <div id="appQRCode" style="position:relative;top:3.6em;left:9em;">
-				            <img id="androidBubbleEn" src="images/AndroidBubble_en.png" style="<?php if(Yii::app()->language != 'en') {echo "display:none;";} ?>position:absolute;bottom:0;" onmouseover="this.src='images/QR_code.png';this.style.cursor='none';" onmouseout="this.src='images/AndroidBubble_en.png';this.style.cursor='default';"/>  			
-				        </div>			        									
-					</div>
+					</div>											
 				</div>							
 				
 				<div id='publicUploadsContent' 
@@ -1373,12 +1390,30 @@ else
 					echo "style='display:none'";
 				}
 				else {
-					
+					echo "style='display:none'";
 				}				
-				?>>				
-					<div class="sideMenu">
-						<div id='publicUploadsTitle' style="font-size:2.6em;font-weight:bold;cursor:text;">
-							<?php echo Yii::t('layout', 'Public Photos'); ?>
+				?>>
+					<div class="form"> <!-- Bu aslina form degil, fakat yazi stili ayni olmasi icin -->				
+						<div class="sideMenu">
+							<div style="position:relative;display:inline-block;bottom:10px;">														
+								<?php echo CHtml::label("<div class=\"secondIconPassive icon-camera\" style=\"color:#D0D0D0; cursor:default;\"></div><div class=\"hi-icon-in-list icon-group\" style=\"color:#555555; cursor:default;\"></div>", "#"); ?>
+							</div>
+							
+							<div style="position:relative;left:3px;bottom:6px;display:inline-block;font-size:2.5em;">									
+								<?php //echo Yii::t('layout', 'Public Photos'); ?>
+								<?php echo CHtml::label(Yii::t('layout', 'Public Photos'), "#", array('style'=>'cursor:text;')); ?>
+							</div>
+							
+							<div id="showRegisterFormLink" class="hi-icon-effect-5 hi-icon-effect-5a" style="position:absolute;left:305px;bottom:6px;display:inline-block;">						
+							<?php						
+							
+							echo CHtml::Link("Show Register Form", "#",
+									array(
+											//'id'=>'registerFormAjaxLink-'.uniqid(),												
+											'class'=>'sliding-icon icon-profile'									
+										 ));
+							?>
+							</div>							
 						</div>
 					</div>										
 					
@@ -1518,13 +1553,36 @@ else
 
 
 		<div id='bottomBar'>			
-			<div id='bottomContent'>
+			<div id='bottomContent'>						
+			    <div id="mobilApplicationInfo">			        
+					<div id="appLink" class="hi-icon-effect-2 hi-icon-effect-2a">						
+					<?php
+					echo CHtml::link('Google Play Link', "https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0.", 
+									 array('id'=>'appGoogleplayLink','class'=>'vtip', 'title'=>Yii::t('layout', 'Download our mobile application at Google Play'), 
+									 	   'class'=>'bottom-icon icon-download1')
+							
+							);
+					?>
+					</div>
+					
+					<div id="appQRCode" class="hi-icon-effect-2 hi-icon-effect-2a" style="margin-left:1em;" class="vtip" title="<?php echo Yii::t('layout', 'Click to view QR code of our mobile application'); ?>">						
+					<?php					
+					echo CHtml::label('QR Code','#',
+									  array(
+										  'id'=>'appQRCodeLink',
+										  'class'=>'bottom-icon icon-qrcode','tabindex'=>14
+										   ));
+					?>
+					</div>					
+			    </div>    			
+			
+			
 				<div class="bottomMenu">
 					<?php
 					echo CHtml::ajaxLink('<div id="aboutUs">'.Yii::t('layout', 'About Us').
 							'</div>', $this->createUrl('site/aboutUs'),
 							array(
-									'complete'=> 'function() { hideFormErrorsIfExist(); $("#aboutUsWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { $("#aboutUsWindow").dialog("open"); return false;}',
 									'update'=> '#aboutUsWindow',
 							),
 							array(
@@ -1539,7 +1597,7 @@ else
 					echo CHtml::ajaxLink('<div id="terms">'.Yii::t('layout', 'Terms').
 							'</div>', $this->createUrl('site/terms'),
 							array(
-									'complete'=> 'function() { hideFormErrorsIfExist(); $("#termsWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { $("#termsWindow").dialog("open"); return false;}',
 									'update'=> '#termsWindow',
 							),
 							array(
@@ -1558,7 +1616,7 @@ else
 					echo CHtml::ajaxLink('<div id="contact">'.Yii::t('layout', 'Contact').
 							'</div>', $this->createUrl('site/contact'),
 							array(
-									'complete'=> 'function() { hideFormErrorsIfExist(); $("#contactWindow").dialog("open"); return false;}',
+									'complete'=> 'function() { $("#contactWindow").dialog("open"); return false;}',
 									'update'=> '#contactWindow',
 							),
 							array(
@@ -1569,7 +1627,7 @@ else
 				</div>
 				
 			    <div id="languageSelection">
-			        <div id="langTr">	
+			        <div id="langTr"<?php echo ((Yii::app()->language !== 'tr')?' class="hi-icon-wrap hi-icon-effect-9 hi-icon-effect-9b" style="position:relative;bottom:5px;"':'');?>>	
 			        	<?php
 			        		if(Yii::app()->language == 'tr')
 			        		{
@@ -1577,12 +1635,12 @@ else
 			        		}
 			        		else
 			        		{
-			        			echo CHtml::link('<img src="images/TurkishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
+			        			echo CHtml::link('<img src="images/Turkish.png"/>', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'tr')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip selectLanguage', 'title'=>'Türkçe (Bu dili seçmek için tıklayın)'));
 			        		}				        					        		
 			        	?>
-			        </div>					    
-			    
-			        <div id="langEn">
+			        </div>
+
+			        <div id="langEn"<?php echo ((Yii::app()->language !== 'en')?' class="hi-icon-wrap hi-icon-effect-9 hi-icon-effect-9b" style="position:relative;bottom:5px;"':'');?>>
 			        	<?php
 			        	//echo CHtml::link('<img src="images/English.png" />', "#", array('type'=>'submit', 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() {'.CHtml::ajax(array('type'=>'POST','url'=>array('site/register'),'update'=>'#forRegisterRefresh')).';'.CHtml::ajax(array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh')).';$("#logo").load();}')));
 			        		
@@ -1592,7 +1650,7 @@ else
 				        	}
 				        	else
 				        	{					        		
-				        		echo CHtml::link('<img src="images/EnglishNotSelected.png" />', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip', 'title'=>'English (Click to choose this language)'));
+				        		echo CHtml::link('<img src="images/English.png" />', "#", array('type'=>'submit', 'tabindex'=>15, 'ajax'=>array('type'=>'POST','url'=>$this->createUrl('site/changeLanguage', array('lang'=>'en')), 'complete'=> 'function() { location.reload();}'), 'class'=>'vtip selectLanguage', 'title'=>'English (Click to choose this language)'));
 				        	}
 			        	?>
 			        </div>			        					        
@@ -1602,6 +1660,8 @@ else
 		
 		<div id="map"></div>			
 	</div>
+	
+	
 	
 
 
@@ -1613,7 +1673,7 @@ else
 <!-- 				id="sendNewPassword" /> -->
 <!-- 		</div> -->
 <!-- 	</div> -->
-				
+					
 </body>
 </html>
 

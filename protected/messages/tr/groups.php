@@ -32,7 +32,6 @@ return array(
 	'Group Members' => 'Grup Üyeleri',
 	'View Group Members' => 'Grup Üyelerini Görüntüleyin',
 	'Group Privacy Settings' => 'Grup Gizlilik Ayarları',
-	'Your settings have been saved' => 'Ayarlarınız kaydedilmiştir',
 	'Group Settings' => 'Grup Ayarları',
 	'You can enroll your friend to the selected group(s) just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friend from the membership of a group, just remove the tick on the corresponding checkbox and save the operation again:' => 'Arkadaşınızı istediğiniz gruba ya da gruplara dahil etmek için ilgili grubun yanındaki onay kutusunu işaretlemeniz ve "Kaydet" butonuna basmanız yeterlidir. Arkadaşınızı herhangi bir gruptan çıkarmak içinse, ilgili gruba ait onay kutusundaki işareti kaldırmanız ve yine işlemi kaydetmeniz gerekmektedir:',
 	'You can enroll your friends to this group just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friends from the membership of this group, just remove the tick on the corresponding checkbox and save the operation again:' => 'Aşağıda listelenmiş arkadaşlarınızdan bu gruba dahil etmek istediklerinizi işaretleyiniz, bu gruptan çıkarmak isteğiniz arkadaşlarınızın yanındaki işaretleri ise kaldırınız. Düzenlemelerinizi tamamladıktan sonra işleminizi kaydediniz:',
