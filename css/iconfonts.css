@@ -420,18 +420,6 @@
 .icon-arrow-left2:before {
 	content: "\e627";
 }
-.icon-zoomMax1:before {
-	content: "\e628";
-}
-.icon-zoomMax2:before {
-	content: "\e629";
-}
-.icon-zoomMax3:before {
-	content: "\e62a";
-}
-.icon-zoomMax4:before {
-	content: "\e62b";
-}
 .icon-zoomIn1:before {
 	content: "\e62c";
 }
@@ -441,23 +429,8 @@
 .icon-zoomMax5:before {
 	content: "\e62e";
 }
-.icon-zoomMax6:before {
-	content: "\e62f";
-}
-.icon-zoomMax7:before {
-	content: "\e630";
-}
-.icon-zoomMax8:before {
-	content: "\e631";
-}
-.icon-zoomMax9:before {
-	content: "\e632";
-}
-.icon-zoomMax10:before {
-	content: "\e633";
-}
-.icon-zoomMax11:before {
-	content: "\e634";
+.icon-signup:before {
+	content: "\e628";
 }
 .icon-mail:before {
 	content: "\e603";
@@ -482,9 +455,6 @@
 }
 .icon-enter2:before {
 	content: "\e623";
-}
-.icon-zoomMax12:before {
-	content: "\e635";
 }
 
 
