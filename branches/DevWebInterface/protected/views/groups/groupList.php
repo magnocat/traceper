@@ -97,7 +97,7 @@ if ($dataProvider != null) {
 											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the privacy settings of this group').'\', \'class\'=>\'lo-icon icon-lock\')
 					  				 )',		
 		
-					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a')
+					'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a gridViewIcon')
 		),
 		    		
     		array(            // display 'create_time' using an expression
@@ -113,7 +113,7 @@ if ($dataProvider != null) {
 								    		)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'Edit the members of this group').'\', \'class\'=>\'lo-icon icon-cog\')
 							    		)',
     		
-    				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a')
+    				'htmlOptions'=>array('width'=>'50px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-3a gridViewIcon')
     		),		    		
 		    		
 //     		array(            // display 'create_time' using an expression
@@ -183,7 +183,7 @@ if ($dataProvider != null) {
 		    				"class"=>"lo-icon icon-close")
 		    		)',
 		    				//'htmlOptions'=>array('width'=>'16px')
-		    				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red'),
+		    				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red gridViewIcon'),
 		    		),		    		
 	),
 	));

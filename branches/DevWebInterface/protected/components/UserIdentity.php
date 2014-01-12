@@ -23,7 +23,7 @@ class UserIdentity extends CUserIdentity
 	public function authenticate()
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select='Id,realname,password,fb_id,profilePhoto';  
+		$criteria->select='Id,realname,password,fb_id';  
 		$criteria->condition='email=:email';
 		$criteria->params=array(':email'=>$this->username);
 		$user = Users::model()->find($criteria); // $params is not needed

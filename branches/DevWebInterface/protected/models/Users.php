@@ -35,7 +35,7 @@
  * @property string $registrationMedium
  * @property string $preferredLanguage
  * @property integer $termsAccepted
- * @property integer $profilePhoto
+ * @property integer $profilePhotoStatus
  *
  * The followings are the available model relations:
  * @property TraceperFriends[] $traceperFriends
@@ -73,7 +73,7 @@ class Users extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('password, realname, email, account_type', 'required'),
-			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhoto', 'numerical', 'integerOnly'=>true),
+			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhotoStatus', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group, latitude, appVer, registrationMedium', 'length', 'max'=>10),
 			array('longitude', 'length', 'max'=>11),
@@ -86,11 +86,10 @@ class Users extends CActiveRecord
 			array('gp_image', 'length', 'max'=>255),
 			array('androidVer, preferredLanguage', 'length', 'max'=>20),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress', 'safe'),
-			//array('profilePhoto', 'file','types'=>'jpg, gif, png', 'allowEmpty'=>true, 'on'=>'update'),
 				
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhoto', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus', 'safe', 'on'=>'search'),
 		);		
 	}
 
@@ -147,7 +146,7 @@ class Users extends CActiveRecord
 			'registrationMedium' => 'Registration Medium',
 			'preferredLanguage' => 'Preferred Language',
 			'termsAccepted' => 'Terms Accepted',
-			'profilePhoto' => 'Profile Photo',
+			'profilePhotoStatus' => 'Profile Photo Status',
 		);
 	}
 
@@ -193,7 +192,7 @@ class Users extends CActiveRecord
 		$criteria->compare('registrationMedium',$this->registrationMedium,true);
 		$criteria->compare('preferredLanguage',$this->preferredLanguage,true);
 		$criteria->compare('termsAccepted',$this->termsAccepted);
-		$criteria->compare('profilePhoto',$this->profilePhoto);
+		$criteria->compare('profilePhotoStatus',$this->profilePhotoStatus);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -866,7 +865,7 @@ class Users extends CActiveRecord
 	{
 		$result = false;
 	
-		if($this->updateByPk($userId, array("profilePhoto"=>$status))) {
+		if($this->updateByPk($userId, array("profilePhotoStatus"=>$status))) {
 			$result = true;
 		}
 	
@@ -877,6 +876,6 @@ class Users extends CActiveRecord
 	{
 		$user = $this->findByPk($userId);
 	
-		return $user->profilePhoto;
+		return $user->profilePhotoStatus;
 	}	
 }
