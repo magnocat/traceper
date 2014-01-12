@@ -16,13 +16,26 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	}
 	else
 	{
-	?>
+		?>
 		<div class="row" style="padding-top:2em">
-	<?php 
+		<?php 
 			echo Yii::t('layout', 'Please enter a keyword to search...'); 
-	?>
+		?>
 		</div>
-	<?php		
+		<?php
+
+		?>		
+		<div id="userSearchResultsOK" style="padding-top:2em;text-align:center">
+		<?php
+			$app = Yii::app();
+			
+			echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-checkmark" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'OK').'</span>'.'</button>', '#',
+					array(),
+					array('onclick'=>'$("#userSearchResults").dialog("close"); return false;'));
+		?>
+		</div>					
+		
+		<?php	
 	}
 
 	$this->endWidget('zii.widgets.jui.CJuiDialog');

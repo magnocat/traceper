@@ -355,6 +355,8 @@ class SiteController extends Controller
 								Yii::app()->clientScript->scriptMap['*.js'] = false;
 								Yii::app()->clientScript->scriptMap['*.css'] = false;
 							}
+							
+							//Fb::warn("renderPartial - 1", "SiteController");
 								
 							$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 						}
@@ -372,7 +374,7 @@ class SiteController extends Controller
 						
 						echo CJSON::encode(array(
 								"result"=> $result
-						));						
+						));
 					}
 					else
 					{
@@ -401,6 +403,8 @@ class SiteController extends Controller
 								"renderedView"=>$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), true/*return instead of being displayed to end users*/, true),
 								"loginView"=>$this->renderPartial('login',array('model'=>$model), true/*return instead of being displayed to end users*/, $processOutput),
 						));
+						
+						//Fb::warn("result:-3", "SiteController");
 							
 						//$this->renderPartial('acceptTermsForLogin',array('form'=>$_REQUEST['LoginForm']), false, true);						
 					}										
@@ -454,7 +458,9 @@ class SiteController extends Controller
 					if (Yii::app()->request->getIsAjaxRequest()) {
 						Yii::app()->clientScript->scriptMap['*.js'] = false;
 						Yii::app()->clientScript->scriptMap['*.css'] = false;
-					}					
+					}
+
+					//Fb::warn("renderPartial - 2", "SiteController");
 					
 					$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 				}
@@ -464,6 +470,8 @@ class SiteController extends Controller
 		}
 		else
 		{
+			//Fb::warn("renderPartial - 3", "SiteController");
+			
 			//echo 'LoginForm NOT set';
 			$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 		}
@@ -1892,7 +1900,8 @@ class SiteController extends Controller
 							//$result = Yii::t('site', 'Your account has been activated successfully, you can login now. You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');
 							
 							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
-							$result .= Yii::t('site', 'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');							
+							$result .= Yii::t('site', 'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could download the app by clicking the links {downloadIcon} and {QRCodeIcon} at bottom-left part of the page or by just clicking {downloadAppHere}. After logging into mobile app, you and your friends could see your location on the map.', 
+													   array('{downloadIcon}' => '<div class="lo-icon-in-tooltip icon-download1"></div>', '{QRCodeIcon}' => '<div class="lo-icon-in-tooltip icon-qrcode"></div>', '{downloadAppHere}' => CHtml::link(Yii::t('common', 'here'), "https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0.", array())));							
 						}
 						else
 						{
@@ -1926,8 +1935,11 @@ class SiteController extends Controller
 		//$this->redirect(Yii::app()->homeUrl);
 		//$this->renderPartial('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false, true);
 		
-		//Bununla tum site render ediliyor sonra da $content degiskeninde tutulan messageDialoh view'ı render ediliyor
+		//Bununla tum site render ediliyor sonra da $content degiskeninde tutulan messageDialog view'ı render ediliyor
 		$this->render('messageDialog', array('result'=>$result, 'title'=>Yii::t('site', 'Account Activation')), false);
+		
+// 		Yii::app()->user->setflash(1, array('title' => Yii::t('site', 'Account Activation'), 'content' => $result) );
+// 		$this->render('index');
 	}
 	
 	public function actionChangeLanguage()
@@ -2065,7 +2077,7 @@ class SiteController extends Controller
 // 		Fb::warn($_POST['height'], "height");
 		
 		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
-		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/45);
+		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/44);
 		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 115)/42);
 		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/38);
 		

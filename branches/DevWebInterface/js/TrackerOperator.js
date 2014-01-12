@@ -604,27 +604,45 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 	
 	this.showMessageDialog = function(message) {
+		$("#messageDialogOK").show(); 
 		$("#messageDialogText").html('</br>' + message); 
 		$("#messageDialog").dialog("open"); 
 	}
 	
-	this.showLongMessageDialog = function(message) {
-		$("#longMessageDialogText").html('</br>' + message); 
+	this.showLongMessageDialog = function(message, homePage) {
+		$("#longMessageDialogOK").show();
+		$("#longMessageDialogText").html('</br>' + message);
+		$("#longMessageDialogOKButton").unbind("click");
+		
+		if(typeof homePage !== 'undefined')
+		{
+			$('#longMessageDialogOKButton').click(function() { location.href = homePage; });
+		}
+		
 		$("#longMessageDialog").dialog("open"); 
 	}	
 	
+//	this.showConfirmationDialog = function(question, callback){
+//		$("#confirmationDialog #question").html('</br>' + question); 
+//		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
+//		// dont forget first button is positivie button so below loop works
+//		for(var property in buttons) {
+//			buttons[property] = callback;
+//			break;
+//		}
+//		//buttons.OK = callback;
+//		$("#confirmationDialog").dialog("option","buttons",buttons);
+//		$("#confirmationDialog").dialog("open");	
+//	}
+	
 	this.showConfirmationDialog = function(question, callback){
-		$("#confirmationDialog #question").html('</br>' + question); 
-		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
-		// dont forget first button is positivie button so below loop works
-		for(var property in buttons) {
-			buttons[property] = callback;
-			break;
-		}
-		//buttons.OK = callback;
-		$("#confirmationDialog").dialog("option","buttons",buttons);
+		$("#confirmationDialogButtons").show();
+		$("#confirmationDialog #question").html('</br>' + question);
+		$("#confirmationDialogOK").unbind("click"); //Onceden baglanmisları unbind etmezse surekli birikiyor
+		$('#confirmationDialogOK').click(function() { callback(); });
 		$("#confirmationDialog").dialog("open");	
-	}
+	}	
+		
 	this.closeConfirmationDialog = function(){
 		$("#confirmationDialog").dialog("close");
 	}

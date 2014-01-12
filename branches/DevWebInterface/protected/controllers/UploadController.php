@@ -288,7 +288,8 @@ class UploadController extends Controller
 		else {
 			//Fb::warn($uploadId, "File does not exist");
 			
-			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';
+			$fileName = Yii::app()->basePath . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ($fileType == 0)?'images/image_missing.png':'images/video.png';			
+			Yii::app()->session['upload_'.$uploadId] = 'Does not exist'; //To be used in getList.php
 		}
 		
 		if($fileType == 0) //Image

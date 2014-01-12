@@ -2,7 +2,7 @@
 
 if ($dataProvider != null) {
 	$emptyText = Yii::t('groups', 'You do not have any groups at the moment. In order to group your friends, you could create new group(s) by the link {createGroupIcon} at the top menu or by {createGroupByHere}.', array('{createGroupIcon}'=>'<div class="lo-icon-in-tooltip icon-users"></div>', 
-			'{createGroupByHere}'=>	CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('groups/createGroup'),
+			'{createGroupByHere}'=>	CHtml::ajaxLink(Yii::t('common', 'here'), $this->createUrl('groups/createGroup'),
 														array(
 																'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
 																'update'=> '#createGroupWindow',
@@ -35,18 +35,29 @@ if ($dataProvider != null) {
 																 	try {
 																 		TRACKER.closeConfirmationDialog();
 																		var obj = jQuery.parseJSON(result);
-																		if (obj.result && obj.result == "1") 
-																		{																			
-																			$.fn.yiiGridView.update($("#gridViewId").text());
-																		}
-																		else 
+																		
+																		if(obj.result)
 																		{
-																			TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 1').'");
+																			if(obj.result == "1") 
+																			{																			
+																				$.fn.yiiGridView.update($("#gridViewId").text());
+																			}
+																			else if(obj.result == "0")  
+																			{
+																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Group deletion failed!').'");
+																			}
+																			else if(obj.result == "-1")
+																			{
+																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Group does not exist!').'");
+																			}
+																			else
+																			{
+																				TRACKER.showMessageDialog("'.Yii::t('groups', 'Undefined result happened!').'");
+																			}
 																		}
-		
 																	}
 																	catch(ex) {
-																		TRACKER.showMessageDialog("'.Yii::t('groups', 'Sorry,an error occured in operation - 2').'");
+																		TRACKER.showMessageDialog("'.Yii::t('groups', 'jQuery.parseJSON(result) got exception!').'");
 																	}
 																}',
 												)).
@@ -136,7 +147,7 @@ if ($dataProvider != null) {
 					    						\'complete\'=> \'function() { $("#groupMembersWindow").dialog("open"); return false;}\',
 					 							\'update\'=> \'#groupMembersWindow\',	
 					 							
-											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'View Group Members').'\')
+											)),\'class\'=>\'vtip\', \'title\'=>\''.Yii::t('groups', 'View group members').'\')
 					  				 )',		
 		
 		

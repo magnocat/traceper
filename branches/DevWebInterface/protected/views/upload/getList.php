@@ -26,8 +26,8 @@ if ($dataProvider != null) {
 										var obj = jQuery.parseJSON(result);
 										if (obj.result && obj.result == "1") 
 										{
-											$.fn.yiiGridView.update("uploadListView");
-											//$.fn.yiiGridView.update("uploadListView",{ complete: function(){ alert("upladListView updated"); } });
+											$.fn.yiiGridView.update("'.$viewId.'");
+											//$.fn.yiiGridView.update("'.$viewId.'",{ complete: function(){ alert("upladListView updated"); } });
 										}
 										else 
 										{
@@ -73,7 +73,7 @@ if ($dataProvider != null) {
 	<?php	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
-	 		'id'=>$isPublicList?'publicUploadListView':'uploadListView',
+	 		'id'=>$viewId,
 			'ajaxUrl'=>null,
 			'ajaxUpdate'=>true,
 			//'beforeAjaxUpdate'=>'function(id,options){alert(unescape(options.url)) }',
@@ -112,29 +112,31 @@ if ($dataProvider != null) {
 		    'columns'=>array(
 				array(            // display 'create_time' using an expression		          
 					'type' => 'raw',
-		            'value'=>'CHtml::link("<img src=\"".Yii::app()->createUrl("upload/get", array(
+		            'value'=>'(isset(Yii::app()->session["upload_".$data["id"]]) && (Yii::app()->session["upload_".$data["id"]] == "Does not exist"))?
+							   		CHtml::label("<img src=\"images/image_missing.png\" />", "#", array("title"=>Yii::t("upload", "This photo is missing"))):
+							   		CHtml::link("<div class=\"image-view second-effect\"><img src=\"".Yii::app()->createUrl("upload/get", array(
 														 "id"=>$data["id"],
 														 "fileType"=>$data["fileType"],
 														 "thumb"=>"ok"
 														)
-										  			)."\"  />", "#",
-										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');")
+										  			)."\" /> <div class=\"mask\"><div class=\"info\"></div></div></div>", "#",
+										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');", "title"=>Yii::t("upload", "View photo on the map"))
 					  				  )',	
 					'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align:center;'),
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Description'),
 					'type' => 'raw',
-		            'value'=>'CHtml::link($data["description"], "#", array(
-    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');",
+		            'value'=>'(isset(Yii::app()->session["upload_".$data["id"]]) && (Yii::app()->session["upload_".$data["id"]] == "Does not exist"))?
+							   		CHtml::label($data["description"], "#", array("title"=>Yii::t("upload", "This photo is missing"))):
+							 		CHtml::link($data["description"], "#", array(
+    										"onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');", "title"=>Yii::t("upload", "View photo on the map")
 										))',	
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Sender'),
 					'type' => 'raw',
-		            'value'=>$isPublicList?'$data["realname"]':'CHtml::link($data["realname"], "#", array(
-    										"onclick"=>"TRACKER.trackUser(".$data["userId"].");",
-										))',
+		            'value'=>'$data["realname"]',
 					'htmlOptions'=>array('width'=>'120px', 'style'=>'text-align: center;'),
 					//'htmlOptions'=>array('style'=>'width:160px;'),	
 				),
@@ -158,15 +160,15 @@ if ($dataProvider != null) {
 	    				'type' =>'raw',
 	    				'value'=>' ($data["userId"] == Yii::app()->user->id)
 				    				?
-					    				CHtml::link("<span class=\"si-icon si-icon-trash\" data-icon-name=\"trash\"></span>", "#", array(
+					    				CHtml::link("<span class=\"si-icon'.(($isSearchResult == true)?'-search':'').' si-icon-trash\" data-icon-name=\"trash\"></span>", "#", array(
 						    				"onclick"=>"$(\"#uploadId\").html(". $data["id"] .");
 						    				TRACKER.showConfirmationDialog(\"'.Yii::t('upload', 'Do you really want to delete this file?').'\", deleteUpload);",
-						    				"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete file')".', 
+						    				"class"=>"vtip", "title"=>'."Yii::t('upload', 'Delete photo')".', 
 						    				"class"=>"si-icons-hover"
 	    								))
 				    				: ""; ',
 	    				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;'),
-	    				'visible'=>$isPublicList?false:true
+	    				'visible'=>(($isSearchResult == true) || $isPublicList)?false:true
 	    		),		    		
 			),
 	));
@@ -195,8 +197,10 @@ if ($dataProvider != null) {
 <script>
 	(function() {
 		// initialize all
-		[].slice.call( document.querySelectorAll( '.si-icons-hover > .si-icon' ) ).forEach( function( el ) {
+		[].slice.call( document.querySelectorAll( '.si-icons-hover > .si-icon<?php echo (($isSearchResult == true)?'-search':'') ?>' ) ).forEach( function( el ) {
+			
 			var svgicon = new svgIcon( el, svgIconConfig, { easing : mina.elastic, speed: 600, evtoggle : 'mouseover', size : { w : 32, h : 32 } } );
+			
 		} );				
 
 		//new svgIcon( document.querySelector( '.si-icons-hover .si-icon-trash' ), svgIconConfig, { easing : mina.elastic, speed: 600, evtoggle : 'mouseover', size : { w : 32, h : 32 } } );

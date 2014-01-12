@@ -21,8 +21,8 @@ T�rk�e UTF-8
 */
 return array(
 	'Create New Group' => 'Yeni Grup Oluştur',
-	'The group is created successfully' => 'İstenen grup başarılı bir şekilde oluşturulmuştur',
-	'A group with this name already exists!' => 'Aynı isimle grup bulunmaktadır',
+	'The group is created successfully.' => 'İstenen grup başarılı bir şekilde oluşturulmuştur.',
+	'A group with this name already exists!' => 'Aynı isimle grup bulunmaktadır!',
 	'Delete Group' => 'Grubu Sil',
 	'Sorry,an error occured in operation - 1'=> 'Çalışma sırasında hata oluştu - 1',
 	'Sorry,an error occured in operation - 2'=> 'Çalışma sırasında hata oluştu - 2',
@@ -30,7 +30,7 @@ return array(
 	'Remove Group Member'=> 'Üyeyi gruptan çıkar',
 	'Do you really want to remove this group member?'=> 'Bu üyeyi gerçekten gruptan çıkarmak istiyor musunuz?',
 	'Group Members' => 'Grup Üyeleri',
-	'View Group Members' => 'Grup Üyelerini Görüntüleyin',
+	'View group members' => 'Grup üyelerini görüntüleyin',
 	'Group Privacy Settings' => 'Grup Gizlilik Ayarları',
 	'Group Settings' => 'Grup Ayarları',
 	'You can enroll your friend to the selected group(s) just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friend from the membership of a group, just remove the tick on the corresponding checkbox and save the operation again:' => 'Arkadaşınızı istediğiniz gruba ya da gruplara dahil etmek için ilgili grubun yanındaki onay kutusunu işaretlemeniz ve "Kaydet" butonuna basmanız yeterlidir. Arkadaşınızı herhangi bir gruptan çıkarmak içinse, ilgili gruba ait onay kutusundaki işareti kaldırmanız ve yine işlemi kaydetmeniz gerekmektedir:',

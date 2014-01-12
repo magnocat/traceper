@@ -47,7 +47,7 @@ return array(
 	<div class=\"title\"><b><font size="3">Sorumluluk Reddi</font></b></div>
 	Bu servis hiçbir şeyi garanti etmez, kendi riskinizi göze alarak kullanırsınız. Hiçbir durumda sorumluluk kabul edilmez. Detaylı bilgi için lütfen Kullanım Şartlarımızı okuyunuz. <br/><br/>
 	<div class=\"title\"><b><font size="3">Blog Adresi</font></b></div>
-	<a href="http://traceper.blogspot.com"><font color="#6261D8">http://traceper.blogspot.com</font></a> <br/><br/>
+	<a href="http://traceper.blogspot.com">http://traceper.blogspot.com</a> <br/><br/>
 	<div class=\"title\"><b><font size="3">İletişim</font></b></div>
 	contact@traceper.com <br/><br/>',
 	
@@ -58,7 +58,7 @@ return array(
 	'Login' => 'Oturum aç',
 	'Register' => 'Kayıt',
 	'Change Password' => 'Parola Değiştir', 
-	'Invite Friends' => 'Arkadaşlarını Davet Et',
+	'Invite Your Friends to Traceper' => 'Arkadaşlarını Traceper\'a Davet Et',
 	'Create New Group' => 'Yeni Grup Oluştur',
 	'Register GPS Tracker' => 'GPS Takip Cihazı Kaydet',
 	'Register New Staff' => 'Yeni Personel Kaydet',
@@ -90,7 +90,7 @@ return array(
 	'Traceper Terms' =>
 	'<b>Son Güncelleme: 28 Ekim 2013</b> </br></br>
 	<b><font size="5">TRACEPER KULLANIM ŞARTLARI</font></b> </br></br>
-	TRACEPER TARAFINDAN SUNULAN HİZMETLERİ KULLANMADAN ÖNCE LÜTFEN BU KULLANIM ŞARTLARINI DİKKATLE OKUYUN. BU KULLANIM ŞARTLARI, <a href="http://www.traceper.com"><font color="#6261D8">HTTP://TRACEPER.COM</font></a> ADRESİNDEKİ İNTERNET SİTESİNİ VE TRACEPER TARAFINDAN SUNULAN TÜM HİZMET VE UYGULAMALARI KULLANMANIZ İÇİN HUKUKİ BAĞLAYICI ŞART VE KOŞULLARI ORTAYA KOYAR. </br></br>
+	TRACEPER TARAFINDAN SUNULAN HİZMETLERİ KULLANMADAN ÖNCE LÜTFEN BU KULLANIM ŞARTLARINI DİKKATLE OKUYUN. BU KULLANIM ŞARTLARI, <a href="http://www.traceper.com">HTTP://TRACEPER.COM</a> ADRESİNDEKİ İNTERNET SİTESİNİ VE TRACEPER TARAFINDAN SUNULAN TÜM HİZMET VE UYGULAMALARI KULLANMANIZ İÇİN HUKUKİ BAĞLAYICI ŞART VE KOŞULLARI ORTAYA KOYAR. </br></br>
 	<b><font size="3">Şartların Kabulü</font></b> </br></br>
 	Hizmete kaydolarak veya hizmeti herhangi bir şekilde kullanarak burada yer alan Kullanım Şartlarını kabul etmiş olursunuz. 28 Ekim 2013 tarihinden önce kayıt olmuş kullanıcılar için bir defaya mahsus olmak üzere, oturum açma işlemi sırasında Kullanım Şartlarımızın kabul edilmesi talebi yapılacaktır. Oturum açma işlemine devam eden kullanıcılar Kullanım Şartlarımızı kabul etmiş olacaklardır. </br></br>
 	<b><font size="3">Erişim</font></b> </br></br>

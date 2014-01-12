@@ -62,8 +62,11 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.components.FirePHPCore.*',
-    	'ext.facebook.*',  // get facebook lib
-    	'ext.facebook.lib.*',
+    	//'ext.facebook.*',  // get facebook lib
+    	//'ext.facebook.lib.*',
+		'ext.EasyTabs.*',
+		//'ext.imageSelect.*',
+		'application.helpers.*',
 	),
 
 	'modules'=>array(
@@ -174,7 +177,14 @@ return array(
 						        'coreScriptPosition'=>CClientScript::POS_BEGIN
 						),						
 				),
-		),			
+		),
+		'image'=>array(
+				'class'=>'application.extensions.image.CImageComponent',
+				// GD or ImageMagick
+				'driver'=>'GD',
+				// ImageMagick setup path
+				//'params'=>array('directory'=>'/opt/local/bin'),
+		),						
 	),
 
 	// application-level parameters that can be accessed

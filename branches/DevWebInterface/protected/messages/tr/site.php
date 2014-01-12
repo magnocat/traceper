@@ -82,7 +82,8 @@ return array(
 	'(Registration could also be done by mobile application)' => '(Kayıt işlemi mobil uygulamadan da yapılabilmektedir)',
 	'The Traceper Team' => 'Traceper Ekibi',
 	'Invite' => 'Davet et',
-	'Send invitations to your friends' => 'Arkada&#351;lar&#305;n&#305;z&#305; davet edin',
+	'Send Invitation' => 'Davetiye Gönder',
+	'Invite your friends to Traceper' => 'Arkadaşlarınızı Traceper\'a davet edin',
 	'Traceper Invitation' => 'Traceper Daveti',
 	'Invitations sent successfully...' => 'Davetiye(ler) başarıyla gönderildi...',
 	'E-mails may sometimes not reach to inbox of the recipients but spam/junk box. Therefore we recommend you to contact with the invitees thereafter in order to assure that they have received your invitation.' => 'Gönderilen e-postalar bazen alıcıların posta kutularına ulaşmak yerine spam/junk kutularına düşebilir. Bu nedenle daha sonra davet ettiğiniz kişilerle iletişime geçerek davetinizi aldıklarından emin olmanızı öneriyoruz.',
@@ -93,7 +94,7 @@ return array(
 	'Account Activation' => 'Hesap Aktivasyonu',
 	'Your account has been activated successfully, you can login now...' => 'Hesabınız başarıyla etkinleştirilmiştir, artık giriş yapabilirsiniz...',
 	'You should login at mobile app in order to provide your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.' => 'Konum bilginizi paylaşabilmeniz için mobil uygulamada giriş yapmanız gerekmektedir. Diğer yandan, birçok ortak işleme ek olarak sadece web sitesinde mevcut olan paylaşılan fotoğrafları görüntüleme ve arkadaş grupları oluşturma gibi işlemler içinse web sitemizi kullanabilirsiniz.',
-	'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.' => 'Kayıt işlemini web sitemiz üzerinden gerçekleştirdiniz, bu nedenle mobil uygulamamızı kurmamış olabilirsiniz. Mobil uygulamayı kullanmadan, konum bilginizi paylaşamazsınız. Eğer kurmadıysanız, Google Play üzerinden uygulamamızı indirip kurmanızı tavsiye ediyoruz. Uygulama için Google Play bağlantısını "Kayıt" formunun hemen altında bulabilirsiniz. Mobil uygulamada oturum açtıktan sonra siz ve arkadaşlarınız konumunuzu harita üzerinde görmeye başlayacaktır.',
+	'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could download the app by clicking the links {downloadIcon} and {QRCodeIcon} at bottom-left part of the page or by just clicking {downloadAppHere}. After logging into mobile app, you and your friends could see your location on the map.' => 'Kayıt işlemini web sitemiz üzerinden gerçekleştirdiniz, bu nedenle mobil uygulamamızı kurmamış olabilirsiniz. Mobil uygulamayı kullanmadan, konum bilginizi paylaşamazsınız. Eğer kurmadıysanız, Google Play üzerinden uygulamamızı indirip kurmanızı tavsiye ediyoruz. Uygulamayı sayfanın sol alt bölümünde yer alan {downloadIcon} ve {QRCodeIcon} bağlantılarını kullanarak veya {downloadAppHere} indirebilirsiniz. Mobil uygulamada oturum açtıktan sonra siz ve arkadaşlarınız konumunuzu harita üzerinde görmeye başlayacaktır.',	
 	'An error occured while changing your password!' => '&#350;ifrenizi de&#287;i&#351;tirirken bir hata olu&#351;tu!',
 	'Your password has been changed successfully, you can login now...' => '&#350;ifreniz ba&#351;ar&#305;yla de&#287;i&#351;tirildi, &#351;imdi giri&#351; yapabilirsiniz...',	
 	'This e-mail is not registered!' => 'Bu e-posta kay&#305;tl&#305; de&#287;il!',
@@ -150,8 +151,17 @@ return array(
 	'Terms of Use' => 'Kullanım Şartları',
 	'We have updated our {terms of use} as of October 28, 2013. By continuing to log in, you agree to our Terms of Use.' => '{terms of use} 28 Ekim 2013 itibarıyla güncellemiş bulunuyoruz. Oturum açma işlemine devam ederek, Kullanım Şartlarımızı kabul etmiş olursunuz.',
 	'Accept our Terms to continue' => 'Devam etmek için Kullanım Şartlarımızı kabul edin',
-	'I accept, continue' => 'Kabul ediyorum, devam et'
-	
+	'I accept, continue' => 'Kabul ediyorum, devam et',
+	'Click here to upload your profile photo' => 'Profil fotoğrafınızı yüklemek için buraya tıklayınız',
+	'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.' => 'Profil fotoğrafınızı yüklemek ve ayarlamak için buraya tıklayınız. İstediğiniz zaman yine Facebook profil fotoğrafınızı kullanıma alabileceksiniz.',
+	'Click here to change your profile photo' => 'Profil fotoğrafınızı değiştirmek için buraya tıklayınız',
+	'The file you try to select is invalid. Please, select a file of types {extensions}.' => 'Seçmeye çalıştığınız dosya geçerli değil. Lütfen {extensions} tiplerinden bir dosya seçiniz.',
+	'The file you try to select is too large. Please, select a file smaller than 1 MB.' => 'Seçmeye çalıştığınız dosya çok büyük. Lütfen 1 MB\'tan küçük bir dosya seçiniz.',
+	'The file you try to select is empty. Please, select a proper file.' => 'Seçmeye çalıştığınız dosya boş. Lütfen uygun bir dosya seçiniz.',
+	'The file you try to select is unreadable. Please, select a proper file.' => 'Seçmeye çalıştığınız dosya okunabilir değil. Lütfen uygun bir dosya seçiniz.',
+	'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.' => 'Yükleme sırasında bilinmeyen bir hata oluştu. Uygun bir resim dosyası seçtiğinizden emin olun. Hata devam ederse, lütfen bizimle iletişime geçiniz.',
+	'You have uploaded your profile photo successfully.' => 'Profil fotoğrafınızı başarıyla yüklediniz.',
+	'You have changed your profile photo successfully.' => 'Profil fotoğrafınızı başarıyla değiştirdiniz.',
 );
 
 /*

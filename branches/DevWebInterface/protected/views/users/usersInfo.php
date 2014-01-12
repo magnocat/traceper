@@ -19,7 +19,7 @@
 			onlyOne: false,
 			position: "right",
 			interactive: true,
-		 	offsetX: 100,
+		 	offsetX: 120,
 		});
 
 	 	$("#userSearchField").focus(function ()	{
@@ -46,15 +46,26 @@
 // 													'id'=>'searchUserButton',
 // 												));
 				
-				$this->widget('zii.widgets.jui.CJuiButton', array(
-						'name'=>'ajaxUserSearch',
-						'caption'=>Yii::t('common', 'Search'),
-						'id'=>'userSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-						'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>array('users/search'),
-																			'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
-																			'update'=> '#userSearchResults',
-						))
-				));						
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'ajaxUserSearch',
+// 						'caption'=>Yii::t('common', 'Search'),
+// 						'id'=>'userSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 						'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>array('users/search'),
+// 																			'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
+// 																			'update'=> '#userSearchResults',
+// 						))
+// 				));
+
+				$app = Yii::app();
+				
+				//Yii butonları <buton> tag'i ile uretmedigi icin boyle yapildi, bu css'ler Yii'nin urettigi <input> ile calismiyor
+				echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-search" style="'.(($app->language == 'en')?'padding-left:50px;':'padding-left:63px;padding-right:23px;').'">'.Yii::t('common', 'Search').'</button>', $this->createUrl('users/search'),
+						array(
+								'type'=>'POST',
+								'complete'=> 'function() { $("#userSearchResults").dialog("open"); return false;}',
+								'update'=> '#userSearchResults',
+						),
+						array('id'=>'userSearchAjaxButton-'.uniqid(),'type'=>'submit','style'=>'padding-left:2px;'));				
 			?>
 			<?php echo $form->error($model,'keyword'); 	?>
 		</div>

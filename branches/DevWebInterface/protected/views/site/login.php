@@ -7,31 +7,33 @@
 				'validateOnSubmit'=> true,
 				'validateOnChange'=>false,
 		),				
-	));
-	
-	Yii::app()->clientScript->registerScript('loginTooltips',
-			'$("#LoginForm_email").tooltipster({
-			theme: ".tooltipster-error",
-			position: "bottom-right",
-			offsetY: 10,
-			trigger: "custom",
-			maxWidth: 300,
-			onlyOne: false,
-			interactive: true, 
-			});
-
-			$("#LoginForm_password").tooltipster({
-			theme: ".tooltipster-error",
-			position: "bottom-right",
-			offsetY: 10,
-			trigger: "custom",
-			maxWidth: 540,
-			onlyOne: false,
-			interactive: true,
-			});
-			',				
-			CClientScript::POS_HEAD);	
-	?>
+	));	
+	?>		
+		<div id="ajaxLoginResponse">
+			<!-- Ajax cevabinda tooltiplerin calismasi icin bu script'in Yii::app()->clientScript->registerScript() ie degil, -->
+			<!-- direk <div id="ajaxLoginResponse"> tag'inib icinde gonderilmesi gerekiyor, buton ajaxla yeniden yuklenmeyince  -->
+			<!-- multiple ajax problemi de olmadigindan uniqid() kullanmaya da gerek kalmiyor.  -->
+			<script type="text/javascript">
+				$("#LoginForm_email").tooltipster({
+					theme: ".tooltipster-error",
+					position: "bottom-right",
+					offsetY: 10,
+					trigger: "custom",
+					maxWidth: 300,
+					onlyOne: false,
+					interactive: true,
+				});
+						
+				$("#LoginForm_password").tooltipster({
+					theme: ".tooltipster-error",
+					position: "bottom-right",
+					offsetY: 10,
+					trigger: "custom",
+					maxWidth: 540,
+					onlyOne: false,
+					interactive: true,
+				});
+			</script>				
 		
 			<div class="upperMenu">
 				<div style="height:3em;top:0%;padding:0px;">
@@ -83,7 +85,7 @@
 					?>					
 				</div>
 
-				<div id="rememberMeCheckbox" class="ac-custom ac-checkbox ac-checkmark" style="margin-top:0px;padding:0px;">
+				<div id="rememberMeCheckbox" class="ac-custom ac-checkbox ac-checkmark" style="margin-top:0px;padding-top:6px;">
 					<?php echo $form->checkBox($model,'rememberMe',array('size'=>5,'maxlength'=>128,'tabindex'=>4)); ?>
 					<?php echo $form->label($model,'rememberMe',array('style'=>'font-weight:normal;')); ?>
 				</div>
@@ -93,10 +95,10 @@
 				</script>													
 			</div>
 
-			<div class="upperMenu">
+			<div class="upperMenu" style="width:180px;">
 				<div style="height:3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'password'); ?>
-					<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
+					<?php echo $form->passwordField($model,'password', array('size'=>'27%','maxlength'=>'30%','tabindex'=>2)); ?>
 					<?php $errorMessage = $form->error($model,'password'); 
 						  if (strip_tags($errorMessage) == '') 
 						  { 
@@ -124,7 +126,7 @@
 					?>					
 				</div>
 					
- 				<div style="margin-top:2px;padding:0px;">
+ 				<div style="margin-top:0px;padding-top:6px;">
 					<?php
 					echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 										'</div>', $this->createUrl('site/forgotPassword'),
@@ -176,62 +178,7 @@
 									'tabindex'=>5));							
 					?>	 					
  				</div>								
-			</div>							
-											
-			<div class="upperMenu" style="margin-top:0.7em;width:50px;">
-				<div style="height:3.3em;top:0%;padding:0px;">								
-					<?php																											
-// 					$this->widget('zii.widgets.jui.CJuiButton', array(
-// 							'name'=>'ajaxLogin',
-// 							'caption'=>Yii::t('site', 'Log in'),
-// 							'id'=>'loginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-// 							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),'update'=>'#forAjaxRefresh'))
-// 					));
-
-					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'ajaxLogin',
-							'caption'=>Yii::t('site', 'Log in'),
-							'id'=>'loginAjaxButton-'.uniqid(),
-							'htmlOptions'=>array('type'=>'submit','style'=>'width:8.4em;','tabindex'=>3,'ajax'=>array('type'=>'POST','url'=>array('site/login'),
-									'success'=> 'function(msg){
-													try
-													{
-														var obj = jQuery.parseJSON(msg);
-														
-														if (obj.result)
-														{
-															if (obj.result == "1")
-															{
-																$("#tabViewList").html(obj.renderedTabView);
-																$("#forAjaxRefresh").html(obj.loginSuccessfulActions);
-															}									
-															else if (obj.result == "-3")
-															{
-																$("#forAjaxRefresh").html(obj.loginView);
-									
-																var opt = {
-															        autoOpen: false,
-															        modal: true,
-																	resizable: false,
-															        width: 600,
-															        title: "'.Yii::t('site', 'Accept Terms to continue').'"
-																};													
-					
-																$("#acceptTermsForLoginWindow").dialog(opt).dialog("open");
-																$("#acceptTermsForLoginWindow").html(obj.renderedView);
-															}
-														}
-													}
-													catch (error)
-													{
-														$("#forAjaxRefresh").html(msg);
-													}
-												}',
-							))
-					));				
-					?>
-				</div>																					
-			</div>				
-	
+			</div>			
+		</div>			
 	<?php $this->endWidget(); ?>
 </div>

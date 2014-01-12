@@ -15,7 +15,7 @@ if ($dataProvider != null) {
 	}
 	
 	$emptyText = Yii::t('users', 'You do not have any friend at the moment. In order to add new friends, you could search them by name and choose from the list. If you could not find your friends by search, you could invite them to Traceper first by the link {inviteIcon}(Invite Friends) at the top menu or by {inviteByHere}.', array('{inviteIcon}'=>'<div class="lo-icon-in-tooltip icon-inviteUsers"></div>', 
-			'{inviteByHere}'=>CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('site/inviteUsers'),
+			'{inviteByHere}'=>CHtml::ajaxLink(Yii::t('common', 'here'), $this->createUrl('site/inviteUsers'),
 								array(
 										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
 										'update'=> '#inviteUsersWindow',
@@ -26,7 +26,7 @@ if ($dataProvider != null) {
 			));
 			
 	$userSearchEmptyText = Yii::t('users', 'No users found registered by this name unfortunately. You should invite your friend to Traceper first by the link {inviteIcon}(Invite Friends) at the top menu or by {inviteByHere}. After he/she joins Traceper, you could be friends.', array('{inviteIcon}'=>'<div class="lo-icon-in-tooltip icon-inviteUsers"></div>', 
-			'{inviteByHere}'=>CHtml::ajaxLink('<font color="blue">'.Yii::t('common', 'here').'</font>', $this->createUrl('site/inviteUsers'),
+			'{inviteByHere}'=>CHtml::ajaxLink(Yii::t('common', 'here'), $this->createUrl('site/inviteUsers'),
 								array(
 										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
 										'update'=> '#inviteUsersWindow',
@@ -173,7 +173,7 @@ if ($dataProvider != null) {
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,
 	 		'id'=>$viewId,
-			'ajaxUrl'=>$ajaxUrl,			
+			'ajaxUrl'=>$ajaxUrl,
 			'summaryText'=>'',
 			'emptyText'=>$isFriendList?$emptyText:($isFriendRequestList?$friendshipRequestsEmptyText:$userSearchEmptyText),
 			'htmlOptions'=>array('style'=>'font-size:14px;'),				
@@ -239,6 +239,7 @@ if ($dataProvider != null) {
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
 		            'value'=> $isFriendList ? '($data["isVisible"] == 1)?CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',
+					'htmlOptions'=>array('width'=>'200px'),
 
 // 					'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' :
 // 					'(isset($data[\'status\']) && $data[\'status\'] == 1) ?
@@ -297,7 +298,7 @@ if ($dataProvider != null) {
 												"class"=>"lo-icon icon-close")
 					  				  )'				
 				, 
-					'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red'),
+					'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align:center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red'),
 					//'visible'=>($isFriendList || $isFriendRequestList) || '(isset($data[\'status\']) && $data[\'status\'] == 0 && isset($data[\'requester\']) && $data[\'requester\'] == false)',
 					'visible'=>$isFriendRequestList
 		),
