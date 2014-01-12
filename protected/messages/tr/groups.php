@@ -53,7 +53,7 @@ return array(
 	'The members of this group could view my location' => 'Bu gruptaki kişiler konumumu görebilsin',
 	'Privacy Settings' => 'Gizlilik ayarları',
 	'You do not have any groups at the moment. In order to group your friends, you could create new group(s) by the link {createGroupIcon} at the top menu or by {createGroupByHere}.' => 'Şu an için oluşturduğunuz hiç bir grup yok. Arkadaşlarınızı gruplamak isterseniz, üst menüdeki {createGroupIcon} bağlantısından veya {createGroupByHere} yeni grup(lar) oluşturabilirsiniz.',
-	'You have not added any friend into this group yet.' => 'Henüz hiç bir arkadaşınızı bu gruba dahil etmediniz.',
+	'You have not added any of your friends into this group.' => 'Hiç bir arkadaşınızı bu gruba dahil etmediniz.',
 	'Edit the privacy settings of this group' => 'Bu grubun gizlilik ayarlarını düzenleyin',
 	'Edit the members of this group' => 'Bu gruptaki kişileri düzenleyin'
 

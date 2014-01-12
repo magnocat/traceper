@@ -15,7 +15,9 @@
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />	
 <link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/iconfonts.css" />		
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/iconfonts.css" />
+<link rel="stylesheet" type="text/css"
+	href="<?php echo Yii::app()->request->baseUrl; ?>/css/tooltipMenu.css" />			
 					
 <link rel="shortcut icon"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png"
@@ -36,6 +38,8 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgcheckbx.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/modernizr.custom.js"></script>
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/cbpTooltipMenu.js"></script>
 
 <?php
 
@@ -656,7 +660,7 @@ else
 	<div id="confirmationDialogButtons" class="row buttons" style="display:none;padding-top:2em;text-align:center">
 	<?php
 		echo CHtml::label('<button class="btn btn-sliding-green btn-sliding-green-a icon-checkmark" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'OK').'</span>'.'</button>', '#',
-				array('id'=>'confirmationDialogOK', 'style'=>'padding-right:4px;'));
+				array('id'=>'confirmationDialogOK', 'style'=>'padding-right:10px;'));
 		
 		echo CHtml::ajaxLink('<button class="btn btn-sliding-red btn-sliding-red-a icon-close" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Cancel').'</span>'.'</button>', '#',
 				array(),
@@ -921,7 +925,6 @@ else
 
 					<div id='userarea'>
 						<?php if (Yii::app()->user->isGuest == false){ 
-							//echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.$userId.')', 'title'=>Yii::t('layout', 'See your position on the map')));
 							
 							//echo Yii::app()->user->name;
 
@@ -945,134 +948,166 @@ else
 							
 							//Fb::warn($profilePhotoSource, "profilePhotoSource");
 
-							$this->widget('ext.EAjaxUpload.EAjaxUpload',
-									array(
-											'id'=>'uploadProfilePhoto',
-											'config'=>array(
-													'action'=>Yii::app()->createUrl('users/upload'),
-													'allowedExtensions'=>array("jpg", "jpeg", "png"),//array("jpg","jpeg","gif","exe","mov" and etc...
-													'sizeLimit'=>1*1024*1024,// maximum file size in bytes
-													'photoSrc'=>$profilePhotoSource,
-													//'minSizeLimit'=>10*1024*1024,// minimum file size in bytes
+// 							$this->widget('ext.EAjaxUpload.EAjaxUpload',
+// 									array(
+// 											'id'=>'uploadProfilePhoto',
+// 											'config'=>array(
+// 													'action'=>Yii::app()->createUrl('users/upload'),
+// 													'allowedExtensions'=>array("jpg", "jpeg", "png"),//array("jpg","jpeg","gif","exe","mov" and etc...
+// 													'sizeLimit'=>10*1024*1024,// maximum file size in bytes
+// 													'photoSrc'=>$profilePhotoSource,
+// 													//'minSizeLimit'=>10*1024*1024,// minimum file size in bytes
 // 													'onSubmit'=>"js:function(file, extension) {
 // 																	$('div.preview').addClass('loading');
+// 																	bUploadProfilePhotoErrorExists = false;
 // 																}",																	
-													'onComplete'=>"js:function(id, fileName, responseJSON){
-																		$('#profilePhotoUploadButton').removeClass('qq-upload-button-hover');
+// 													'onComplete'=>"js:function(id, fileName, responseJSON){
+// 																		$('#profilePhotoUploadButton').removeClass('qq-upload-button-hover');
 													
-																		if(bProfilePhotoExists == false)
-																		{
-																			if(typeof responseJSON['result'] != 'undefined')
-																			{
-																				if(responseJSON['result'] == '-1')
-																				{
-																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
-																				}
-																				else
-																				{
-																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
-																				}		
+// 																		if(bProfilePhotoExists == false)
+// 																		{
+// 																			if(typeof responseJSON['result'] != 'undefined')
+// 																			{
+// 																				if(responseJSON['result'] == '-1')
+// 																				{
+// 																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
+// 																				}
+// 																				else
+// 																				{
+// 																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
+// 																				}		
 	
-																				$('#profilePhotoUploadButton').addClass('qq-upload-button-error-with-icon');
-																				$('#profileUserIcon').addClass('profileUserIcon-error');
-																				$('#uploadProfilePhoto').addClass('uploadProfilePhotoErrorForIcon');
-																				$('#uploadProfilePhotoErrorTooltip').css('bottom', '28px');																 			
-																				$('#uploadProfilePhotoErrorTooltip').tooltipster('show');															
-																				bUploadProfilePhotoErrorExists = true;
-																				eUploadProfilePhotoErrorFor = 'ICON';
-																			}
-																			else
-																			{															
-																				timeStamp = new Date().getTime();
-																				$('#profileUserIcon').hide();
-																				$('#profilePhoto').attr('src', 'profilePhotos/'+responseJSON['filename']+'.png'+'?random=' + timeStamp);
+// 																				$('#profilePhotoUploadButton').addClass('qq-upload-button-error-with-icon');
+// 																				$('#profileUserIcon').addClass('profileUserIcon-error');
+// 																				$('#uploadProfilePhoto').addClass('uploadProfilePhotoErrorForIcon');
+// 																				$('#uploadProfilePhotoErrorTooltip').css('bottom', '28px');																 			
+// 																				$('#uploadProfilePhotoErrorTooltip').tooltipster('show');															
+// 																				bUploadProfilePhotoErrorExists = true;
+// 																				eUploadProfilePhotoErrorFor = 'ICON';
+// 																			}
+// 																			else if(bUploadProfilePhotoErrorExists == false) //showMessage'a bir hata gelmemisse
+// 																			{
+// 																				timeStamp = new Date().getTime();
+// 																				$('#profileUserIcon').hide();
+// 																				$('#profilePhoto').attr('src', 'profilePhotos/'+responseJSON['filename']+'.png'+'?random=' + timeStamp);
 																				
-																				$('#profilePhoto').show();".((Yii::app()->user->fb_id == 0)?
-																				("$('#uploadProfilePhoto').tooltipster('update', '".Yii::t('site', 'Click here to change your profile photo')."');"):
-																				("$('#uploadProfilePhoto').tooltipster('destroy');")).
-																				"
-																				$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have uploaded your profile photo successfully.')."');
-																		 		$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('show');
-																				bProfilePhotoExists = true;															
-																			}						
-																		}
-																		else
-																		{
-																			if(typeof responseJSON['result'] != 'undefined')
-																			{
-																				if(responseJSON['result'] == '-1')
-																				{
-																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
-																				}
-																				else
-																				{
-																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
-																				}		
+// 																				$('#profilePhoto').show();".((Yii::app()->user->fb_id == 0)?
+// 																				("$('#uploadProfilePhoto').tooltipster('update', '".Yii::t('site', 'Click here to change your profile photo')."');"):
+// 																				("$('#uploadProfilePhoto').tooltipster('destroy');")).
+// 																				"
+// 																				$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have uploaded your profile photo successfully.')."');
+// 																		 		$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('show');
+// 																				bProfilePhotoExists = true;															
+// 																			}
+// 																			else
+// 																			{
+// 																				//Show message'a hata gelmis
+// 																			}						
+// 																		}
+// 																		else
+// 																		{
+// 																			if(typeof responseJSON['result'] != 'undefined')
+// 																			{
+// 																				if(responseJSON['result'] == '-1')
+// 																				{
+// 																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
+// 																				}
+// 																				else
+// 																				{
+// 																					$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
+// 																				}		
 	
-																				$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
-																				$('#profilePhoto').addClass('profilePhoto-error');																 			
-																				$('#uploadProfilePhotoErrorTooltip').tooltipster('show');																				
-																				bUploadProfilePhotoErrorExists = true;
-																				eUploadProfilePhotoErrorFor = 'PHOTO';	
-																			}
-																			else
-																			{
-																				timeStamp = new Date().getTime();
-																				$('#profilePhoto').attr('src', 'profilePhotos/'+responseJSON['filename']+'.png'+'?random=' + timeStamp);".
-																				((Yii::app()->user->fb_id == 0)?"$('#uploadProfilePhoto').tooltipster('hide');":"").
-																				"$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have changed your profile photo successfully.')."');
-																		 		$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('show');
-																				bProfilePhotoExists = true;						
-																			}						
-																		}
-																   }",
-													'messages'=>array(
-													                 'typeError'=>Yii::t('site', 'The file you try to select is invalid. Please, select a file of types {extensions}.'),
-													                 'sizeError'=>Yii::t('site', 'The file you try to select is too large. Please, select a file smaller than 1 MB.'),
-													                 //'minSizeError'=>"{file} is too small, minimum file size is {minSizeLimit}.",
-													                 'emptyError'=>Yii::t('site', 'The file you try to select is empty. Please, select a proper file.'),
-													                 //'onLeave'=>"The files are being uploaded, if you leave now the upload will be cancelled."
-													                ),
-													'showMessage'=>"js:function(message){ 
-																		//alert(message);
-																		$('#profilePhotoUploadButton').removeClass('qq-upload-button-hover');
+// 																				$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
+// 																				$('#profilePhoto').addClass('profilePhoto-error');																 			
+// 																				$('#uploadProfilePhotoErrorTooltip').tooltipster('show');																				
+// 																				bUploadProfilePhotoErrorExists = true;
+// 																				eUploadProfilePhotoErrorFor = 'PHOTO';	
+// 																			}
+// 																			else if(bUploadProfilePhotoErrorExists == false) //showMessage'a bir hata gelmemisse
+// 																			{
+// 																				timeStamp = new Date().getTime();
+// 																				$('#profilePhoto').attr('src', 'profilePhotos/'+responseJSON['filename']+'.png'+'?random=' + timeStamp);".
+// 																				((Yii::app()->user->fb_id == 0)?"$('#uploadProfilePhoto').tooltipster('hide');":"").
+// 																				"$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have changed your profile photo successfully.')."');
+// 																		 		$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('show');
+// 																				bProfilePhotoExists = true;						
+// 																			}
+// 																			else
+// 																			{
+// 																				//Show message'a hata gelmis
+// 																			}						
+// 																		}
+// 																   }",
+// 													'messages'=>array(
+// 													                 'typeError'=>Yii::t('site', 'The file you try to select is invalid. Please, select a file of types {extensions}.'),
+// 													                 'sizeError'=>Yii::t('site', 'The file you try to select is too large. Please, select a file smaller than 10 MB.'),
+// 													                 //'minSizeError'=>"{file} is too small, minimum file size is {minSizeLimit}.",
+// 													                 'emptyError'=>Yii::t('site', 'The file you try to select is empty. Please, select a proper file.'),
+// 													                 //'onLeave'=>"The files are being uploaded, if you leave now the upload will be cancelled."
+// 													                ),
+// 													'showMessage'=>"js:function(message){ 
+// 																		//alert(message);
+// 																		$('#profilePhotoUploadButton').removeClass('qq-upload-button-hover');
 																		
-																		if(bProfilePhotoExists == false)
-																		{
-																			$('#profilePhotoUploadButton').addClass('qq-upload-button-error-with-icon');
-																			$('#profileUserIcon').addClass('profileUserIcon-error');
-																			$('#uploadProfilePhoto').addClass('uploadProfilePhotoErrorForIcon');
-																			$('#uploadProfilePhotoErrorTooltip').css('bottom', '28px');
-																			eUploadProfilePhotoErrorFor = 'ICON';						
-																		}
-																		else
-																		{
-																			$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
-																			$('#profilePhoto').addClass('profilePhoto-error');
-																			eUploadProfilePhotoErrorFor = 'PHOTO';						
-																		}
+// 																		if(bProfilePhotoExists == false)
+// 																		{
+// 																			$('#profilePhotoUploadButton').addClass('qq-upload-button-error-with-icon');
+// 																			$('#profileUserIcon').addClass('profileUserIcon-error');
+// 																			$('#uploadProfilePhoto').addClass('uploadProfilePhotoErrorForIcon');
+// 																			$('#uploadProfilePhotoErrorTooltip').css('bottom', '28px');
+// 																			eUploadProfilePhotoErrorFor = 'ICON';						
+// 																		}
+// 																		else
+// 																		{
+// 																			$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
+// 																			$('#profilePhoto').addClass('profilePhoto-error');
+// 																			eUploadProfilePhotoErrorFor = 'PHOTO';						
+// 																		}
 
-																		$('#uploadProfilePhotoErrorTooltip').tooltipster('update', message);
-																 		$('#uploadProfilePhotoErrorTooltip').tooltipster('show');
-																		bUploadProfilePhotoErrorExists = true;																		
-																	}"
-											),
-									));
+// 																		$('#uploadProfilePhotoErrorTooltip').tooltipster('update', message);
+// 																 		$('#uploadProfilePhotoErrorTooltip').tooltipster('show');
+// 																		bUploadProfilePhotoErrorExists = true;																		
+// 																	}"
+// 											),
+// 									));
 
-							echo CHtml::label('', '#',
-									array(
-											'id'=>'uploadProfilePhotoErrorTooltip',
-											'style'=>'pointer-events:none; position:absolute; left:3px; bottom:4px;'
-									));
+// 							echo CHtml::label('', '#',
+// 									array(
+// 											'id'=>'uploadProfilePhotoErrorTooltip',
+// 											'style'=>'pointer-events:none; position:absolute; left:3px; bottom:4px;'
+// 									));
 
-							echo CHtml::label('', '#',
-									array(
-											'id'=>'uploadProfilePhotoSuccessfulTooltip',
-											'style'=>'pointer-events:none; position: absolute; bottom:4px;'
-									));							
+// 							echo CHtml::label('', '#',
+// 									array(
+// 											'id'=>'uploadProfilePhotoSuccessfulTooltip',
+// 											'style'=>'pointer-events:none; position: absolute; bottom:4px;'
+// 									));
+
+// 							echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.$userId.')', 'title'=>Yii::t('layout', 'See your position on the map'),
+// 																				'style'=>'position:absolute; left:54px; bottom:-20px;'));
+							
+						
+							?>
+
+								
+								<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">								
+									<li>
+										<img id="profilePhotoSettingsMenu" src="profilePhotos/1.png">
+										<ul class="cbp-tm-submenu">
+											<li><a href="#">Sorrel desert</a></li>
+											<li><a href="#">Raisin kakadu</a></li>
+											<li><a href="#">Plum salsify</a></li>
+										</ul>
+									</li>
+								</ul>
+							
+						<?php								
 						}
-						?>										
+						?>									
 					</div>
+					
+						
+					
 
 					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">	
 					<?php
@@ -2060,6 +2095,10 @@ else
 	<!-- Bu gizli div gelen ajax cevabini document icine alip getElementById() ile gelen cevaptaki belli bir kismi alabilmek icin -->
 	<!-- kullaniliyor. Bu div'in kullanan kisimdan sonra tanimlanmasi gerekiyor, bu nedenle document'in en sonuna tanimlandi -->
 	<div id="hiddenAjaxResponseToParse" style="display:none;"></div>
+	
+	<script>
+		var menu = new cbpTooltipMenu( document.getElementById( 'profilePhotoSettingsMenu' ) );
+	</script>	
 
 <!-- 	<div id="forgotPasswordForm" -->
 <!-- 		class="containerPlus draggable {buttons:'c', skin:'default', icon:'tick_ok.png',width:'300', height:'200', closed:'true' }"> -->
