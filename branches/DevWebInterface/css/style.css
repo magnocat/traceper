@@ -18,13 +18,30 @@ a {
    text-decoration: none;
 }
 
-a, img {
+a:hover {
+	text-decoration:underline;
+}
+
+a:active {
+	text-decoration:underline;
+}
+
+a, img, td {
     border:none;
 }
 
 a:focus{
    border: none;
+   outline: none;
  }
+ 
+ button:focus {
+    outline: none; 
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
 
 /*Grid view'lerde en basta "Onceki" ve en sonda "Sonraki" butonlari cikmamasi icin*/
 .yiiPager .hidden, .yiiPager .first, .yiiPager .last {
@@ -255,7 +272,12 @@ display: none;
 .bottomMenu {	
 	position: relative;
 	display:inline-block;
-	width:10%;
+	vertical-align:middle;
+	width:8%;
+	margin-left:2%;
+	padding-top:6px;
+	padding-bottom:6px;
+/* 	height:40px; */
 }
 
 .sideMenu {
@@ -417,7 +439,7 @@ display: none;
 	margin-top:10px;
 }
 .searchBox{
-	width:65%;
+	width:61%;
 	height:20px;
 	color:#666;	
 }
@@ -475,8 +497,13 @@ display: none;
 	width:66px;
 	float:right;
 /* 	margin-right:1%; */
-	cursor: pointer;
-	
+	cursor: pointer;	
+}
+
+.userOperations a:hover,
+.userOperations a:focus {
+	color: #FF7F00;
+	text-decoration:none;
 }
 
 #languageSelection{
@@ -730,14 +757,19 @@ cursor:pointer;
 
 #groupPrivacySettings-form svg {
 	left: 18px;
-	top: 49.5%;
+	top: 84px;
+}
+
+#groupSettings-form svg {
+	left: 3px;
+	top: 18px;
 }
 
 #rememberMeCheckbox svg {
 	width: 14px;
 	height: 14px;	
 	left: 15px;
-	top: 4.7em;
+	top: 5.1em;
 }
 
 #rememberMeCheckbox svg path {
@@ -1182,4 +1214,543 @@ cursor:pointer;
 	display: block;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;	
+}
+
+/* General button style (reset) */
+.btn {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	background: none;
+	cursor: pointer;
+	padding: 10px 40px;
+	display: inline-block;
+/* 	margin: 15px 30px; */
+	text-align: center;
+	letter-spacing: 0px;
+	font-weight: 700;
+	outline: none;
+	position: relative;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.btn:after {
+	content: '';
+	position: absolute;
+	z-index: -1;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+/* Pseudo elements for icons */
+.btn:before {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	position: relative;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Button 3 */
+.btn-3 {
+	background: #D7EBF9; /*#fcad26;*/
+	color: #2779AA; /*#fff;*/
+}
+
+.btn-3:hover {
+	background: #ebf5fc /*#f29e0d*/;
+}
+
+.btn-3:active {
+/* 	background: #f58500; */
+	top: 2px;
+	-webkit-transition: all 0s; /*Chrome daha yavas calistigindan hizlandirildi*/
+}
+
+.btn-3:before {
+	position: absolute;
+	height: 100%;
+	left: 0;
+	top: 0;
+	line-height: 38px;
+	font-size: 140%;
+	width: 40px;
+/* 	-webkit-transition: all 0.3s; */
+/* 	-moz-transition: all 0.3s; */
+/* 	transition: all 0.3s;	 */
+}
+
+/* .btn-3:hover:before { */
+/* 	position: absolute; */
+/* 	height: 100%; */
+/* 	left: 0; */
+/* 	top: 0; */
+/* 	line-height: 38px; */
+/* 	font-size: 180%; */
+/* 	width: 50px;    */
+/* } */
+
+/* Button 3a */
+.btn-3a {
+/* 	padding: 25px 60px 25px 120px; */
+	padding: 10px 10px 10px 100px;
+	border-radius: 10px;
+	border: 1px solid #929190;	
+}
+
+.btn-3a:before {
+/*  	background: rgba(0,0,0,0.05); */
+ 	border-top-left-radius: 8px;
+ 	border-bottom-left-radius: 8px;
+ 	color: #fff;
+/*  	background: #2779AA; */
+ 	background: rgba(39,121,170,0.7);
+}
+
+.btn-3a:hover:before {
+ 	background: rgba(39,121,170,1);
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;	 	
+}
+
+/**************************************************************/
+
+/* Button 3 */
+.btn-green {
+	background: #94db63; /*#fcad26;*/
+	color: #fff; /*#fff;*/
+}
+
+.btn-green:hover {
+	background: #73d033 /*#f29e0d*/;
+}
+
+.btn-green:active {
+/* 	background: #f58500; */
+	top: 2px;
+	-webkit-transition: all 0s; /*Chrome daha yavas calistigindan hizlandirildi*/
+}
+
+.btn-green:before {
+	position: absolute;
+	height: 100%;
+	left: 0;
+	top: 0;
+	line-height: 44px;
+	font-size: 140%;
+	width: 44px;
+/* 	-webkit-transition: all 0.3s; */
+/* 	-moz-transition: all 0.3s; */
+/* 	transition: all 0.3s;	 */
+}
+
+/* .btn-3:hover:before { */
+/* 	position: absolute; */
+/* 	height: 100%; */
+/* 	left: 0; */
+/* 	top: 0; */
+/* 	line-height: 38px; */
+/* 	font-size: 180%; */
+/* 	width: 50px;    */
+/* } */
+
+.btn-green-a {
+/* 	padding: 25px 60px 25px 120px; */
+	padding: 10px 20px 10px 60px;
+	border-radius: 12px;
+	border: 1px solid #929190;
+}
+
+.btn-green-a:before {
+/*  	background: rgba(0,0,0,0.05); */
+ 	border-top-left-radius: 10px;
+ 	border-bottom-left-radius: 10px;
+ 	color: #fff;
+/*  	background: #2779AA; */
+ 	background: rgba(80,147,34,0.7);
+}
+
+.btn-green-a:hover:before {
+ 	background: rgba(80,147,34,1);
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;	 	
+}
+
+/********** Button Sliding Green **********/
+.btn-sliding-green {
+/* 	border-radius: 50px; */
+	border: 1px solid #8ac2e4;
+/* 	color: #fff; */
+	overflow: hidden;
+	
+	background: #D7EBF9; /*#fcad26;*/
+	color: #2779AA; /*#fff;*/	
+}
+
+.btn-sliding-green span {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+/* 	-webkit-transition: all 0.3s; */
+/* 	-webkit-backface-visibility: hidden; */
+	-moz-transition: all 0.3s;
+	-moz-backface-visibility: hidden;
+	transition: all 0.3s;
+	backface-visibility: hidden;
+}
+
+.btn-sliding-green:hover {
+	background: #ebf5fc;
+	border: 1px solid #6ab2dd;
+}
+
+.btn-sliding-green:before {
+	position: absolute;
+	height: 100%;
+	font-size: 125%;
+	line-height: 32px;
+	color: #fff;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;	
+}
+
+.btn-sliding-green:active:before {
+	color: #2779aa;
+}
+
+.btn-sliding-green:active:after {
+	background: rgba(159,223,115,1);
+}
+
+.btn-sliding-green-a {
+	padding: 6px/*top*/ 10px/*right*/ 6px/*bottom*/ 100px/*left*/;
+	overflow: hidden;
+	border-radius: 10px;	
+}
+
+.btn-sliding-green-a:active {
+	background: #5aaad9;
+	color:#fff;
+	border: 1px solid #2779aa;
+	-webkit-transition: all 0.1s; /*Chrome'daki gecisler daha yavas oldugundan hizlandir*/
+}
+
+.btn-sliding-green-a:hover span {
+/* 	-webkit-transform: translateX(-20%); */
+	-moz-transform: translateX(-10px);
+	-ms-transform: translateX(-10px);
+	transform: translateX(-10px);
+}
+
+.btn-sliding-green-a:before {
+/* 	left: 130%; */
+	right:-20px;
+	top: 0;
+	z-index: 2;
+}
+
+.btn-sliding-green-a:hover:before {
+/* 	left: 80%; */
+	right:2px;
+}
+
+.btn-sliding-green-a:after {
+	width: 0px;
+	height: 200%;
+	background: rgba(137,215,83,1);
+	z-index: 1;
+	right: 0;
+	top: 0;
+	margin: -5px 0 0 -5px;
+	-webkit-transform-origin: 0 0;
+	-webkit-transform: rotate(-20deg);
+	-moz-transform-origin: 0 0;
+	-moz-transform: rotate(-20deg);
+	-ms-transform-origin: 0 0;
+	-ms-transform: rotate(-20deg);
+	transform-origin: 0 0;
+	transform: rotate(-20deg);
+}
+
+.btn-sliding-green-a:hover:after {
+	width: 32px;
+}
+
+/********** Button Sliding Green **********/
+
+/********** Button Sliding Red **********/
+.btn-sliding-red {
+	border: 1px solid #8ac2e4;
+	overflow: hidden;	
+	background: #D7EBF9; /*#fcad26;*/
+	color: #2779AA; /*#fff;*/	
+}
+
+.btn-sliding-red span {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+/* 	-webkit-transition: all 0.3s; */
+/* 	-webkit-backface-visibility: hidden; */
+	-moz-transition: all 0.3s;
+	-moz-backface-visibility: hidden;
+	transition: all 0.3s;
+	backface-visibility: hidden;
+}
+
+.btn-sliding-red:hover {
+	background: #ebf5fc;
+	border: 1px solid #6ab2dd;
+}
+
+.btn-sliding-red:before {
+	position: absolute;
+	height: 100%;
+	font-size: 125%;
+	line-height: 32px;
+	color: #fff;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;	
+}
+
+.btn-sliding-red:active:before {
+	color: #2779aa;
+}
+
+.btn-sliding-red:active:after {
+	background: rgba(240,116,109,1);
+}
+
+.btn-sliding-red-a {
+	padding: 6px/*top*/ 10px/*right*/ 6px/*bottom*/ 100px/*left*/;
+	overflow: hidden;
+	border-radius: 10px;	
+}
+
+.btn-sliding-red-a:active {
+	background: #5aaad9;
+	color:#fff;
+	border: 1px solid #2779aa;
+	-webkit-transition: all 0.1s; /*Chrome'daki gecisler daha yavas oldugundan hizlandir*/
+}
+
+.btn-sliding-red-a:hover span {
+/* 	-webkit-transform: translateX(-20%); */
+	-moz-transform: translateX(-10px);
+	-ms-transform: translateX(-10px);
+	transform: translateX(-10px);
+}
+
+.btn-sliding-red-a:before {
+/* 	left: 130%; */
+	right:-20px;
+	top: 0;
+	z-index: 2;
+}
+
+.btn-sliding-red-a:hover:before {
+/* 	left: 80%; */
+	right:2px;
+}
+
+.btn-sliding-red-a:after {
+	width: 0px;
+	height: 200%;
+	background: rgba(233,48,38,1);
+	z-index: 1;
+	right: 0;
+	top: 0;
+	margin: -5px 0 0 -5px;
+	-webkit-transform-origin: 0 0;
+	-webkit-transform: rotate(-20deg);
+	-moz-transform-origin: 0 0;
+	-moz-transform: rotate(-20deg);
+	-ms-transform-origin: 0 0;
+	-ms-transform: rotate(-20deg);
+	transform-origin: 0 0;
+	transform: rotate(-20deg);
+}
+
+.btn-sliding-red-a:hover:after {
+	width: 32px;
+}
+
+/********** Button Sliding Red **********/
+
+/********** Bottom Menu Item Effect: borders slight translate START **********/
+.cl-effect-bottomMenu a {
+	padding: 10px;
+/* 	color: #237546; */
+/* 	font-weight: 700; */
+	text-shadow: none;
+	-webkit-transition: color 0.3s;
+	-moz-transition: color 0.3s;
+	transition: color 0.3s;
+}
+
+.cl-effect-bottomMenu a::before,
+.cl-effect-bottomMenu a::after {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: #FF7F00;
+	content: '';
+	opacity: 0;
+	-webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+	-moz-transition: opacity 0.3s, -moz-transform 0.3s;
+	transition: opacity 0.3s, transform 0.3s;
+	-webkit-transform: translateY(-10px);
+	-moz-transform: translateY(-10px);
+	transform: translateY(-10px);
+}
+
+.cl-effect-bottomMenu a::before {
+	top: 0;
+	-webkit-transform: translateY(-10px);
+	-moz-transform: translateY(-10px);
+	transform: translateY(-10px);
+}
+
+.cl-effect-bottomMenu a::after {
+	bottom: 0;
+	-webkit-transform: translateY(10px);
+	-moz-transform: translateY(10px);
+	transform: translateY(10px);
+}
+
+.cl-effect-bottomMenu a:hover,
+.cl-effect-bottomMenu a:focus {
+	color: #FF7F00;
+	text-decoration:none;
+}
+
+.cl-effect-bottomMenu a:hover::before,
+.cl-effect-bottomMenu a:focus::before,
+.cl-effect-bottomMenu a:hover::after,
+.cl-effect-bottomMenu a:focus::after {
+	opacity: 1;
+	-webkit-transform: translateY(0px);
+	-moz-transform: translateY(0px);
+	transform: translateY(0px);
+}
+
+/********** Bottom Menu Item Effect: borders slight translate END **********/
+
+/********** Photo Hover Effect START **********/
+
+.image-view {
+   width: 48px;
+   height: 36px;
+/*    margin: 10px; */
+   float: left;
+   border: 2px solid #fff;
+   overflow: hidden;
+   position: relative;
+   text-align: center;
+   box-shadow: 0px 0px 5px #aaa;
+   cursor: pointer;
+}
+.image-view .mask, .image-view .content {
+   width: 48px;
+   height: 36px;
+   position: absolute;
+   overflow: hidden;
+   top: 0;
+   left: 0;
+}
+.image-view img {
+   display: block;
+   position: relative;
+}
+.image-view .info {
+   background:url(../images/link.png) center no-repeat;
+   display: inline-block;
+   text-decoration: none;
+   bottom:9px;
+   right:3px;
+   text-indent:-9999px;
+   width:20px;
+   height:20px;
+}
+
+.second-effect .mask {
+   opacity: 0;
+   overflow:visible;
+   border:0px solid rgba(0,0,0,0.7);
+   -moz-box-sizing:border-box;
+   -webkit-box-sizing:border-box;
+   box-sizing:border-box;
+   -webkit-transition: all 0.4s ease-in-out;
+   -moz-transition: all 0.4s ease-in-out;
+   -o-transition: all 0.4s ease-in-out;
+   -ms-transition: all 0.4s ease-in-out;
+   transition: all 0.4s ease-in-out;
+}
+.second-effect .info {
+	position:relative;
+/* 	top:-10px; */
+	opacity:0;
+   -moz-transform:scale(0,0);
+   -webkit-transform:scale(0,0);
+   -o-transform:scale(0,0);
+   -ms-transform:scale(0,0);
+   transform:scale(0,0);
+   -webkit-transition: -webkit-transform 0.2s 0.1s ease-in, opacity 0.1s ease-in-out;
+   -moz-transition: -moz-transform 0.2s 0.1s ease-in, opacity 0.1s ease-in-out;
+   -o-transition: -o-transform 0.2s 0.1s ease-in, opacity 0.1s ease-in-out;
+   -ms-transition: -ms-transform 0.2s 0.1s ease-in, opacity 0.1s ease-in-out;
+   transition: transform 0.2s 0.1s ease-in, opacity 0.1s ease-in-out;
+}
+.second-effect:hover .mask {
+   opacity: 1;
+   border:18px solid rgba(0,0,0,0.7);   
+}
+.second-effect:hover .info {
+	opacity:1;
+	-moz-transform:scale(1,1);
+	-webkit-transform:scale(1,1);
+	-o-transform:scale(1,1);
+	-ms-transform:scale(1,1);
+	transform:scale(1,1);
+	-moz-transition-delay:0.3s;
+	-webkit-transition-delay:0.3s;
+	-o-transition-delay:0.3s;
+	-ms-transition-delay:0.3s;
+	transition-delay:0.3s;
+}
+
+/********** Photo Hover Effect END **********/
+
+input[type="file"] {
+	opacity:0;
+	color: transparent;
+}
+
+.uploadPhotoError {
+	opacity:0;
+	background: #FEE;
+	border-color: #C00;
+	border: 4px solid #fff;	
+}
+
+.uploadProfilePhotoErrorForIcon {
+	width:44px;
+	height:48px;
+/* 	left:4px; */
+	position:relative;
+	bottom:3px;
+	border: 3px solid #C00;
 }
