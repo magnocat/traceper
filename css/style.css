@@ -102,7 +102,7 @@ display: none;
 	background-image: url("../images/left.png");
 	background-repeat:no-repeat;
 	background-position:center;
-	z-index: 150;
+	z-index: 10;
 	position: absolute;
 /* 	right:78%; */
 	left:380px; /*left:260px; 284px*/
@@ -184,26 +184,25 @@ display: none;
 	cursor: default;
 }
 
-#userarea ul {
-	display:none;
-	list-style: none;
-	position: absolute;
-	margin-left:-22px;
-	padding:0px;
-	width:190px;
-	background-color: #FFFFFF;
-	border-bottom: 1px dotted #ddd;
-	
-}
-#userarea ul li {
-	font-size:11px;
-	padding:10px;
-	padding-left:22px;
-	border-top: 1px dotted #ddd;
-}
-#userarea ul li:hover {
-	background-color: #CFDEFF;
-}
+/* #userarea ul { */
+/* 	display:none; */
+/* 	list-style: none; */
+/* 	position: absolute; */
+/* 	margin-left:-22px; */
+/* 	padding:0px; */
+/* 	width:190px; */
+/* 	background-color: #FFFFFF; */
+/* 	border-bottom: 1px dotted #ddd;	 */
+/* } */
+/* #userarea ul li { */
+/* 	font-size:11px; */
+/* 	padding:10px; */
+/* 	padding-left:22px; */
+/* 	border-top: 1px dotted #ddd; */
+/* } */
+/* #userarea ul li:hover { */
+/* 	background-color: #CFDEFF; */
+/* } */
 
 #username{
 /* 	padding-left:22px; */
@@ -503,6 +502,11 @@ display: none;
 .userOperations a:hover,
 .userOperations a:focus {
 	color: #FF7F00;
+	text-decoration:none;
+}
+
+.gridViewIcon a:hover,
+.gridViewIcon a:focus {
 	text-decoration:none;
 }
 
