@@ -23,10 +23,13 @@ return array(
 	'Description' => 'Tanım',
 	'Sender' => 'Gönderen',
 	'Delete file' => 'Dosyayı sil',
+	'Delete photo' => 'Fotoğrafı sil',
 	'Do you really want to delete this file?' => 'Bu dosyayı gerçekten silmek istiyor musunuz?',
 	'Type a keyword' => 'Anahtar kelime girin',
 	'No uploads found by your search criteria' => 'Aradığınız kriterde herhangi bir yükleme bulunamadı',
-	'There is not any upload shared by you, your friends or publicly at the moment. You could take photos by your mobile app and share them with your friends or as public' => 'Şu an için siz, arkadaşlarınız veya herkese açık olarak paylaşılan hiç bir yükleme bulunmuyor. Mobil uygulamanızla fotoğraf çekerek arkadaşlarınızla veya herkese açık olarak paylaşabilirsiniz.'			
+	'There is not any upload shared by you, your friends or publicly at the moment. You could take photos by your mobile app and share them with your friends or as public' => 'Şu an için siz, arkadaşlarınız veya herkese açık olarak paylaşılan hiç bir yükleme bulunmuyor. Mobil uygulamanızla fotoğraf çekerek arkadaşlarınızla veya herkese açık olarak paylaşabilirsiniz.',
+	'View photo on the map' => 'Fotoğrafı harita üzerinde görüntüleyin',
+	'This photo is missing' => 'Bu fotoğrafa erişilemiyor'				
 	
 	
 	

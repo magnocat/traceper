@@ -22,15 +22,17 @@
 		$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")') });
 		$('#map').animate({width:(w - offsetLeft)});
 		$('#bar').animate({left:'380px'});			
-	}    
+	}
 
-	$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-	$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-	$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+	$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 152));
+	$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
+	$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));	
 	
-	$("#usersGridView").css("height", userListHeight - 50);
-	$("#uploadsGridView").css("height", userListHeight - 50);
-	$("#groupsGridView").css("height", userListHeight - 50);
+	//$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));	
+	
+	//$("#usersGridView").css("height", userListHeight - 50);
+	//$("#uploadsGridView").css("height", userListHeight - 50);
+	//$("#groupsGridView").css("height", userListHeight - 50);
 
 	$('#tab_view').bind('easytabs:before', function(e, $clicked, $targetPanel, settings){
         switch($targetPanel.get(0).id)
@@ -53,7 +55,20 @@
 		   	 }
 		   	 break;       
         }
-	});	    
+	});
+
+	$('#tab_view').bind('easytabs:ajax:complete', function(e, $clicked, $targetPanel, response, status, xhr){
+		var h = $(window).height();
+		var offsetTop = 0;
+
+		$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 152));
+		$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
+		$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));				
+		
+		$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#usersGridView").css("height", (h - offsetTop - 82));
+		
+		//alert("ajax complete");
+	});		    
 
 	resetAllFormErrors();
 
@@ -72,7 +87,7 @@
 	$('#map').css('min-width', (735 + 260 - 380));
 	$('#map').css('min-height', (485 + 100 - 70));
 
-	$("#username").html('<?php echo $realname ?>');
+	$("#username").html('<div class="hi-icon-in-list icon-user"></div><a><?php echo $realname ?></a>');
 	$("#userId").html('<?php echo $id ?>');	
 	//$("#tab_view").tabs("load",0);
 	//$("#tab_view").tabs("select",0);
@@ -89,69 +104,40 @@
 </script>	
 
 <?php
-	CHtml::ajax(
-		array(
-		'url'=>Yii::app()->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))),
-		'update'=>'#users_tab',
-		)
-	);
+// 	CHtml::ajax(
+// 		array(
+// 		'url'=>Yii::app()->createUrl('users/getFriendList', array('userType'=>array(UserType::RealUser, UserType::GPSDevice))),
+// 		'update'=>'#users_tab',
+// 		)
+// 	);
 
-	CHtml::ajax(
-		array(
-		'url'=>Yii::app()->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
-		'update'=>'#staff_tab',
-		)
-	);
+// 	CHtml::ajax(
+// 		array(
+// 		'url'=>Yii::app()->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
+// 		'update'=>'#staff_tab',
+// 		)
+// 	);
 													
-	CHtml::ajax(
-		array(
-		'url'=> Yii::app()->createUrl('upload/getList', array('fileType'=>0)),
-		'update'=>'#photos_tab',
-		)
-	);
+// 	CHtml::ajax(
+// 		array(
+// 		'url'=> Yii::app()->createUrl('upload/getList', array('fileType'=>0)),
+// 		'update'=>'#photos_tab',
+// 		)
+// 	);
 
-	CHtml::ajax(
-		array(
-		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
-		'update'=>'#groups_tab',
-		)
-	);
+// 	CHtml::ajax(
+// 		array(
+// 		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::FriendGroup)),
+// 		'update'=>'#groups_tab',
+// 		)
+// 	);
 													
-	CHtml::ajax(
-		array(
-		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
-		'update'=>'#staff_groups_tab',
-		)
-	);
-
-	$newRequestsCount = null;
-	$totalRequestsCount = null;
-
-	Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
-
-	if($newRequestsCount > 0)
-	{
-		if($newRequestsCount <= 5)
-		{
-		?>
-		<script type="text/javascript">
-			document.getElementById('friendRequestsImage').src = "images/friends_" + <?php echo $newRequestsCount ?> + ".png";			
-			document.getElementById('friendRequestsImage').title = "<?php echo Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')' ?>";
-			document.getElementById('friendRequestsImage').onclick = function() {changeSrcTitleBack('friendRequestsImage', 'images/friends.png', '<?php echo Yii::t('users', 'Friendship Requests') ?>')};
-		</script>	
-		<?php
-		}
-		else
-		{
-		?>
-		<script type="text/javascript">
-			document.getElementById('friendRequestsImage').src = "images/friends_many.png";			
-			document.getElementById('friendRequestsImage').title = "<?php echo Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')' ?>";
-			document.getElementById('friendRequestsImage').onclick = function() {changeSrcTitleBack('friendRequestsImage', 'images/friends.png', '<?php echo Yii::t('users', 'Friendship Requests') ?>')};
-		</script>	
-		<?php
-		}
-	}	
+// 	CHtml::ajax(
+// 		array(
+// 		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
+// 		'update'=>'#staff_groups_tab',
+// 		)
+// 	);	
 ?>
 
 <script type="text/javascript">

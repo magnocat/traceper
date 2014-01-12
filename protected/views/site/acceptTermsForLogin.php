@@ -1,4 +1,3 @@
-
 <?php 
 $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 	    'id'=>'acceptTermsForLoginWindow',
@@ -39,44 +38,75 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 // 				))
 // 		));
 
-		$this->widget('zii.widgets.jui.CJuiButton', array(
-				'name'=>'ajaxContinueLoginButton',
-				'caption'=>Yii::t('site', 'I accept, continue'),
-				'id'=>'continueLoginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-				'htmlOptions'=>array('type'=>'submit',
-									 'ajax'=>array('url'=>$this->createUrl('site/continueLogin', array('LoginForm'=>$form)),
-												   'success'=>'function(msg){
-																try
-																{
-																	var obj = jQuery.parseJSON(msg);
+// 		$this->widget('zii.widgets.jui.CJuiButton', array(
+// 				'name'=>'ajaxContinueLoginButton',
+// 				'caption'=>Yii::t('site', 'I accept, continue'),
+// 				'id'=>'continueLoginAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 				'htmlOptions'=>array('type'=>'submit',
+// 									 'ajax'=>array('url'=>$this->createUrl('site/continueLogin', array('LoginForm'=>$form)),
+// 												   'success'=>'function(msg){
+// 																try
+// 																{
+// 																	var obj = jQuery.parseJSON(msg);
 												
-																	if (obj.result)
-																	{
-																		if (obj.result == "1")
-																		{
-																			$("#acceptTermsForLoginWindow").dialog("close");
-									 										$("#tabViewList").html(obj.renderedTabView);
-																			$("#forAjaxRefresh").html(obj.loginSuccessfulActions);
-																		}
-																	}
-																}
-																catch (error)
-																{
-																	$("#forAjaxRefresh").html(msg);
-																}
-															}',
-				))
-		));		
-		
+// 																	if (obj.result)
+// 																	{
+// 																		if (obj.result == "1")
+// 																		{
+// 																			$("#acceptTermsForLoginWindow").dialog("close");
+// 									 										$("#tabViewList").html(obj.renderedTabView);
+// 																			$("#loginBlock").html(obj.loginSuccessfulActions);
+// 																		}
+// 																	}
+// 																}
+// 																catch (error)
+// 																{
+// 																	$("#loginBlock").html(msg);
+// 																}
+// 															}',
+// 				))
+// 		));
+
+		$app = Yii::app();
+			
+		echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-arrow-right" style="'.(($app->language == 'en')?'padding-left:28px;padding-right:28px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('site', 'I accept, continue').'</span>'.'</button>', $this->createUrl('site/continueLogin', array('LoginForm'=>$form)),
+				array(
+						'type'=>'POST',
+						'success'=>'function(msg){
+										try
+										{
+											var obj = jQuery.parseJSON(msg);
+										
+											if (obj.result)
+											{
+												if (obj.result == "1")
+												{
+													$("#acceptTermsForLoginWindow").dialog("close");
+													$("#tabViewList").html(obj.renderedTabView);
+													$("#loginBlock").html(obj.loginSuccessfulActions);
+												}
+											}
+										}
+										catch (error)
+										{
+											$("#loginBlock").html(msg);
+										}
+									}',
+				),
+				array('id'=>'continueLoginAjaxButton-'.uniqid(), 'style'=>'padding-right:4px;'));		
 		?>
 											
 		<?php			 
-			$this->widget('zii.widgets.jui.CJuiButton', array(
-					'name'=>'cancelLogin',
-					'caption'=>Yii::t('common', 'Cancel'),
-					'id'=>'cancelLoginButton',
-					'onclick'=> 'js:function(){$("#acceptTermsForLoginWindow").dialog("close"); return false;}'
-			));		
+// 			$this->widget('zii.widgets.jui.CJuiButton', array(
+// 					'name'=>'cancelLogin',
+// 					'caption'=>Yii::t('common', 'Cancel'),
+// 					'id'=>'cancelLoginButton',
+// 					'onclick'=> 'js:function(){$("#acceptTermsForLoginWindow").dialog("close"); return false;}'
+// 			));
+
+			echo CHtml::ajaxLink('<button class="btn btn-sliding-red btn-sliding-red-a icon-close" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Cancel').'</span>'.'</button>', '#',
+					array(),
+					array('id'=>'cancelLoginButton', 'onclick'=>'$("#acceptTermsForLoginWindow").dialog("close"); return false;'));			
 		?>												
 	</div>
 <?php 

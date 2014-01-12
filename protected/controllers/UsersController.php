@@ -850,6 +850,158 @@ class UsersController extends Controller
 		));
 		Yii::app()->end();
 	}
+	
+// 	public function actionUpload(){
+// 		Fb::warn('actionUpload() called', "UsersController");
+		
+// 	    $file = CUploadedFile::getInstanceByName('file');
+// 	    // Do your business ... save on file system for example,
+// 	    // and/or do some db operations for example
+// 	    $file->saveAs('profilePhotos/'.$file->getName());
+// 	    // return the new file path
+// 	    echo Yii::app()->baseUrl.'/images/'.$file->getName();
+// 	}
+	
+	public function actionUpdate()
+	{
+		Fb::warn('actionUpdate() called', "UsersController");
+
+		//$model=Users::model()->findByPk((int)$id);
+		
+		$model = new UploadProfilePhotoForm;
+
+		if(isset($_POST['UploadProfilePhotoForm']))
+		{
+			//$_POST['Users']['profilePhoto'] = $model->profilePhoto;
+			$model->attributes=$_POST['UploadProfilePhotoForm'];
+			
+			Fb::warn("Form SET", "UsersController");
+	
+			$uploadedFile=CUploadedFile::getInstance($model,'profilePhoto');
+			
+			//$model->profilePhoto = 1;
+	
+			if($model->validate())
+			{
+				Fb::warn("model VALID", "actionUpdate()");
+				
+				if(!empty($uploadedFile))  // check if uploaded file is set or not
+				{
+					Fb::warn("uploadedFile EXISTS", "actionUpdate()");
+					
+					$uploadedFile->saveAs(Yii::app()->basePath.'/../profilePhotos/'.Yii::app()->user->id.'.jpg');
+				}
+				else
+				{
+					Fb::warn("uploadedFile is EMPTY", "actionUpdate()");
+				}
+				
+				//Yii::app()->end();
+				
+				//$this->redirect(array('admin'));
+			}
+			else
+			{
+				Fb::warn("model NOT VALID", "actionUpdate()");
+			}
+		}
+		else
+		{
+			Fb::warn("Form NOT set", "UsersController");
+		}
+	
+		//$this->render('update',array('model'=>$model));
+		
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
+		
+		//Complete solution for blinking problem at FireFox
+		if (Yii::app()->request->getIsAjaxRequest()) {
+			Yii::app()->clientScript->scriptMap['*.js'] = false;
+			Yii::app()->clientScript->scriptMap['*.css'] = false;
+		}		
+		
+		$this->renderPartial('update',array('model'=>$model), false, true);
+	}
+
+	public function actionUpload()
+	{		
+		try 
+		{
+			Yii::import("ext.EAjaxUpload.qqFileUploader");
+			
+			$folder='profilePhotos/';// folder for uploaded files
+			$allowedExtensions = array("jpg", "jpeg", "png");//array("jpg","jpeg","gif","exe","mov" and etc...
+			$sizeLimit = 10 * 1024 * 1024;// maximum file size in bytes
+			$uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
+			$result = $uploader->handleUpload($folder, Yii::app()->user->id);
+			//$result = $uploader->handleUpload($folder, null);
+			$return = htmlspecialchars(json_encode($result), ENT_NOQUOTES);
+			
+			//Fb::warn($result['filename'], "UsersController - filename");
+			
+			//$fileSize = filesize($folder.$result['filename']);//GETTING FILE SIZE
+			$filename = $result['filename'];//GETTING FILE NAME
+			$extension = $result['extension'];
+			$filenameWithPath = $folder.$filename.$extension;
+			
+			$image = Yii::app()->image->load($filenameWithPath);
+			$image->smart_resize(44, 48)->quality(75);
+			//$image->save(); // or $image->save('images/small.jpg');
+			$image->save($folder.$filename.'.png');
+			
+			if($extension != '.png')
+			{
+				unlink($filenameWithPath);
+			}
+			
+			$profilePhotoStatus = Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS;
+			
+			if(Yii::app()->user->fb_id == 0)
+			{
+				$profilePhotoStatus = Users::TRACEPER_PROFILE_PHOTO_EXISTS;
+			}
+			else
+			{
+				$profilePhotoStatus = Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER;
+			}
+			
+			Users::model()->setProfilePhotoStatus(Yii::app()->user->id, $profilePhotoStatus);						
+		}
+		catch( Exception $e )
+		{
+			if ($e instanceof CException) 
+			{
+				if($e->getMessage() == 'image file unreadable')
+				{
+					$return = CJSON::encode(array("result"=>"-1")); //File Unreadable
+				}
+				else
+				{
+					$return = CJSON::encode(array("result"=>"-2")); //Unknown Photo Upload Error
+				}
+			}
+			else
+			{
+				$return = CJSON::encode(array("result"=>"-2")); //Unknown Photo Upload Error
+			}			
+		}
+		
+		//Fb::warn($return, "actionUpload() - return");
+		
+		echo $return;// it's array	
+	}	
 
 // 	private function prepareJson($dataProvider){
 	

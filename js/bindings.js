@@ -395,12 +395,14 @@ function bindElements(langOperator, trackerOp)
 	
 	$("#showRegisterFormLink").click(function (){
 		//$('#sideBar > #formContent').fadeIn('slow');
-		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").hide();});
+		$("#showRegisterFormLink").hide();
+		$("#formContent").fadeToggle( "slow", function(){showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); $("#showCachedPublicPhotosLink").show(); $("#publicUploadsContent").hide();});
 		//$('#formContent').animate({height:'100%', marginTop:'0'}, function(){ $('#formContent').show(); $("#showRegisterFormLink").hide(); $("#publicUploads").hide(); $("#showPublicPhotosLink").show();});		
 	});
 	
 	$("#showCachedPublicPhotosLink").click(function (){
-		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#publicUploadsContent").show();});
+		$("#showCachedPublicPhotosLink").hide();
+		$("#formContent").fadeToggle( "slow", function(){ hideRegisterFormErrorsIfExist(); hideResetPasswordFormErrorsIfExist(); $("#showRegisterFormLink").show(); $("#publicUploadsContent").show();});
 	});
 
 	function changeSrcBack(elementid, imgSrc)
@@ -422,11 +424,23 @@ function bindElements(langOperator, trackerOp)
 			offsetTop = 85;
 		}
 		
-		$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-		$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-		$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+		$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
+		$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
+		$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
+
+//		var myElem = document.getElementById('usersGridView');
+//		if(myElem == null)
+//		{
+//			alert('"#usersGridView" does not exist!');
+//		}
+//		else
+//		{
+//			alert('"#usersGridView" exists');
+//		}
+		
+		//alert("height:" + (h - offsetTop - 82));
 		    
-		var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
+		var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
 		
 		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
 		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
@@ -473,15 +487,13 @@ function bindElements(langOperator, trackerOp)
 				//alert('Narrow');
 			}
 			
-			$("#users_tab").css("min-height", (485 + 100 - 70 - 72)); $("#users_tab").css("height", (h - offsetTop - 72));
-			$("#photos_tab").css("min-height", (485 + 100 - 70 - 72)); $("#photos_tab").css("height", (h - offsetTop - 72));
-			$("#groups_tab").css("min-height", (485 + 100 - 70 - 72)); $("#groups_tab").css("height", (h - offsetTop - 72));
+			$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
+			$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
+			$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
 			
-			var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
-			
-			$("#usersGridView").css("height", userListHeight - 50);
-			$("#uploadsGridView").css("height", userListHeight - 50);
-			$("#groupsGridView").css("height", userListHeight - 50);
+			//$("#usersGridView").css("height", userListHeight - 50);
+			//$("#uploadsGridView").css("height", userListHeight - 50);
+			//$("#groupsGridView").css("height", userListHeight - 50);
 			
 //		    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
 //		        if(json.outcome == 'success') {
@@ -497,7 +509,7 @@ function bindElements(langOperator, trackerOp)
 			offsetTop = 85;
 			offsetLeft = 396;
 			
-			var userListHeight = ((h - offsetTop - 72) > 445)?(h - offsetTop - 72):445;
+			var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
 			$("#uploadsGridView").css("height", userListHeight - 40);
 			
 			if ($('#sideBar > #content').css('display') == "none")
@@ -523,7 +535,7 @@ function bindElements(langOperator, trackerOp)
 		
 	    $('#map').css('height', (h - offsetTop));
 	    $('#bar').css('height', (h - offsetTop));
-	    //$('#sideBar').css('height', (h - offsetTop));
+	    $('#sideBar').css('height', (h - offsetTop));
 	    
 	}).resize();
 //     
@@ -594,7 +606,16 @@ function bindElements(langOperator, trackerOp)
 		   	 }
 		   	 break;       
         }
-	});    
+	});
+	
+	$('#tab_view').bind('easytabs:ajax:complete', function(e, $clicked, $targetPanel, response, status, xhr){
+		var h = $(window).height();
+		var offsetTop = 0;		
+		
+		$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#usersGridView").css("height", (h - offsetTop - 82));
+		
+		//alert("ajax complete");
+	});	
 	
 //	$("#bar").click(function ()	{	
 //				if ($('#sideBar > #content').css('display') == "none")

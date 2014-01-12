@@ -37,7 +37,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 					echo Yii::t('groups', 'Since each group has its own privacy settings, the same person cannot be enrolled to more than one group in order to prevent potetial conflicts. Therefore if a selected friend belongs to another group that membership will be cancelled and your this choice will be applied.').'</br></br>';
 					echo Yii::t('groups', 'You can enroll your friends to this group just by ticking the corresponding checkboxes and clicking the "Save" button. Conversely, in order to remove your friends from the membership of this group, just remove the tick on the corresponding checkbox and save the operation again:').'</br></br>';
 					?>
-					<div style="margin-left:40px; max-height:300px; overflow:auto;">
+					<div style="margin-left:40px; max-height:300px; overflow:auto; list-style:none;">
 					<?php
 					echo CHtml::activeCheckboxList(
 					  $model, 'groupStatusArray', 
@@ -67,17 +67,48 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 			<?php 
 				if(!empty($friendsOfUser))
 				{
-					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'ajaxUpdateGroup',
-							'caption'=>Yii::t('common', 'Save'),
-							'id'=>'updateGroupAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('groupId'=>$groupId)),
+// 					$this->widget('zii.widgets.jui.CJuiButton', array(
+// 							'name'=>'ajaxUpdateGroup',
+// 							'caption'=>Yii::t('common', 'Save'),
+// 							'id'=>'updateGroupAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 							'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/updateGroup', array('groupId'=>$groupId)),
+// 									'success'=> 'function(result)
+// 												{
+// 													try 
+// 													{
+// 														var obj = jQuery.parseJSON(result);
+									
+// 														if (obj.result && obj.result == "1")
+// 														{
+// 															$("#groupSettingsWindow").dialog("close");
+// 															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'")
+// 														}
+// 														else if(obj.result && obj.result == "Duplicate Entry")
+// 														{
+// 															$("#groupSettingsWindow").html(result);													
+// 															$("#groupSettingsWindow").dialog("close");
+// 															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
+// 														}
+// 													}
+// 													catch(error)
+// 													{
+// 														$("#groupSettingsWindow").html(result);
+// 													}
+// 												}',
+// 							))
+// 					));
+
+					$app = Yii::app();
+					
+					echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-checkmark" style="'.(($app->language == 'en')?'padding-left:28px;padding-right:28px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Save').'</span>'.'</button>', $this->createUrl('groups/updateGroup', array('groupId'=>$groupId)),
+							array(
+									'type'=>'POST',
 									'success'=> 'function(result)
 												{
-													try 
+													try
 													{
 														var obj = jQuery.parseJSON(result);
-									
+													
 														if (obj.result && obj.result == "1")
 														{
 															$("#groupSettingsWindow").dialog("close");
@@ -85,7 +116,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														}
 														else if(obj.result && obj.result == "Duplicate Entry")
 														{
-															$("#groupSettingsWindow").html(result);													
+															$("#groupSettingsWindow").html(result);
 															$("#groupSettingsWindow").dialog("close");
 															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
 														}
@@ -95,29 +126,37 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														$("#groupSettingsWindow").html(result);
 													}
 												}',
-							))
-					));					
+							),
+							array('id'=>'updateGroupAjaxButton-'.uniqid(), 'style'=>'padding-right:4px;'));					
 				}
 				else
 				{					
-					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'groupSettingsOK',
-							'caption'=>Yii::t('common', 'OK'),
-							'id'=>'groupSettingsOKButton',
-							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
-					));					
+// 					$this->widget('zii.widgets.jui.CJuiButton', array(
+// 							'name'=>'groupSettingsOK',
+// 							'caption'=>Yii::t('common', 'OK'),
+// 							'id'=>'groupSettingsOKButton',
+// 							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
+// 					));
+
+					echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-checkmark" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'OK').'</span>'.'</button>', '#',
+							array(),
+							array('id'=>'groupSettingsOKButton', 'onclick'=>'$("#groupSettingsWindow").dialog("close"); return false;'));					
 				} 
 			?>
 												
 			<?php 
 				if(!empty($friendsOfUser))
 				{
-					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'updateGroupCancel',
-							'caption'=>Yii::t('common', 'Cancel'),
-							'id'=>'updateGroupCancelButton',
-							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
-					));					
+// 					$this->widget('zii.widgets.jui.CJuiButton', array(
+// 							'name'=>'updateGroupCancel',
+// 							'caption'=>Yii::t('common', 'Cancel'),
+// 							'id'=>'updateGroupCancelButton',
+// 							'onclick'=> 'js:function(){$("#groupSettingsWindow").dialog("close"); return false;}'
+// 					));
+
+					echo CHtml::ajaxLink('<button class="btn btn-sliding-red btn-sliding-red-a icon-close" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Cancel').'</span>'.'</button>', '#',
+							array(),
+							array('id'=>'updateGroupCancelButton', 'onclick'=>'$("#groupSettingsWindow").dialog("close"); return false;'));					
 				} 
 			?>												
 		</div>	

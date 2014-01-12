@@ -143,18 +143,19 @@ class PrivacyGroups extends CActiveRecord
 			if($result->delete()) // Delete the selected group
 			{
 				//Group deleted from the traceper_groups table
-				$returnResult=1;
+				$returnResult = 1;
 			}
 			else
 			{
-				$returnResult=0;
+				$returnResult = 0; //Deletion failed
 			}
 		}
 		else
 		{
 			//traceper_groups table has not the selected group of the owner
-			$returnResult=-1;
+			$returnResult = -1; //Group does not exist
 		}
+		
 		return $returnResult;
 	}	
 	

@@ -24,7 +24,7 @@
 				onlyOne: false,
 				position: "right",
 				interactive: true,
-				offsetX: 100,
+				offsetX: 120,
 			});
 	
 			$("#uploadSearchField").focus(function (){
@@ -51,15 +51,26 @@
 // 													'id'=>'searchUploadButton'
 // 							 					));
 					
-					$this->widget('zii.widgets.jui.CJuiButton', array(
-							'name'=>'ajaxUploadSearch',
-							'caption'=>Yii::t('common', 'Search'),
-							'id'=>'uploadSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-							'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>$this->createUrl('upload/search', array('fileType'=>$fileType)),
+// 					$this->widget('zii.widgets.jui.CJuiButton', array(
+// 							'name'=>'ajaxUploadSearch',
+// 							'caption'=>Yii::t('common', 'Search'),
+// 							'id'=>'uploadSearchAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 							'htmlOptions'=>array('type'=>'submit','style'=>'width:6em;margin-left:0.2em;','ajax'=>array('type'=>'POST','url'=>$this->createUrl('upload/search', array('fileType'=>$fileType)),
+// 									'complete'=> 'function() { $("#uploadSearchResults").dialog("open"); return false;}',
+// 									'update'=> '#uploadSearchResults',
+// 							))
+// 					));
+
+					$app = Yii::app();
+
+					//Yii butonları <buton> tag'i ile uretmedigi icin boyle yapildi, bu css'ler Yii'nin urettigi <input> ile calismiyor
+					echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-search" style="'.(($app->language == 'en')?'padding-left:50px;':'padding-left:63px;padding-right:23px;').'">'.Yii::t('common', 'Search').'</button>', $this->createUrl('upload/search', array('fileType'=>$fileType)),
+							array(
+									'type'=>'POST',
 									'complete'=> 'function() { $("#uploadSearchResults").dialog("open"); return false;}',
 									'update'=> '#uploadSearchResults',
-							))
-					));					
+							),
+							array('id'=>'uploadSearchAjaxButton-'.uniqid(),'type'=>'submit','style'=>'padding-left:2px;'));					
 				?>
 			<?php echo $form->error($model,'keyword'); 	?>
 		</div>
@@ -75,7 +86,11 @@
 		}
 		
 		if (isset($isPublicList) && $isPublicList == true) {
-			$params = array_merge($params, array('isPublicList'=>true));
+			$params = array_merge($params, array('isPublicList'=>true, 'viewId'=>'publicUploadListView'));
+		}
+		else
+		{
+			$params = array_merge($params, array('isPublicList'=>false, 'viewId'=>'uploadListView'));
 		}
 		
 		$this->renderPartial('getList', $params, false, true);

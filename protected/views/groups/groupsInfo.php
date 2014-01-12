@@ -17,5 +17,5 @@
 		echo Yii::t('groups', 'No groups to show...').'<br/> <br/>';
 	}
 	
-	echo '<div id="groupSearchResults"></div>';
+	//echo '<div id="groupSearchResults"></div>';
 ?>

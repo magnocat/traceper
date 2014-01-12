@@ -617,22 +617,9 @@ class GroupsController extends Controller
 		//Since there is a foreign constraint between PrivacyGroups and UserPrivacyGroupRelation, when the group is deleted the corresponding relation rows are also be deleted automatically
 		//Since a group can be deleted only by its owner, check also the group owner
 		$result = PrivacyGroups::model()->deleteGroup($groupId, Yii::app()->user->id);
-		if($result == 1)
-		{
-			//Group deleted from the traceper_groups table
 		
-			echo CJSON::encode(array("result"=> "1"));
-			Yii::app()->end();
-		}
-		elseif ($result == 0)
-		{
-			echo CJSON::encode(array("result"=> "Unknown error"));
-			Yii::app()->end();
-		}
-		else
-		{
-			//traceper_groups table has not the selected group of the owner
-		}
+		echo CJSON::encode(array("result"=>$result));
+		Yii::app()->end();
 	}
 	
 	//Deletes the member of the selected group

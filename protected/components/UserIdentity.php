@@ -23,7 +23,7 @@ class UserIdentity extends CUserIdentity
 	public function authenticate()
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select='Id,realname,password';  
+		$criteria->select='Id,realname,password,fb_id,profilePhoto';  
 		$criteria->condition='email=:email';
 		$criteria->params=array(':email'=>$this->username);
 		$user = Users::model()->find($criteria); // $params is not needed
@@ -49,6 +49,8 @@ class UserIdentity extends CUserIdentity
 			$this->errorCode = self::ERROR_NONE;
 			$this->realname = $user->realname;
 			$this->userId = $user->Id;
+			
+			$this->setState('fb_id', $user->fb_id);
 		}
 		else {
 			$this->errorCode = self::ERROR_PASSWORD_INVALID;				
@@ -64,5 +66,4 @@ class UserIdentity extends CUserIdentity
 	public function getId(){
 		return $this->userId;
 	}
-	
 }

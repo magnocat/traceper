@@ -37,8 +37,12 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 		<div class="row buttons" style="padding-top:2em;text-align:center">
 			<?php 
-// 				echo CHtml::ajaxSubmitButton(Yii::t('common', 'Save'), $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)), 
-// 													array(
+				
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'ajaxSetPrivacyRights',
+// 						'caption'=>Yii::t('common', 'Save'),
+// 						'id'=>'setPrivacyRightsAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
+// 						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)),
 // 														'success'=> 'function(result){ 
 // 																		try {
 // 																			var obj = jQuery.parseJSON(result);
@@ -51,30 +55,30 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 // 																		catch (error){
 // 																			$("#groupPrivacySettingsWindow").html(result);
 // 																		}
-// 																	 }',														
-// 														 ),
-// 													null);
+// 																	 }',
+// 						))
+// 				));
 				
-				$this->widget('zii.widgets.jui.CJuiButton', array(
-						'name'=>'ajaxSetPrivacyRights',
-						'caption'=>Yii::t('common', 'Save'),
-						'id'=>'setPrivacyRightsAjaxButton-'.uniqid(), //Unique ID oluşturmayınca her ajaxta bir önceki sorgular da tekrarlanıyor
-						'htmlOptions'=>array('type'=>'submit','ajax'=>array('type'=>'POST','url'=>$this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)),
-														'success'=> 'function(result){ 
-																		try {
-																			var obj = jQuery.parseJSON(result);
-																			if (obj.result && obj.result == "1") 
-																			{
-																				$("#groupPrivacySettingsWindow").dialog("close");
-																				TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
-																			}
-																		}
-																		catch (error){
-																			$("#groupPrivacySettingsWindow").html(result);
-																		}
-																	 }',
-						))
-				));
+				$app = Yii::app();
+				
+				echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-checkmark" style="'.(($app->language == 'en')?'padding-left:28px;padding-right:28px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Save').'</span>'.'</button>', $this->createUrl('groups/setPrivacyRights', array('groupId'=>$groupId)),
+						array(
+								'type'=>'POST',
+								'success'=> 'function(result){ 
+												try {
+													var obj = jQuery.parseJSON(result);
+													if (obj.result && obj.result == "1") 
+													{
+														$("#groupPrivacySettingsWindow").dialog("close");
+														TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
+													}
+												}
+												catch (error){
+													$("#groupPrivacySettingsWindow").html(result);
+												}
+											 }',
+						),
+						array('id'=>'setPrivacyRightsAjaxButton-'.uniqid(), 'style'=>'padding-right:4px;'));				
 				
 // 				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
 // 													array(
@@ -82,12 +86,16 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 // 														 ),
 // 													null);
 
-				$this->widget('zii.widgets.jui.CJuiButton', array(
-						'name'=>'setPrivacyRightsCancel',
-						'caption'=>Yii::t('common', 'Cancel'),
-						'id'=>'setPrivacyRightsCancelButton',
-						'onclick'=> 'js:function(){$("#groupPrivacySettingsWindow").dialog("close"); return false;}'
-				));				
+// 				$this->widget('zii.widgets.jui.CJuiButton', array(
+// 						'name'=>'setPrivacyRightsCancel',
+// 						'caption'=>Yii::t('common', 'Cancel'),
+// 						'id'=>'setPrivacyRightsCancelButton',
+// 						'onclick'=> 'js:function(){$("#groupPrivacySettingsWindow").dialog("close"); return false;}'
+// 				));
+
+				echo CHtml::ajaxLink('<button class="btn btn-sliding-red btn-sliding-red-a icon-close" style="'.(($app->language == 'en')?'padding-left:25px;padding-right:25px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Cancel').'</span>'.'</button>', '#',
+						array(),
+						array('id'=>'setPrivacyRightsCancelButton', 'onclick'=>'$("#groupPrivacySettingsWindow").dialog("close"); return false;'));				
 			?>												
 		</div>	
 		
