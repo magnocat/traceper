@@ -862,78 +862,78 @@ class UsersController extends Controller
 // 	    echo Yii::app()->baseUrl.'/images/'.$file->getName();
 // 	}
 	
-	public function actionUpdate()
-	{
-		Fb::warn('actionUpdate() called', "UsersController");
+// 	public function actionUpdate()
+// 	{
+// 		Fb::warn('actionUpdate() called', "UsersController");
 
-		//$model=Users::model()->findByPk((int)$id);
+// 		//$model=Users::model()->findByPk((int)$id);
 		
-		$model = new UploadProfilePhotoForm;
+// 		$model = new UploadProfilePhotoForm;
 
-		if(isset($_POST['UploadProfilePhotoForm']))
-		{
-			//$_POST['Users']['profilePhoto'] = $model->profilePhoto;
-			$model->attributes=$_POST['UploadProfilePhotoForm'];
+// 		if(isset($_POST['UploadProfilePhotoForm']))
+// 		{
+// 			//$_POST['Users']['profilePhoto'] = $model->profilePhoto;
+// 			$model->attributes=$_POST['UploadProfilePhotoForm'];
 			
-			Fb::warn("Form SET", "UsersController");
+// 			Fb::warn("Form SET", "UsersController");
 	
-			$uploadedFile=CUploadedFile::getInstance($model,'profilePhoto');
+// 			$uploadedFile=CUploadedFile::getInstance($model,'profilePhoto');
 			
-			//$model->profilePhoto = 1;
+// 			//$model->profilePhoto = 1;
 	
-			if($model->validate())
-			{
-				Fb::warn("model VALID", "actionUpdate()");
+// 			if($model->validate())
+// 			{
+// 				Fb::warn("model VALID", "actionUpdate()");
 				
-				if(!empty($uploadedFile))  // check if uploaded file is set or not
-				{
-					Fb::warn("uploadedFile EXISTS", "actionUpdate()");
+// 				if(!empty($uploadedFile))  // check if uploaded file is set or not
+// 				{
+// 					Fb::warn("uploadedFile EXISTS", "actionUpdate()");
 					
-					$uploadedFile->saveAs(Yii::app()->basePath.'/../profilePhotos/'.Yii::app()->user->id.'.jpg');
-				}
-				else
-				{
-					Fb::warn("uploadedFile is EMPTY", "actionUpdate()");
-				}
+// 					$uploadedFile->saveAs(Yii::app()->basePath.'/../profilePhotos/'.Yii::app()->user->id.'.jpg');
+// 				}
+// 				else
+// 				{
+// 					Fb::warn("uploadedFile is EMPTY", "actionUpdate()");
+// 				}
 				
-				//Yii::app()->end();
+// 				//Yii::app()->end();
 				
-				//$this->redirect(array('admin'));
-			}
-			else
-			{
-				Fb::warn("model NOT VALID", "actionUpdate()");
-			}
-		}
-		else
-		{
-			Fb::warn("Form NOT set", "UsersController");
-		}
+// 				//$this->redirect(array('admin'));
+// 			}
+// 			else
+// 			{
+// 				Fb::warn("model NOT VALID", "actionUpdate()");
+// 			}
+// 		}
+// 		else
+// 		{
+// 			Fb::warn("Form NOT set", "UsersController");
+// 		}
 	
-		//$this->render('update',array('model'=>$model));
+// 		//$this->render('update',array('model'=>$model));
 		
-		if (Yii::app()->request->isAjaxRequest)
-		{
-			if (YII_DEBUG)
-			{
-				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-			}
-			else
-			{
-				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-			}
-		}
+// 		if (Yii::app()->request->isAjaxRequest)
+// 		{
+// 			if (YII_DEBUG)
+// 			{
+// 				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+// 				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+// 			}
+// 			else
+// 			{
+// 				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+// 				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+// 			}
+// 		}
 		
-		//Complete solution for blinking problem at FireFox
-		if (Yii::app()->request->getIsAjaxRequest()) {
-			Yii::app()->clientScript->scriptMap['*.js'] = false;
-			Yii::app()->clientScript->scriptMap['*.css'] = false;
-		}		
+// 		//Complete solution for blinking problem at FireFox
+// 		if (Yii::app()->request->getIsAjaxRequest()) {
+// 			Yii::app()->clientScript->scriptMap['*.js'] = false;
+// 			Yii::app()->clientScript->scriptMap['*.css'] = false;
+// 		}		
 		
-		$this->renderPartial('update',array('model'=>$model), false, true);
-	}
+// 		$this->renderPartial('update',array('model'=>$model), false, true);
+// 	}
 
 	public function actionUpload()
 	{		
