@@ -78,7 +78,30 @@ class EAjaxUpload extends CWidget
 		$assets = dirname(__FILE__).'/assets';
                 $baseUrl = Yii::app()->assetManager->publish($assets);
 
-        Yii::app()->clientScript->registerScript('profilePhotoTitle',"var profilePhotoTitle = '".Yii::app()->user->name."';", CClientScript::POS_HEAD);
+        if(null == $this->config['bothPhotoExists']) //Tooltip menu yoksa
+        {
+        	Yii::app()->clientScript->registerScript('profilePhotoTitle',"var profilePhotoTitle = '".Yii::app()->user->name."';", CClientScript::POS_HEAD);
+        }
+        else
+        {
+        	Yii::app()->clientScript->registerScript('profilePhotoTitle',
+        			"var profilePhotoTitle;
+			        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+			        var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+
+        			//Webkit browser'larda 'No file chosen' tooltip'i cikmamasi icin '' yerine ' ' kullanmak gerekiyor
+        			if(isChrome || isSafari)
+        			{
+        				profilePhotoTitle = ' ';
+        			}
+        			else
+        			{
+        				profilePhotoTitle = '';
+        			}
+        			", 
+        			CClientScript::POS_HEAD);
+        }
+        
                 		
         Yii::app()->clientScript->registerScriptFile($baseUrl . '/fileuploader.js', CClientScript::POS_HEAD);
 

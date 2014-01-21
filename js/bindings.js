@@ -13,6 +13,8 @@ var bResetPasswordFormNewPasswordAgainErrorExists = false;
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
 
+var currentUserMarker;
+
 function changecss(myclass,element,value) {
 	var CSSRules
 	if (document.all) {
@@ -361,7 +363,7 @@ function bindElements(langOperator, trackerOp)
 			
 			//$('.logo_inFullMap').fadeOut().animate({left:'10px'});
 			$('#sideBar > #content').fadeIn('slow');
-			$('#sideBar').animate({width:'396px'}, function(){  $('#bar').css('background-image','url("images/left.png")'); showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); });
+			$('#sideBar').animate({width:'380px'}, function(){  $('#bar').css('background-image','url("images/left.png")'); showRegisterFormErrorsIfExist(); showResetPasswordFormErrorsIfExist(); });
 			$('#map').animate({width:(w - offsetLeft)});
 			$('#bar').animate({left:'380px'});			
 		}	

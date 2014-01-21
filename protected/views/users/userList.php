@@ -1,5 +1,102 @@
 <?php
 
+function getFriendPhoto($data, $row, $isFriendList){
+	$value = null;
+
+	switch($data['profilePhotoStatus'])
+	{
+		case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
+		{
+			if($data['fb_id'] == 0)
+			{
+				if($isFriendList)
+				{
+					if($data['isVisible'] == 1)
+					{
+						$value = CHtml::link('<div class="hi-icon-effect-user hi-icon-effect-usera"><div class="hi-icon-in-list icon-user"></div></div>', '#', array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));
+					}
+					else
+					{
+						$value = CHtml::label('<div class="hi-icon-in-list icon-user" style="color:#FFDB58"></div>', '#', array('title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));
+					}
+				}
+				else
+				{
+					$value = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+				}
+			}
+			else
+			{					
+				if($isFriendList)
+				{
+					if($data['isVisible'] == 1)
+					{
+						$value = CHtml::link('<div class="user-view second-effect"><img src="https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square" width="33px" height="36px" /> <div class="mask"><div class="info"></div></div></div>', '#',
+								array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));
+					}
+					else
+					{						
+						$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px', 'title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));						
+					}
+				}
+				else
+				{
+					$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px'));
+				}
+			}
+		}
+		break;
+
+		case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
+		case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
+		{
+			if($isFriendList)
+			{
+				if($data['isVisible'] == 1)
+				{
+					$value = CHtml::link('<div class="user-view second-effect"><img src="profilePhotos/'.$data['id'].'.png" width="33px" height="36px" /> <div class="mask"><div class="info"></div></div></div>', '#',
+							array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));
+				}
+				else
+				{
+					$value = CHtml::image('profilePhotos/'.$data['id'].'.png', '#', array('width'=>'33px', 'height'=>'36px', 'title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));
+				}
+			}
+			else
+			{
+				$value = CHtml::image('profilePhotos/'.$data['id'].'.png', '#', array('width'=>'33px', 'height'=>'36px'));
+			}
+		}
+		break;
+
+		case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
+		{
+			if($isFriendList)
+			{
+				if($data['isVisible'] == 1)
+				{
+					$value = CHtml::link('<div class="user-view second-effect"><img src="https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square" width="33px" height="36px" /> <div class="mask"><div class="info"></div></div></div>', '#',
+							array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));
+				}
+				else
+				{						
+					$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px', 'title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));						
+				}
+			}
+			else
+			{
+				$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px'));
+			}
+		}
+		break;
+
+		default:
+			Fb::warn($profilePhotoSource, "default - profilePhotoSource");
+	}
+
+	return $value;
+}
+
 //In order not to receive "TypeError: settings is undefined" exception while the grid view is being updated at testDeleteFriendShip() test
 //Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
 //Yii::app()->clientScript->scriptMap['jquery.ba-bbq.js'] = false;
@@ -188,8 +285,12 @@ if ($dataProvider != null) {
 				    				'name'=>Yii::t('users', ''),
 				    				'type' => 'raw',				    					
 				    				//'value'=>'CHtml::image("images/Friend.png")',
-				    				'value'=> $isFriendList ? '($data["isVisible"] == 1)?CHtml::link("<div class=\"hi-icon-effect-user hi-icon-effect-usera\"><div class=\"hi-icon-in-list icon-user\"></div></div>", "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label("<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58\"></div>", "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' :
-							    			  '"<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58; cursor:default;\"></div>"',					    		
+	
+// 				    				'value'=> $isFriendList ? '($data["isVisible"] == 1)?CHtml::link("<div class=\"hi-icon-effect-user hi-icon-effect-usera\"><div class=\"hi-icon-in-list icon-user\"></div></div>", "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label("<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58\"></div>", "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' :
+// 							    			  '"<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58; cursor:default;\"></div>"',
+
+				    				'value'=> $isFriendList?'getFriendPhoto($data, $row, true)':'getFriendPhoto($data, $row, false)',
+
 				    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;')
 				    				//'visible'=>$isFriendList || $isFriendRequestList
 				    		),		    		
@@ -298,7 +399,7 @@ if ($dataProvider != null) {
 												"class"=>"lo-icon icon-close")
 					  				  )'				
 				, 
-					'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align:center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red'),
+					'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align:center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-red gridViewIcon'),
 					//'visible'=>($isFriendList || $isFriendRequestList) || '(isset($data[\'status\']) && $data[\'status\'] == 0 && isset($data[\'requester\']) && $data[\'requester\'] == false)',
 					'visible'=>$isFriendRequestList
 		),
@@ -340,7 +441,7 @@ if ($dataProvider != null) {
 											)),"class"=>"vtip", "title"=>"'.Yii::t('users', 'Approve').'", "class"=>"lo-icon icon-checkmark")
 					  				 )
 					  			: ""',
-				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-green'),
+				'htmlOptions'=>array('width'=>'28px', 'style'=>'text-align: center;', 'class'=>'lo-icon-effect-3 lo-icon-effect-green gridViewIcon'),
 					'visible'=>$isFriendRequestList
 		),
 		array(            // display 'create_time' using an expression

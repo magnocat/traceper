@@ -34,26 +34,86 @@ function MapOperator(lang) {
 	 * location is mandatory and defined in MapStructs.js,
 	 * other params are optional.
 	 */
-	MAP_OPERATOR.putMarker = function(location, image, visible) {
+//	MAP_OPERATOR.putMarker = function(location, image, visible) {
+//
+//		var markerImage = null;
+//		if (typeof(image) != "undefined") {
+//			markerImage = new google.maps.MarkerImage(image);
+//		}  
+//		if (typeof(visible) == "undefined") {
+//			visible = true;
+//		}
+//		var location = new google.maps.LatLng(location.latitude, location.longitude);
+//		var marker = new google.maps.Marker({
+//			position: location, 
+//			map: MAP_OPERATOR.map,
+//			visible:visible
+//		});
+//		if (markerImage != null) {
+//			marker.setIcon(markerImage);
+//		}
+//		return marker;
+//	}
+	
+	MAP_OPERATOR.putMarker = function(location, image, visible, toBeScaled) {
+ 
+	    var pinImage = null;
+	    
+	    if(toBeScaled == true)
+	    {
+		    pinImage = new google.maps.MarkerImage(
+		    		image,
+		    	    null, /* size is determined at runtime */
+		    	    null, /* origin is 0,0 */
+		    	    null, /* anchor is bottom center of the scaled image */
+		    	    new google.maps.Size(33, 36) //scaledSize
+		    	);	    	
+	    }
+	    else
+	    {
+	    	pinImage = {
+	    		url: image
+	    	};	    	
+	    }
 
-		var markerImage = null;
-		if (typeof(image) != "undefined") {
-			markerImage = new google.maps.MarkerImage(image);
-		}  
 		if (typeof(visible) == "undefined") {
 			visible = true;
 		}
+		
 		var location = new google.maps.LatLng(location.latitude, location.longitude);
 		var marker = new google.maps.Marker({
 			position: location, 
 			map: MAP_OPERATOR.map,
+	        icon: pinImage,
 			visible:visible
 		});
-		if (markerImage != null) {
-			marker.setIcon(markerImage);
-		}
+
 		return marker;
 	}
+	
+	MAP_OPERATOR.updateMarkerImage = function(marker, image, toBeScaled) {
+		 
+	    var pinImage = null;
+	    
+	    if(toBeScaled == true)
+	    {
+		    pinImage = new google.maps.MarkerImage(
+		    		image,
+		    	    null, /* size is determined at runtime */
+		    	    null, /* origin is 0,0 */
+		    	    null, /* anchor is bottom center of the scaled image */
+		    	    new google.maps.Size(33, 36) //scaledSize
+		    	);	    	
+	    }
+	    else
+	    {
+	    	pinImage = {
+	    		url: image
+	    	};	    	
+	    }
+
+	    marker.setIcon(pinImage);
+	}	
 
 	/*
 	 * marker is the type that returns from putMarker,

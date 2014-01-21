@@ -469,6 +469,7 @@ qq.FileUploaderBasic.prototype = {
     }
 };
 
+var tooltipMenuExists = false;
 
 /**
  * Class that creates upload widget with drag-and-drop and file list
@@ -481,18 +482,66 @@ qq.FileUploader = function(o){
     //alert(o.photoSrc);
     
     templateHtml = null;
+    buttonClass = 'qq-upload-button';
+    buttonHoverClass = 'qq-upload-button-hover';
     
-    if(o.photoSrc !== null)
+    if(o.bothPhotoExists !== null)
     {
+    	tooltipMenuExists = true;
     	
-      //alert('photoSrc:' + o.photoSrc);
+    	buttonClass = 'qq-upload-button-in-tooltip';
+    	buttonHoverClass = 'qq-upload-button-in-tooltip-hover';
     	
-      templateHtml = '<div class="qq-uploader">' +
-      '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-      '<div id="profilePhotoUploadButton" class="qq-upload-button">' +
-  		//'<div id="profileUserIcon" class="hi-icon icon-user" style="pointer-events:none; color:yellow;"></div>' +
- 			'<img id="profilePhoto" src="' + o.photoSrc +'">' +                
-      '</div>' +
+    	if(o.bothPhotoExists === 'useFacebook')
+		{
+			templateHtml =			
+				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
+					'<li>' +
+						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
+						'<ul id="Adnan" class="cbp-tm-submenu">' + 
+							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
+							'<li>' +
+								'<a>' +
+					                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
+					                '<ul class="qq-upload-list"></ul>' +
+			                	'</a>'
+							'</li>' + 
+						'</ul>' +
+					'</li>' +
+				'</ul>';			
+		}
+		else
+		{
+			//alert('useTraceper');			
+			//alert(o.photoSrc);
+			
+			templateHtml =			
+				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
+					'<li>' +
+						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
+						'<ul id="Adnan" class="cbp-tm-submenu">' + 
+							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
+							'<li>' +
+								'<a>' +
+					                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
+					                '<ul class="qq-upload-list"></ul>' +
+			                	'</a>'
+							'</li>' + 
+						'</ul>' +
+					'</li>' +
+				'</ul>';			
+		}
+    }
+    else if(o.photoSrc !== null)    
+    {
+      templateHtml = 
+      '<div class="qq-uploader">' +
+      	'<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+      	'<div id="profilePhotoUploadButton" class="qq-upload-button">' +
+ 			'<img id="profilePhoto" src="' + o.photoSrc +'"  width="44px" height="48px">' +                
+ 		'</div>' +
       '<ul class="qq-upload-list"></ul>' +
       '</div>';   	
     }
@@ -502,11 +551,10 @@ qq.FileUploader = function(o){
         '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
         '<div id="profilePhotoUploadButton" class="qq-upload-button">' +
    			'<div id="profileUserIcon" class="hi-icon icon-user" style="pointer-events:none; color:yellow; width:44px;"></div>' +
-   			'<img id="profilePhoto" src="" style="display:none;">' +        
+   			'<img id="profilePhoto" src="" style="display:none;"  width="44px" height="48px">' +        
         '</div>' +
         '<ul class="qq-upload-list"></ul>' +
      '</div>';    	
-    	
     }
     
     // additional options
@@ -528,7 +576,7 @@ qq.FileUploader = function(o){
 
         classes: {
             // used to get elements from templates
-            button: 'qq-upload-button',
+            button: buttonClass, //'qq-upload-button',
             drop: 'qq-upload-drop-area',
             dropActive: 'qq-upload-drop-area-active',
             list: 'qq-upload-list',
@@ -557,6 +605,27 @@ qq.FileUploader = function(o){
 
     this._bindCancelEvent();
     this._setupDragDrop();
+    
+    if(tooltipMenuExists)
+    {
+    	//ADNAN: Tooltip menunun olusturulmasini sagliyor
+    	tooltipMenu = new cbpTooltipMenu( document.getElementById( 'profilePhotoSettingsMenu' ) );
+    	
+        $('#profilePhotoSettingsMenu').hover(function(){
+        	$('#profilePhoto').css('opacity', 0.7);
+        },
+        function () {
+        	if(bUploadProfilePhotoErrorExists == false)
+        	{
+        		$('#profilePhoto').css('opacity', 1);
+        	}        	       	
+        });
+    	
+        if(LAN_OPERATOR.lang === 'en')
+        {
+        	$('ul.cbp-tm-submenu').css('width', '350px');
+        }
+    }
 };
 
 // inherit from Basic Uploader
@@ -785,7 +854,7 @@ qq.UploadButton = function(o){
         // name attribute of file input
         name: 'file',
         onChange: function(input){},
-        hoverClass: 'qq-upload-button-hover',
+        hoverClass: buttonHoverClass, //'qq-upload-button-hover',
         focusClass: 'qq-upload-button-focus'
     };
 

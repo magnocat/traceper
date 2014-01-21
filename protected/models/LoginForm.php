@@ -26,8 +26,12 @@ class LoginForm extends CFormModel
 			array('email, password', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
+			
 			// rememberMe needs to be a boolean
 			array('rememberMe', 'boolean'),
+			
+			array('email', 'isExists'),
+				
 			// password needs to be authenticated
 			array('password', 'authenticate'),
 		);
@@ -44,6 +48,31 @@ class LoginForm extends CFormModel
 			'password'=>Yii::t('site', 'Password'),
 		);
 	}
+	
+	public function isExists($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			$criteria=new CDbCriteria;
+			$criteria->select='email';
+			$criteria->condition='email=:email';
+			$criteria->params=array(':email'=>$this->email);
+			//$data = Users::model()->find($criteria);
+				
+			if(Users::model()->find($criteria) == null) //e-mail Users tablosunda yoksa
+			{
+				if(UserCandidates::model()->find($criteria) != null)
+				{
+					$this->addError('email',Yii::t('site', 'Activate your account first')); //Candidates tablosunda ise
+				}
+				else //Her iki tabloda da yoksa
+				{
+					//Aslinda kullanicinin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
+					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
+				}				
+			}
+		}
+	}	
 
 	/**
 	 * Authenticates the password.
@@ -56,14 +85,15 @@ class LoginForm extends CFormModel
 			$this->_identity=new UserIdentity($this->email, $this->password);
 			switch($this->_identity->authenticate())
 			{
-				case CUserIdentity::ERROR_USERNAME_INVALID:					
+				//case CUserIdentity::ERROR_USERNAME_INVALID:					
 				case CUserIdentity::ERROR_PASSWORD_INVALID:
+					//Aslinda sifrenin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
 					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
 					break;
 					
-				case UserIdentity::ERROR_REGISTRATION_UNCOMPLETED:
-					$this->addError('email',Yii::t('site', 'Activate your account first'));
-					break;
+// 				case UserIdentity::ERROR_REGISTRATION_UNCOMPLETED:
+// 					$this->addError('email',Yii::t('site', 'Activate your account first'));
+// 					break;
 					
 				case CUserIdentity::ERROR_NONE:
 					break;					
