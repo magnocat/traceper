@@ -104,51 +104,73 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		//newFriendId = typeof newFriendId !== 'undefined' ? newFriendId : null;
 		//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
 		
-		var jsonparams = "r=users/getUserListJson&pageNo=" + TRACKER.updateFriendListPageNo + "&userType=" + userType + "&"; 
+		var jsonparams;
+		
+		//Normalde userType hep gonderiliyor, fakat undefined gelebildigi goruldugu icin boyle bir onlem koyuldu
+		if(typeof userType !== 'undefined')
+		{
+			jsonparams = "r=users/getUserListJson&pageNo=" + TRACKER.updateFriendListPageNo + "&userType=" + userType; 
+		}
+		else
+		{
+			jsonparams = "r=users/getUserListJson&pageNo=" + TRACKER.updateFriendListPageNo + "&userType=0";
+		}
+		
+		//jsonparams = "r=users/getUserListJson&pageNo=" + TRACKER.updateFriendListPageNo + "&userType=" + userType + "&"; 
 		
 		if (TRACKER.friendPageResetCount > 0) 
 		{
-			jsonparams += "list=onlyUpdated";
+			jsonparams += "&list=onlyUpdated";
 		}
 		
 		//if(newFriendId != null)
 		if(typeof newFriendId !== 'undefined')
 		{
-			jsonparams += "newFriendId=" + newFriendId;
+			jsonparams += "&newFriendId=" + newFriendId;
 		}
 		
-		TRACKER.ajaxReq(jsonparams, function(result){
-			
-			var obj = $.parseJSON(result);
-			
-			if(typeof deletedFriendId !== 'undefined')
+		TRACKER.ajaxReq(jsonparams, function(result){			
+			try
 			{
-				processUsers(MAP, obj.userlist, obj.updateType, deletedFriendId);
+				var obj = $.parseJSON(result);
+				
+				if(typeof deletedFriendId !== 'undefined')
+				{
+					processUsers(MAP, obj.userlist, obj.currentUser, obj.updateType, deletedFriendId);
+				}
+				else
+				{
+					processUsers(MAP, obj.userlist, obj.currentUser, obj.updateType);
+				}
+				
+				TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
+				TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
+				// to fetched all data reguarly updateFriendListPageNo must be resetted.
+				var updateInt = TRACKER.updateInterval;
+				
+				//alert("PageNo:" + TRACKER.updateFriendListPageNo + " / PageCount:" + TRACKER.updateFriendListPageCount);
+				
+				if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
+					TRACKER.updateFriendListPageNo = 1;
+					//TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
+					TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
+				}
+				else{
+					TRACKER.updateFriendListPageNo++;
+					TRACKER.updateInterval = TRACKER.getUserListInterval;
+				}
+				
+				clearTimeout(TRACKER.timer);
+				//TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
+				TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType, newFriendId, deletedFriendId);}, TRACKER.updateInterval);				
+				
 			}
-			else
+			catch(error)
 			{
-				processUsers(MAP, obj.userlist, obj.updateType);
-			}
-			
-			TRACKER.updateFriendListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
-			TRACKER.updateFriendListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
-			// to fetched all data reguarly updateFriendListPageNo must be resetted.
-			var updateInt = TRACKER.updateInterval;
-			
-			//alert("PageNo:" + TRACKER.updateFriendListPageNo + " / PageCount:" + TRACKER.updateFriendListPageCount);
-			
-			if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
-				TRACKER.updateFriendListPageNo = 1;
-				//TRACKER.updateInterval = TRACKER.queryUpdatedUserInterval;
-				TRACKER.friendPageResetCount = Number(TRACKER.friendPageResetCount) + 1;
-			}
-			else{
-				TRACKER.updateFriendListPageNo++;
-				TRACKER.updateInterval = TRACKER.getUserListInterval;
-			}
-			
-			clearTimeout(TRACKER.timer);
-			TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);			
+				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+					  'Error: ' + error.message + '\n' + 
+					  'JSON result: ' + result);
+			}			
 		}, true);
 		
 	};
@@ -191,67 +213,73 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 		TRACKER.ajaxReq(jsonparams, function(result){
 			
-			//alert("result: " + result);
-			
-			//alert("Before parseJSON()");
-			var obj = $.parseJSON(result);
-			//alert("After parseJSON()");
-			
-			TRACKER.bgImageListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
-			TRACKER.bgImageListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
-			
-			//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
-
-			processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix);
-			
-			//alert("processImageXML() called");
-			
-			if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
-				TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
-				clearTimeout(TRACKER.imageTimer);
-				TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.getUserListInterval);
-			}	
-			else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+			try
 			{
-				TRACKER.bgImageListPageNo = 1;
-				TRACKER.allImagesFetched = true;
-				//alert('allImagesFetched');
-				clearTimeout(TRACKER.imageTimer);
-				TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.queryUpdatedUserInterval);
+				var obj = $.parseJSON(result);
+				//alert("After parseJSON()");
 				
-				//alert("allImagesFetched: " + TRACKER.allImagesFetched);
+				TRACKER.bgImageListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
+				TRACKER.bgImageListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
+				
+				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+
+				processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix);
+				
+				//alert("processImageXML() called");
+				
+				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+					clearTimeout(TRACKER.imageTimer);
+					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.getUserListInterval);
+				}	
+				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+				{
+					TRACKER.bgImageListPageNo = 1;
+					TRACKER.allImagesFetched = true;
+					//alert('allImagesFetched');
+					clearTimeout(TRACKER.imageTimer);
+					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.queryUpdatedUserInterval);
+					
+					//alert("allImagesFetched: " + TRACKER.allImagesFetched);
+				}
+				
+				if (typeof callback == 'function'){
+					callback();					
+				}			
+				
+//				if (result != "") {
+//					TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
+//					TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
+//					
+//					//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+	//	
+//					processImageXML(MAP, result);
+//					
+//					//alert("processImageXML() called");
+//					
+//					if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
+//						TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
+//						clearTimeout(TRACKER.imageTimer);
+//						TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.getUserListInterval);
+//					}	
+//					else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
+//					{
+//						TRACKER.bgImageListPageNo = 1;
+//						TRACKER.allImagesFetched = true;
+//						clearTimeout(TRACKER.imageTimer);
+//						TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.queryUpdatedUserInterval);
+//					}
+//					if (typeof callback == 'function'){
+//						callback();					
+//					}
+//				}				
 			}
-			
-			if (typeof callback == 'function'){
-				callback();					
-			}			
-			
-//			if (result != "") {
-//				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
-//				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
-//				
-//				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
-//	
-//				processImageXML(MAP, result);
-//				
-//				//alert("processImageXML() called");
-//				
-//				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
-//					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
-//					clearTimeout(TRACKER.imageTimer);
-//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.getUserListInterval);
-//				}	
-//				else //if (TRACKER.bgImageListPageNo == TRACKER.bgImageListPageCount)
-//				{
-//					TRACKER.bgImageListPageNo = 1;
-//					TRACKER.allImagesFetched = true;
-//					clearTimeout(TRACKER.imageTimer);
-//					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic)}, TRACKER.queryUpdatedUserInterval);
-//				}
-//				if (typeof callback == 'function'){
-//					callback();					
-//				}
-//			}		
+			catch(error)
+			{
+				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+					  'Error: ' + error.message + '\n' + 
+					  'JSON result: ' + result);
+			}					
 		}, 
 		
 //		_V_("my_video_2", {}, function(){
@@ -390,16 +418,25 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			var jsonparams = "r=users/getUserPastPointsJSON&userId=" + userId + "&page=" + pageNo;
 			
 			TRACKER.ajaxReq(jsonparams, function(result){
-				var obj = $.parseJSON(result);
+				try
+				{
+					var obj = $.parseJSON(result);
 
-				TRACKER.pastPointsPageNo =  obj.pageNo;
-				TRACKER.pastPointsPageCount =  obj.pageCount;
-				
-				var str = processUserPastLocations(MAP, obj.userwashere, userId);
+					TRACKER.pastPointsPageNo =  obj.pageNo;
+					TRACKER.pastPointsPageCount =  obj.pageCount;
+					
+					var str = processUserPastLocations(MAP, obj.userwashere, userId);
 
-				if (typeof callback == "function") {
-					callback();
+					if (typeof callback == "function") {
+						callback();
+					}					
 				}
+				catch(error)
+				{
+					alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+						  'Error: ' + error.message + '\n' + 
+						  'JSON result: ' + result);
+				}				
 			});			
 		}
 		else {			
@@ -437,22 +474,32 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.sendGeoFencePoints = function(name,desc,lat1,long1,lat2,long2,lat3,long3) {
 		
-			var processOutput = true;
-			var params = "r=geofence/sendGeofenceData&name="+name+"&description="+desc+"&point1Latitude="+ lat1.toFixed(6) +"&point1Longitude="+ long1.toFixed(6)+"&point2Latitude="+ lat2.toFixed(6) +"&point2Longitude="+ long2.toFixed(6)+"&point3Latitude="+ lat3.toFixed(6) +"&point3Longitude="+ long3.toFixed(6);
-			TRACKER.ajaxReq(params, function(response){			
-			var obj = jQuery.parseJSON(response);
-			if (obj.result && obj.result == "1") 
+		var processOutput = true;
+		var params = "r=geofence/sendGeofenceData&name="+name+"&description="+desc+"&point1Latitude="+ lat1.toFixed(6) +"&point1Longitude="+ long1.toFixed(6)+"&point2Latitude="+ lat2.toFixed(6) +"&point2Longitude="+ long2.toFixed(6)+"&point3Latitude="+ lat3.toFixed(6) +"&point3Longitude="+ long3.toFixed(6);
+		
+		TRACKER.ajaxReq(params, function(response){
+			try
 			{
+				var obj = jQuery.parseJSON(response);
+				if (obj.result && obj.result == "1") 
+				{
+				}
+				else
+				{
+					processOutput = false;
+					TRACKER.showMessageDialog("A geofence with this name already exists!");
+				}				
 			}
-			else
+			catch(error)
 			{
-				processOutput = false;
-				TRACKER.showMessageDialog("A geofence with this name already exists!");
+				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+					  'Error: ' + error.message + '\n' + 
+					  'JSON result: ' + result);
 			}
 		}, true);
+		
 		return processOutput;	
 	}
-
 
 	this.showMediaWindow = function(uploadId, isPublic){
 		if (typeof TRACKER.images[uploadId] == "undefined") {

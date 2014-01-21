@@ -8,6 +8,7 @@
  * Copyright 2013, Codrops
  * http://www.codrops.com
  */
+
 ;( function( window ) {
 	
 	'use strict';
@@ -53,7 +54,7 @@
 		this.options = extend( this.defaults, options );
 		this._init();
 	}
-
+	
 	cbpTooltipMenu.prototype = {
 		defaults : {
 			// add a timeout to avoid the menu to open instantly
@@ -81,13 +82,19 @@
 						}
 					} );
 					el.addEventListener( 'mouseover', function(ev) { if( isMouseLeaveOrEnter( ev, this ) ) self._openMenu( this ); } );
-					el.addEventListener( 'mouseout', function(ev) { if( isMouseLeaveOrEnter( ev, this ) ) self._closeMenu( this ); } );
+					el.addEventListener( 'mouseout', function(ev) {
+						
+						if( isMouseLeaveOrEnter( ev, this ) )
+						{
+							self._closeMenu( this );
+						}
+					});
 				}
 			} );
 
 		},
 		_openMenu : function( el ) {
-
+			
 			var self = this;
 			clearTimeout( this.omtimeout );
 			this.omtimeout = setTimeout( function() {
@@ -106,7 +113,7 @@
 
 		},
 		_closeMenu : function( el ) {
-			
+
 			clearTimeout( this.omtimeout );
 
 			var submenu = el.querySelector( 'ul.cbp-tm-submenu' );
@@ -117,7 +124,6 @@
 				el.className = el.className.replace(new RegExp("(^|\\s+)" + "cbp-tm-show-below" + "(\\s+|$)"), ' ');
 				el.className = el.className.replace(new RegExp("(^|\\s+)" + "cbp-tm-show-above" + "(\\s+|$)"), ' ');
 			}
-
 		},
 		_handleClick : function( el, ev ) {
 			var item = el.parentNode,

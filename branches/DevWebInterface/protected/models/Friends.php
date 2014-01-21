@@ -226,7 +226,7 @@ class Friends extends CActiveRecord
 		 * to make view show approve link,
 		 * requester who make friend request cannot approve request
 		 */
-		$sql = 'SELECT u.Id as id, u.userType as userType, u.realname as Name, f.status, u.fb_id, u.account_type,
+		$sql = 'SELECT u.Id as id, u.userType as userType, u.realname as Name, f.status, u.fb_id, u.profilePhotoStatus, u.account_type,
 		false as requester
 		FROM '. Friends::model()->tableName() . ' f
 		LEFT JOIN ' . Users::model()->tableName() . ' u

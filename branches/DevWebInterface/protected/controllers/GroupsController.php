@@ -575,7 +575,7 @@ class GroupsController extends Controller
 		{
 			$count=UserPrivacyGroupRelation::model()->getGroupMembersCount($groupId);
 			
-			$sql = 'SELECT u.Id as id, u.realname as Name, ugr.groupId, ugr.userId 	   
+			$sql = 'SELECT u.Id as id, u.realname as Name, u.fb_id, u.profilePhotoStatus, ugr.groupId, ugr.userId 	   
 					FROM '. UserPrivacyGroupRelation::model()->tableName() . ' ugr 
 					LEFT JOIN ' . Users::model()->tableName() . ' u
 						ON u.Id = ugr.userId

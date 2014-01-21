@@ -111,12 +111,31 @@ function processUserPastLocations(MAP, locations, userId){
 	
 }
 
+function getContentFor(userId, imageSrc) {
+	var content = 
+		  '<div style="width:280px; height:180px;">'
+		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" />' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+		+ 	'</br>'
+		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].time + ' - (' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + ')' + '</div>'
+		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
+		+ 	'</br>'				
+		+ 	'<div style="position:absolute;bottom:10px;">'
+		+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'
+		+ 	'</div>';
+		+ '</div>';
+		
+	return content;	
+}
+
 /**
  * this function process users array returned when actions are search user, get user list, update list,
  * updated list...
  */	
-function processUsers(MAP, users, par_updateType, deletedFriendId) {
-	
+function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) {
+
 	//alert("processUsers(), start - TRACKER.users.length:" + TRACKER.users.length);
 	//alert('processUsers() called');
 	
@@ -157,6 +176,7 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 		var locationCalculatedTime = value.calculatedTime
 		var status_message = value.status_message;
 		var fb_id = value.fb_id;
+		var profilePhotoStatus = value.profilePhotoStatus;
 		var dataArrivedTime = value.time;
 		var message = value.message;
 		var deviceId = value.deviceId;
@@ -175,15 +195,67 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 			newFriend = true;
 			
 			var personPhotoElement;
-			if((fb_id != 0) && (typeof fb_id != "undefined")){
-				//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
-				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square"/>';				
-				
-				var userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible);
-			}else{
-				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
-				var userMarker = MAP.putMarker(location, "images/person.png", visible);
+			var timeStamp = new Date().getTime();
+			var userMarker;
+
+			switch(profilePhotoStatus)
+			{
+				case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
+				{
+					if((fb_id != 0) && (typeof fb_id != "undefined")){
+						//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
+						personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" />';						
+						userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
+					}else{
+						personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+						userMarker = MAP.putMarker(location, "images/person.png", visible, false);
+					}
+				}
+				break;
+
+				case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
+				case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
+				{
+					if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
+					{
+						personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';					
+						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png" + "?random=" + timeStamp, visible, true);						
+					}
+					else //Diger kullanicilar icin cache kullan
+					{
+						personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';					
+						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png", visible, true);						
+					}					
+				}
+				break;
+
+				case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
+				{
+					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" />';					
+					userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
+				}
+				break;
+
+				default:
+					//alert("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
+					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+					userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
 			}
+			
+			if(userId === currentUser)
+			{
+				currentUserMarker = userMarker;
+			}
+			
+//			if((fb_id != 0) && (typeof fb_id != "undefined")){
+//				//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
+//				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square"/>';				
+//				
+//				var userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible);
+//			}else{
+//				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+//				var userMarker = MAP.putMarker(location, "images/person.png", visible);
+//			}
 	
 			var markerInfo= new MapStruct.MapMarker({marker:userMarker});
 			
@@ -296,7 +368,7 @@ function processUsers(MAP, users, par_updateType, deletedFriendId) {
 					typeof TRACKER.users[userId].polyline != "undefined")
 			{
 				//these "if" is for creating new gmarker when user polyline is already drawed
-				var userMarker = MAP.putMarker(location, "images/person.png", true);					
+				var userMarker = MAP.putMarker(location, "images/person.png", true, false);					
 				var iWindow = MAP.initializeInfoWindow();
 				var markerInfoWindow = new TRACKER.mapMarker({marker:userMarker, infoWindow:iWindow});
 				
@@ -532,7 +604,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 	
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			//image = imageURL + "&fileType=0&thumb=ok";
-			var userMarker = MAP.putMarker(location, image, false);
+			var userMarker = MAP.putMarker(location, image, false, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
 			
@@ -749,7 +821,7 @@ function processImageXML(MAP, xml){
 	
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			//image = imageURL + "&fileType=0&thumb=ok";
-			var userMarker = MAP.putMarker(location, image, false);
+			var userMarker = MAP.putMarker(location, image, false, false);
 			var iWindow = MAP.initializeInfoWindow();
 			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
 			

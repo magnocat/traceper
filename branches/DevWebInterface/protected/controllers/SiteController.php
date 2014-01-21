@@ -310,11 +310,60 @@ class SiteController extends Controller
 									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
 									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
 								}
-							}						
+							}
+
+							$profilePhotoSource = null;
+							$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
+							$profilePhotoStatusTooltipMessage = null;
+							$bothPhotoExists = null;
+							
+							switch($profilePhotoStatus)
+							{
+								case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
+									{
+										if(Yii::app()->user->fb_id == 0)
+										{
+											$profilePhotoSource = null;
+											$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
+										}
+										else
+										{
+											$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+											$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
+										}
+									}
+									break;
+										
+								case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
+									{
+										$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+										$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
+							
+										//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
+									}
+									break;
+										
+								case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
+									{
+										$bothPhotoExists = 'useFacebook';
+										$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+										//$profilePhotoStatusTooltipMessage = '4';
+									}
+									break;
+										
+								case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
+									{
+										$bothPhotoExists = 'useTraceper';
+										$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+										//$profilePhotoStatusTooltipMessage = '5';
+									}
+									break;
+							}							
 							
 							echo CJSON::encode(array(
 									"result"=> "1",
 									"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
+									"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, $processOutput),
 							));							
 								
@@ -593,9 +642,58 @@ class SiteController extends Controller
 						}
 					}
 					
+					$profilePhotoSource = null;
+					$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
+					$profilePhotoStatusTooltipMessage = null;
+					$bothPhotoExists = null;
+						
+					switch($profilePhotoStatus)
+					{
+						case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
+							{
+								if(Yii::app()->user->fb_id == 0)
+								{
+									$profilePhotoSource = null;
+									$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
+								}
+								else
+								{
+									$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+									$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
+								}
+							}
+							break;
+					
+						case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
+							{
+								$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+								$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
+									
+								//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
+							}
+							break;
+					
+						case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
+							{
+								$bothPhotoExists = 'useFacebook';
+								$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+								//$profilePhotoStatusTooltipMessage = '4';
+							}
+							break;
+					
+						case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
+							{
+								$bothPhotoExists = 'useTraceper';
+								$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+								//$profilePhotoStatusTooltipMessage = '5';
+							}
+							break;
+					}					
+					
 					echo CJSON::encode(array(
 							"result"=> "1",
 							"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
+							"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, true),
 					));					
 			

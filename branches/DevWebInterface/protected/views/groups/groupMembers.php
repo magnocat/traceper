@@ -1,5 +1,43 @@
 <?php
 
+function getMemberPhoto($data, $row){
+	$value = null;
+
+	switch($data['profilePhotoStatus'])
+	{
+		case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
+			{
+				if($data['fb_id'] == 0)
+				{
+					$value = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+				}
+				else
+				{
+					$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px'));
+				}
+			}
+			break;
+
+		case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
+		case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
+			{
+				$value = CHtml::image('profilePhotos/'.$data['id'].'.png', '#', array('width'=>'33px', 'height'=>'36px'));
+			}
+			break;
+
+		case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
+			{
+				$value = CHtml::image('https://graph.facebook.com/'.$data['fb_id'].'/picture?type=square', '#', array('width'=>'33px', 'height'=>'36px'));
+			}
+			break;
+
+		default:
+			Fb::warn($profilePhotoSource, "default - profilePhotoSource");
+	}
+
+	return $value;
+}
+
 if ($dataProvider != null) 
 {
 	//TODO: Refactor make common confirmation dialog 	
@@ -58,7 +96,10 @@ if ($dataProvider != null)
 		    		array(            // display 'create_time' using an expression
 		    				'name'=>Yii::t('users', ''),
 		    				'type' => 'raw',
-							'value'=>'"<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58; cursor:default;\"></div>"',
+							//'value'=>'"<div class=\"hi-icon-in-list icon-user\" style=\"color:#FFDB58; cursor:default;\"></div>"',
+		    				
+		    				'value'=>'getMemberPhoto($data, $row)',
+		    				
 		    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;'),
 		    		),		    		
 		    		

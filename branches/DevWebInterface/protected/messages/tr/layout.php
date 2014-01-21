@@ -86,6 +86,9 @@ return array(
 	'Click here to view the registration form again' => 'Kayıt formunu yeniden görüntülemek için buraya tıklayınız',
 	'Click here to view the password reset form again' => 'Şifre belirleme formunu yeniden görüntülemek için buraya tıklayınız',
 	'Public Photos' => 'Genel Fotolar',
+	'Use my Traceper profile photo' => 'Traceper profil fotoğrafımı kullan',
+	'Use my Facebook profile photo' => 'Facebook profil fotoğrafımı kullan',
+	'Upload a new Traceper profile photo and use it' => 'Yeni bir Traceper profil fotoğrafı yükle ve onu kullan',
 	
 	'Traceper Terms' =>
 	'<b>Son Güncelleme: 28 Ekim 2013</b> </br></br>

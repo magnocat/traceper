@@ -385,7 +385,7 @@ class UsersController extends Controller
 			
 			if ($userId == Yii::app()->user->id || array_search($userId,$friendArray) !== false)
 			{
-				$dataProvider = Users::model()->getListDataProvider($userId, null, null, null, 0, 1, 1);
+				$dataProvider = Users::model()->getListDataProviderForJson($userId, null, null, null, 0, 1, 1);
 				$out = $this->prepareJson($dataProvider);
 			}
 		}
@@ -448,7 +448,7 @@ class UsersController extends Controller
 		$time = null;
 		$updateType = null;
 		
-		if(isset(Yii::app()->session[$this->dataFetchedTimeKey]) === false)
+		if(isset(Yii::app()->session[$this->dataFetchedTimeKey]) == false)
 		{
 			Yii::app()->session[$this->dataFetchedTimeKey] = time();
 		}		
@@ -475,9 +475,9 @@ class UsersController extends Controller
 
 		//Fb::warn("actionGetUserListJson() called", "UsersController");
 
-		$dataProvider = Users::model()->getListDataProvider($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
+		$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
 		
-		//$dataProvider = Users::model()->getListDataProvider($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
+		//$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
 
 		$out = $this->prepareJson($dataProvider, $updateType);
 
@@ -487,7 +487,6 @@ class UsersController extends Controller
 		Yii::app()->session[$this->dataFetchedTimeKey] = time();
 		Yii::app()->session['visibleFriendCount'] = $friendCount;
 		Yii::app()->end();
-
 	}
 
 	public function actionGetUserPastPointsJSON(){
@@ -1001,6 +1000,131 @@ class UsersController extends Controller
 		//Fb::warn($return, "actionUpload() - return");
 		
 		echo $return;// it's array	
+	}
+
+	public function actionUseTraceperProfilePhoto()
+	{
+		//Fb::warn("actionUseTraceperProfilePhoto() called", "UsersController");
+		
+		Users::model()->setProfilePhotoStatus(Yii::app()->user->id, Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER);
+		
+		//userAreaView icinde gelen tooltipster'larin calismasi icin jquery'nin yeniden yuklenmemesi gerekiyor (tooltipster jquery'ye bagli oldugu icin)
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}		
+		
+		$this->renderPartial('//site/userAreaView',array('profilePhotoSource'=>'profilePhotos/'.Yii::app()->user->id.'.png?random='.time(), 'profilePhotoStatus'=>Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER, 'profilePhotoStatusTooltipMessage'=>null, 'bothPhotoExists'=>'useTraceper', 'variablesDefined'=>true), false, true);		
+	}
+
+	public function actionUseFacebookProfilePhoto()
+	{
+		//Fb::warn("actionUseFacebookProfilePhoto() called", "UsersController");
+		
+		Users::model()->setProfilePhotoStatus(Yii::app()->user->id, Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK);
+		
+		//userAreaView icinde gelen tooltipster'larin calismasi icin jquery'nin yeniden yuklenmemesi gerekiyor (tooltipster jquery'ye bagli oldugu icin)
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}		
+		
+		$this->renderPartial('//site/userAreaView',array('profilePhotoSource'=>'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square', 'profilePhotoStatus'=>Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK, 'profilePhotoStatusTooltipMessage'=>null, 'bothPhotoExists'=>'useFacebook', 'variablesDefined'=>true), false, true);
+	}
+
+	public function actionViewProfilePhoto($variablesNotDefined = false)
+	{
+		$profilePhotoSource = null;
+		$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
+		$profilePhotoStatusTooltipMessage = null;
+		$bothPhotoExists = null;
+		
+// 		if($variablesNotDefined == true)
+// 		{
+// 			Fb::warn("variablesNotDefined", "actionViewProfilePhoto()");
+// 		}
+// 		else
+// 		{
+// 			Fb::warn("variablesDefined", "actionViewProfilePhoto()");
+// 		}
+		
+		switch($profilePhotoStatus)
+		{
+			case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
+				{
+					if(Yii::app()->user->fb_id == 0)
+					{
+						$profilePhotoSource = null;
+						$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
+					}
+					else
+					{
+						$profilePhotoSource = 'https://graph.facebook.com/'+ Yii::app()->user->fb_id + '/picture?type=square';
+						$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
+					}
+				}
+				break;
+					
+			case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
+				{
+					$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();										
+					$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
+						
+					//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
+				}
+				break;
+					
+			case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
+				{
+					$bothPhotoExists = 'useFacebook';
+					$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+					//$profilePhotoStatusTooltipMessage = '4';
+				}
+				break;
+					
+			case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
+				{
+					$bothPhotoExists = 'useTraceper';
+					$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+					//$profilePhotoStatusTooltipMessage = '5';
+				}
+				break;					
+		}
+		
+		//userAreaView icinde gelen tooltipster'larin calismasi icin jquery'nin yeniden yuklenmemesi gerekiyor (tooltipster jquery'ye bagli oldugu icin)
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}		
+	
+		$this->renderPartial('//site/userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>null, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>($variablesNotDefined == false)), false, true);
 	}	
 
 // 	private function prepareJson($dataProvider){
@@ -1065,11 +1189,11 @@ class UsersController extends Controller
 				
 		if($par_updateType != null)
 		{
-			$str = '{"updateType":"'.$par_updateType.'", "userlist": ['.$str.'], "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+			$str = '{"updateType":"'.$par_updateType.'", "userlist": ['.$str.'], "pageNo":"1", "pageCount":"1", "currentUser":"'.Yii::app()->user->id.'"}'; //Simdilik tek sayfada hepsi gonderiliyor
 		}
 		else
 		{
-			$str = '{"userlist": ['.$str.'], "pageNo":"1", "pageCount":"1"}'; //Simdilik tek sayfada hepsi gonderiliyor
+			$str = '{"userlist": ['.$str.'], "pageNo":"1", "pageCount":"1", "currentUser":"'.Yii::app()->user->id.'"}'; //Simdilik tek sayfada hepsi gonderiliyor
 		}
 
 		return $str;
@@ -1178,6 +1302,7 @@ class UsersController extends Controller
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : "";
 		$row['gp_image'] = "";
 		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : "";
+		$row['profilePhotoStatus'] = isset($row['profilePhotoStatus']) ? $row['profilePhotoStatus'] : "";
 		$row['g_id'] = "";
 		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";
 		
@@ -1208,6 +1333,7 @@ class UsersController extends Controller
 				'userType'=>$row['userType'],
 				'gp_image'=>$row['gp_image'],
 				'fb_id'=>$row['fb_id'],
+				'profilePhotoStatus'=>$row['profilePhotoStatus'],
 				'g_id'=>$row['g_id'],
 				'account_type'=>$row['account_type'],
 		));

@@ -400,7 +400,70 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
-	public function getListDataProvider($IdList, $userType=null, $newFriendId=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
+	public function getListDataProvider($IdList, $userType=null, $totalItemCount = null)
+	{
+		$userTypeSqlPart = '';
+		if ($userType != null) {
+			$userTypeCount = count($userType);
+			for ($i = 0; $i < $userTypeCount; $i++) {
+				if ($userTypeSqlPart != '')
+				{
+					$userTypeSqlPart .= ' OR ';
+				}
+				$userTypeSqlPart .= ' u.userType = "'.$userType[$i].'" ';
+			}
+		}
+	
+		$sqlCount = 'SELECT count(*)
+		FROM '.  Users::model()->tableName() . ' u
+		WHERE ((Id in ('. $IdList.')';
+	
+		$sql = 'SELECT  u.Id as id, u.realname as Name,
+		u.userType, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
+		u.profilePhotoStatus, u.fb_id
+		FROM '.  Users::model()->tableName() . ' u
+		LEFT JOIN ' . Friends::model()->tableName() . ' f
+		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
+		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
+		WHERE ((u.Id in ('. $IdList.')';
+
+		$doubleCloseParanthesisSql = '))';
+		$sqlCount .= $doubleCloseParanthesisSql;
+		$sql .= $doubleCloseParanthesisSql;
+	
+		if ($userTypeSqlPart != '') {
+			$sqlCount .= ' AND ('. $userTypeSqlPart. ')';
+			$sql .= ' AND (' . $userTypeSqlPart. ')';
+		}
+	
+		$count = $totalItemCount;
+	
+		if ($count == null) {
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		}
+	
+		if(isset(Yii::app()->session['usersPageSize']) == false)
+		{
+			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
+		}
+	
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id', 'Name',
+						),
+				),
+				'pagination'=>array(
+						'pageSize'=>Yii::app()->session['usersPageSize'],
+						'itemCount'=>$count
+				),
+		));
+	
+		return $dataProvider;
+	}	
+	
+	public function getListDataProviderForJson($IdList, $userType=null, $newFriendId=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
 	{
 		$userTypeSqlPart = '';
 		if ($userType != null) {
@@ -432,7 +495,7 @@ class Users extends CActiveRecord
 		u.userType, u.deviceId, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type, u.fb_id
+		u.account_type, u.fb_id, u.profilePhotoStatus
 		FROM '.  Users::model()->tableName() . ' u 
 		LEFT JOIN ' . Friends::model()->tableName() . ' f 
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR 
@@ -512,8 +575,8 @@ class Users extends CActiveRecord
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id ; //Aramada kullanıcının kendisi çıkmasın diye
 	
-		$sql = 'SELECT  u.Id as id, u.realname as Name,
-		u.userType, u.fb_id, u.account_type, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
+		$sql = 'SELECT  u.Id as id, u.realname as Name, 
+		u.userType, u.fb_id, u.profilePhotoStatus, u.account_type, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		IFNULL(f.status, -1) as status, IF(f.friend1 = '.Yii::app()->user->id.', true, false) as requester
 		FROM '.  Users::model()->tableName() . ' u
 		LEFT JOIN ' . Friends::model()->tableName() . ' f
@@ -875,7 +938,7 @@ class Users extends CActiveRecord
 	public function getProfilePhotoStatus($userId)
 	{
 		$user = $this->findByPk($userId);
-	
+
 		return $user->profilePhotoStatus;
 	}	
 }
