@@ -1096,7 +1096,7 @@ class UsersController extends Controller
 				{
 					$bothPhotoExists = 'useFacebook';
 					$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
-					//$profilePhotoStatusTooltipMessage = '4';
+					$profilePhotoStatusTooltipMessage = null;
 				}
 				break;
 					
@@ -1104,7 +1104,7 @@ class UsersController extends Controller
 				{
 					$bothPhotoExists = 'useTraceper';
 					$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
-					//$profilePhotoStatusTooltipMessage = '5';
+					$profilePhotoStatusTooltipMessage = null;
 				}
 				break;					
 		}
@@ -1124,7 +1124,7 @@ class UsersController extends Controller
 			}
 		}		
 	
-		$this->renderPartial('//site/userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>null, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>($variablesNotDefined == false)), false, true);
+		$this->renderPartial('//site/userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>($variablesNotDefined == false)), false, true);
 	}	
 
 // 	private function prepareJson($dataProvider){

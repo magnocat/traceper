@@ -1047,7 +1047,7 @@ else
 											'id'=>'uploadProfilePhoto',
 											'config'=>array(
 													'action'=>Yii::app()->createUrl('users/upload'),
-													'allowedExtensions'=>array("jpg", "jpeg", "png"),//array("jpg","jpeg","gif","exe","mov" and etc...
+													'allowedExtensions'=>array("jpg", "jpeg", "png", "gif"),//array("jpg","jpeg","gif","exe","mov" and etc...
 													'sizeLimit'=>10*1024*1024,// maximum file size in bytes
 													'photoSrc'=>$profilePhotoSource,
 													'bothPhotoExists'=>$bothPhotoExists,
@@ -1132,9 +1132,8 @@ else
 																					success: function(html){
 																						jQuery('#userarea').html(html);".
 													
-																						((Yii::app()->user->fb_id == 0)?"$('#uploadProfilePhoto').tooltipster('hide'); eProfilePhotoExists = 'ONE';":"eProfilePhotoExists = 'BOTH';").
-																						"$('#uploadProfilePhotoSuccessfulTooltip').css('bottom', '22px');
-																						$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have changed your profile photo successfully.')."');
+																						((Yii::app()->user->fb_id == 0)?"$('#uploadProfilePhoto').tooltipster('hide'); eProfilePhotoExists = 'ONE';":"eProfilePhotoExists = 'BOTH'; $('#uploadProfilePhotoSuccessfulTooltip').css('bottom', '22px');").
+																						"$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('update', '".Yii::t('site', 'You have changed your profile photo successfully.')."');
 																						$('#uploadProfilePhotoSuccessfulTooltip').tooltipster('show');
 
 																						var timeStamp = new Date().getTime();													
@@ -1278,7 +1277,7 @@ else
 						<?php						
 
 							echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.$userId.')', 'title'=>Yii::t('layout', 'See your position on the map'),
-																				'style'=>'position:absolute; left:54px; bottom:-20px;'));
+																				'style'=>'position:absolute; left:54px; bottom:-20px; width:200px;'));
 						?>
 						</div>
 
