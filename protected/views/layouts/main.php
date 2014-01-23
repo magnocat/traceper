@@ -552,7 +552,26 @@ else
 	
 	langOp.load("<?php echo $language;?>");  //TODO: itshould be parametric
 	
-	var mapOperator = new MapOperator("<?php echo $language;?>");	
+	var mapOperator = new MapOperator("<?php echo $language;?>");
+
+
+	var h = $(window).height();
+	var w = $(window).width();
+	var offsetTop = 70; //User list login olmusken ciktigi icin
+
+	var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
+
+	//alert("userListHeight: " + userListHeight);
+	
+	//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+	$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
+        if(json.outcome == 'success') {
+        	//alert('OKKKKK');
+            // do something with the knowledge possibly?
+        } else {
+            alert('Unable to let PHP know what the screen resolution is!');
+        }
+    },'json');		
 </script>
 </head>
 <body>

@@ -2173,10 +2173,12 @@ class SiteController extends Controller
 // 		Fb::warn("actionGetWinDimensions() called", "SiteController");
 // 		Fb::warn($_POST['width'], "width");
 // 		Fb::warn($_POST['height'], "height");
+
+		unset(Yii::app()->session['usersPageSize']);
 		
 		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
 		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/44);
-		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 115)/42);
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 160)/42);
 		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/38);
 		
 // 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");
