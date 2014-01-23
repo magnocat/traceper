@@ -602,7 +602,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
-
 		$.ajax({
 			type: 'POST',
 			url: TRACKER.ajaxUrl,
@@ -622,11 +621,18 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				$("#loading").hide();
 				alert("Failure in ajax.");						
 			},
-			error: function(par1, par2, par3){
+/*			error: function(par1, par2, par3){
 				//alert(par1.responseText);		
 				$("#loading").hide();
 				alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
-			}
+			}*/
+			error: function(xhr, status, error) {
+				  var err = eval("(" + xhr.responseText + ")");
+				  alert("err.Message: " + err.Message + "\n\n" +
+						"status: " + status + "\n\n" +
+						"error: " + error + "\n\n" +						  
+						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+				}			
 		});
 	};	
 

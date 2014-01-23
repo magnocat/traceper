@@ -446,6 +446,8 @@ class Users extends CActiveRecord
 		{
 			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
 		}
+		
+		//Fb::warn(Yii::app()->session['usersPageSize'], "getListDataProvider() - usersPageSize");
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
@@ -585,6 +587,11 @@ class Users extends CActiveRecord
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullanıcının kendisi çıkmasın diye
 		
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		
+		if(isset(Yii::app()->session['usersPageSize']) == false)
+		{
+			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
+		}		
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
@@ -595,7 +602,8 @@ class Users extends CActiveRecord
 				),
 				//	'params'=>array($searchIndex=>$text),
 				'pagination'=>array(
-						'pageSize'=>Yii::app()->params->itemCountInOnePage,
+						//'pageSize'=>Yii::app()->params->itemCountInOnePage,
+						'pageSize'=>Yii::app()->session['usersPageSize'],
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
 				),
 		));

@@ -15,6 +15,37 @@ var uploadsGridViewId = 'publicUploadListView';
 
 var currentUserMarker;
 
+var IE = (function () {
+    "use strict";
+
+    var ret, isTheBrowser,
+        actualVersion,
+        jscriptMap, jscriptVersion;
+
+    isTheBrowser = false;
+    jscriptMap = {
+        "5.5": "5.5",
+        "5.6": "6",
+        "5.7": "7",
+        "5.8": "8",
+        "9": "9",
+        "10": "10"
+    };
+    jscriptVersion = new Function("/*@cc_on return @_jscript_version; @*/")();
+
+    if (jscriptVersion !== undefined) {
+        isTheBrowser = true;
+        actualVersion = jscriptMap[jscriptVersion];
+    }
+
+    ret = {
+        isTheBrowser: isTheBrowser,
+        actualVersion: actualVersion
+    };
+
+    return ret;
+}());
+
 function changecss(myclass,element,value) {
 	var CSSRules
 	if (document.all) {
@@ -412,7 +443,7 @@ function bindElements(langOperator, trackerOp)
 	  document.getElementById(elementid).src = imgSrc;
 	}
 	
-	$( document ).ready(function() {		
+	$( document ).ready(function() {
 		var h = $(window).height();
 		var w = $(window).width();
 		var offsetTop = 0;
@@ -442,17 +473,17 @@ function bindElements(langOperator, trackerOp)
 		
 		//alert("height:" + (h - offsetTop - 82));
 		    
-		var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
-		
-		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
-		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
-	        if(json.outcome == 'success') {
-	        	//alert('OKKKKK');
-	            // do something with the knowledge possibly?
-	        } else {
-	            alert('Unable to let PHP know what the screen resolution is!');
-	        }
-	    },'json');
+//		var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
+//		
+//		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
+//		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
+//	        if(json.outcome == 'success') {
+//	        	//alert('OKKKKK');
+//	            // do something with the knowledge possibly?
+//	        } else {
+//	            alert('Unable to let PHP know what the screen resolution is!');
+//	        }
+//	    },'json');
 	});	
 
 	$(window).resize(function () {
