@@ -129,10 +129,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			jsonparams += "&newFriendId=" + newFriendId;
 		}
 		
-		TRACKER.ajaxReq(jsonparams, function(result){			
+		TRACKER.ajaxReq(jsonparams, function(obj){			
 			try
 			{
-				var obj = $.parseJSON(result);
+				//var obj = $.parseJSON(result);
 				
 				if(typeof deletedFriendId !== 'undefined')
 				{
@@ -169,7 +169,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			{
 				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
 					  'Error: ' + error.message + '\n' + 
-					  'JSON result: ' + result);
+					  'JSON obj: ' + JSON.stringify(obj));
 			}			
 		}, true);
 		
@@ -211,11 +211,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 		//alert("getImageList(), jsonparams: " + jsonparams);
 
-		TRACKER.ajaxReq(jsonparams, function(result){
+		TRACKER.ajaxReq(jsonparams, function(obj){
 			
 			try
 			{
-				var obj = $.parseJSON(result);
+				//var obj = $.parseJSON(result);
 				//alert("After parseJSON()");
 				
 				TRACKER.bgImageListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
@@ -278,7 +278,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			{
 				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
 					  'Error: ' + error.message + '\n' + 
-					  'JSON result: ' + result);
+					  'JSON obj: ' + JSON.stringify(obj));
 			}					
 		}, 
 		
@@ -417,10 +417,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 			var jsonparams = "r=users/getUserPastPointsJSON&userId=" + userId + "&page=" + pageNo;
 			
-			TRACKER.ajaxReq(jsonparams, function(result){
+			TRACKER.ajaxReq(jsonparams, function(obj){
 				try
 				{
-					var obj = $.parseJSON(result);
+					//var obj = $.parseJSON(result);
 
 					TRACKER.pastPointsPageNo =  obj.pageNo;
 					TRACKER.pastPointsPageCount =  obj.pageCount;
@@ -435,7 +435,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					alert('Exception in jsonparams: ' + jsonparams + '\n' + 
 						  'Error: ' + error.message + '\n' + 
-						  'JSON result: ' + result);
+						  'JSON obj: ' + JSON.stringify(obj));
 				}				
 			});			
 		}
@@ -477,10 +477,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var processOutput = true;
 		var params = "r=geofence/sendGeofenceData&name="+name+"&description="+desc+"&point1Latitude="+ lat1.toFixed(6) +"&point1Longitude="+ long1.toFixed(6)+"&point2Latitude="+ lat2.toFixed(6) +"&point2Longitude="+ long2.toFixed(6)+"&point3Latitude="+ lat3.toFixed(6) +"&point3Longitude="+ long3.toFixed(6);
 		
-		TRACKER.ajaxReq(params, function(response){
+		TRACKER.ajaxReq(params, function(obj){
 			try
 			{
-				var obj = jQuery.parseJSON(response);
+				//var obj = jQuery.parseJSON(response);
 				if (obj.result && obj.result == "1") 
 				{
 				}
@@ -494,7 +494,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			{
 				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
 					  'Error: ' + error.message + '\n' + 
-					  'JSON result: ' + result);
+					  'JSON obj: ' + JSON.stringify(obj));
 			}
 		}, true);
 		
@@ -603,21 +603,21 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
 		$.ajax({
-			type: 'POST',
 			url: TRACKER.ajaxUrl,
+			type: 'POST',
 			data: params,
 			//	dataType: 'xml',
-            //contentType: "application/json; charset=utf-8",
-            //dataType: "json",			
+            //contentType: "application/json; charset=utf-8", //Bunu acinca hata olusuyor?
+            dataType: "json",			
 			timeout:100000,
 			beforeSend: function()
 			{ 	if (!notShowLoadingInfo) {
-				$("#loading").show();
-			} 
+					$("#loading").show();
+				} 
 			},
 			success: function(result){ 
 				$("#loading").hide(); 	
-				callback(result);			
+				callback(result);
 			}, 
 //			failure: function(result) {								
 //				$("#loading").hide();

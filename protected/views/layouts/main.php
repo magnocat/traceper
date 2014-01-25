@@ -789,7 +789,7 @@ else
 	<div id='wrap'>
 <!-- 	<div id='wrap'> -->
 		<div class='logo_inFullMap'></div>
-		<div id='bar' style:'z-index:50;'></div> <!-- Firefox'ta muhtemelen upload photo'daki iframe'den dolayı cache temizleme calismiyor, bunun icin css yerine burada z-index set et -->
+		<div id='bar' style='z-index:50;'></div> <!-- Firefox'ta muhtemelen upload photo'daki iframe'den dolayı cache temizleme calismiyor, bunun icin css yerine burada z-index set et -->
 
 		<div id='topBar'>
 			<div id='topContent'>
@@ -1653,7 +1653,7 @@ else
 									</div>																		
 								</div>
 								
-								<div id="forRegisterRefresh"'>
+								<div id="forRegisterRefresh">
 								<div class="sideMenu">
 									<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
 									<?php //echo $form->labelEx($model,'name'); ?>
@@ -1904,7 +1904,7 @@ else
 								
 <!-- 				<video id="my_video_1" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" poster="my_video_poster.png" data-setup="{}"> -->
 <!-- 				  <source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type='video/mp4'> -->
-<!-- <!-- 				  <source src="http://localhost/traceper/branches/DevWebInterface/upload/14.flv" type='video/flv'> -->
+<!-- 				  <source src="http://localhost/traceper/branches/DevWebInterface/upload/14.flv" type='video/flv'> -->
 <!-- 				</video>				 -->
 				
 				
