@@ -399,6 +399,8 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListJson()
 	{	
+		//Fb::warn("actionGetUserListJson() called", "UsersController");
+		
 		try
 		{
 			$pageNo = 1;
@@ -483,11 +485,12 @@ class UsersController extends Controller
 			
 			$out = $this->prepareJson($dataProvider, $updateType);
 			
+			Yii::app()->session[$this->dataFetchedTimeKey] = time();
+			Yii::app()->session['visibleFriendCount'] = $friendCount;			
+			
 			//Fb::warn($out, "Json()");
 			
 			echo $out;
-			Yii::app()->session[$this->dataFetchedTimeKey] = time();
-			Yii::app()->session['visibleFriendCount'] = $friendCount;			
 		}
 		catch(Exception $e)
 		{
@@ -1183,6 +1186,8 @@ class UsersController extends Controller
 		
 	
 	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
+		
+		Header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
 		
 		$pagination = $dataProvider->getPagination();
 		//Fb::warn($pagination->pageCount, "pageCount");

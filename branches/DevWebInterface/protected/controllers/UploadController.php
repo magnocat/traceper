@@ -572,10 +572,10 @@ class UploadController extends Controller
 				//Fb::warn($out, "XML");
 			}
 			
-			echo $out;
-			
 			Yii::app()->session[$dataFetchedTimeKey] = time();
-			Yii::app()->session['uploadCount'] = $uploadCount;				
+			Yii::app()->session['uploadCount'] = $uploadCount;			
+			
+			echo $out;		
 		}
 		catch(Exception $e)
 		{
@@ -679,10 +679,11 @@ class UploadController extends Controller
 		}
 		
 		//Fb::warn($out, "Json()");
-		echo $out;
 		
 		Yii::app()->session[$dataFetchedTimeKey] = time();
 		Yii::app()->session['publicUploadCount'] = $publicUploadCount;
+				
+		echo $out;	
 		Yii::app()->end();
 	}	
 
@@ -721,6 +722,9 @@ class UploadController extends Controller
 	}
 	
 	private function prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, $par_updateType = null){ //Multisent prepareJson()
+		
+		Header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
+		
 		$deletedListStr = '';
 		
 		if ($deletedDataReader != NULL)
