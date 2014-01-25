@@ -607,6 +607,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			url: TRACKER.ajaxUrl,
 			data: params,
 			//	dataType: 'xml',
+            //contentType: "application/json; charset=utf-8",
+            //dataType: "json",			
 			timeout:100000,
 			beforeSend: function()
 			{ 	if (!notShowLoadingInfo) {
@@ -617,21 +619,26 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				$("#loading").hide(); 	
 				callback(result);			
 			}, 
-			failure: function(result) {								
-				$("#loading").hide();
-				alert("Failure in ajax.");						
-			},
+//			failure: function(result) {								
+//				$("#loading").hide();
+//				alert("Failure in ajax.");						
+//			},
 /*			error: function(par1, par2, par3){
 				//alert(par1.responseText);		
 				$("#loading").hide();
 				alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
 			}*/
 			error: function(xhr, status, error) {
-				  var err = eval("(" + xhr.responseText + ")");
-				  alert("err.Message: " + err.Message + "\n\n" +
-						"status: " + status + "\n\n" +
-						"error: " + error + "\n\n" +						  
-						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+//				  var err = eval("(" + xhr.responseText + ")");
+//				  alert("err.Message: " + err.Message + "\n\n" +
+//						"status: " + status + "\n\n" +
+//						"error: " + error + "\n\n" +						  
+//						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+				  
+				  alert("xhr.responseText: " + xhr.responseText + "\n\n" +
+							"status: " + status + "\n\n" +
+							"error: " + error + "\n\n" +						  
+							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);				  
 				}			
 		});
 	};	

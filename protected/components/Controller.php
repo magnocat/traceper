@@ -51,12 +51,15 @@ class Controller extends CController
 		));		
 	}
 
-	public function SMTP_UTF8_mail($fromEmail, $fromName, $toEmail, $toName, $subject, $message)
+	public function SMTP_UTF8_mail($fromEmail, $fromName, $toEmail, $toName, $subject, $message, $addFooter = true)
 	{
-		$message .= '<br/><br/>';
-		$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
-		$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact (contact@traceper.com)</a> address if you need to contact us.');		
-		
+		if($addFooter == true)
+		{
+			$message .= '<br/><br/>';
+			$message .= Yii::t('site', 'The Traceper Team').'<br/><br/><br/>';
+			$message .= Yii::t('site', 'Please note: This is an auto generated e-mail and it was sent from an unmonitored e-mail addres. Therefore do not reply to this message and use our <a href="mailto:contact@traceper.com">contact (contact@traceper.com)</a> address if you need to contact us.');			
+		}
+
 		header("Content-Type: text/html; charset=utf-8");
 	
 		error_reporting(E_ALL);
