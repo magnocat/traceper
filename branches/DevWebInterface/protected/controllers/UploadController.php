@@ -495,85 +495,113 @@ class UploadController extends Controller
 			return;
 		}
 		
-		if(isset(Yii::app()->session['uploadCount']) == false)
+		try
 		{
-			Yii::app()->session['uploadCount'] = 0;
-		}
-		
-		if(isset(Yii::app()->session['uploadsPageSize']) == false)
-		{
-			Yii::app()->session['uploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
-		}		
-
-		$pageNo = 1;
-		
-		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
-			$pageNo = (int) $_REQUEST['pageNo'];
-			
-			//Fb::warn($pageNo, "pageNo");
-		}
-		
-		if(isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
-		{
-			$fileType = (int)$_REQUEST['fileType'];
-		}	
-		
-		$offset = ($pageNo - 1) * Yii::app()->session['uploadsPageSize'];
-		$out = '';
-		$dataFetchedTimeKey = "uploadController.dataFetchedTime";
-
-		$dataReader = NULL;
-		
-		$friendList = AuxiliaryFriendsOperator::getFriendIdList();
-		$uploadCount = Upload::model()->getUploadCount($fileType, Yii::app()->user->id, $friendList);
-		//$uploadCount = Upload::model()->getUploadPageCount($fileType, Yii::app()->user->id, $friendList, NULL);
-		
-		if(isset(Yii::app()->session[$dataFetchedTimeKey]) === false)
-		{
-			Yii::app()->session[$dataFetchedTimeKey] = time();
-		}		
-		
-		//$deletedDataReader = NULL;
-		//Upload'lari aldiktan sonra silinmis olanlar varsa bunlari haritadan kaldirmak icin kontrol et
-		$deletedDataReader = DeletedUploads::model()->getDeletedList($friendList, Yii::app()->session[$dataFetchedTimeKey]);
-	
-		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
-		{
-			//Fb::warn("onlyUpdated", "actionGetUploadListXML()");
-			
-			$time = Yii::app()->session[$dataFetchedTimeKey];
-			if ($time !== false && $time != "")
+			if(isset(Yii::app()->session['uploadCount']) == false)
 			{
-				$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,$time);
-				
-				if ($pageCount >= $pageNo && $pageCount != 0) {
-					$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
+				Yii::app()->session['uploadCount'] = 0;
+			}
+			
+			if(isset(Yii::app()->session['uploadsPageSize']) == false)
+			{
+				Yii::app()->session['uploadsPageSize'] = Yii::app()->params->uploadCountInOnePage;
+			}
+			
+			$pageNo = 1;
+			
+			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+				$pageNo = (int) $_REQUEST['pageNo'];
+					
+				//Fb::warn($pageNo, "pageNo");
+			}
+			
+			if(isset($_REQUEST['fileType']) && $_REQUEST['fileType'] != NULL)
+			{
+				$fileType = (int)$_REQUEST['fileType'];
+			}
+			
+			$offset = ($pageNo - 1) * Yii::app()->session['uploadsPageSize'];
+			$out = '';
+			$dataFetchedTimeKey = "uploadController.dataFetchedTime";
+			
+			$dataReader = NULL;
+			
+			$friendList = AuxiliaryFriendsOperator::getFriendIdList();
+			$uploadCount = Upload::model()->getUploadCount($fileType, Yii::app()->user->id, $friendList);
+			//$uploadCount = Upload::model()->getUploadPageCount($fileType, Yii::app()->user->id, $friendList, NULL);
+			
+			if(isset(Yii::app()->session[$dataFetchedTimeKey]) === false)
+			{
+				Yii::app()->session[$dataFetchedTimeKey] = time();
+			}
+			
+			//$deletedDataReader = NULL;
+			//Upload'lari aldiktan sonra silinmis olanlar varsa bunlari haritadan kaldirmak icin kontrol et
+			$deletedDataReader = DeletedUploads::model()->getDeletedList($friendList, Yii::app()->session[$dataFetchedTimeKey]);
+			
+			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
+			{
+				//Fb::warn("onlyUpdated", "actionGetUploadListXML()");
+					
+				$time = Yii::app()->session[$dataFetchedTimeKey];
+				if ($time !== false && $time != "")
+				{
+					$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,$time);
+			
+					if ($pageCount >= $pageNo && $pageCount != 0) {
+						$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
+					}
+			
+					//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
+					$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, "onlyUpdated");
 				}
+			}
+			else {
+				//Fb::warn("ALL", "actionGetUploadListXML()");
+			
+				$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
+					
+				if ($pageCount >= $pageNo && $pageCount != 0) {
+					$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
+				}
+					
+				//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
+				$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount,"all");
+					
+				//Fb::warn($out, "Json()");
+				//Fb::warn($out, "XML");
+			}
+			
+			echo $out;
+			
+			Yii::app()->session[$dataFetchedTimeKey] = time();
+			Yii::app()->session['uploadCount'] = $uploadCount;				
+		}
+		catch(Exception $e)
+		{
+			$message = $e->getMessage();
 				
-				//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
-				$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, "onlyUpdated");				
+			if(isset(Yii::app()->session['getUploadListJsonErrorCount']) == false)
+			{
+				Yii::app()->session['getUploadListJsonErrorCount'] = 0;
 			}
-		}
-		else {
-			//Fb::warn("ALL", "actionGetUploadListXML()");
+				
+				
+			if(Yii::app()->session['getUploadListJsonErrorCount'] < 3)
+			{
+				if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'PHP Exception in actionGetUploadListJson()', $message, false /*Do not add footer for error message*/))
+				{
+					//Mail gönderildi
+				}
+				else
+				{
+					//Mail gönderilirken hata oluştu
+				}
+		
+				Yii::app()->session['getUploadListJsonErrorCount'] = Yii::app()->session['getUploadListJsonErrorCount'] + 1;
+			}
+		}		
 
-			$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
-			
-			if ($pageCount >= $pageNo && $pageCount != 0) {
-				$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
-			}
-			
-			//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
-			$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount,"all");
-			
-			//Fb::warn($out, "Json()");
-			//Fb::warn($out, "XML");
-		}
-		
-		echo $out;
-		
-		Yii::app()->session[$dataFetchedTimeKey] = time();
-		Yii::app()->session['uploadCount'] = $uploadCount;
 		Yii::app()->end();
 	}
 	

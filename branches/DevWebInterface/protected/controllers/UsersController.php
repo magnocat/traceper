@@ -399,93 +399,121 @@ class UsersController extends Controller
 	 */
 	public function actionGetUserListJson()
 	{	
-		$pageNo = 1;
-		$userTypes = array();
-		
-		if(isset(Yii::app()->session['visibleFriendCount']) == false)
+		try
 		{
-			Yii::app()->session['visibleFriendCount'] = 0;
-		}		
-
-		if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
-			$pageNo = (int)$_REQUEST['pageNo'];
-		}
-		
-		if (isset($_REQUEST['userType'])) {
-			$userTypes[] = (int)$_REQUEST['userType'];
+			$pageNo = 1;
+			$userTypes = array();
 			
-			//Fb::warn("userType is SET", "actionGetUserListJson()");
-		}
-
-		$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
-		
-		//Webde kullanicinin kendi ismine tikladiginda kendini konumunu gorebilmesi icin
-		
-		//Burası direk true degil mobilde gelen istekle guncellenmeli
-		$friendCount = $this->getFriendCount(true/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
-		//$friendCount = $this->getFriendCount();
+			if(isset(Yii::app()->session['visibleFriendCount']) == false)
+			{
+				Yii::app()->session['visibleFriendCount'] = 0;
+			}
 			
-		$friendIdList = $this->getFriendIdList(true/*$par_onlyVisible*/, $userTypes);
-		
-		//Fb::warn($userTypes, "userTypes");
-		
-		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-		{
-			//Do not add user himself for mobile
-		}
-		else //For web
-		{
-			if ($friendIdList != -1) {
-				$friendIdList .= ',' . Yii::app()->user->id;
+			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+				$pageNo = (int)$_REQUEST['pageNo'];
 			}
-			else {
-				$friendIdList = Yii::app()->user->id;
+			
+			if (isset($_REQUEST['userType'])) {
+				$userTypes[] = (int)$_REQUEST['userType'];
+					
+				//Fb::warn("userType is SET", "actionGetUserListJson()");
 			}
-
-			//Fb::warn($friendIdList, "friendIdList");
-		}
+			
+			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
+			
+			//Webde kullanicinin kendi ismine tikladiginda kendini konumunu gorebilmesi icin
+			
+			//Burası direk true degil mobilde gelen istekle guncellenmeli
+			$friendCount = $this->getFriendCount(true/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
+			//$friendCount = $this->getFriendCount();
 				
-		$time = null;
-		$updateType = null;
-		
-		if(isset(Yii::app()->session[$this->dataFetchedTimeKey]) == false)
-		{
-			Yii::app()->session[$this->dataFetchedTimeKey] = time();
-		}		
-		
-		//Sadece zamansal olarak update olmuslar istendiginde ve visible arkadas sayisi degismediyse onlyUpdated yoksa ALL
-		if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($friendCount == Yii::app()->session['visibleFriendCount'])) {
-			$time = Yii::app()->session[$this->dataFetchedTimeKey];
-			$updateType = 'onlyUpdated';
-
-			//Fb::warn("onlyUpdated", "actionGetUserListJson()");
-		}
-		else
-		{
-			$updateType = 'all';
+			$friendIdList = $this->getFriendIdList(true/*$par_onlyVisible*/, $userTypes);
 			
-			//Fb::warn("ALL, friendCount:".$friendCount." - sessionCount:".Yii::app()->session['visibleFriendCount'], "actionGetUserListJson()");
+			//Fb::warn($userTypes, "userTypes");
+			
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				//Do not add user himself for mobile
+			}
+			else //For web
+			{
+				if ($friendIdList != -1) {
+					$friendIdList .= ',' . Yii::app()->user->id;
+				}
+				else {
+					$friendIdList = Yii::app()->user->id;
+				}
+			
+				//Fb::warn($friendIdList, "friendIdList");
+			}
+			
+			$time = null;
+			$updateType = null;
+			
+			if(isset(Yii::app()->session[$this->dataFetchedTimeKey]) == false)
+			{
+				Yii::app()->session[$this->dataFetchedTimeKey] = time();
+			}
+			
+			//Sadece zamansal olarak update olmuslar istendiginde ve visible arkadas sayisi degismediyse onlyUpdated yoksa ALL
+			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($friendCount == Yii::app()->session['visibleFriendCount'])) {
+				$time = Yii::app()->session[$this->dataFetchedTimeKey];
+				$updateType = 'onlyUpdated';
+			
+				//Fb::warn("onlyUpdated", "actionGetUserListJson()");
+			}
+			else
+			{
+				$updateType = 'all';
+					
+				//Fb::warn("ALL, friendCount:".$friendCount." - sessionCount:".Yii::app()->session['visibleFriendCount'], "actionGetUserListJson()");
+			}
+			
+			$newFriendId = null;
+			
+			if (isset($_REQUEST['newFriendId'])) {
+				$newFriendId = (int)$_REQUEST['newFriendId'];
+			}
+			
+			//Fb::warn("actionGetUserListJson() called", "UsersController");
+			
+			$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
+			
+			//$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
+			
+			$out = $this->prepareJson($dataProvider, $updateType);
+			
+			//Fb::warn($out, "Json()");
+			
+			echo $out;
+			Yii::app()->session[$this->dataFetchedTimeKey] = time();
+			Yii::app()->session['visibleFriendCount'] = $friendCount;			
 		}
+		catch(Exception $e)
+		{
+			$message = $e->getMessage();
+			
+			if(isset(Yii::app()->session['getUserListJsonErrorCount']) == false)
+			{
+				Yii::app()->session['getUserListJsonErrorCount'] = 0;
+			}
+			
+			
+			if(Yii::app()->session['getUserListJsonErrorCount'] < 3)
+			{
+				if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'PHP Exception in actionGetUserListJson()', $message, false /*Do not add footer for error message*/))
+				{
+					//Mail gönderildi
+				}
+				else
+				{
+					//Mail gönderilirken hata oluştu
+				}
 
-		$newFriendId = null;
+				Yii::app()->session['getUserListJsonErrorCount'] = Yii::app()->session['getUserListJsonErrorCount'] + 1;
+			}			
+		}
 		
-		if (isset($_REQUEST['newFriendId'])) {
-			$newFriendId = (int)$_REQUEST['newFriendId'];
-		}		
-
-		//Fb::warn("actionGetUserListJson() called", "UsersController");
-
-		$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
-		
-		//$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
-
-		$out = $this->prepareJson($dataProvider, $updateType);
-
-		//Fb::warn($out, "Json()");
-
-		echo $out;
-		Yii::app()->session[$this->dataFetchedTimeKey] = time();
-		Yii::app()->session['visibleFriendCount'] = $friendCount;
 		Yii::app()->end();
 	}
 
