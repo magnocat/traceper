@@ -498,13 +498,11 @@ qq.FileUploader = function(o){
 				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
 					'<li>' +
 						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
-						'<ul id="Adnan" class="cbp-tm-submenu">' + 
+						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
 							'<li>' +
 								'<a>' +
-					                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
 					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
-					                '<ul class="qq-upload-list"></ul>' +
 			                	'</a>'
 							'</li>' + 
 						'</ul>' +
@@ -520,13 +518,11 @@ qq.FileUploader = function(o){
 				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
 					'<li>' +
 						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
-						'<ul id="Adnan" class="cbp-tm-submenu">' + 
+						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
 							'<li>' +
 								'<a>' +
-					                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
 					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
-					                '<ul class="qq-upload-list"></ul>' +
 			                	'</a>'
 							'</li>' + 
 						'</ul>' +
@@ -538,22 +534,18 @@ qq.FileUploader = function(o){
     {
       templateHtml = 
       '<div class="qq-uploader">' +
-      	'<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
       	'<div id="profilePhotoUploadButton" class="qq-upload-button">' +
  			'<img id="profilePhoto" src="' + o.photoSrc +'"  width="44px" height="48px">' +                
  		'</div>' +
-      '<ul class="qq-upload-list"></ul>' +
       '</div>';   	
     }
     else
     {
     	templateHtml = '<div class="qq-uploader">' +
-        '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
         '<div id="profilePhotoUploadButton" class="qq-upload-button">' +
    			'<div id="profileUserIcon" class="hi-icon icon-user" style="pointer-events:none; color:yellow; width:44px;"></div>' +
    			'<img id="profilePhoto" src="" style="display:none;"  width="44px" height="48px">' +        
         '</div>' +
-        '<ul class="qq-upload-list"></ul>' +
      '</div>';    	
     }
     
@@ -597,14 +589,14 @@ qq.FileUploader = function(o){
 
     this._element = this._options.element;
     this._element.innerHTML = this._options.template;
-    this._listElement = this._options.listElement || this._find(this._element, 'list');
+    //this._listElement = this._options.listElement || this._find(this._element, 'list');
 
     this._classes = this._options.classes;
 
     this._button = this._createUploadButton(this._find(this._element, 'button'));
 
-    this._bindCancelEvent();
-    this._setupDragDrop();
+    //this._bindCancelEvent();
+    //this._setupDragDrop();
     
     if(tooltipMenuExists)
     {
@@ -685,37 +677,37 @@ qq.extend(qq.FileUploader.prototype, {
     },
     _onSubmit: function(id, fileName){
         qq.FileUploaderBasic.prototype._onSubmit.apply(this, arguments);
-        this._addToList(id, fileName);
+        //this._addToList(id, fileName);
     },
     _onProgress: function(id, fileName, loaded, total){
         qq.FileUploaderBasic.prototype._onProgress.apply(this, arguments);
 
-        var item = this._getItemByFileId(id);
-        var size = this._find(item, 'size');
-        size.style.display = 'inline';
-
-        var text;
-        if (loaded != total){
-            text = Math.round(loaded / total * 100) + '% from ' + this._formatSize(total);
-        } else {
-            text = this._formatSize(total);
-        }
-
-        qq.setText(size, text);
+//        var item = this._getItemByFileId(id);
+//        var size = this._find(item, 'size');
+//        size.style.display = 'inline';
+//
+//        var text;
+//        if (loaded != total){
+//            text = Math.round(loaded / total * 100) + '% from ' + this._formatSize(total);
+//        } else {
+//            text = this._formatSize(total);
+//        }
+//
+//        qq.setText(size, text);
     },
     _onComplete: function(id, fileName, result){
         qq.FileUploaderBasic.prototype._onComplete.apply(this, arguments);
 
-        // mark completed
-        var item = this._getItemByFileId(id);
-        qq.remove(this._find(item, 'cancel'));
-        qq.remove(this._find(item, 'spinner'));
-
-        if (result.success){
-            qq.addClass(item, this._classes.success);
-        } else {
-            qq.addClass(item, this._classes.fail);
-        }
+//        // mark completed
+//        var item = this._getItemByFileId(id);
+//        qq.remove(this._find(item, 'cancel'));
+//        qq.remove(this._find(item, 'spinner'));
+//
+//        if (result.success){
+//            qq.addClass(item, this._classes.success);
+//        } else {
+//            qq.addClass(item, this._classes.fail);
+//        }
     },
     _addToList: function(id, fileName){
         var item = qq.toElement(this._options.fileTemplate);

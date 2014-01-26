@@ -114,7 +114,7 @@ function processUserPastLocations(MAP, locations, userId){
 function getContentFor(userId, imageSrc) {
 	var content = 
 		  '<div style="width:280px; height:180px;">'
-		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" />' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" width="44px" height="48px"/>' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
 		+ 	'</br>'
 		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].time + ' - (' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + ')' + '</div>'
 		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
@@ -200,7 +200,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			{
 				if((fb_id != 0) && (typeof fb_id != "undefined")){
 					//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
-					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" />';						
+					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';						
 					userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
 				}else{
 					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
@@ -227,7 +227,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 
 			case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
 			{
-				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" />';					
+				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';					
 				userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
 			}
 			break;
