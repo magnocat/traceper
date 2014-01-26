@@ -723,7 +723,7 @@ class UploadController extends Controller
 	
 	private function prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount, $par_updateType = null){ //Multisent prepareJson()
 		
-		Header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
+		//header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
 		
 		$deletedListStr = '';
 		

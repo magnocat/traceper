@@ -490,6 +490,7 @@ class UsersController extends Controller
 			
 			//Fb::warn($out, "Json()");
 			
+			//header('HTTP/1.1 200 OK');
 			echo $out;
 		}
 		catch(Exception $e)
@@ -1187,8 +1188,8 @@ class UsersController extends Controller
 	
 	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
 		
-		Header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
-		
+		//header('Content-Type: application/json; charset=UTF8'); //Bunu ajax request'i yaparken tanimlayinca hata olusuyor?
+
 		$pagination = $dataProvider->getPagination();
 		//Fb::warn($pagination->pageCount, "pageCount");
 		$currentPage = $pagination->currentPage;

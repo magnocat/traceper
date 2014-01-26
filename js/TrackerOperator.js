@@ -618,7 +618,34 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			success: function(result){ 
 				$("#loading").hide(); 	
 				callback(result);
-			}, 
+			}, 			
+			statusCode: {
+				  400: function() {
+					    alert('400 Bad Request: Server understood the request but request content was invalid.');
+					  },				
+				  401: function() {
+					    alert('401 Unauthorized: Unauthorized Access!');
+					  },				
+				  403: function() {
+					    //alert('403 Forbidden: Forbidden, authorization required!');
+					    location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+					  },				
+				  404: function() {
+					  	alert('404 Not Found: Could not contact server!');
+				  	  },
+				  406: function() {
+					    alert('406 Not Acceptable');
+					  },
+				  408: function() {
+					    alert('408 Request Timeout');
+					  },					  
+				  500: function() {
+					  	alert('500: A server-side error has occurred!');
+				  	  },
+				  503: function() {
+					    alert('503: Service Unavailable!');
+					  }				  
+				},			
 //			failure: function(result) {								
 //				$("#loading").hide();
 //				alert("Failure in ajax.");						
@@ -636,6 +663,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
 				  
 				  alert("xhr.responseText: " + xhr.responseText + "\n\n" +
+						"xhr.status: " + xhr.status + "\n\n" +  
 							"status: " + status + "\n\n" +
 							"error: " + error + "\n\n" +						  
 							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);				  
