@@ -44,7 +44,7 @@ class UsersController extends Controller
 								'deleteFriendShip','getFriendRequestList',
 								'getUserPastPointsXML', 'getUserListXML', 'search',
 								'takeMyLocation', 'getUserInfo',
-								'getUserListJson'),
+								'getUserListJson', 'upload'),
 						'users'=>array('?'),
 				)
 		);
@@ -972,7 +972,7 @@ class UsersController extends Controller
 			Yii::import("ext.EAjaxUpload.qqFileUploader");
 			
 			$folder='profilePhotos/';// folder for uploaded files
-			$allowedExtensions = array("jpg", "jpeg", "png");//array("jpg","jpeg","gif","exe","mov" and etc...
+			$allowedExtensions = array("jpg", "jpeg", "png", "gif");//array("jpg","jpeg","gif","exe","mov" and etc...
 			$sizeLimit = 10 * 1024 * 1024;// maximum file size in bytes
 			$uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
 			$result = $uploader->handleUpload($folder, Yii::app()->user->id);
@@ -981,33 +981,49 @@ class UsersController extends Controller
 			
 			//Fb::warn($result['filename'], "UsersController - filename");
 			
-			//$fileSize = filesize($folder.$result['filename']);//GETTING FILE SIZE
-			$filename = $result['filename'];//GETTING FILE NAME
-			$extension = $result['extension'];
-			$filenameWithPath = $folder.$filename.$extension;
-			
-			$image = Yii::app()->image->load($filenameWithPath);
-			$image->smart_resize(44, 48)->quality(75);
-			//$image->save(); // or $image->save('images/small.jpg');
-			$image->save($folder.$filename.'.png');
-			
-			if($extension != '.png')
+			if(isset($result['error']) == false)
 			{
-				unlink($filenameWithPath);
-			}
-			
-			$profilePhotoStatus = Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS;
-			
-			if(Yii::app()->user->fb_id == 0)
-			{
-				$profilePhotoStatus = Users::TRACEPER_PROFILE_PHOTO_EXISTS;
+				//$fileSize = filesize($folder.$result['filename']);//GETTING FILE SIZE
+				$filename = $result['filename'];//GETTING FILE NAME
+				$extension = $result['extension'];
+				$filenameWithPath = $folder.$filename.$extension;
+				
+				$image = Yii::app()->image->load($filenameWithPath);
+				$image->smart_resize(44, 48)->quality(75);
+				//$image->save(); // or $image->save('images/small.jpg');
+				
+				if($extension != '.png')
+				{
+					$image->save($folder.$filename.'.png');
+					unlink($filenameWithPath);
+				}
+				
+				$profilePhotoStatus = Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS;
+				
+				if(Yii::app()->user->fb_id == 0)
+				{
+					$profilePhotoStatus = Users::TRACEPER_PROFILE_PHOTO_EXISTS;
+				}
+				else
+				{
+					$profilePhotoStatus = Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER;
+				}
+				
+				Users::model()->setProfilePhotoStatus(Yii::app()->user->id, $profilePhotoStatus);
 			}
 			else
 			{
-				$profilePhotoStatus = Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER;
-			}
-			
-			Users::model()->setProfilePhotoStatus(Yii::app()->user->id, $profilePhotoStatus);						
+				//Fb::warn('error EXISTS!', "UsersController - actionUpload()");
+				
+				if($result['error'] == 'File is unreadable')
+				{
+					$return = CJSON::encode(array("result"=>"-1")); //File Unreadable
+				}
+				else
+				{
+					$return = CJSON::encode(array("result"=>"-2")); //Unknown Photo Upload Error
+				}
+			}			
 		}
 		catch( Exception $e )
 		{
@@ -1016,6 +1032,13 @@ class UsersController extends Controller
 				if($e->getMessage() == 'image file unreadable')
 				{
 					$return = CJSON::encode(array("result"=>"-1")); //File Unreadable
+					
+					//Fb::warn('image file unreadable', "UsersController - actioUpload()");
+					
+					if(file_exists($filenameWithPath))
+					{
+						unlink($filenameWithPath);
+					}
 				}
 				else
 				{

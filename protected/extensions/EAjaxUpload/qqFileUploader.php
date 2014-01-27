@@ -33,7 +33,18 @@ class qqUploadedFileXhr {
         } else {
             throw new Exception('Getting content length is not supported.');
         }
-    }
+    }    
+    function isFileImage()
+    {
+    	$a = getimagesize("php://input"); //Secilen dosya kaydedilmeden once bu lokasyonda
+    	$image_type = $a[2];
+    	 
+    	if(in_array($image_type , array(IMAGETYPE_GIF , IMAGETYPE_JPEG ,IMAGETYPE_PNG , IMAGETYPE_BMP)))
+    	{
+    		return true;
+    	}
+    	return false;
+    }        
 }
 
 /**
@@ -56,6 +67,17 @@ class qqUploadedFileForm {
     function getSize() {
         return $_FILES['qqfile']['size'];
     }
+    function isFileImage()
+    {
+    	$a = getimagesize($_FILES['qqfile']['tmp_name']); //Secilen dosya kaydedilmeden once bu lokasyonda
+    	$image_type = $a[2];
+    
+    	if(in_array($image_type , array(IMAGETYPE_GIF , IMAGETYPE_JPEG ,IMAGETYPE_PNG , IMAGETYPE_BMP)))
+    	{
+    		return true;
+    	}
+    	return false;
+    }    
 }
 
 class qqFileUploader {
@@ -148,6 +170,12 @@ class qqFileUploader {
                 $filename .= rand(10, 99);
             }
         }
+        
+        if($this->file->isFileImage() == false)
+        {
+        	//Fb::warn('File is UNREADABLE!', "qqFileUploader.php");
+        	return array('error' => 'File is unreadable');
+        }
 
         if ($this->file->save($uploadDirectory . $filename . '.' . $ext)){
             //return array('success'=>true,'filename'=>$filename.'.'.$ext);
@@ -156,6 +184,5 @@ class qqFileUploader {
             return array('error'=> 'Could not save uploaded file.' .
                 'The upload was cancelled, or server error encountered');
         }
-
     }
 }

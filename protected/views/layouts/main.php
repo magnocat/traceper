@@ -356,7 +356,8 @@ if (Yii::app()->user->isGuest == false)
 				else if(eProfilePhotoExists == 'BOTH')
 				{
 					$('#profilePhoto').css('opacity', 1);
-					$('#profilePhotoSettingsMenu').removeClass('profilePhotoSettingsMenu-error');
+					//$('#profilePhotoSettingsMenu').removeClass('profilePhotoSettingsMenu-error');
+					$('#profilePhotoSettingsMenu').css('border', '');
 					$('#profilePhotoSettingsMenu').css('left', '4px');
 					$('#profilePhotoSettingsMenu').css('bottom', '0px');
 					$('#profilePhotoSettingsMenu').css('background', '');			
@@ -394,7 +395,8 @@ if (Yii::app()->user->isGuest == false)
 				else if(eProfilePhotoExists == 'BOTH')
 				{
 					$('#profilePhoto').css('opacity', 1);
-					$('#profilePhotoSettingsMenu').removeClass('profilePhotoSettingsMenu-error');
+					//$('#profilePhotoSettingsMenu').removeClass('profilePhotoSettingsMenu-error');
+					$('#profilePhotoSettingsMenu').css('border', '');
 					$('#profilePhotoSettingsMenu').css('left', '4px');
 					$('#profilePhotoSettingsMenu').css('bottom', '0px');
 					$('#profilePhotoSettingsMenu').css('background', '');			
@@ -1312,7 +1314,9 @@ else
 																			{
 																				closeTooltipMenu();
 														
-																				$('#profilePhotoSettingsMenu').addClass('profilePhotoSettingsMenu-error');
+																				//$('#profilePhotoSettingsMenu').addClass('profilePhotoSettingsMenu-error');
+																				$('#profilePhoto').css('opacity', 0.7);
+																				$('#profilePhotoSettingsMenu').css('border', '3px solid #C00');													
 																				$('#profilePhotoSettingsMenu').css('left', '1px');
 																				$('#profilePhotoSettingsMenu').css('bottom', '3px');
 																				$('#profilePhotoSettingsMenu').css('background', '#C00');
@@ -1396,9 +1400,11 @@ else
 																		}
 																		else if(eProfilePhotoExists == 'BOTH')
 																		{
-																			closeTooltipMenu();
+																			closeTooltipMenu();												
 													
-																			$('#profilePhotoSettingsMenu').addClass('profilePhotoSettingsMenu-error');
+																			//$('#profilePhotoSettingsMenu').addClass('profilePhotoSettingsMenu-error');
+																			$('#profilePhoto').css('opacity', 0.7);
+																			$('#profilePhotoSettingsMenu').css('border', '3px solid #C00');
 																			$('#profilePhotoSettingsMenu').css('left', '1px');
 																			$('#profilePhotoSettingsMenu').css('bottom', '3px');
 																			$('#profilePhotoSettingsMenu').css('background', '#C00');
