@@ -24,9 +24,24 @@
 		$('#bar').animate({left:'380px'});			
 	}
 
-	$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 152));
-	$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
-	$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));	
+	//$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 152));
+	//$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
+	//$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));
+
+			$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
+			$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
+			$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
+			
+	 		$("#usersGridView").css("min-height", 370);
+			$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
+			
+	 		$("#uploadsGridView").css("min-height", 370);
+			$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+			
+	 		$("#groupsGridView").css("min-height", 440);
+			$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));
+
+		
 	
 	//$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));	
 	
@@ -59,14 +74,32 @@
 
 	$('#tab_view').bind('easytabs:ajax:complete', function(e, $clicked, $targetPanel, response, status, xhr){
 		var h = $(window).height();
-		var offsetTop = 0;
+		var offsetTop = 70;
 
-		$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 152));
-		$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
-		$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));				
-		
-		$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#usersGridView").css("height", (h - offsetTop - 82));
-		
+        switch($targetPanel.get(0).id)
+        {
+		   	 case "users_tab": //Friends
+		   	 {
+		 		$("#usersGridView").css("min-height", 370);
+				$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
+		   	 }
+		   	 break;
+		   	   
+		   	 case "photos_tab": //Uploads
+		   	 {
+		 		$("#uploadsGridView").css("min-height", 370);
+				$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+		   	 }
+		   	 break;
+		   	   
+		   	 case "groups_tab": //Groups
+		   	 {
+		 		$("#groupsGridView").css("min-height", 440);
+				$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));	
+		   	 }
+		   	 break;       
+        }		
+
 		//alert("ajax complete");
 	});		    
 

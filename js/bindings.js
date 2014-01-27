@@ -9,6 +9,7 @@ var bLoginFormEmailErrorExists = false;
 var bLoginFormPasswordErrorExists = false;
 var bResetPasswordFormNewPasswordErrorExists = false;
 var bResetPasswordFormNewPasswordAgainErrorExists = false;
+var bAppQRCodeTooltipOpened = false; 
 
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
@@ -325,15 +326,30 @@ function bindElements(langOperator, trackerOp)
  		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
  		$("#RegisterForm_email").tooltipster('show'); 		
 	});
-
- 	$("#appQRCodeLink").focus(function ()	{
+ 	
+//  Label'lar webkit browser'larda focus almadigindan bu cozum calismiyor, linkler de tiklaninca sayfanin yukarisina gittiginden click cozumu uygulandi
+// 	$("#appQRCodeLink").focus(function (event)	{
+// 		$("#appQRCodeLink").tooltipster('update', '<table><tr><td><img src="images/QR_code.png" width="130" height="130" style="cursor:none;"></td><td>' + TRACKER.langOperator.QRCodeNotificationMessage + '</td></tr></table>');
+// 		$("#appQRCodeLink").tooltipster('show');
+//	});
+// 	
+// 	$("#appQRCodeLink").blur(function ()	{
+// 		$("#appQRCodeLink").tooltipster('hide');
+// 	}); 	
+ 		
+ 	$("#appQRCodeLink").click(function (event)	{
+ 		event.stopPropagation();
  		$("#appQRCodeLink").tooltipster('update', '<table><tr><td><img src="images/QR_code.png" width="130" height="130" style="cursor:none;"></td><td>' + TRACKER.langOperator.QRCodeNotificationMessage + '</td></tr></table>');
- 		$("#appQRCodeLink").tooltipster('show'); 		
+ 		$("#appQRCodeLink").tooltipster('show');
+ 		bAppQRCodeTooltipOpened = true;
 	});
  	
- 	$("#appQRCodeLink").blur(function ()	{
- 		$("#appQRCodeLink").tooltipster('hide');
- 	});
+ 	$('html').click(function() {
+ 		if(true == bAppQRCodeTooltipOpened)
+ 		{
+ 			$("#appQRCodeLink").tooltipster('hide');
+ 		}
+ 	}); 	
 
 	$("#bar").click(function ()	{
 		
@@ -493,6 +509,17 @@ function bindElements(langOperator, trackerOp)
 			$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
 			$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
 			
+	 		$("#usersGridView").css("min-height", 370);
+			$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
+			
+	 		$("#uploadsGridView").css("min-height", 370);
+			$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+			
+	 		$("#groupsGridView").css("min-height", 440);
+			$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));				
+
+		    //alert("resize - height: " + (h - offsetTop - 82 - 100));			
+			
 			//$("#usersGridView").css("height", userListHeight - 50);
 			//$("#uploadsGridView").css("height", userListHeight - 50);
 			//$("#groupsGridView").css("height", userListHeight - 50);
@@ -537,8 +564,7 @@ function bindElements(langOperator, trackerOp)
 		
 	    $('#map').css('height', (h - offsetTop));
 	    $('#bar').css('height', (h - offsetTop));
-	    $('#sideBar').css('height', (h - offsetTop));
-	    
+	    $('#sideBar').css('height', (h - offsetTop));  
 	}).resize();
 //     
 //     $('#tab_view').bind('tabsselect', function(event, ui) {
@@ -612,10 +638,32 @@ function bindElements(langOperator, trackerOp)
 	
 	$('#tab_view').bind('easytabs:ajax:complete', function(e, $clicked, $targetPanel, response, status, xhr){
 		var h = $(window).height();
-		var offsetTop = 0;		
-		
-		$("#usersGridView").css("min-height", (485 + 100 - 70 - 82)); $("#usersGridView").css("height", (h - offsetTop - 82));
-		
+		var offsetTop = 70;
+
+        switch($targetPanel.get(0).id)
+        {
+		   	 case "users_tab": //Friends
+		   	 {
+		 		$("#usersGridView").css("min-height", 370);
+				$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
+		   	 }
+		   	 break;
+		   	   
+		   	 case "photos_tab": //Uploads
+		   	 {
+		 		$("#uploadsGridView").css("min-height", 370);
+				$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+		   	 }
+		   	 break;
+		   	   
+		   	 case "groups_tab": //Groups
+		   	 {
+		 		$("#groupsGridView").css("min-height", 440);
+				$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));	
+		   	 }
+		   	 break;       
+        }		
+
 		//alert("ajax complete");
 	});	
 	

@@ -501,8 +501,7 @@ class UsersController extends Controller
 			{
 				Yii::app()->session['getUserListJsonErrorCount'] = 0;
 			}
-			
-			
+						
 			if(Yii::app()->session['getUserListJsonErrorCount'] < 3)
 			{
 				if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'PHP Exception in actionGetUserListJson()', $message, false /*Do not add footer for error message*/))

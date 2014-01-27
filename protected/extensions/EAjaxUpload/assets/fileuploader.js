@@ -501,9 +501,7 @@ qq.FileUploader = function(o){
 						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
 							'<li>' +
-								'<a>' +
-					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
-			                	'</a>'
+					        	'<a class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</a>' +
 							'</li>' + 
 						'</ul>' +
 					'</li>' +
@@ -521,9 +519,7 @@ qq.FileUploader = function(o){
 						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
 							'<li>' +
-								'<a>' +
-					                '<div class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</div>' +
-			                	'</a>'
+					        	'<a class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</a>' +
 							'</li>' + 
 						'</ul>' +
 					'</li>' +

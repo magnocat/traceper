@@ -602,6 +602,20 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
+//		if(BrowserDetect.browser == "Internet Explorer")
+//		{
+//			//alert("ajax in Internet Explorer");
+//			
+//		    var xhReq = new XMLHttpRequest();
+//		    xhReq.open("POST", params, true);
+//		    xhReq.send(null);
+//		    AjaxSuccess(xhReq.responseText);			
+//		}
+//		else
+//		{
+//			
+//		}
+		
 		$.ajax({
 			url: TRACKER.ajaxUrl,
 			type: 'POST',
@@ -621,29 +635,29 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}, 			
 			statusCode: {
 				  400: function() {
-					    alert('400 Bad Request: Server understood the request but request content was invalid.');
+					    //alert('400 Bad Request: Server understood the request but request content was invalid.');
 					  },				
 				  401: function() {
-					    alert('401 Unauthorized: Unauthorized Access!');
+					    //alert('401 Unauthorized: Unauthorized Access!');
 					  },				
 				  403: function() {
 					    //alert('403 Forbidden: Forbidden, authorization required!');
-					    location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+					    //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
 					  },				
 				  404: function() {
-					  	alert('404 Not Found: Could not contact server!');
+					  	//alert('404 Not Found: Could not contact server!');
 				  	  },
 				  406: function() {
-					    alert('406 Not Acceptable');
+					    //alert('406 Not Acceptable');
 					  },
 				  408: function() {
-					    alert('408 Request Timeout');
+					    //alert('408 Request Timeout');
 					  },					  
 				  500: function() {
-					  	alert('500: A server-side error has occurred!');
+					  	//alert('500: A server-side error has occurred!');
 				  	  },
 				  503: function() {
-					    alert('503: Service Unavailable!');
+					    //alert('503: Service Unavailable!');
 					  }				  
 				},			
 //			failure: function(result) {								
@@ -661,12 +675,35 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //						"status: " + status + "\n\n" +
 //						"error: " + error + "\n\n" +						  
 //						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
-				  
-				  alert("xhr.responseText: " + xhr.responseText + "\n\n" +
-						"xhr.status: " + xhr.status + "\n\n" +  
-							"status: " + status + "\n\n" +
-							"error: " + error + "\n\n" +						  
-							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);				  
+				
+				  if(xhr.status != 200) //status 200 de olsa error diye gelebiliyor, 200 olmayanlari dikkate al
+				  {
+					  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
+					  
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+					  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
+	  				  "xhr.responseText: " + xhr.responseText + "</br>" +
+					  "xhr.status: " + xhr.status + "</br>" + 
+					  "error: " + error + "</br>" +						  
+					  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
+					  
+					  "&params=" + params;	 
+
+					  //TRACKER.ajaxReq(errorData, null, true);				
+					  
+					  alert("xhr.responseText: " + xhr.responseText + "\n" +
+							"xhr.status: " + xhr.status + "\n" + 
+							"error: " + error + "\n" +						  
+							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
+							"User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "\n" +
+							"User OS: " + BrowserDetect.OS);					  
+				  }
+
+				  if(xhr.status == 403)
+				  {
+					  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+					  //alert('403 Forbidden: Forbidden, authorization required!');
+				  }
 				}			
 		});
 	};	
