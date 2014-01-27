@@ -425,6 +425,144 @@ if (Yii::app()->user->isGuest == false)
 		CClientScript::POS_READY);	
 }
 
+Yii::app()->clientScript->registerScript('browserDetection',
+		'
+			var BrowserDetect = {
+			    init: function () {
+			        this.browser = this.searchString(this.dataBrowser) || "An unknown browser";
+			        this.version = this.searchVersion(navigator.userAgent)
+			            || this.searchVersion(navigator.appVersion)
+			            || "an unknown version";
+			        this.OS = this.searchString(this.dataOS) || "an unknown OS";
+			    },
+			    searchString: function (data) {
+			        for (var i=0;i<data.length;i++)    {
+			            var dataString = data[i].string;
+			            var dataProp = data[i].prop;
+			            this.versionSearchString = data[i].versionSearch || data[i].identity;
+			            if (dataString) {
+			                if (dataString.indexOf(data[i].subString) != -1)
+			                    return data[i].identity;
+			            }
+			            else if (dataProp)
+			                return data[i].identity;
+			        }
+			    },
+			    searchVersion: function (dataString) {
+			        var index = dataString.indexOf(this.versionSearchString);
+			        if (index == -1) return;
+			        return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
+			    },
+			    dataBrowser: [
+			        {
+			            string: navigator.userAgent,
+			            subString: "YaBrowser",
+			            identity: "Yandex Browser", //Icinde Chrome gectigi icin Chrome dan once bakilmali
+						versionSearch: "YaBrowser"
+			        },
+			        {
+			            string: navigator.userAgent,
+			            subString: "OPR",
+			            identity: "Opera",
+						versionSearch: "OPR"
+			        },				
+			        {
+			            string: navigator.userAgent,
+			            subString: "Chrome",
+			            identity: "Chrome"
+			        },
+			        {
+			            string: navigator.userAgent,
+			            subString: "Firefox",
+			            identity: "Firefox"
+			        },
+			        {
+			            string: navigator.userAgent,
+			            subString: "Trident",
+			            identity: "Internet Explorer",
+			            versionSearch: "rv"
+			        },		
+			        {
+			            string: navigator.userAgent,
+			            subString: "MSIE",
+			            identity: "Explorer",
+			            versionSearch: "MSIE"
+			        },				
+			        {
+			            string: navigator.userAgent,
+			            subString: "OmniWeb",
+			            versionSearch: "OmniWeb/",
+			            identity: "OmniWeb"
+			        },
+			        {
+			            string: navigator.vendor,
+			            subString: "Apple",
+			            identity: "Safari",
+			            versionSearch: "Version"
+			        },
+			        {
+			            prop: window.opera,
+			            identity: "Opera"
+			        },
+			        {
+			            string: navigator.vendor,
+			            subString: "iCab",
+			            identity: "iCab"
+			        },
+			        {
+			            string: navigator.vendor,
+			            subString: "KDE",
+			            identity: "Konqueror"
+			        },
+			        {
+			            string: navigator.vendor,
+			            subString: "Camino",
+			            identity: "Camino"
+			        },
+			        {        // for newer Netscapes (6+)
+			            string: navigator.userAgent,
+			            subString: "Netscape",
+			            identity: "Netscape"
+			        },				
+			        {
+			            string: navigator.userAgent,
+			            subString: "Gecko",
+			            identity: "Mozilla",
+			            versionSearch: "rv"
+			        },
+			        {         // for older Netscapes (4-)
+			            string: navigator.userAgent,
+			            subString: "Mozilla",
+			            identity: "Netscape",
+			            versionSearch: "Mozilla"
+			        }
+			    ],
+			    dataOS : [
+			        {
+			            string: navigator.platform,
+			            subString: "Win",
+			            identity: "Windows"
+			        },
+			        {
+			            string: navigator.platform,
+			            subString: "Mac",
+			            identity: "Mac"
+			        },
+			        {
+			            string: navigator.platform,
+			            subString: "Linux",
+			            identity: "Linux"
+			        }
+			    ]			 
+			};
+			 
+			BrowserDetect.init();
+
+			//alert("navigator.userAgent: " + navigator.userAgent);
+			//alert("Browser is : " + BrowserDetect.browser + " " + BrowserDetect.version + " / OS: " + BrowserDetect.OS);
+		',
+		CClientScript::POS_HEAD);
+
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/bindings.js', CClientScript::POS_END);
 
 if (Yii::app()->user->isGuest == false)
@@ -1291,29 +1429,26 @@ else
 									));
 						?>
 						</div>
-						
-						<div style="position:absolute;display:inline-block;top:30px;">
-						<?php						
 
+						<div style="display:inline-block;">
+						<?php						
 							echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.$userId.')', 'title'=>Yii::t('layout', 'See your position on the map'),
-																				'style'=>'position:absolute; left:54px; bottom:-20px; width:200px;'));
+																				'style'=>'position:relative; left:54px; top:35px;'));
 						?>
 						</div>
 
-								<!-- Yusuf'un FB fotosu: https://graph.facebook.com/100000325092362/picture?type=square -->
+						<!-- Yusuf'un FB fotosu: https://graph.facebook.com/100000325092362/picture?type=square -->
 					<?php								
 					}
 					?>									
 					</div>
 
-					
 					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">	
 					<?php
 					echo CHtml::link('Signout', $this->createUrl('site/logout'), 
 							array('class'=>'vtip', 'title'=>Yii::t('layout', 'Sign Out'),
 								  'class'=>'hi-icon icon-exit'
 								 ));
-
 					?>
 					</div>
 					
@@ -2183,7 +2318,7 @@ else
 		<div id='bottomBar'>			
 			<div id='bottomContent'>						
 			    <div id="mobilApplicationInfo">			        
-					<div id="appLink" class="hi-icon-effect-2 hi-icon-effect-2a">						
+					<div id="appLink" class="hi-icon-effect-2 hi-icon-effect-2a appOperations">						
 					<?php
 					echo CHtml::link('Google Play Link', "https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0.", 
 									 array('id'=>'appGoogleplayLink','class'=>'vtip', 'title'=>Yii::t('layout', 'Download our mobile application at Google Play'), 
@@ -2193,7 +2328,7 @@ else
 					?>
 					</div>
 					
-					<div id="appQRCode" class="hi-icon-effect-2 hi-icon-effect-2a" style="margin-left:1em;" class="vtip" title="<?php echo Yii::t('layout', 'Click to view QR code of our mobile application'); ?>">						
+					<div id="appQRCode" class="hi-icon-effect-2 hi-icon-effect-2a appOperations" style="margin-left:1em;" class="vtip" title="<?php echo Yii::t('layout', 'Click to view QR code of our mobile application'); ?>">						
 					<?php					
 					echo CHtml::label('QR Code','#',
 									  array(

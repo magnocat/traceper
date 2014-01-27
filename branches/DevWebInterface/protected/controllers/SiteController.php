@@ -2186,7 +2186,60 @@ class SiteController extends Controller
 //		Fb::warn(Yii::app()->session['usersPageSize'], "usersPageSize");
 		
 		echo json_encode(array('outcome'=>'success'));		
-	}	
+	}
+
+	public function actionAjaxErrorOccured()
+	{	
+		//Fb::warn("actionAjaxErrorOccured() called", "SiteController");		
+
+		$errorMessage = 'Error Info: </br></br>';
+		$params = null;
+		
+		$name = null;
+		$email = null;
+			
+		Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);		
+	
+		if(isset($_REQUEST['errorMessage']))
+		{
+			$errorMessage .= $_REQUEST['errorMessage'];
+		}
+		
+		if (Yii::app()->user->isGuest == false)
+		{
+			$errorMessage .= '</br></br>-----------------------------------------------</br></br>';
+			$errorMessage .= 'User Info: </br></br>';
+			$errorMessage .= 'Id: '.Yii::app()->user->id.'</br>';
+			$errorMessage .= 'Name: '.$name.'</br>';
+			$errorMessage .= 'E-mail: '.$email.'</br>';			
+		}
+
+		if(isset($_REQUEST['params']))
+		{
+			$params = $_REQUEST['params'];
+		}
+
+		if(isset(Yii::app()->session[$params]) == false)
+		{
+			Yii::app()->session[$params] = 0;
+		}		
+
+		if(Yii::app()->session[$params] < 1)
+		{
+			if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'AJAX Error Occured!', $errorMessage, false /*Do not add footer for error message*/))
+			{
+				//Mail gönderildi
+			}
+			else
+			{
+				//Mail gönderilirken hata oluştu
+			}
+		
+			Yii::app()->session[$params] = Yii::app()->session[$params] + 1;
+		}		
+
+		//Yii::app()->end();
+	}		
 }
 
 

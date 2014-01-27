@@ -505,6 +505,12 @@ display: none;
 	text-decoration:none;
 }
 
+.appOperations a:hover,
+.appOperations a:focus {
+	color: #FF7F00;
+	text-decoration:none;
+}
+
 .gridViewIcon a:hover,
 .gridViewIcon a:focus {
 	text-decoration:none;

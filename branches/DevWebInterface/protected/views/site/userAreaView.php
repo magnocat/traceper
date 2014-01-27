@@ -439,11 +439,9 @@ echo CHtml::label('', '#',
 ?>
 </div>
 
-<div style="position:absolute;display:inline-block;top:30px;">
-<?php
-
-echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.Yii::app()->user->id.')', 'title'=>Yii::t('layout', 'See your position on the map'),
-		'style'=>'position:absolute; left:54px; bottom:-20px; width:200px;'));
-
+<div style="display:inline-block;">
+<?php						
+	echo CHtml::link(Yii::app()->user->name, "#", array('class'=>'vtip', 'onclick'=>'TRACKER.trackUser('.Yii::app()->user->id.')', 'title'=>Yii::t('layout', 'See your position on the map'),
+														'style'=>'position:relative; left:54px; top:35px;'));
 ?>
 </div>
