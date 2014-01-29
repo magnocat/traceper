@@ -602,112 +602,112 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
-//		if(BrowserDetect.browser == "Internet Explorer")
-//		{
-//			//alert("ajax in Internet Explorer");
-//			
-//		    var xhReq = new XMLHttpRequest();
-//		    xhReq.open("POST", params, true);
-//		    xhReq.send(null);
-//		    AjaxSuccess(xhReq.responseText);			
-//		}
-//		else
-//		{
-//			
-//		}
-		
-		$.ajax({
-			url: TRACKER.ajaxUrl,
-			type: 'POST',
-			data: params,
-			//	dataType: 'xml',
-            //contentType: "application/json; charset=utf-8", //Bunu acinca hata olusuyor?
-            dataType: "json",			
-			timeout:100000,
-			beforeSend: function()
-			{ 	if (!notShowLoadingInfo) {
-					$("#loading").show();
-				} 
-			},
-			success: function(result){ 
-				$("#loading").hide(); 	
-				callback(result);
-			}, 			
-			statusCode: {
-				  400: function() {
-					    //alert('400 Bad Request: Server understood the request but request content was invalid.');
-					  },				
-				  401: function() {
-					    //alert('401 Unauthorized: Unauthorized Access!');
-					  },				
-				  403: function() {
-					    //alert('403 Forbidden: Forbidden, authorization required!');
-					    //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
-					  },				
-				  404: function() {
-					  	//alert('404 Not Found: Could not contact server!');
-				  	  },
-				  406: function() {
-					    //alert('406 Not Acceptable');
-					  },
-				  408: function() {
-					    //alert('408 Request Timeout');
-					  },					  
-				  500: function() {
-					  	//alert('500: A server-side error has occurred!');
-				  	  },
-				  503: function() {
-					    //alert('503: Service Unavailable!');
-					  }				  
-				},			
-//			failure: function(result) {								
-//				$("#loading").hide();
-//				alert("Failure in ajax.");						
-//			},
-/*			error: function(par1, par2, par3){
-				//alert(par1.responseText);		
-				$("#loading").hide();
-				alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
-			}*/
-			error: function(xhr, status, error) {
-//				  var err = eval("(" + xhr.responseText + ")");
-//				  alert("err.Message: " + err.Message + "\n\n" +
-//						"status: " + status + "\n\n" +
-//						"error: " + error + "\n\n" +						  
-//						"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
-				
-				  if(xhr.status != 200) //status 200 de olsa error diye gelebiliyor, 200 olmayanlari dikkate al
-				  {
-					  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
-					  
-					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-					  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
-	  				  "xhr.responseText: " + xhr.responseText + "</br>" +
-					  "xhr.status: " + xhr.status + "</br>" + 
-					  "error: " + error + "</br>" +						  
-					  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
-					  
-					  "&params=" + params;	 
+		if(BrowserDetect.browser == "Internet Explorer")
+		{
+			//alert("ajax in Internet Explorer");
+			
+		    var xhReq = new XMLHttpRequest();
+		    xhReq.open("POST", 'index.php?' + params, false);
+		    xhReq.send(null);
 
-					  //TRACKER.ajaxReq(errorData, null, true);				
-					  
-					  alert("xhr.responseText: " + xhr.responseText + "\n" +
-							"xhr.status: " + xhr.status + "\n" + 
-							"error: " + error + "\n" +						  
-							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
-							"User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "\n" +
-							"User OS: " + BrowserDetect.OS);					  
-				  }
+		    var result = JSON.parse(xhReq.responseText);
+		    callback(result);
+		}
+		else
+		{
+			$.ajax({
+				url: TRACKER.ajaxUrl,
+				type: 'POST',
+				data: params,
+				//	dataType: 'xml',
+	            //contentType: "application/json; charset=utf-8", //Bunu acinca hata olusuyor?
+	            dataType: "json",			
+				timeout:100000,
+				beforeSend: function()
+				{ 	if (!notShowLoadingInfo) {
+						$("#loading").show();
+					} 
+				},
+				success: function(result){ 
+					$("#loading").hide(); 	
+					callback(result);
+				}, 			
+				statusCode: {
+					  400: function() {
+						    //alert('400 Bad Request: Server understood the request but request content was invalid.');
+						  },				
+					  401: function() {
+						    //alert('401 Unauthorized: Unauthorized Access!');
+						  },				
+					  403: function() {
+						    //alert('403 Forbidden: Forbidden, authorization required!');
+						    //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+						  },				
+					  404: function() {
+						  	//alert('404 Not Found: Could not contact server!');
+					  	  },
+					  406: function() {
+						    //alert('406 Not Acceptable');
+						  },
+					  408: function() {
+						    //alert('408 Request Timeout');
+						  },					  
+					  500: function() {
+						  	//alert('500: A server-side error has occurred!');
+					  	  },
+					  503: function() {
+						    //alert('503: Service Unavailable!');
+						  }				  
+					},			
+//				failure: function(result) {								
+//					$("#loading").hide();
+//					alert("Failure in ajax.");						
+//				},
+	/*			error: function(par1, par2, par3){
+					//alert(par1.responseText);		
+					$("#loading").hide();
+					alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+				}*/
+				error: function(xhr, status, error) {
+//					  var err = eval("(" + xhr.responseText + ")");
+//					  alert("err.Message: " + err.Message + "\n\n" +
+//							"status: " + status + "\n\n" +
+//							"error: " + error + "\n\n" +						  
+//							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+					
+					  if(xhr.status != 200) //status 200 de olsa error diye gelebiliyor, 200 olmayanlari dikkate al
+					  {
+						  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
+						  
+						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+						  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
+		  				  "xhr.responseText: " + xhr.responseText + "</br>" +
+						  "xhr.status: " + xhr.status + "</br>" + 
+						  "error: " + error + "</br>" +						  
+						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
+						  
+						  "&params=" + params;	 
 
-				  if(xhr.status == 403)
-				  {
-					  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
-					  //alert('403 Forbidden: Forbidden, authorization required!');
-				  }
-				}			
-		});
-	};	
+						  //TRACKER.ajaxReq(errorData, null, true);				
+						  
+						  alert("xhr.responseText: " + xhr.responseText + "\n" +
+								"xhr.status: " + xhr.status + "\n" + 
+								"error: " + error + "\n" +						  
+								"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
+								"User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "\n" +
+								"User OS: " + BrowserDetect.OS);					  
+					  }
 
+					  if(xhr.status == 403)
+					  {
+						  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+						  //alert('403 Forbidden: Forbidden, authorization required!');
+					  }
+					}			
+			});			
+		}
+	};
+	
 	this.getPageNo = function(xml){		
 		return $(xml).find("page").attr("pageNo");
 	};
