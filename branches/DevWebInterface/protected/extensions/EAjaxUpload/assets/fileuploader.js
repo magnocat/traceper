@@ -496,7 +496,7 @@ qq.FileUploader = function(o){
 		{
 			templateHtml =			
 				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
-					'<li>' +
+					'<li>' +						
 						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
 						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
@@ -504,6 +504,7 @@ qq.FileUploader = function(o){
 					        	'<a class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</a>' +
 							'</li>' + 
 						'</ul>' +
+						'<div id="profilePhotoLoading" style="display:none;">' + 
 					'</li>' +
 				'</ul>';			
 		}
@@ -514,7 +515,7 @@ qq.FileUploader = function(o){
 			
 			templateHtml =			
 				'<ul id="profilePhotoSettingsMenu" class="cbp-tm-menu">' +								
-					'<li>' +
+					'<li>' + 
 						'<img id="profilePhoto" src="' + o.photoSrc + '" width="44px" height="48px">' +
 						'<ul class="cbp-tm-submenu">' + 
 							'<li id="useAjaxLink">' + o.useAjaxLink + '</li>' +
@@ -522,6 +523,7 @@ qq.FileUploader = function(o){
 					        	'<a class="qq-upload-button-in-tooltip">' + o.uploadMenuLabel + '</a>' +
 							'</li>' + 
 						'</ul>' +
+						'<div id="profilePhotoLoading" style="display:none;">' + 
 					'</li>' +
 				'</ul>';			
 		}
@@ -531,7 +533,8 @@ qq.FileUploader = function(o){
       templateHtml = 
       '<div class="qq-uploader">' +
       	'<div id="profilePhotoUploadButton" class="qq-upload-button">' +
- 			'<img id="profilePhoto" src="' + o.photoSrc +'"  width="44px" height="48px">' +                
+ 			'<img id="profilePhoto" src="' + o.photoSrc +'"  width="44px" height="48px">' +
+ 			'<div id="profilePhotoLoading" style="display:none;">' + 
  		'</div>' +
       '</div>';   	
     }
@@ -540,7 +543,8 @@ qq.FileUploader = function(o){
     	templateHtml = '<div class="qq-uploader">' +
         '<div id="profilePhotoUploadButton" class="qq-upload-button">' +
    			'<div id="profileUserIcon" class="hi-icon icon-user" style="pointer-events:none; color:yellow; width:44px;"></div>' +
-   			'<img id="profilePhoto" src="" style="display:none;"  width="44px" height="48px">' +        
+   			'<img id="profilePhoto" src="" style="display:none;"  width="44px" height="48px">' +
+   			'<div id="profilePhotoLoading" style="display:none;">' +
         '</div>' +
      '</div>';    	
     }
@@ -607,7 +611,7 @@ qq.FileUploader = function(o){
         	{
         		$('#profilePhoto').css('opacity', 1);
         	}        	       	
-        });
+        });       
     	
         if(LAN_OPERATOR.lang === 'en')
         {

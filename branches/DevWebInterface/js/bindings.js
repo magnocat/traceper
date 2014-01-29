@@ -349,6 +349,10 @@ function bindElements(langOperator, trackerOp)
  		{
  			$("#appQRCodeLink").tooltipster('hide');
  		}
+ 		
+// 		alert("Clicked");
+// 		$('#profilePhoto').css('opacity', 0.5);
+// 		$('#profilePhotoLoading').show();
  	}); 	
 
 	$("#bar").click(function ()	{

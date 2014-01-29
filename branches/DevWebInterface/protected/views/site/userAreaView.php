@@ -59,7 +59,7 @@ Yii::app()->clientScript->registerScript('uploadProfilePhotoFailureAndSuccessToo
 		content: \" \",
 		position: \"right\",
 		trigger: \"custom\",
-		maxWidth: 300,
+		maxWidth: 320,
 		offsetX: 45,
 		offsetY: 1,
 		onlyOne: false,
@@ -72,6 +72,7 @@ Yii::app()->clientScript->registerScript('uploadProfilePhotoFailureAndSuccessToo
 
 			if(eProfilePhotoExists == 'NONE')
 			{
+				$('#profilePhoto').css('opacity', 1);
 				$('#profilePhotoUploadButton').removeClass('qq-upload-button-error-with-icon');
 				$('#profileUserIcon').removeClass('profileUserIcon-error');
 				$('#uploadProfilePhoto').removeClass('uploadProfilePhotoErrorForIcon');
@@ -79,6 +80,7 @@ Yii::app()->clientScript->registerScript('uploadProfilePhotoFailureAndSuccessToo
 			}
 			else if(eProfilePhotoExists == 'ONE')
 			{
+				$('#profilePhoto').css('opacity', 1);
 				$('#profilePhotoUploadButton').removeClass('qq-upload-button-error');
 				$('#profilePhoto').removeClass('profilePhoto-error');
 			}
@@ -107,6 +109,7 @@ Yii::app()->clientScript->registerScript('uploadProfilePhotoFailureAndSuccessToo
 
 			if(eProfilePhotoExists == 'NONE')
 			{
+				$('#profilePhoto').css('opacity', 1);
 				$('#profilePhotoUploadButton').removeClass('qq-upload-button-error-with-icon');
 				$('#profileUserIcon').removeClass('profileUserIcon-error');
 				$('#uploadProfilePhoto').removeClass('uploadProfilePhotoErrorForIcon');
@@ -114,6 +117,7 @@ Yii::app()->clientScript->registerScript('uploadProfilePhotoFailureAndSuccessToo
 			}
 			else if(eProfilePhotoExists == 'ONE')
 			{
+				$('#profilePhoto').css('opacity', 1);
 				$('#profilePhotoUploadButton').removeClass('qq-upload-button-error');
 				$('#profilePhoto').removeClass('profilePhoto-error');
 			}
@@ -215,7 +219,7 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 				'config'=>array(
 						'action'=>Yii::app()->createUrl('users/upload'),
 						'allowedExtensions'=>array("jpg", "jpeg", "png", "gif"),//array("jpg","jpeg","gif","exe","mov" and etc...
-						'sizeLimit'=>10*1024*1024,// maximum file size in bytes
+						'sizeLimit'=>1*1024*1024,// maximum file size in bytes
 						'photoSrc'=>$profilePhotoSource,
 						'bothPhotoExists'=>$bothPhotoExists,
 						'useAjaxLink'=>$useAjaxLink,
@@ -223,6 +227,9 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						//'minSizeLimit'=>10*1024*1024,// minimum file size in bytes
 						'onSubmit'=>"js:function(file, extension) {
 						//$('div.preview').addClass('loading');
+							
+						$('#profilePhoto').css('opacity', 0.5);
+						$('#profilePhotoLoading').show();
 						bUploadProfilePhotoErrorExists = false;
 }",
 						'onComplete'=>"js:function(id, fileName, responseJSON){
@@ -234,13 +241,14 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						{
 						if(responseJSON['result'] == '-1')
 						{
-						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
+						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select appears to be damaged, corrupted, or unreadable. Please, select a proper file.')."');
 }
 						else
 						{
 						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
 }
 
+						$('#profilePhotoLoading').hide();
 						$('#profilePhotoUploadButton').addClass('qq-upload-button-error-with-icon');
 						$('#profileUserIcon').addClass('profileUserIcon-error');
 						$('#uploadProfilePhoto').addClass('uploadProfilePhotoErrorForIcon');
@@ -253,6 +261,8 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						var timeStamp = new Date().getTime();
 						var imageSrc = 'profilePhotos/'+responseJSON['filename']+'.png'+'?random=' + timeStamp;
 							
+						$('#profilePhotoLoading').hide();
+						$('#profilePhoto').css('opacity', 1);
 						$('#profileUserIcon').hide();
 						$('#profilePhoto').attr('src', imageSrc);
 
@@ -278,15 +288,16 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						{
 						if(responseJSON['result'] == '-1')
 						{
-						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
+						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select appears to be damaged, corrupted, or unreadable. Please, select a proper file.')."');
 }
 						else
 						{
 						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.')."');
 }
 
+						$('#profilePhotoLoading').hide();
 						$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
-						$('#profilePhoto').addClass('profilePhoto-error');
+						$('#profilePhoto').css('opacity', '0.7');
 						$('#uploadProfilePhotoErrorTooltip').tooltipster('show');
 						bUploadProfilePhotoErrorExists = true;
 }
@@ -323,6 +334,7 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						closeTooltipMenu();
 
 						//$('#profilePhotoSettingsMenu').addClass('profilePhotoSettingsMenu-error');
+						$('#profilePhotoLoading').hide();
 						$('#profilePhoto').css('opacity', 0.7);
 						$('#profilePhotoSettingsMenu').css('border', '3px solid #C00');
 						$('#profilePhotoSettingsMenu').css('left', '1px');
@@ -332,7 +344,7 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 
 						if(responseJSON['result'] == '-1')
 						{
-						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select is unreadable. Please, select a proper file.')."');
+						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', '".Yii::t('site', 'The file you try to select appears to be damaged, corrupted, or unreadable. Please, select a proper file.')."');
 }
 						else
 						{
@@ -376,7 +388,7 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 }",
 						'messages'=>array(
 								'typeError'=>Yii::t('site', 'The file you try to select is invalid. Please, select a file of types {extensions}.'),
-								'sizeError'=>Yii::t('site', 'The file you try to select is too large. Please, select a file smaller than 10 MB.'),
+								'sizeError'=>Yii::t('site', 'The file you try to select is too large. Please, select a file smaller than 1 MB.'),
 								//'minSizeError'=>"{file} is too small, minimum file size is {minSizeLimit}.",
 								'emptyError'=>Yii::t('site', 'The file you try to select is empty. Please, select a proper file.'),
 								//'onLeave'=>"The files are being uploaded, if you leave now the upload will be cancelled."
@@ -400,7 +412,7 @@ $this->widget('ext.EAjaxUpload.EAjaxUpload',
 						{
 						$('#profilePhotoUploadButton').removeClass('qq-upload-button-hover');
 						$('#profilePhotoUploadButton').addClass('qq-upload-button-error');
-						$('#profilePhoto').addClass('profilePhoto-error');
+						$('#profilePhoto').css('opacity', '0.7');
 
 						$('#uploadProfilePhotoErrorTooltip').tooltipster('update', message);
 						$('#uploadProfilePhotoErrorTooltip').tooltipster('show');
@@ -441,7 +453,6 @@ echo CHtml::label('', '#',
 				'id'=>'uploadProfilePhotoSuccessfulTooltip',
 				'style'=>'pointer-events:none; position: absolute; bottom:4px;'
 		));
-
 ?>
 </div>
 

@@ -95,5 +95,23 @@
 .qq-upload-spinner {display:inline-block; background: url("loading.gif"); width:15px; height:15px; vertical-align:text-bottom;}
 .qq-upload-size,.qq-upload-cancel {font-size:11px;}
 
+#profilePhotoLoading {	
+	position:absolute;
+/* 	width:100%;	 */
+	width:32px;
+	height:32px;
+	top:8px;
+	left:6px;
+	z-index:100;
+	display:none;	
+/* 	padding:10px; */
+	margin:0px;
+	background:url(ajax-loader.gif) no-repeat center;	
+}
+
+#profilePhotoSettingsMenu {
+	background:#FFF;
+}
+
 .qq-upload-failed-text {display:none;}
 .qq-upload-fail .qq-upload-failed-text {display:inline;}
