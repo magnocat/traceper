@@ -596,25 +596,73 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, "click");			
 		}
 	}
+	
+	function postRequest (url, params, success, error) {  
+		  var xhr = XMLHttpRequest ? new XMLHttpRequest() : 
+		                             new ActiveXObject("Microsoft.XMLHTTP");
+
+		  xhr.open("POST", url, true/*async*/);
+		  
+		  xhr.onreadystatechange = function(){ 
+		    if(xhr.readyState == 4) 
+		    { 
+		      if(xhr.status == 200) 
+		      { 
+		    	  success(xhr.responseText); 
+		      } 
+		      else 
+		      { 
+		    	  error(xhr, xhr.status); 
+		      } 
+		    } 
+		  };
+		  
+		  xhr.onerror = function () { 
+		    error(xhr, xhr.status); 
+		  };
+		  
+		  xhr.send(params); 
+		}	
 
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
 	 */
 	this.ajaxReq = function(params, callback, notShowLoadingInfo)
 	{	
-		if(BrowserDetect.browser == "Internet Explorer")
-		{
-			//alert("ajax in Internet Explorer");
-			
-		    var xhReq = new XMLHttpRequest();
-		    xhReq.open("POST", 'index.php?' + params, false);
-		    xhReq.send(null);
-
-		    var result = JSON.parse(xhReq.responseText);
-		    callback(result);
-		}
-		else
-		{
+//		if(BrowserDetect.browser == "Internet Explorer")
+//		{
+//			//alert("ajax in Internet Explorer");
+//			
+////		    var xhReq = new XMLHttpRequest();
+////		    xhReq.open("POST", 'index.php?' + params, false);
+////		    xhReq.send(null);
+////
+////		    var result = JSON.parse(xhReq.responseText);
+////		    callback(result);
+//		    
+//		    postRequest('index.php?' + params, null, 
+//		    	function (response) { // success callback
+//		    		var result = JSON.parse(response);
+//		    		callback(result);
+//		    	}, 
+//			    function (xhr, status) { // error callback
+//			        switch(status) { 
+//			          case 404: 
+//			            alert('File not found'); 
+//			            break; 
+//			          case 500: 
+//			            alert('Server error'); 
+//			            break; 
+//			          case 0: 
+//			            alert('Request aborted'); 
+//			            break; 
+//			          default: 
+//			            alert('Unknown error ' + status); 
+//			        } 
+//		    	});		    
+//		}
+//		else
+//		{
 			$.ajax({
 				url: TRACKER.ajaxUrl,
 				type: 'POST',
@@ -705,7 +753,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					  }
 					}			
 			});			
-		}
+		//}
 	};
 	
 	this.getPageNo = function(xml){		
