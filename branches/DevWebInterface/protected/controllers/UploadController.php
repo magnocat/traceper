@@ -96,8 +96,12 @@ class UploadController extends Controller
 				}
 			}
 		}
-		
-		echo CJSON::encode(array("result"=> $result));
+
+		echo CJSON::encode(array(
+				"result"=>$result,
+				"deletedImageId"=>$uploadId
+		));
+				
 		Yii::app()->end();
 	}
 
@@ -530,6 +534,8 @@ class UploadController extends Controller
 			$uploadCount = Upload::model()->getUploadCount($fileType, Yii::app()->user->id, $friendList);
 			//$uploadCount = Upload::model()->getUploadPageCount($fileType, Yii::app()->user->id, $friendList, NULL);
 			
+			//Fb::warn("$uploadCount", "uploadCount");
+			
 			if(isset(Yii::app()->session[$dataFetchedTimeKey]) === false)
 			{
 				Yii::app()->session[$dataFetchedTimeKey] = time();
@@ -539,9 +545,10 @@ class UploadController extends Controller
 			//Upload'lari aldiktan sonra silinmis olanlar varsa bunlari haritadan kaldirmak icin kontrol et
 			$deletedDataReader = DeletedUploads::model()->getDeletedList($friendList, Yii::app()->session[$dataFetchedTimeKey]);
 			
-			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
+			//if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($uploadCount == Yii::app()->session['uploadCount']))
+			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated"))
 			{
-				//Fb::warn("onlyUpdated", "actionGetUploadListXML()");
+				//Fb::warn("onlyUpdated", "actionGetUploadListJson()");
 					
 				$time = Yii::app()->session[$dataFetchedTimeKey];
 				if ($time !== false && $time != "")
@@ -550,6 +557,12 @@ class UploadController extends Controller
 			
 					if ($pageCount >= $pageNo && $pageCount != 0) {
 						$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,$time,$offset);
+						
+						//Fb::warn("getUploadList() called, pageCount:$pageCount / pageNo:$pageNo", "actionGetUploadListJson()");
+					}
+					else
+					{
+						//Fb::warn("NO CALL!, pageCount:$pageCount / pageNo:$pageNo", "actionGetUploadListJson()");
 					}
 			
 					//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "onlyUpdated");
@@ -557,19 +570,24 @@ class UploadController extends Controller
 				}
 			}
 			else {
-				//Fb::warn("ALL", "actionGetUploadListXML()");
+				//Fb::warn("ALL", "actionGetUploadListJson()");
 			
 				$pageCount = Upload::model()->getUploadPageCount($fileType,Yii::app()->user->id,$friendList,NULL);
 					
 				if ($pageCount >= $pageNo && $pageCount != 0) {
 					$dataReader = Upload::model()->getUploadList($fileType,Yii::app()->user->id,$friendList,NULL,$offset);
+					
+					//Fb::warn("getUploadList() called, pageCount:$pageCount / pageNo:$pageNo", "actionGetUploadListJson()");
+				}
+				else
+				{
+					//Fb::warn("NO CALL!, pageCount:$pageCount / pageNo:$pageNo", "actionGetUploadListJson()");
 				}
 					
 				//$out = $this->prepareXML($dataReader, $pageNo, $pageCount, "all");
 				$out = $this->prepareJson($dataReader, $deletedDataReader, $pageNo, $pageCount,"all");
 					
 				//Fb::warn($out, "Json()");
-				//Fb::warn($out, "XML");
 			}
 			
 			Yii::app()->session[$dataFetchedTimeKey] = time();

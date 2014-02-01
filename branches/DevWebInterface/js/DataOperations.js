@@ -142,22 +142,39 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	//Default value implementation in JS
 	//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
 		
-	//if(deletedFriendId != null)
-	if(typeof deletedFriendId !== 'undefined')
-	{
-		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
-		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
-		
-		TRACKER.users.splice(deletedFriendId, 1);			
-	}
+//	//if(deletedFriendId != null)
+//	if(typeof deletedFriendId !== 'undefined')
+//	{
+//		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
+//		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
+//		
+//		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
+//		{
+//			MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0].infoWindow)
+//			
+//		}
+//		
+//		if(TRACKER.preUserId == deletedFriendId)
+//		{
+//			TRACKER.preUserId = -1;
+//		}
+//		
+//		delete TRACKER.users[deletedFriendId];
+//	}
 	
 	var updateType = 'all';
 	
 	if(typeof par_updateType !== 'undefined')
 	{
 		updateType = par_updateType;
-	}	
-	
+		
+		//alert("if - updateType: " + updateType);
+	}
+	else
+	{
+		//alert("else - updateType: " + updateType);
+	}
+		
 	//alert("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
 	
 	var userIdArray = new Array();
@@ -188,64 +205,65 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			visible = true;
 		}
 		
-		//alert("userId:" + userId);
-		
-		var personPhotoElement;
-		var timeStamp = new Date().getTime();
-		var userMarker;
-		
-		switch(profilePhotoStatus)
-		{
-			case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
-			{
-				if((fb_id != 0) && (typeof fb_id != "undefined")){
-					//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
-					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';						
-					userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
-				}else{
-					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
-					userMarker = MAP.putMarker(location, "images/person.png", visible, false);
-				}
-			}
-			break;
-
-			case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
-			case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
-			{
-				if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
-				{
-					personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';					
-					userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png" + "?random=" + timeStamp, visible, true);						
-				}
-				else //Diger kullanicilar icin cache kullan
-				{
-					personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';					
-					userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png", visible, true);						
-				}					
-			}
-			break;
-
-			case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
-			{
-				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';					
-				userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
-			}
-			break;
-
-			default:
-				//alert("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
-				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
-				userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
-		}
-		
-		if(userId === currentUser)
-		{
-			currentUserMarker = userMarker;
-		}		
+		//alert("userId:" + userId);		
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
+			var personPhotoElement;
+			var timeStamp = new Date().getTime();
+			var userMarker;
+			
+			switch(profilePhotoStatus)
+			{
+				case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
+				{
+					if((fb_id != 0) && (typeof fb_id != "undefined")){
+						//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
+						personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';						
+						userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
+					}else{
+						personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+						userMarker = MAP.putMarker(location, "images/person.png", visible, false);
+					}
+				}
+				break;
+
+				case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
+				case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
+				{
+					if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
+					{
+						personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';					
+						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png" + "?random=" + timeStamp, visible, true);						
+					}
+					else //Diger kullanicilar icin cache kullan
+					{
+						personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';					
+						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png", visible, true);						
+					}					
+				}
+				break;
+
+				case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
+				{
+					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';					
+					userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
+				}
+				break;
+
+				default:
+					//alert("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
+					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+					userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
+			}
+			
+//			if(userId === currentUser)
+//			{
+//				currentUserMarker = userMarker;
+//			}			
+			
 			newFriend = true;
+			//alert('userId:' + userId + ' added');
 	
 			var markerInfo= new MapStruct.MapMarker({marker:userMarker});
 			
@@ -283,6 +301,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 			
 			MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
+				//alert(userId + ". marker clicked");
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
@@ -301,7 +320,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			var time = dataArrivedTime;
 			var deviceId = deviceId;
 			var userType = userType;
-			MAP.setMarkerPosition(TRACKER.users[userId].mapMarker[0].marker,location);
+			//MAP.setMarkerPosition(TRACKER.users[userId].mapMarker[0].marker,location);
 
 			if (isFriend == "1" && TRACKER.users[userId].latitude == "" && TRACKER.users[userId].longitude == "")
 			{
@@ -311,40 +330,40 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, (userId==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);						
 			}
 
-			if ((TRACKER.users[userId].latitude != latitude ||
-					TRACKER.users[userId].longitude != longitude) &&
-					typeof TRACKER.users[userId].polyline != "undefined")
-			{
-				//these "if" is for creating new gmarker when user polyline is already drawed
-				//var userMarker = MAP.putMarker(location, "images/person.png", true, false);					
-				var iWindow = MAP.initializeInfoWindow();
-				var markerInfoWindow = new TRACKER.mapMarker({marker:userMarker, infoWindow:iWindow});
-				
-				MAP.insertPointToPolyline(TRACKER.users[userId].polyline,location,0);
-				
-				var oldlatitude = TRACKER.users[userId].latitude;
-				var oldlongitude = TRACKER.users[userId].longitude;
-
-				MAP.setMarkerClickListener(userMarker,function (){
-					// attention similar function is used in 
-					// processUserPastLocationsXML function
-					var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
-					var previousGMarkerIndex = tr + 1; // it is reverse because 
-					var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
-
-					var infoWindow = MAP.initializeInfoWindow(
-							getPastPointInfoContent(userId, time, deviceId, userType, previousGMarkerIndex, oldlatitude, oldlongitude, nextGMarkerIndex));
-					MAP.openInfoWindow(infoWindow, userMarker);
-					TRACKER.users[userId].infoWindowIsOpened = true;
-				});
-
-				TRACKER.users[userId].mapMarker.splice(1,0, markerInfoWindow);					
-
-				if (TRACKER.traceLineDrawedUserId != userId) {
-					// if traceline is not visible, hide the marker
-					MAP.setMarkerVisible(userMarker, false)						
-				}
-			}
+//			if ((TRACKER.users[userId].latitude != latitude ||
+//					TRACKER.users[userId].longitude != longitude) &&
+//					typeof TRACKER.users[userId].polyline != "undefined")
+//			{
+//				//these "if" is for creating new gmarker when user polyline is already drawed
+//				//var userMarker = MAP.putMarker(location, "images/person.png", true, false);					
+//				var iWindow = MAP.initializeInfoWindow();
+//				var markerInfoWindow = new TRACKER.mapMarker({marker:userMarker, infoWindow:iWindow});
+//				
+//				MAP.insertPointToPolyline(TRACKER.users[userId].polyline,location,0);
+//				
+//				var oldlatitude = TRACKER.users[userId].latitude;
+//				var oldlongitude = TRACKER.users[userId].longitude;
+//
+//				MAP.setMarkerClickListener(userMarker,function (){
+//					// attention similar function is used in 
+//					// processUserPastLocationsXML function
+//					var tr = TRACKER.users[userId].mapMarker.indexOf(markerInfoWindow);
+//					var previousGMarkerIndex = tr + 1; // it is reverse because 
+//					var nextGMarkerIndex = tr - 1;    // as index decreases, the current point gets closer
+//
+//					var infoWindow = MAP.initializeInfoWindow(
+//							getPastPointInfoContent(userId, time, deviceId, userType, previousGMarkerIndex, oldlatitude, oldlongitude, nextGMarkerIndex));
+//					MAP.openInfoWindow(infoWindow, userMarker);
+//					TRACKER.users[userId].infoWindowIsOpened = true;
+//				});
+//
+//				TRACKER.users[userId].mapMarker.splice(1,0, markerInfoWindow);					
+//
+//				if (TRACKER.traceLineDrawedUserId != userId) {
+//					// if traceline is not visible, hide the marker
+//					MAP.setMarkerVisible(userMarker, false)						
+//				}
+//			}
 			
 			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null) && ((TRACKER.users[userId].latitude != latitude) ||
 					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].time != time))){
@@ -363,8 +382,8 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
 					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'					
 					+ 	'</div>';
-					+ '</div>';					
-								
+					+ '</div>';	
+			
 				if (isWindowOpen == true) {
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
 					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow,content);			
@@ -386,70 +405,129 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
 	//alert('TRACKER.users.size:' + size);
 	
+//	var allKeys = "";
+//	
+//	for (var key in TRACKER.users) {
+//		allKeys += key + " ";
+//	}
+//	
+//	alert("allKeys: " + allKeys);
+	
 	var anyDeletedFriend = false;
 	
-	for (key in TRACKER.users) {
-	    if (TRACKER.users.hasOwnProperty(key)  &&        // These are explained
-	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
-	        key <= 4294967294                // away below
-	        ) {
+	for (var key in TRACKER.users) {	    			
+		if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
+		{
+			//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+			//Kullanicinin kendisi her zaman haritada gosterilsin
+	    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
 			
-	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
-	    			
-	    	if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
+	    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+	    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
+			{
+				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
+			}	
+	
+	    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
 	    	{
-	    		//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
-	    		//Kullanicinin kendisi her zaman haritada gosterilsin
-		    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
-				
-		    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
-		    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
-				{
-					MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
-				}	
-
-		    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
-		    	{
-		    		//alert('userId:' + key + 'deleted');
-		    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
-		    		
-		    		if(TRACKER.users[key].infoWindowIsOpened)
-		    		{
-		    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
-		    		}
-
-//		    		if(typeof $.fn.yiiGridView != "undefined")
+	    		//alert('userId:' + key + ' deleted');
+	    		//Bir once tiklanan kisi bu yeni arkadasliktan cikmis kisi ise
+	    		if(TRACKER.preUserId == key)
+	    		{
+	    			TRACKER.preUserId = -1;
+	    		}
+	    		
+	    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
+	    		
+	    		if(TRACKER.users[key].infoWindowIsOpened)
+	    		{
+	    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
+	    		}
+	
+	    		delete TRACKER.users[key];		    		
+	    		anyDeletedFriend = true;
+	    	}
+		}
+	}	
+	
+//	for (key in TRACKER.users) {
+//	    if (TRACKER.users.hasOwnProperty(key)  &&        // These are explained
+//	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
+//	        key <= 4294967294                // away below
+//	        ) {
+//			
+//	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
+//	    			
+//	    	if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
+//	    	{
+//	    		//MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
+//	    		//Kullanicinin kendisi her zaman haritada gosterilsin
+//		    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
+//				
+//		    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
+//		    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
+//				{
+//					MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
+//				}	
+//
+//		    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
+//		    	{
+//		    		//alert('userId:' + key + ' deleted');
+//		    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
+//		    		
+//		    		if(TRACKER.users[key].infoWindowIsOpened)
 //		    		{
-//			    		$.fn.yiiGridView.update("userListView");
-//			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
-//		    		}		    		
-		    		
-//		            var myElem = document.getElementById('uploadListView');
-//		            if(myElem == null)
-//		            {
-//		           	 alert('userListView YOK!');
-//		            }
-//		            else
-//		            {
-//		           	 alert('userListView VAR');
-//		            }		    		
-		    		
-		    		delete TRACKER.users[key];
-		    		
-		    		anyDeletedFriend = true;
-		    	}
-	    	}	    		    	
-	    }
-	}
+//		    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
+//		    		}
+//
+////		    		if(typeof $.fn.yiiGridView != "undefined")
+////		    		{
+////			    		$.fn.yiiGridView.update("userListView");
+////			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
+////		    		}		    		
+//		    		
+////		            var myElem = document.getElementById('uploadListView');
+////		            if(myElem == null)
+////		            {
+////		           	 alert('userListView YOK!');
+////		            }
+////		            else
+////		            {
+////		           	 alert('userListView VAR');
+////		            }		    		
+//		    		
+//		    		delete TRACKER.users[key];
+//		    		
+//		    		anyDeletedFriend = true;
+//		    	}
+//	    	}	    		    	
+//	    }
+//	}
 	
 	//if(newFriend === true)
-	if((anyDeletedFriend === true) || ((updateType === 'onlyUpdated') && (newFriend === true)))
+	//if((anyDeletedFriend === true) || ((updateType === 'onlyUpdated') && (newFriend === true)))
+	//Sayfa bir kere yuklendikten yani tum arkadaslar alindiktan sonra yeni arkadas geldiyse
+	if((anyDeletedFriend === true) || ((TRACKER.updateFriendListPageCount == 1) && (newFriend === true)))
 	{
-		if(typeof $.fn.yiiGridView != "undefined")
+		//alert('$.fn.yiiGridView.settings["userListView"]: ' + typeof $.fn.yiiGridView.settings["userListView"]);
+		
+		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings["userListView"] == "undefined"))	
+		{
+			//Do not update
+			
+			//alert('NOT UPDATED 1');
+		}
+		else
 		{
 			$.fn.yiiGridView.update("userListView");
-		}		    		
-	}	
+			
+			//alert('$.fn.yiiGridView.update("userListView")');
+		}
+	}
+	else
+	{
+		//alert('NOT UPDATED 2');
+	}
 	
 	delete userIdArray;
 }
@@ -464,7 +542,13 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 	if(typeof par_updateType !== 'undefined')
 	{
 		updateType = par_updateType;
-	}	
+		
+		//alert("processUploads - if updateType: " + updateType);
+	}
+	else
+	{
+		//alert("processUploads - else updateType: " + updateType);
+	}
 	
 	if(typeof par_thumbSuffix !== 'undefined')
 	{
@@ -538,9 +622,9 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 				var image = new Image();
 
 				image.src= TRACKER.images[imageId].imageURL + "&fileType=0"; // + TRACKER.imageOrigSuffix;
-				$("#loading").show();
+				//$("#loading").show();
 				$(image).load(function(){
-					$("#loading").hide();
+					//$("#loading").hide();
 					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
@@ -601,43 +685,63 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //		MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
 //	}
 	
-	for (key in TRACKER.images) {
-	    if (TRACKER.images.hasOwnProperty(key)  &&        // These are explained
-	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
-	        key <= 4294967294                // away below
-	        ) {
-			//alert("processUsers(), TRACKER.images[" + key + "]: false");
-
-			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
+//	var allKeys = "";
+//	
+//	for (var key in TRACKER.images) {
+//		allKeys += key + " ";
+//	}
+//	
+//	alert("allKeys: " + allKeys);
+	
+	for (var key in TRACKER.images) {	    			
+		if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
+		{
+	    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+			
+			if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
 			{
-		    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
-				
-				if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
-				{
-					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
-				}
-				
-//		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
-//		    	{
-//		    		//alert('uploadId:' + key + 'deleted');
-//		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
-//		    		
-//		    		if(TRACKER.images[key].infoWindowIsOpened)
-//		    		{
-//		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
-//		    		}
+				MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+			}				
+		}
+	}	
+	
+//	for (key in TRACKER.images) {
+//	    if (TRACKER.images.hasOwnProperty(key)  &&        // These are explained
+//	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
+//	        key <= 4294967294                // away below
+//	        ) {
+//			//alert("processUsers(), TRACKER.images[" + key + "]: false");
 //
-//		    		if(typeof $.fn.yiiGridView != "undefined")
-//		    		{
-//			    		$.fn.yiiGridView.update(uploadsGridViewId);
-//			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
-//		    		}		    		
-//
-//		    		delete TRACKER.images[key];
-//		    	}				
-			}	    				
-	    }
-	}
+//			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
+//			{
+//		    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
+//				
+//				if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+//				{
+//					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+//				}
+//				
+////		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
+////		    	{
+////		    		//alert('uploadId:' + key + 'deleted');
+////		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
+////		    		
+////		    		if(TRACKER.images[key].infoWindowIsOpened)
+////		    		{
+////		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
+////		    		}
+////
+////		    		if(typeof $.fn.yiiGridView != "undefined")
+////		    		{
+////			    		$.fn.yiiGridView.update(uploadsGridViewId);
+////			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+////		    		}		    		
+////
+////		    		delete TRACKER.images[key];
+////		    	}				
+//			}	    				
+//	    }
+//	}
 	
 	var anyDeletedUpload = false;
 	
@@ -668,15 +772,28 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
     	}						
 	});				
 	
-	if((anyDeletedUpload === true) || ((updateType === 'onlyUpdated') && (newUpload === true)))
+	//Tum fotolar alindiktan sonra yeni foto geldiyse
+	if((anyDeletedUpload === true) || ((TRACKER.allImagesFetched === true) && (newUpload === true)))
 	{
-		if(typeof $.fn.yiiGridView != "undefined")
+		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined"))	
+		{
+			//Do not update
+			
+			//alert('NOT UPDATED 1 - 1.cond:' + (typeof $.fn.yiiGridView == "undefined") + ' / 2. cond:' + (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined") + ' / uploadsGridViewId:' + uploadsGridViewId);
+		}
+		else
 		{
 			$.fn.yiiGridView.update(uploadsGridViewId);
-		}
+			
+			//alert('$.fn.yiiGridView.update(uploadsGridViewId)');
+		}		
 		
 		//alert("Deleted or New Upload");
-	}	
+	}
+	else
+	{
+		//alert('NOT UPDATED 2 - TRACKER.allImagesFetched: ' + TRACKER.allImagesFetched + ' / newUpload: ' + newUpload);
+	}
 	
 	//delete uploadIdArray;
 	
@@ -755,9 +872,9 @@ function processImageXML(MAP, xml){
 				var image = new Image();
 
 				image.src= TRACKER.images[imageId].imageURL + "&fileType=0"; // + TRACKER.imageOrigSuffix;
-				$("#loading").show();
+				//$("#loading").show();
 				$(image).load(function(){
-					$("#loading").hide();
+					//$("#loading").hide();
 					
 					var content = "<div class='origImageContainer'>"
 						+ "<div>"
@@ -844,10 +961,15 @@ function processImageXML(MAP, xml){
 		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
 		    		}
 
-		    		if(typeof $.fn.yiiGridView != "undefined")
+		    		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined"))	
 		    		{
-			    		$.fn.yiiGridView.update(uploadsGridViewId);
-			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+		    			//Do not update
+		    			
+		    			//alert('NOT UPDATED 1');
+		    		}
+		    		else
+		    		{
+		    			$.fn.yiiGridView.update(uploadsGridViewId);
 		    		}		    		
 
 		    		delete TRACKER.images[key];
@@ -858,10 +980,16 @@ function processImageXML(MAP, xml){
 	
 	if(newUpload === true)
 	{
-		if(typeof $.fn.yiiGridView != "undefined")
+		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined"))	
+		{
+			//Do not update
+			
+			//alert('NOT UPDATED 1');
+		}
+		else
 		{
 			$.fn.yiiGridView.update(uploadsGridViewId);
-		}		    		
+		}		
 	}	
 	
 	delete uploadIdArray;

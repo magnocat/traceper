@@ -184,7 +184,10 @@ if ($dataProvider != null) {
 																		}
 																		else
 																		{
-																			TRACKER.getFriendList(1, 0/*UserType::RealUser*/, null/*New friend id*/, obj.deletedFriendId);
+																			//TRACKER.getFriendList(1, 0/*UserType::RealUser*/, null/*New friend id*/, obj.deletedFriendId);
+													
+																			TRACKER.updateFriendListWithDeletion(obj.deletedFriendId);
+													
 																			TRACKER.showMessageDialog("'.Yii::t('users', 'The person is removed from your friend list').'");
 																		}
 																		
@@ -291,7 +294,7 @@ if ($dataProvider != null) {
 
 				    				'value'=> $isFriendList?'getFriendPhoto($data, $row, true)':'getFriendPhoto($data, $row, false)',
 
-				    				'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align: center;')
+				    				'htmlOptions'=>array('width'=>'40px', 'height'=>'48px', 'style'=>'text-align: center;')
 				    				//'visible'=>$isFriendList || $isFriendRequestList
 				    		),		    		
 		    		
