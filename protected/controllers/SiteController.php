@@ -772,6 +772,8 @@ class SiteController extends Controller
 	 */
 	public function actionChangePassword()
 	{
+		Fb::warn("actionChangePassword() called", "SiteController");
+		
 		$model = new ChangePasswordForm;
 
 		$processOutput = true;

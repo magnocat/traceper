@@ -82,7 +82,9 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 												if (obj.result == "1")
 												{
 													$("#acceptTermsForLoginWindow").dialog("close");
+						
 													$("#tabViewList").html(obj.renderedTabView);
+													$("#userarea").html(obj.renderedUserAreaView);
 													$("#loginBlock").html(obj.loginSuccessfulActions);
 												}
 											}
