@@ -1109,8 +1109,7 @@ else
 																	//alert("result:1");
 										
 																	$("#tabViewList").html(obj.renderedTabView);
-																	$("#userarea").html(obj.renderedUserAreaView);
-										
+																	$("#userarea").html(obj.renderedUserAreaView);										
 																	$("#loginBlock").html(obj.loginSuccessfulActions);
 																}
 																else if (obj.result == "-3")

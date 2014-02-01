@@ -205,24 +205,59 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			visible = true;
 		}
 		
+		var personPhotoElement;
+		var timeStamp = new Date().getTime();
+		
+		switch(profilePhotoStatus)
+		{
+			case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
+			{
+				if((fb_id != 0) && (typeof fb_id != "undefined")){			
+					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';
+				}else{
+					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+				}
+			}
+			break;
+
+			case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
+			case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
+			{
+				if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
+				{
+					personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';											
+				}
+				else //Diger kullanicilar icin cache kullan
+				{
+					personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';						
+				}					
+			}
+			break;
+
+			case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
+			{
+				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';
+			}
+			break;
+
+			default:
+				//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
+				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';				
+		}		
+		
 		//alertMsg("userId:" + userId);		
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
-			var personPhotoElement;
-			var timeStamp = new Date().getTime();
 			var userMarker;
 			
 			switch(profilePhotoStatus)
 			{
 				case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
 				{
-					if((fb_id != 0) && (typeof fb_id != "undefined")){
-						//personPhoto = "https://graph.facebook.com/"+ fb_id + "/picture?type=square";				
-						personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';						
+					if((fb_id != 0) && (typeof fb_id != "undefined")){					
 						userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
 					}else{
-						personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
 						userMarker = MAP.putMarker(location, "images/person.png", visible, false);
 					}
 				}
@@ -232,28 +267,24 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
 				{
 					if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
-					{
-						personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';					
+					{					
 						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png" + "?random=" + timeStamp, visible, true);						
 					}
 					else //Diger kullanicilar icin cache kullan
-					{
-						personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';					
+					{					
 						userMarker = MAP.putMarker(location, "profilePhotos/" + userId + ".png", visible, true);						
 					}					
 				}
 				break;
 
 				case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
-				{
-					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';					
+				{				
 					userMarker = MAP.putMarker(location, "https://graph.facebook.com/"+ fb_id + "/picture?type=square", visible, true);
 				}
 				break;
 
 				default:
 					//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
-					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
 					userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
 			}
 			
