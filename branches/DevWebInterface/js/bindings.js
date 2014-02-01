@@ -16,6 +16,13 @@ var uploadsGridViewId = 'publicUploadListView';
 
 var currentUserMarker;
 
+function alertMsg(par_message) {
+	if(bDeploymentModeOn === false)
+	{
+		alert(par_message);
+	}
+}
+
 function changecss(myclass,element,value) {
 	var CSSRules
 	if (document.all) {
@@ -350,14 +357,14 @@ function bindElements(langOperator, trackerOp)
  			$("#appQRCodeLink").tooltipster('hide');
  		}
  		
-// 		alert("Clicked");
+// 		alertMsg("Clicked");
 // 		$('#profilePhoto').css('opacity', 0.5);
 // 		$('#profilePhotoLoading').show();
  	}); 	
 
 	$("#bar").click(function ()	{
 		
-		//alert("Deneme");
+		//alertMsg("Deneme");
 		
 	    var w = $(window).width();
 	    
@@ -453,24 +460,24 @@ function bindElements(langOperator, trackerOp)
 //		var myElem = document.getElementById('usersGridView');
 //		if(myElem == null)
 //		{
-//			alert('"#usersGridView" does not exist!');
+//			alertMsg('"#usersGridView" does not exist!');
 //		}
 //		else
 //		{
-//			alert('"#usersGridView" exists');
+//			alertMsg('"#usersGridView" exists');
 //		}
 		
-		//alert("height:" + (h - offsetTop - 82));
+		//alertMsg("height:" + (h - offsetTop - 82));
 		    
 //		var userListHeight = ((h - offsetTop - 82) > 445)?(h - offsetTop - 82):445;
 //		
 //		//$.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
 //		$.post('index.php?r=site/getWinDimensions', { width:w, height:userListHeight }, function(json) {	
 //	        if(json.outcome == 'success') {
-//	        	//alert('OKKKKK');
+//	        	//alertMsg('OKKKKK');
 //	            // do something with the knowledge possibly?
 //	        } else {
-//	            alert('Unable to let PHP know what the screen resolution is!');
+//	            alertMsg('Unable to let PHP know what the screen resolution is!');
 //	        }
 //	    },'json');
 	});	
@@ -481,9 +488,9 @@ function bindElements(langOperator, trackerOp)
 	    
 	    var usersCount = 5;
 
-	    //alert('Javascript');
+	    //alertMsg('Javascript');
 	    
-	    //alert('Height:'+(h)+' Width:'+(w));
+	    //alertMsg('Height:'+(h)+' Width:'+(w));
 
 	  //If logged in and top bar height decreased
 		if(document.getElementById('topBar').style.height == "70px")
@@ -498,7 +505,7 @@ function bindElements(langOperator, trackerOp)
 				$('#map').css('min-width', (735 + 260));
 				$('#bar').css('left', '0px');
 				
-				//alert('Wide');
+				//alertMsg('Wide');
 			}
 			else
 			{
@@ -506,7 +513,7 @@ function bindElements(langOperator, trackerOp)
 				$('#map').css('min-width', (735 + 260 - 380));
 				$('#bar').css('left', '380px');
 				
-				//alert('Narrow');
+				//alertMsg('Narrow');
 			}
 			
 			$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
@@ -522,7 +529,7 @@ function bindElements(langOperator, trackerOp)
 	 		$("#groupsGridView").css("min-height", 440);
 			$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));				
 
-		    //alert("resize - height: " + (h - offsetTop - 82 - 100));			
+		    //alertMsg("resize - height: " + (h - offsetTop - 82 - 100));			
 			
 			//$("#usersGridView").css("height", userListHeight - 50);
 			//$("#uploadsGridView").css("height", userListHeight - 50);
@@ -530,10 +537,10 @@ function bindElements(langOperator, trackerOp)
 			
 //		    $.post('saveToSession.php', { width:w, height:userListHeight }, function(json) {
 //		        if(json.outcome == 'success') {
-//		        	//alert('OKKKKK');
+//		        	//alertMsg('OKKKKK');
 //		            // do something with the knowledge possibly?
 //		        } else {
-//		            alert('Unable to let PHP know what the screen resolution is!');
+//		            alertMsg('Unable to let PHP know what the screen resolution is!');
 //		        }
 //		    },'json');	    			
 		}
@@ -552,7 +559,7 @@ function bindElements(langOperator, trackerOp)
 				$('#map').css('min-width', (735 + 380));
 				$('#bar').css('left', '0px');
 				
-				//alert('Wide:' + (w - 16));
+				//alertMsg('Wide:' + (w - 16));
 			}
 			else
 			{
@@ -560,11 +567,15 @@ function bindElements(langOperator, trackerOp)
 				$('#map').css('min-width', 735);
 				$('#bar').css('left', '380px');
 				
-				//alert('Narrow');
-			}			
+				//alertMsg('Narrow');
+			}
+			
+	 		//Public upload'lar icin
+			$("#publicUploadsGridView").css("min-height", 450);
+			$("#publicUploadsGridView").css("height", (h - offsetTop));
 		}
 		
-		//alert('binding.js: offsetTop:'+(offsetTop)+' offsetLeft:'+(offsetLeft));
+		//alertMsg('binding.js: offsetTop:'+(offsetTop)+' offsetLeft:'+(offsetLeft));
 		
 	    $('#map').css('height', (h - offsetTop));
 	    $('#bar').css('height', (h - offsetTop));
@@ -669,7 +680,7 @@ function bindElements(langOperator, trackerOp)
 		   	 break;       
         }		
 
-		//alert("ajax complete");
+		//alertMsg("ajax complete");
 	});	
 	
 //	$("#bar").click(function ()	{	

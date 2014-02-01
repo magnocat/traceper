@@ -101,10 +101,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			allKeys += key + " ";
 //		}
 //		
-//		alert("allKeys BEFORE deletion: " + allKeys);		
+//		alertMsg("allKeys BEFORE deletion: " + allKeys);		
 		
 		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
-		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
+		//alertMsg("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
 		
 		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
 		{
@@ -124,7 +124,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			allKeys += key + " ";
 //		}
 //		
-//		alert("allKeys AFTER deletion: " + allKeys);		
+//		alertMsg("allKeys AFTER deletion: " + allKeys);		
 	}
 	
 	this.updateImageListWithDeletion = function(deletedImageId){
@@ -135,10 +135,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			allKeys += key + " ";
 //		}
 //		
-//		alert("allKeys BEFORE deletion: " + allKeys);		
+//		alertMsg("allKeys BEFORE deletion: " + allKeys);		
 		
 		MAP.setMarkerVisible(TRACKER.images[deletedImageId].mapMarker.marker, false);
-		//alert("setMarkerVisible(false) for deletedImageId:" + deletedImageId);
+		//alertMsg("setMarkerVisible(false) for deletedImageId:" + deletedImageId);
 		
 		if(TRACKER.images[deletedImageId].infoWindowIsOpened)
 		{
@@ -153,15 +153,17 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			allKeys += key + " ";
 //		}
 //		
-//		alert("allKeys AFTER deletion: " + allKeys);		
-	}	
+//		alertMsg("allKeys AFTER deletion: " + allKeys);		
+	}
+	
+	var exceptionForParamsMap = {'getUserListJson':0, 'getPublicUploadListJson':0, 'getUploadListJson':0, 'getUserPastPointsJSON':0, 'sendGeofenceData':0};
 
 	/**
 	 * 
 	 */
 	this.getFriendList = function(pageNo, userType, newFriendId, deletedFriendId){
-		
-		//alert('getFriendList() called');	
+
+		//alertMsg('getFriendList() called');
 		
 		//Default value implementation in JS
 		//newFriendId = typeof newFriendId !== 'undefined' ? newFriendId : null;
@@ -211,7 +213,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				// to fetched all data reguarly updateFriendListPageNo must be resetted.
 				var updateInt = TRACKER.updateInterval;
 				
-				//alert("PageNo:" + TRACKER.updateFriendListPageNo + " / PageCount:" + TRACKER.updateFriendListPageCount);
+				//alertMsg("PageNo:" + TRACKER.updateFriendListPageNo + " / PageCount:" + TRACKER.updateFriendListPageCount);
 				
 				if (TRACKER.updateFriendListPageNo >= TRACKER.updateFriendListPageCount){
 					TRACKER.updateFriendListPageNo = 1;
@@ -230,31 +232,77 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				//newFriendId ve deletedFriendId parametreleri sadece bu islemler yapildiginda userList.php tarafindan verilmeli diger durumlarda verilmemeli
 				TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType);}, TRACKER.updateInterval);
 				
+				if(exceptionForParamsMap['getUserListJson'] > 5)
+				{
+					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
+					  
+					  "User Info: </br></br>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+					  "User OS: " + BrowserDetect.OS + "</br></br>" +
+					  "'getUserListJson' javascript exception is recovered at " + exceptionForParamsMap['getUserListJson'] + ". trial." + "</br>" +
+					  "&params=" + 'getUserListJsonRecovery'; 
+
+					  //If the javascript exception is recovered, report this situation via e-mail
+					  TRACKER.ajaxReq(data, null, true);					
+				}				
+				
+				exceptionForParamsMap['getUserListJson'] = 0;				
 			}
 			catch(error)
 			{
-				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+				alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
 					  'Error: ' + error.message + '\n' + 
 					  'JSON obj: ' + JSON.stringify(obj));
+				
+				exceptionForParamsMap['getUserListJson'] = exceptionForParamsMap['getUserListJson'] + 1;
+				
+				if(exceptionForParamsMap['getUserListJson'] < 5)
+				{
+					//Try the function call again after 1 second
+					clearTimeout(TRACKER.timer);  
+					TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType, newFriendId, deletedFriendId);}, 1000);					
+				}
+				else if(exceptionForParamsMap['getUserListJson'] == 5)
+				{
+					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
+					  
+					  "Exception Info: </br></br>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+					  "User OS: " + BrowserDetect.OS + "</br></br>" +
+					  "Exception in jsonparams: " + jsonparams + "</br>" +
+					  "Error: " + error.message + "</br>" +
+					  "JSON obj: " + JSON.stringify(obj) + "&params=" + "getUserListJson"; 
+
+					  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
+					  TRACKER.ajaxReq(data, null, true);					
+				}
+				else //exceptionForParamsMap['getUserListJson'] > 5
+				{
+					//For the error case check connection for every 10 seconds
+					clearTimeout(TRACKER.timer);  
+					TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType, newFriendId, deletedFriendId);}, 10000);					
+				}
 			}			
-		}, true);
-		
+		}, true);		
 	};
 	
 	this.getImageList = function(isPublic, updateAll, callback){
 		var jsonparams;
+		var exceptionForParamsMapKey;
 		
-		//alert("getImageList() called");
+		//alertMsg("getImageList() called");
 		
-		//alert("TRACKER.bgImageListPageNo:" + TRACKER.bgImageListPageNo);
+		//alertMsg("TRACKER.bgImageListPageNo:" + TRACKER.bgImageListPageNo);
 
 		if((typeof isPublic !== 'undefined') && (isPublic == true))
 		{
 			jsonparams = "r=upload/getPublicUploadListJson&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0";
+			exceptionForParamsMapKey = 'getPublicUploadListJson';
 		}
 		else
 		{
-			jsonparams = "r=upload/getUploadListJson&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0"; 
+			jsonparams = "r=upload/getUploadListJson&pageNo="+ TRACKER.bgImageListPageNo +"&fileType=0";
+			exceptionForParamsMapKey = 'getUploadListJson';
 		}
 		
 		if((typeof updateAll !== 'undefined') && (updateAll == true))
@@ -266,32 +314,31 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		else if (TRACKER.allImagesFetched == true) {
 			jsonparams += "&list=onlyUpdated";
 			
-			//alert("onlyUpdated");
+			//alertMsg("onlyUpdated");
 		}
 		else
 		{
-			//alert("All");
+			//alertMsg("All");
 		}		
 
 		TRACKER.showImagesOnTheMapJustToggled = false;
 		
-		//alert("getImageList(), jsonparams: " + jsonparams);
+		//alertMsg("getImageList(), jsonparams: " + jsonparams);
 
-		TRACKER.ajaxReq(jsonparams, function(obj){
-			
+		TRACKER.ajaxReq(jsonparams, function(obj){			
 			try
 			{
 				//var obj = $.parseJSON(result);
-				//alert("After parseJSON()");
+				//alertMsg("After parseJSON()");
 				
 				TRACKER.bgImageListPageNo = obj.pageNo; //TRACKER.getPageNo(result);
 				TRACKER.bgImageListPageCount = obj.pageCount; //TRACKER.getPageCount(result);
 				
-				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+				//alertMsg("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
 
 				processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix);
 				
-				//alert("processImageXML() called");
+				//alertMsg("processImageXML() called");
 				
 				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
@@ -302,11 +349,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					TRACKER.bgImageListPageNo = 1;
 					TRACKER.allImagesFetched = true;
-					//alert('allImagesFetched');
+					//alertMsg('allImagesFetched');
 					clearTimeout(TRACKER.imageTimer);
 					TRACKER.imageTimer = setTimeout(function(){TRACKER.getImageList(isPublic, false)}, TRACKER.queryUpdatedUserInterval);
 					
-					//alert("allImagesFetched: " + TRACKER.allImagesFetched);
+					//alertMsg("allImagesFetched: " + TRACKER.allImagesFetched);
 				}
 				
 				if (typeof callback == 'function'){
@@ -317,11 +364,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //					TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
 //					TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
 //					
-//					//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+//					//alertMsg("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
 	//	
 //					processImageXML(MAP, result);
 //					
-//					//alert("processImageXML() called");
+//					//alertMsg("processImageXML() called");
 //					
 //					if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 //						TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
@@ -338,13 +385,58 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //					if (typeof callback == 'function'){
 //						callback();					
 //					}
-//				}				
+//				}
+				
+				if(exceptionForParamsMap[exceptionForParamsMapKey] > 5)
+				{
+					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
+					  
+					  "User Info: </br></br>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+					  "User OS: " + BrowserDetect.OS + "</br></br>" +
+					  exceptionForParamsMapKey + " javascript exception is recovered at " + exceptionForParamsMap[exceptionForParamsMapKey] + ". trial." + "</br>" +
+					  "&params=" + exceptionForParamsMapKey + "Recovery"; 
+
+					  //If the javascript exception is recovered, report this situation via e-mail
+					  TRACKER.ajaxReq(data, null, true);					
+				}				
+				
+				exceptionForParamsMap[exceptionForParamsMapKey] = 0;				
 			}
 			catch(error)
 			{
-				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
-					  'Error: ' + error.message + '\n' + 
-					  'JSON obj: ' + JSON.stringify(obj));
+				alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
+						  'Error: ' + error.message + '\n' + 
+						  'JSON obj: ' + JSON.stringify(obj));
+					
+				exceptionForParamsMap[exceptionForParamsMapKey] = exceptionForParamsMap[exceptionForParamsMapKey] + 1;
+				
+				if(exceptionForParamsMap[exceptionForParamsMapKey] < 5)
+				{
+					//Try the function call again after 1 second
+					clearTimeout(TRACKER.imageTimer);  
+					TRACKER.imageTimer = setTimeout(function() {TRACKER.getImageList(isPublic, updateAll, callback);}, 1000);					
+				}
+				else if(exceptionForParamsMap[exceptionForParamsMapKey] == 5)
+				{
+					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
+					  
+					  "Exception Info: </br></br>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+					  "User OS: " + BrowserDetect.OS + "</br></br>" +
+					  "Exception in jsonparams: " + jsonparams + "</br>" +
+					  "Error: " + error.message + "</br>" +
+					  "JSON obj: " + JSON.stringify(obj) + "&params=" + exceptionForParamsMapKey; 
+
+					  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
+					  TRACKER.ajaxReq(data, null, true);					
+				}
+				else //exceptionForParamsMap[exceptionForParamsMapKey] > 5
+				{
+					//For the error case check connection for every 10 seconds
+					clearTimeout(TRACKER.imageTimer);  
+					TRACKER.imageTimer = setTimeout(function() {TRACKER.getImageList(isPublic, updateAll, callback);}, 10000);					
+				}				
 			}					
 		}, 
 		
@@ -377,27 +469,27 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //		else if (TRACKER.allImagesFetched == true) {
 //			params += "list=onlyUpdated";
 //			
-//			//alert("onlyUpdated");
+//			//alertMsg("onlyUpdated");
 //		}
 //		else
 //		{
-//			//alert("All");
+//			//alertMsg("All");
 //		}
 //		
 //		TRACKER.showImagesOnTheMapJustToggled = false;
 //		
-//		//alert("getImageList() called");
+//		//alertMsg("getImageList() called");
 //
 //		TRACKER.ajaxReq(params, function(result){	
 //			if (result != "") {
 //				TRACKER.bgImageListPageNo = TRACKER.getPageNo(result);
 //				TRACKER.bgImageListPageCount = TRACKER.getPageCount(result);
 //				
-//				//alert("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
+//				//alertMsg("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
 //	
 //				processImageXML(MAP, result);
 //				
-//				//alert("processImageXML() called");
+//				//alertMsg("processImageXML() called");
 //				
 //				if (TRACKER.bgImageListPageNo < TRACKER.bgImageListPageCount){
 //					TRACKER.bgImageListPageNo = Number(TRACKER.bgImageListPageNo) + 1;
@@ -430,7 +522,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.trackUser = function(userId){
 		
 		if (typeof TRACKER.users[userId] === "undefined") {
-			alert("Id:" + userId + " is undefined");
+			alertMsg("Id:" + userId + " is undefined");
 			
 			var params = "r=users/getUserInfoJSON&userId="+ userId +"&"; 
 			TRACKER.ajaxReq(params, function(result){
@@ -447,7 +539,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				 TRACKER.users[userId].friendshipStatus == "1" &&  
 				 TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
 		{
-			//alert("else if");
+			//alertMsg("else if");
 			
 			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 			MAP.panMapTo(location);
@@ -455,7 +547,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			//Kisi kendisi sildiyse preUserId -1'e cekiliyor ve bu kontrol edilmeli
 			if(TRACKER.preUserId != -1)//Check for the first click in order not to take "undefined" error
 			{
-				//alert("TRACKER.users[TRACKER.preUserId]: " + TRACKER.users[TRACKER.preUserId]);
+				//alertMsg("TRACKER.users[TRACKER.preUserId]: " + TRACKER.users[TRACKER.preUserId]);
 				
 				//Kullanici bilgi disinda arkadasliktan ciktiysa veya konumunu kapattiysa diye "undefined" kontrolu de yapilmali
 				if((typeof TRACKER.users[TRACKER.preUserId] == "undefined") || (TRACKER.users[TRACKER.preUserId] == "undefined"))
@@ -474,7 +566,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}
 		else
 		{
-			alert("else, TRACKER.users[userId]:" + TRACKER.users[userId]);
+			alertMsg("else, TRACKER.users[userId]:" + TRACKER.users[userId]);
 		}	
 	};
 
@@ -507,13 +599,56 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 					if (typeof callback == "function") {
 						callback();
-					}					
+					}
+					
+					if(exceptionForParamsMap['getUserPastPointsJSON'] > 5)
+					{
+						  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
+						  
+						  "User Info: </br></br>" + 
+						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+						  "User OS: " + BrowserDetect.OS + "</br></br>" +
+						  "'getUserPastPointsJSON' javascript exception is recovered at " + exceptionForParamsMap['getUserPastPointsJSON'] + ". trial." + "</br>" +
+						  "&params=" + 'getUserPastPointsJSONRecovery'; 
+
+						  //If the javascript exception is recovered, report this situation via e-mail
+						  TRACKER.ajaxReq(data, null, true);					
+					}				
+					
+					exceptionForParamsMap['getUserPastPointsJSON'] = 0;					
 				}
 				catch(error)
 				{
-					alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+					alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
 						  'Error: ' + error.message + '\n' + 
 						  'JSON obj: ' + JSON.stringify(obj));
+						
+					exceptionForParamsMap['getUserPastPointsJSON'] = exceptionForParamsMap['getUserPastPointsJSON'] + 1;
+					
+					if(exceptionForParamsMap['getUserPastPointsJSON'] < 5)
+					{
+						//Try the function call again after 1 second 
+						setTimeout(function() {TRACKER.drawTraceLine(userId, pageNo, callback);}, 1000);					
+					}
+					else if(exceptionForParamsMap['getUserPastPointsJSON'] == 5)
+					{
+						  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
+						  
+						  "Exception Info: </br></br>" + 
+						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+						  "User OS: " + BrowserDetect.OS + "</br></br>" +
+						  "Exception in jsonparams: " + jsonparams + "</br>" +
+						  "Error: " + error.message + "</br>" +
+						  "JSON obj: " + JSON.stringify(obj) + "&params=" + "getUserPastPointsJSON"; 
+
+						  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
+						  TRACKER.ajaxReq(data, null, true);					
+					}
+					else //exceptionForParamsMap['getUserListJson'] > 5
+					{
+						//For the error case check connection for every 10 seconds 
+						setTimeout(function() {TRACKER.drawTraceLine(userId, pageNo, callback);}, 10000);					
+					}					
 				}				
 			}, true);			
 		}
@@ -570,7 +705,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 			catch(error)
 			{
-				alert('Exception in jsonparams: ' + jsonparams + '\n' + 
+				alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
 					  'Error: ' + error.message + '\n' + 
 					  'JSON obj: ' + JSON.stringify(obj));
 			}
@@ -585,12 +720,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
 			});
 			
-			//alert("showMediaWindow 111");
+			//alertMsg("showMediaWindow 111");
 		}
 		else {		
 			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');
 			
-			//alert("showMediaWindow 222");
+			//alertMsg("showMediaWindow 222");
 		}		
 	};
 	this.closeMarkerInfoWindow = function (userId) {
@@ -711,7 +846,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	{	
 //		if(BrowserDetect.browser == "Internet Explorer")
 //		{
-//			//alert("ajax in Internet Explorer");
+//			//alertMsg("ajax in Internet Explorer");
 //			
 ////		    var xhReq = new XMLHttpRequest();
 ////		    xhReq.open("POST", 'index.php?' + params, false);
@@ -728,16 +863,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //			    function (xhr, status) { // error callback
 //			        switch(status) { 
 //			          case 404: 
-//			            alert('File not found'); 
+//			            alertMsg('File not found'); 
 //			            break; 
 //			          case 500: 
-//			            alert('Server error'); 
+//			            alertMsg('Server error'); 
 //			            break; 
 //			          case 0: 
-//			            alert('Request aborted'); 
+//			            alertMsg('Request aborted'); 
 //			            break; 
 //			          default: 
-//			            alert('Unknown error ' + status); 
+//			            alertMsg('Unknown error ' + status); 
 //			        } 
 //		    	});		    
 //		}
@@ -765,43 +900,43 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				}, 			
 				statusCode: {
 					  400: function() {
-						    //alert('400 Bad Request: Server understood the request but request content was invalid.');
+						    //alertMsg('400 Bad Request: Server understood the request but request content was invalid.');
 						  },				
 					  401: function() {
-						    //alert('401 Unauthorized: Unauthorized Access!');
+						    //alertMsg('401 Unauthorized: Unauthorized Access!');
 						  },				
 					  403: function() {
-						    //alert('403 Forbidden: Forbidden, authorization required!');
+						    //alertMsg('403 Forbidden: Forbidden, authorization required!');
 						    //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
 						  },				
 					  404: function() {
-						  	//alert('404 Not Found: Could not contact server!');
+						  	//alertMsg('404 Not Found: Could not contact server!');
 					  	  },
 					  406: function() {
-						    //alert('406 Not Acceptable');
+						    //alertMsg('406 Not Acceptable');
 						  },
 					  408: function() {
-						    //alert('408 Request Timeout');
+						    //alertMsg('408 Request Timeout');
 						  },					  
 					  500: function() {
-						  	//alert('500: A server-side error has occurred!');
+						  	//alertMsg('500: A server-side error has occurred!');
 					  	  },
 					  503: function() {
-						    //alert('503: Service Unavailable!');
+						    //alertMsg('503: Service Unavailable!');
 						  }				  
 					},			
 //				failure: function(result) {								
 //					$("#loading").hide();
-//					alert("Failure in ajax.");						
+//					alertMsg("Failure in ajax.");						
 //				},
 	/*			error: function(par1, par2, par3){
-					//alert(par1.responseText);		
+					//alertMsg(par1.responseText);		
 					$("#loading").hide();
-					alert("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
+					alertMsg("Error in ajax.." + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
 				}*/
 				error: function(xhr, status, error) {
 //					  var err = eval("(" + xhr.responseText + ")");
-//					  alert("err.Message: " + err.Message + "\n\n" +
+//					  alertMsg("err.Message: " + err.Message + "\n\n" +
 //							"status: " + status + "\n\n" +
 //							"error: " + error + "\n\n" +						  
 //							"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params);
@@ -821,7 +956,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //
 //						  TRACKER.ajaxReq(errorData, null, true);				
 //						  
-//						  alert("xhr.responseText: " + xhr.responseText + "\n" +
+//						  alertMsg("xhr.responseText: " + xhr.responseText + "\n" +
 //								"xhr.status: " + xhr.status + "\n" + 
 //								"error: " + error + "\n" +						  
 //								"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
@@ -831,39 +966,59 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 					  if(xhr.status == 403)
 					  {
-						  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
-						  //alert('403 Forbidden: Forbidden, authorization required!');
-					  }
-					  
-					  if(!ajaxErrorForParamsMap[params]) 
-					  {
-						  ajaxErrorForParamsMap[params] = 0;
-					  }					  
-					  
-					  ajaxErrorForParamsMap[params] = ajaxErrorForParamsMap[params] + 1;
-					  
-					  if(ajaxErrorForParamsMap[params] > 5)
-					  {
-						  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
+						  alertMsg('403 Forbidden: Forbidden, authorization required!');
 						  
-						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-						  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
-		  				  "xhr.responseText: " + xhr.responseText + "</br>" +
-						  "xhr.status: " + xhr.status + "</br>" + 
-						  "error: " + error + "</br>" +						  
-						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params;	 
+						  if(bDeploymentModeOn === true)
+						  {
+							  var data = "r=site/ajaxEmailNotification&title=Ajax Error Occured!&message=" +
+							  
+							  "Error Info: </br></br>" + 
+							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+							  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
+			  				  "xhr.responseText: " + xhr.responseText + "</br>" +
+							  "xhr.status: " + xhr.status + "</br>" + 
+							  "error: " + error + "</br>" +						  
+							  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params; 
 
-						  //If more than 5 consecutive ajax queries are erroneous, report this situation via e-mail
-						  TRACKER.ajaxReq(errorData, null, true);						  
-						  
-						  //If more than 5 consecutive ajax queries are erroneous, then reload the page
-						  location.reload();
+							  //If authorization error occurs, report this situation via e-mail
+							  TRACKER.ajaxReq(data, null, true);							  
+						  }
+						  						  
+						  //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin 
 					  }
 					  else
 					  {
-						  //Try the ajax query again after 1 second
-						  //TRACKER.ajaxReq(params, callback, notShowLoadingInfo);
-						  setTimeout(function() {TRACKER.ajaxReq(params, callback, notShowLoadingInfo);}, 1000);
+						  if(!ajaxErrorForParamsMap[params]) 
+						  {
+							  ajaxErrorForParamsMap[params] = 0;
+						  }					  
+						  
+						  ajaxErrorForParamsMap[params] = ajaxErrorForParamsMap[params] + 1;
+						  
+						  if(ajaxErrorForParamsMap[params] > 5)
+						  {
+							  var data = "r=site/ajaxEmailNotification&title=Ajax Error Occured!&message=" +
+							  
+							  "Error Info: </br></br>" + 
+							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+							  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
+			  				  "xhr.responseText: " + xhr.responseText + "</br>" +
+							  "xhr.status: " + xhr.status + "</br>" + 
+							  "error: " + error + "</br>" +						  
+							  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params; 
+
+							  //If more than 5 consecutive ajax queries are erroneous, report this situation via e-mail
+							  TRACKER.ajaxReq(data, null, true);
+
+							  //If more than 5 consecutive ajax queries are erroneous, then reload the page
+							  location.reload();
+						  }
+						  else
+						  {
+							  //Try the ajax query again after 1 second
+							  //TRACKER.ajaxReq(params, callback, notShowLoadingInfo);
+							  setTimeout(function() {TRACKER.ajaxReq(params, callback, notShowLoadingInfo);}, 1000);
+						  }						  
 					  }
 					}			
 			});			

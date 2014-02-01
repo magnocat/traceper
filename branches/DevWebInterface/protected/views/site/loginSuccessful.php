@@ -28,18 +28,18 @@
 	//$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 152));
 	//$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 138));
 
-			$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
-			$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
-			$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
-			
-	 		$("#usersGridView").css("min-height", 370);
-			$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
-			
-	 		$("#uploadsGridView").css("min-height", 370);
-			$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
-			
-	 		$("#groupsGridView").css("min-height", 440);
-			$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));
+		$("#users_tab").css("min-height", (485 + 100 - 70 - 82)); $("#users_tab").css("height", (h - offsetTop - 82));
+		$("#photos_tab").css("min-height", (485 + 100 - 70 - 82)); $("#photos_tab").css("height", (h - offsetTop - 82));
+		$("#groups_tab").css("min-height", (485 + 100 - 70 - 68)); $("#groups_tab").css("height", (h - offsetTop - 72));
+		
+ 		$("#usersGridView").css("min-height", 370);
+		$("#usersGridView").css("height", (h - offsetTop - 82 - 20));
+		
+ 		$("#uploadsGridView").css("min-height", 370);
+		$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+		
+ 		$("#groupsGridView").css("min-height", 440);
+		$("#groupsGridView").css("height", (h - offsetTop - 82 + 10));		
 
 		
 	
@@ -89,6 +89,7 @@
 		   	 {
 		 		$("#uploadsGridView").css("min-height", 370);
 				$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+				uploadsGridViewId = 'uploadListView';
 		   	 }
 		   	 break;
 		   	   
