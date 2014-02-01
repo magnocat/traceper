@@ -657,6 +657,7 @@ function bindElements(langOperator, trackerOp)
 		   	 {
 		 		$("#uploadsGridView").css("min-height", 370);
 				$("#uploadsGridView").css("height", (h - offsetTop - 82 - 20));
+				uploadsGridViewId = 'uploadListView';
 		   	 }
 		   	 break;
 		   	   

@@ -2176,9 +2176,9 @@ class SiteController extends Controller
 
 		unset(Yii::app()->session['usersPageSize']);
 		
-		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 80)/45);
-		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 140)/44);
-		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 160)/42);
+		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 150)/50);
+		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 200)/50);
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 170)/48);
 		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/38);
 		
 // 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");

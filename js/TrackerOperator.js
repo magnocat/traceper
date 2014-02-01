@@ -92,6 +92,69 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.setLangOperator = function(langOperator) {
 		TRACKER.langOperator = langOperator;		
 	}
+	
+	this.updateFriendListWithDeletion = function(deletedFriendId){
+		
+//		var allKeys = "";
+//		
+//		for (var key in TRACKER.users) {
+//			allKeys += key + " ";
+//		}
+//		
+//		alert("allKeys BEFORE deletion: " + allKeys);		
+		
+		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
+		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
+		
+		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
+		{
+			MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0].infoWindow)			
+		}
+		
+		if(TRACKER.preUserId == deletedFriendId)
+		{
+			TRACKER.preUserId = -1;
+		}
+		
+		delete TRACKER.users[deletedFriendId];
+		
+//		allKeys = "";
+//		
+//		for (var key in TRACKER.users) {
+//			allKeys += key + " ";
+//		}
+//		
+//		alert("allKeys AFTER deletion: " + allKeys);		
+	}
+	
+	this.updateImageListWithDeletion = function(deletedImageId){
+		
+//		var allKeys = "";
+//		
+//		for (var key in TRACKER.images) {
+//			allKeys += key + " ";
+//		}
+//		
+//		alert("allKeys BEFORE deletion: " + allKeys);		
+		
+		MAP.setMarkerVisible(TRACKER.images[deletedImageId].mapMarker.marker, false);
+		//alert("setMarkerVisible(false) for deletedImageId:" + deletedImageId);
+		
+		if(TRACKER.images[deletedImageId].infoWindowIsOpened)
+		{
+			MAP.closeInfoWindow(TRACKER.images[deletedImageId].mapMarker.infoWindow)			
+		}
+		
+		delete TRACKER.images[deletedImageId];
+		
+//		allKeys = "";
+//		
+//		for (var key in TRACKER.images) {
+//			allKeys += key + " ";
+//		}
+//		
+//		alert("allKeys AFTER deletion: " + allKeys);		
+	}	
 
 	/**
 	 * 
@@ -133,7 +196,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			try
 			{
 				//var obj = $.parseJSON(result);
-				
+
 				if(typeof deletedFriendId !== 'undefined')
 				{
 					processUsers(MAP, obj.userlist, obj.currentUser, obj.updateType, deletedFriendId);
@@ -162,7 +225,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				
 				clearTimeout(TRACKER.timer);
 				//TRACKER.timer = setTimeout(TRACKER.getFriendList, TRACKER.updateInterval);
-				TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType, newFriendId, deletedFriendId);}, TRACKER.updateInterval);				
+				//TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType, newFriendId, deletedFriendId);}, TRACKER.updateInterval);
+				
+				//newFriendId ve deletedFriendId parametreleri sadece bu islemler yapildiginda userList.php tarafindan verilmeli diger durumlarda verilmemeli
+				TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType);}, TRACKER.updateInterval);
 				
 			}
 			catch(error)
@@ -289,7 +355,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //				//player.play();
 //			});	
 		
-		true);	
+		true);
 	}	
 
 //	this.getImageList = function(isPublic, updateAll, callback){
@@ -375,7 +441,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				else {
 					TRACKER.users[userId] = null;
 				}
-			});
+			}, true);
 		}
 		else if (TRACKER.users[userId] !== null &&
 				 TRACKER.users[userId].friendshipStatus == "1" &&  
@@ -385,10 +451,22 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			
 			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
 			MAP.panMapTo(location);
+			
+			//Kisi kendisi sildiyse preUserId -1'e cekiliyor ve bu kontrol edilmeli
 			if(TRACKER.preUserId != -1)//Check for the first click in order not to take "undefined" error
 			{
-				MAP.closeInfoWindow(TRACKER.users[TRACKER.preUserId].mapMarker[0].infoWindow);
-				TRACKER.users[userId].infoWindowIsOpened = false;
+				//alert("TRACKER.users[TRACKER.preUserId]: " + TRACKER.users[TRACKER.preUserId]);
+				
+				//Kullanici bilgi disinda arkadasliktan ciktiysa veya konumunu kapattiysa diye "undefined" kontrolu de yapilmali
+				if((typeof TRACKER.users[TRACKER.preUserId] == "undefined") || (TRACKER.users[TRACKER.preUserId] == "undefined"))
+				{
+					//Do not take action
+				}
+				else
+				{
+					MAP.closeInfoWindow(TRACKER.users[TRACKER.preUserId].mapMarker[0].infoWindow);
+					TRACKER.users[TRACKER.preUserId].infoWindowIsOpened = false;					
+				}
 			}
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 			TRACKER.users[userId].infoWindowIsOpened = true;
@@ -437,7 +515,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						  'Error: ' + error.message + '\n' + 
 						  'JSON obj: ' + JSON.stringify(obj));
 				}				
-			});			
+			}, true);			
 		}
 		else {			
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
@@ -622,7 +700,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		  };
 		  
 		  xhr.send(params); 
-		}	
+		}
+	
+	var ajaxErrorForParamsMap = {};
 
 	/**
 	 * this a general ajax request function, it is used whenever any ajax request is made 
@@ -672,13 +752,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	            dataType: "json",			
 				timeout:100000,
 				beforeSend: function()
-				{ 	if (!notShowLoadingInfo) {
-						$("#loading").show();
-					} 
+				{ 	
+//					if (!notShowLoadingInfo) {
+//						$("#loading").show();
+//					} 
 				},
 				success: function(result){ 
-					$("#loading").hide(); 	
+					//$("#loading").hide(); 	
 					callback(result);
+					
+					ajaxErrorForParamsMap[params] = 0;
 				}, 			
 				statusCode: {
 					  400: function() {
@@ -725,6 +808,42 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					
 					  if(xhr.status != 200) //status 200 de olsa error diye gelebiliyor, 200 olmayanlari dikkate al
 					  {
+//						  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
+//						  
+//						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
+//						  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
+//		  				  "xhr.responseText: " + xhr.responseText + "</br>" +
+//						  "xhr.status: " + xhr.status + "</br>" + 
+//						  "error: " + error + "</br>" +						  
+//						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
+//						  
+//						  "&params=" + params;	 
+//
+//						  TRACKER.ajaxReq(errorData, null, true);				
+//						  
+//						  alert("xhr.responseText: " + xhr.responseText + "\n" +
+//								"xhr.status: " + xhr.status + "\n" + 
+//								"error: " + error + "\n" +						  
+//								"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
+//								"User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "\n" +
+//								"User OS: " + BrowserDetect.OS);					  
+					  }
+
+					  if(xhr.status == 403)
+					  {
+						  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
+						  //alert('403 Forbidden: Forbidden, authorization required!');
+					  }
+					  
+					  if(!ajaxErrorForParamsMap[params]) 
+					  {
+						  ajaxErrorForParamsMap[params] = 0;
+					  }					  
+					  
+					  ajaxErrorForParamsMap[params] = ajaxErrorForParamsMap[params] + 1;
+					  
+					  if(ajaxErrorForParamsMap[params] > 5)
+					  {
 						  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
 						  
 						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
@@ -732,24 +851,19 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		  				  "xhr.responseText: " + xhr.responseText + "</br>" +
 						  "xhr.status: " + xhr.status + "</br>" + 
 						  "error: " + error + "</br>" +						  
-						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
-						  
-						  "&params=" + params;	 
+						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params;	 
 
-						  //TRACKER.ajaxReq(errorData, null, true);				
+						  //If more than 5 consecutive ajax queries are erroneous, report this situation via e-mail
+						  TRACKER.ajaxReq(errorData, null, true);						  
 						  
-						  alert("xhr.responseText: " + xhr.responseText + "\n" +
-								"xhr.status: " + xhr.status + "\n" + 
-								"error: " + error + "\n" +						  
-								"Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "\n\n" +
-								"User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "\n" +
-								"User OS: " + BrowserDetect.OS);					  
+						  //If more than 5 consecutive ajax queries are erroneous, then reload the page
+						  location.reload();
 					  }
-
-					  if(xhr.status == 403)
+					  else
 					  {
-						  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin
-						  //alert('403 Forbidden: Forbidden, authorization required!');
+						  //Try the ajax query again after 1 second
+						  //TRACKER.ajaxReq(params, callback, notShowLoadingInfo);
+						  setTimeout(function() {TRACKER.ajaxReq(params, callback, notShowLoadingInfo);}, 1000);
 					  }
 					}			
 			});			

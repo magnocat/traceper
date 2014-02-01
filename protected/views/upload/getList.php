@@ -24,8 +24,10 @@ if ($dataProvider != null) {
 								 	try {
 								 		TRACKER.closeConfirmationDialog();
 										var obj = jQuery.parseJSON(result);
+					
 										if (obj.result && obj.result == "1") 
 										{
+											TRACKER.updateImageListWithDeletion(obj.deletedImageId);
 											$.fn.yiiGridView.update("'.$viewId.'");
 											//$.fn.yiiGridView.update("'.$viewId.'",{ complete: function(){ alert("upladListView updated"); } });
 										}
@@ -122,7 +124,7 @@ if ($dataProvider != null) {
 										  			)."\" /> <div class=\"mask\"><div class=\"info\"></div></div></div>", "#",
 										array("onclick"=>"TRACKER.showMediaWindow(".$data["id"].", '.(($isPublicList === true)?'true':'false').');", "title"=>Yii::t("upload", "View photo on the map"))
 					  				  )',	
-					'htmlOptions'=>array('width'=>'40px', 'style'=>'text-align:center;'),
+					'htmlOptions'=>array('width'=>'40px', 'height'=>'50px', 'style'=>'text-align:center;'),
 				),
 				array(            // display 'create_time' using an expression
 		            'name'=>Yii::t('upload', 'Description'),
