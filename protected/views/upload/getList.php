@@ -71,7 +71,7 @@ if ($dataProvider != null) {
 	}
 	
 	?>
-	<div id="uploadsGridView" style="overflow:auto;">
+	<div id="<?php echo ($isPublicList === true)?"publicUploadsGridView":"uploadsGridView"; ?>" style="overflow:auto;">
 	<?php	
 	$this->widget('zii.widgets.grid.CGridView', array(
 		    'dataProvider'=>$dataProvider,

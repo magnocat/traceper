@@ -276,6 +276,10 @@ Yii::app()->clientScript->registerScript('formTooltips',
 		",
 		CClientScript::POS_READY);
 
+Yii::app()->clientScript->registerScript('deploymentModeVariableDeclaration',
+		"var bDeploymentModeOn = ".((YII_DEBUG)?"false":"true").";",
+		CClientScript::POS_HEAD);
+
 if (Yii::app()->user->isGuest == false)
 {
 	if($profilePhotoStatus <= 1)
@@ -1774,7 +1778,7 @@ else
 										<?php echo $form->labelEx($model, 'register', array('style'=>'cursor:text;')); ?>
 									</div>
 									
-									<div id="showPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:inline-block;">						
+									<div id="showPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:inline-block;z-index:200;">						
 									<?php					
 									echo CHtml::ajaxLink("<div id=\"publicPhotosCamera\" class=\"secondIcon icon-camera\"></div><div class=\"sliding-icon icon-group\"></div>", $this->createUrl('upload/getPublicList', array('fileType'=>0)),
 											array(
@@ -1793,7 +1797,7 @@ else
 									?>
 									</div>
 
-									<div id="showCachedPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:none;">
+									<div id="showCachedPublicPhotosLink" class="hi-icon-effect-5 hi-icon-effect-5b" style="position:absolute;left:305px;bottom:6px;display:none;z-index:200;">
 									<?php 	
 									echo CHtml::label("<div id=\"publicPhotosCameraCached\" class=\"secondIcon icon-camera\"></div><div class=\"sliding-icon icon-group\"></div>", "#",
 											array(
@@ -2186,7 +2190,7 @@ else
 								<?php echo CHtml::label(Yii::t('layout', 'Public Photos'), "#", array('style'=>'cursor:text;')); ?>
 							</div>
 							
-							<div id="showRegisterFormLink" class="hi-icon-effect-5 hi-icon-effect-5a" style="position:absolute;left:305px;bottom:6px;display:inline-block;">						
+							<div id="showRegisterFormLink" class="hi-icon-effect-5 hi-icon-effect-5a" style="position:absolute;left:305px;bottom:6px;display:inline-block;z-index:200;">						
 							<?php						
 							
 							echo CHtml::label("Show Register Form", "#",

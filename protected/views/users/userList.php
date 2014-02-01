@@ -294,7 +294,7 @@ if ($dataProvider != null) {
 
 				    				'value'=> $isFriendList?'getFriendPhoto($data, $row, true)':'getFriendPhoto($data, $row, false)',
 
-				    				'htmlOptions'=>array('width'=>'40px', 'height'=>'48px', 'style'=>'text-align: center;')
+				    				'htmlOptions'=>array('width'=>'40px', 'height'=>'50px', 'style'=>'text-align: center;')
 				    				//'visible'=>$isFriendList || $isFriendRequestList
 				    		),		    		
 		    		

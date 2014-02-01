@@ -136,8 +136,8 @@ function getContentFor(userId, imageSrc) {
  */	
 function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) {
 
-	//alert("processUsers(), start - TRACKER.users.length:" + TRACKER.users.length);
-	//alert('processUsers() called');
+	//alertMsg("processUsers(), start - TRACKER.users.length:" + TRACKER.users.length);
+	//alertMsg('processUsers() called');
 	
 	//Default value implementation in JS
 	//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
@@ -146,7 +146,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //	if(typeof deletedFriendId !== 'undefined')
 //	{
 //		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
-//		//alert("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
+//		//alertMsg("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
 //		
 //		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
 //		{
@@ -168,14 +168,14 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	{
 		updateType = par_updateType;
 		
-		//alert("if - updateType: " + updateType);
+		//alertMsg("if - updateType: " + updateType);
 	}
 	else
 	{
-		//alert("else - updateType: " + updateType);
+		//alertMsg("else - updateType: " + updateType);
 	}
 		
-	//alert("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
+	//alertMsg("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
 	
 	var userIdArray = new Array();
 	var newFriend = false;
@@ -205,7 +205,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			visible = true;
 		}
 		
-		//alert("userId:" + userId);		
+		//alertMsg("userId:" + userId);		
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
@@ -252,18 +252,19 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				break;
 
 				default:
-					//alert("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
+					//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
 					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
 					userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
 			}
 			
-//			if(userId === currentUser)
-//			{
-//				currentUserMarker = userMarker;
-//			}			
+			if(userId === currentUser)
+			{
+				//main.php ve userAreaView.php dosyalarinda kullaniliyor
+				currentUserMarker = userMarker;
+			}			
 			
 			newFriend = true;
-			//alert('userId:' + userId + ' added');
+			//alertMsg('userId:' + userId + ' added');
 	
 			var markerInfo= new MapStruct.MapMarker({marker:userMarker});
 			
@@ -301,7 +302,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 			
 			MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
-				//alert(userId + ". marker clicked");
+				//alertMsg(userId + ". marker clicked");
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
@@ -315,7 +316,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		}
 		else
 		{						
-			//alert("else");
+			//alertMsg("else");
 			
 			var time = dataArrivedTime;
 			var deviceId = deviceId;
@@ -401,9 +402,9 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		}
 	});
 	
-	//alert("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
+	//alertMsg("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
 	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
-	//alert('TRACKER.users.size:' + size);
+	//alertMsg('TRACKER.users.size:' + size);
 	
 //	var allKeys = "";
 //	
@@ -411,7 +412,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //		allKeys += key + " ";
 //	}
 //	
-//	alert("allKeys: " + allKeys);
+//	alertMsg("allKeys: " + allKeys);
 	
 	var anyDeletedFriend = false;
 	
@@ -430,7 +431,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	
 	    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
 	    	{
-	    		//alert('userId:' + key + ' deleted');
+	    		//alertMsg('userId:' + key + ' deleted');
 	    		//Bir once tiklanan kisi bu yeni arkadasliktan cikmis kisi ise
 	    		if(TRACKER.preUserId == key)
 	    		{
@@ -456,7 +457,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //	        key <= 4294967294                // away below
 //	        ) {
 //			
-//	    	//alert("processUsers(), TRACKER.users[" + key + "]: false");
+//	    	//alertMsg("processUsers(), TRACKER.users[" + key + "]: false");
 //	    			
 //	    	if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
 //	    	{
@@ -472,7 +473,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //
 //		    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
 //		    	{
-//		    		//alert('userId:' + key + ' deleted');
+//		    		//alertMsg('userId:' + key + ' deleted');
 //		    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
 //		    		
 //		    		if(TRACKER.users[key].infoWindowIsOpened)
@@ -483,17 +484,17 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 ////		    		if(typeof $.fn.yiiGridView != "undefined")
 ////		    		{
 ////			    		$.fn.yiiGridView.update("userListView");
-////			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alert("userListView updated"); } });
+////			    		//$.fn.yiiGridView.update('userListView',{ complete: function(){ alertMsg("userListView updated"); } });
 ////		    		}		    		
 //		    		
 ////		            var myElem = document.getElementById('uploadListView');
 ////		            if(myElem == null)
 ////		            {
-////		           	 alert('userListView YOK!');
+////		           	 alertMsg('userListView YOK!');
 ////		            }
 ////		            else
 ////		            {
-////		           	 alert('userListView VAR');
+////		           	 alertMsg('userListView VAR');
 ////		            }		    		
 //		    		
 //		    		delete TRACKER.users[key];
@@ -509,24 +510,24 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	//Sayfa bir kere yuklendikten yani tum arkadaslar alindiktan sonra yeni arkadas geldiyse
 	if((anyDeletedFriend === true) || ((TRACKER.updateFriendListPageCount == 1) && (newFriend === true)))
 	{
-		//alert('$.fn.yiiGridView.settings["userListView"]: ' + typeof $.fn.yiiGridView.settings["userListView"]);
+		//alertMsg('$.fn.yiiGridView.settings["userListView"]: ' + typeof $.fn.yiiGridView.settings["userListView"]);
 		
 		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings["userListView"] == "undefined"))	
 		{
 			//Do not update
 			
-			//alert('NOT UPDATED 1');
+			//alertMsg('NOT UPDATED 1');
 		}
 		else
 		{
 			$.fn.yiiGridView.update("userListView");
 			
-			//alert('$.fn.yiiGridView.update("userListView")');
+			//alertMsg('$.fn.yiiGridView.update("userListView")');
 		}
 	}
 	else
 	{
-		//alert('NOT UPDATED 2');
+		//alertMsg('NOT UPDATED 2');
 	}
 	
 	delete userIdArray;
@@ -536,18 +537,18 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 
 function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbSuffix){
 	
-	//alert("processUploads() called");
+	//alertMsg("processUploads() called");
 	var updateType = 'all';
 	
 	if(typeof par_updateType !== 'undefined')
 	{
 		updateType = par_updateType;
 		
-		//alert("processUploads - if updateType: " + updateType);
+		//alertMsg("processUploads - if updateType: " + updateType);
 	}
 	else
 	{
-		//alert("processUploads - else updateType: " + updateType);
+		//alertMsg("processUploads - else updateType: " + updateType);
 	}
 	
 	if(typeof par_thumbSuffix !== 'undefined')
@@ -557,22 +558,22 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 
 	var newUpload = false;
 	
-	//alert("uploads.length:" + uploads.length);
+	//alertMsg("uploads.length:" + uploads.length);
 	
 	//$(xml).find("page").find("upload").each(function(){
 	$.each(uploads, function(index, value)
 	{				
-		//alert("processImageXML(), find-each");
+		//alertMsg("processImageXML(), find-each");
 
 		var imageId = value.id;
-		//alert("imageId:" + imageId);
+		//alertMsg("imageId:" + imageId);
 		
 		//uploadIdArray.push(imageId);
 		
 		var imageURL = decodeURIComponent(value.url); //decodeURIComponent($(image).attr('url'));
 		
-		//alert("value.url: " + value.url);
-		//alert("decodeURIComponent(value.url): " + decodeURIComponent(value.url));
+		//alertMsg("value.url: " + value.url);
+		//alertMsg("decodeURIComponent(value.url): " + decodeURIComponent(value.url));
 		
 		var realname = value.byRealName;
 		var userId = value.byUserId;
@@ -582,7 +583,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		var rating = value.rating;
 		var description = ""; //value.description; //$(image).attr('description');
 		
-		//alert(value.description);
+		//alertMsg(value.description);
 		
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		
@@ -595,7 +596,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 			
 			newUpload = true;
 			
-			//alert("images["+ imageId +"] is undefined!");
+			//alertMsg("images["+ imageId +"] is undefined!");
 	
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			//image = imageURL + "&fileType=0&thumb=ok";
@@ -615,7 +616,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 				description:description,
 			});
 			
-			//alert("MAP.setMarkerVisible(true)");
+			//alertMsg("MAP.setMarkerVisible(true)");
 						
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN					
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
@@ -672,9 +673,9 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		}
 		else
 		{
-			//alert("images["+ imageId +"] is already defined");
+			//alertMsg("images["+ imageId +"] is already defined");
 			
-			//alert("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
+			//alertMsg("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
 			
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN		
 		}
@@ -691,7 +692,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //		allKeys += key + " ";
 //	}
 //	
-//	alert("allKeys: " + allKeys);
+//	alertMsg("allKeys: " + allKeys);
 	
 	for (var key in TRACKER.images) {	    			
 		if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
@@ -710,7 +711,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
 //	        key <= 4294967294                // away below
 //	        ) {
-//			//alert("processUsers(), TRACKER.images[" + key + "]: false");
+//			//alertMsg("processUsers(), TRACKER.images[" + key + "]: false");
 //
 //			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
 //			{
@@ -723,7 +724,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //				
 ////		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
 ////		    	{
-////		    		//alert('uploadId:' + key + 'deleted');
+////		    		//alertMsg('uploadId:' + key + 'deleted');
 ////		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
 ////		    		
 ////		    		if(TRACKER.images[key].infoWindowIsOpened)
@@ -734,7 +735,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 ////		    		if(typeof $.fn.yiiGridView != "undefined")
 ////		    		{
 ////			    		$.fn.yiiGridView.update(uploadsGridViewId);
-////			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+////			    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alertMsg("uploadListView updated"); } });
 ////		    		}		    		
 ////
 ////		    		delete TRACKER.images[key];
@@ -749,7 +750,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 	{				
 		var uploadId = value.uploadId;
 
-    	//alert('uploadId:' + uploadId + ' deleted');
+    	//alertMsg('uploadId:' + uploadId + ' deleted');
     	
     	if((typeof TRACKER.images[uploadId] !== "undefined") && (TRACKER.images[uploadId] !== null))
     	{
@@ -765,7 +766,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //    		if(typeof $.fn.yiiGridView != "undefined")
 //    		{
 //	    		$.fn.yiiGridView.update(uploadsGridViewId);
-//	    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alert("uploadListView updated"); } });
+//	    		//$.fn.yiiGridView.update('uploadListView',{ complete: function(){ alertMsg("uploadListView updated"); } });
 //    		}		    		
 
     		delete TRACKER.images[uploadId];   		
@@ -779,25 +780,25 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		{
 			//Do not update
 			
-			//alert('NOT UPDATED 1 - 1.cond:' + (typeof $.fn.yiiGridView == "undefined") + ' / 2. cond:' + (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined") + ' / uploadsGridViewId:' + uploadsGridViewId);
+			//alertMsg('NOT UPDATED 1 - 1.cond:' + (typeof $.fn.yiiGridView == "undefined") + ' / 2. cond:' + (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined") + ' / uploadsGridViewId:' + uploadsGridViewId);
 		}
 		else
 		{
 			$.fn.yiiGridView.update(uploadsGridViewId);
 			
-			//alert('$.fn.yiiGridView.update(uploadsGridViewId)');
+			//alertMsg('$.fn.yiiGridView.update(uploadsGridViewId)');
 		}		
 		
-		//alert("Deleted or New Upload");
+		//alertMsg("Deleted or New Upload");
 	}
 	else
 	{
-		//alert('NOT UPDATED 2 - TRACKER.allImagesFetched: ' + TRACKER.allImagesFetched + ' / newUpload: ' + newUpload);
+		//alertMsg('NOT UPDATED 2 - TRACKER.allImagesFetched: ' + TRACKER.allImagesFetched + ' / newUpload: ' + newUpload);
 	}
 	
 	//delete uploadIdArray;
 	
-	//alert("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
+	//alertMsg("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
 }
 
 /**
@@ -808,18 +809,18 @@ function processImageXML(MAP, xml){
 	TRACKER.imageThumbSuffix = decodeURIComponent($(xml).find("page").attr("thumbSuffix"));
 //	TRACKER.imageOrigSuffix = decodeURIComponent($(xml).find("page").attr("origSuffix"));
 	
-	//alert("processImageXML(), start - TRACKER.images.length:" + TRACKER.images.length);
+	//alertMsg("processImageXML(), start - TRACKER.images.length:" + TRACKER.images.length);
 
 	var updateType = decodeURIComponent($(xml).find("page").attr("updateType"));
 	
-	//alert("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
+	//alertMsg("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
 	
 	var uploadIdArray = new Array();
 	var newUpload = false;	
 	
 	$(xml).find("page").find("upload").each(function(){
 		
-		//alert("processImageXML(), find-each");
+		//alertMsg("processImageXML(), find-each");
 		
 		var image = $(this);
 		var imageId = $(image).attr('id');
@@ -845,7 +846,7 @@ function processImageXML(MAP, xml){
 			
 			newUpload = true;
 			
-			//alert("images["+ imageId +"] is undefined!");
+			//alertMsg("images["+ imageId +"] is undefined!");
 	
 			image = imageURL + "&fileType=0&"+ TRACKER.imageThumbSuffix;
 			//image = imageURL + "&fileType=0&thumb=ok";
@@ -865,7 +866,7 @@ function processImageXML(MAP, xml){
 				description:description,
 			});
 			
-			//alert("MAP.setMarkerVisible(true)");
+			//alertMsg("MAP.setMarkerVisible(true)");
 						
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN					
 			MAP.setMarkerClickListener(TRACKER.images[imageId].mapMarker.marker,function (){
@@ -922,9 +923,9 @@ function processImageXML(MAP, xml){
 		}
 		else
 		{
-			//alert("images["+ imageId +"] is already defined");
+			//alertMsg("images["+ imageId +"] is already defined");
 			
-			//alert("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
+			//alertMsg("TRACKER.showImagesOnTheMap: " + TRACKER.showImagesOnTheMap);
 			
 			MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN		
 		}
@@ -940,7 +941,7 @@ function processImageXML(MAP, xml){
 	        /^0$|^[1-9]\d*$/.test(key) &&    // and then hidden
 	        key <= 4294967294                // away below
 	        ) {
-			//alert("processUsers(), TRACKER.images[" + key + "]: false");
+			//alertMsg("processUsers(), TRACKER.images[" + key + "]: false");
 
 			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
 			{
@@ -953,7 +954,7 @@ function processImageXML(MAP, xml){
 				
 		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
 		    	{
-		    		//alert('uploadId:' + key + 'deleted');
+		    		//alertMsg('uploadId:' + key + 'deleted');
 		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
 		    		
 		    		if(TRACKER.images[key].infoWindowIsOpened)
@@ -965,7 +966,7 @@ function processImageXML(MAP, xml){
 		    		{
 		    			//Do not update
 		    			
-		    			//alert('NOT UPDATED 1');
+		    			//alertMsg('NOT UPDATED 1');
 		    		}
 		    		else
 		    		{
@@ -984,7 +985,7 @@ function processImageXML(MAP, xml){
 		{
 			//Do not update
 			
-			//alert('NOT UPDATED 1');
+			//alertMsg('NOT UPDATED 1');
 		}
 		else
 		{
@@ -994,7 +995,7 @@ function processImageXML(MAP, xml){
 	
 	delete uploadIdArray;
 	
-	//alert("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
+	//alertMsg("processImageXML(), stop - TRACKER.images.length:" + TRACKER.images.length);
 	
 	return list;
 }

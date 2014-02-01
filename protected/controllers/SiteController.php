@@ -2178,7 +2178,7 @@ class SiteController extends Controller
 		
 		Yii::app()->session['publicUploadsPageSize'] = (int)(($_POST['height'] - 150)/50);
 		Yii::app()->session['uploadsPageSize'] = (int)(($_POST['height'] - 200)/50);
-		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 170)/48);
+		Yii::app()->session['usersPageSize'] = (int)(($_POST['height'] - 180)/50);
 		Yii::app()->session['groupsPageSize'] = (int)(($_POST['height'] - 75)/38);
 		
 // 		Fb::warn(Yii::app()->session['publicUploadsPageSize'], "publicUploadsPageSize");
@@ -2188,31 +2188,40 @@ class SiteController extends Controller
 		echo json_encode(array('outcome'=>'success'));		
 	}
 
-	public function actionAjaxErrorOccured()
+	public function actionAjaxEmailNotification()
 	{	
-		//Fb::warn("actionAjaxErrorOccured() called", "SiteController");		
+		Fb::warn("actionAjaxEmailNotification() called", "SiteController");		
 
-		$errorMessage = 'Error Info: </br></br>';
+		$title = null;
+		$message = null;
 		$params = null;
 		
 		$name = null;
 		$email = null;
 			
-		Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);		
-	
-		if(isset($_REQUEST['errorMessage']))
+		Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+
+		if(isset($_REQUEST['title']))
 		{
-			$errorMessage .= $_REQUEST['errorMessage'];
+			$title = $_REQUEST['title'];
+		}		
+	
+		if(isset($_REQUEST['message']))
+		{
+			$message = $_REQUEST['message'];
 		}
 		
+		$message .= '</br></br>----------------------------------------------------------------------------------------------</br></br>';
+		
 		if (Yii::app()->user->isGuest == false)
-		{
-			$errorMessage .= '</br></br>-----------------------------------------------</br></br>';
-			$errorMessage .= 'User Info: </br></br>';
-			$errorMessage .= 'Id: '.Yii::app()->user->id.'</br>';
-			$errorMessage .= 'Name: '.$name.'</br>';
-			$errorMessage .= 'E-mail: '.$email.'</br>';			
+		{			
+			$message .= 'User Info: </br></br>';
+			$message .= 'Id: '.Yii::app()->user->id.'</br>';
+			$message .= 'Name: '.$name.'</br>';
+			$message .= 'E-mail: '.$email.'</br>';
 		}
+		
+		$message .= 'Server Info: '.Yii::app()->request->getServerName().'</br>';
 
 		if(isset($_REQUEST['params']))
 		{
@@ -2226,13 +2235,15 @@ class SiteController extends Controller
 
 		if(Yii::app()->session[$params] < 1)
 		{
-			if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'AJAX Error Occured!', $errorMessage, false /*Do not add footer for error message*/))
+			if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', $title, $message, false /*Do not add footer for error message*/))
 			{
 				//Mail gönderildi
+				Fb::warn("mail SENT", "actionAjaxEmailNotification()");
 			}
 			else
 			{
 				//Mail gönderilirken hata oluştu
+				Fb::warn("mail CANNOT be sent!", "actionAjaxEmailNotification()");
 			}
 		
 			Yii::app()->session[$params] = Yii::app()->session[$params] + 1;
