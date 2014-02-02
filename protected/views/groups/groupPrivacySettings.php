@@ -78,7 +78,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 												}
 											 }',
 						),
-						array('id'=>'setPrivacyRightsAjaxButton-'.uniqid(), 'style'=>'padding-right:4px;'));				
+						array('id'=>'setPrivacyRightsAjaxButton-'.uniqid(), 'style'=>'padding-right:8px;'));				
 				
 // 				echo CHtml::htmlButton(Yii::t('common', 'Cancel'),  
 // 													array(

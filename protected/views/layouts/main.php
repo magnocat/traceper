@@ -40,6 +40,8 @@
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/modernizr.custom.js"></script>
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/cbpTooltipMenu.js"></script>
+<script type="text/javascript"
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery.placeholder.js"></script>	
 
 <?php
 
@@ -272,7 +274,9 @@ Yii::app()->clientScript->registerScript('formTooltips',
 			 interactive: true,
         	 });		
 
-        bindTooltipActions();			
+        bindTooltipActions();
+
+		$('input, textarea').placeholder(); //Placeholder desteklemeyen browser'lar icin
 		",
 		CClientScript::POS_READY);
 
@@ -485,19 +489,19 @@ Yii::app()->clientScript->registerScript('browserDetection',
 			            string: navigator.userAgent,
 			            subString: "Firefox",
 			            identity: "Firefox"
+			        },		
+			        {
+			            string: navigator.userAgent,
+			            subString: "MSIE",
+			            identity: "Internet Explorer",
+			            versionSearch: "MSIE"
 			        },
 			        {
 			            string: navigator.userAgent,
 			            subString: "Trident",
 			            identity: "Internet Explorer",
 			            versionSearch: "rv"
-			        },		
-			        {
-			            string: navigator.userAgent,
-			            subString: "MSIE",
-			            identity: "Explorer",
-			            versionSearch: "MSIE"
-			        },				
+			        },						
 			        {
 			            string: navigator.userAgent,
 			            subString: "OmniWeb",
@@ -659,9 +663,9 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	}
 	catch (e) {
 
-	}
-		",
-		CClientScript::POS_READY);
+	}			
+	",
+	CClientScript::POS_READY);
 
 if (Yii::app()->user->isGuest == false)
 {
@@ -1109,8 +1113,9 @@ else
 																	//alert("result:1");
 										
 																	$("#tabViewList").html(obj.renderedTabView);
-																	$("#userarea").html(obj.renderedUserAreaView);										
-																	$("#loginBlock").html(obj.loginSuccessfulActions);
+																	$("#userarea").html(obj.renderedUserAreaView);
+																	$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);										
+																	$("#loginBlock").html(obj.loginSuccessfulActions);																											
 																}
 																else if (obj.result == "-3")
 																{
@@ -1178,35 +1183,11 @@ else
 					
 
 				}  ?>>
-				
-				
 
 					<div id='userarea'>
 					<?php if (Yii::app()->user->isGuest == false){ ?>
 						<div style="position:absolute;display:inline-block;">
 						<?php
-
-							//echo Yii::app()->user->name;
-
-							//Fb::warn(Yii::app()->user->fb_id, "fb_id");
-
-// 							if($profilePhotoStatus != 0)
-// 							{
-// 								if(Yii::app()->user->fb_id == 0)
-// 								{
-// 									$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();																		
-// 								}
-// 								else
-// 								{
-// 									$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';																		
-// 								}
-// 							}
-// 							else
-// 							{
-// 								$profilePhotoSource = null;
-// 							}
-							
-							//Fb::warn($profilePhotoSource, "profilePhotoSource");
 
 							$this->widget('ext.EAjaxUpload.EAjaxUpload',
 									array(
@@ -1519,6 +1500,8 @@ else
 						{
 							//Bir kullanıcı ID'si olmadığından sorgu yapma
 						}
+						
+						//Fb::warn("newRequestsCount:$newRequestsCount - totalRequestsCount:$totalRequestsCount", "main");
 
 						if($newRequestsCount > 0)
 						{	
@@ -1537,7 +1520,7 @@ else
 						}						
 						?>
 											
-						<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations" style="position: relative;"> <!-- Friend req sayisini buna gore konumlandırmak icin parent'in da position ozelligi set edilmeli  -->						
+						<div id="FriendRequestsIconLink" class="hi-icon-effect-1 hi-icon-effect-1a userOperations" style="position: relative;"> <!-- Friend req sayisini buna gore konumlandırmak icin parent'in da position ozelligi set edilmeli  -->						
 							<?php
 							if($newRequestsCount > 0)
 							{
@@ -2015,14 +1998,15 @@ else
 																	}
 																	catch (error)
 																	{
-																		$("#hiddenAjaxResponseToParse").html(msg);
+																		$("#hiddenAjaxResponseToParse").html(msg);																		
 																		//alert(document.getElementById("ajaxRegisterResponse").innerHTML);
-																		$("#forRegisterRefresh").html(document.getElementById("ajaxRegisterResponse").innerHTML);
-																		$("#hiddenAjaxResponseToParse").html("");																		
+																		$("#forRegisterRefresh").html(document.getElementById("ajaxRegisterResponse").innerHTML);																		
+																		$("#hiddenAjaxResponseToParse").html("");
+																		$("input, textarea").placeholder(); //Placeholder desteklemeyen browserlar icin																		
 													
 // 																		$("#forRegisterRefresh").html(msg);
 // 																		setTimeout(function(){document.getElementById("registerButton").className = "btn btn-green btn-green-a icon-signup";}, 10);
-																	
+																																																
 																		//alert("Deneme");
 																	}
 																}',

@@ -52,11 +52,11 @@ function resetAllFormErrors()
 	$("#RegisterForm_emailAgain").tooltipster('update', "");
 	$("#RegisterForm_emailAgain").tooltipster("hide");
 	
-	$("#RegisterForm_password").tooltipster('update', "");
-	$("#RegisterForm_password").tooltipster("hide");
+	$("#registerPasswordField").tooltipster('update', "");
+	$("#registerPasswordField").tooltipster("hide");
 	
-	$("#RegisterForm_passwordAgain").tooltipster('update', "");
-	$("#RegisterForm_passwordAgain").tooltipster("hide");
+	$("#registerPasswordAgainField").tooltipster('update', "");
+	$("#registerPasswordAgainField").tooltipster("hide");
 
 	$("#LoginForm_email").tooltipster('update', "");
 	$("#LoginForm_email").tooltipster("hide");
@@ -107,12 +107,12 @@ function hideRegisterFormErrorsIfExist()
 
   	if(bRegisterFormPasswordErrorExists)
 	{
-		$("#RegisterForm_password").tooltipster("hide");
+		$("#registerPasswordField").tooltipster("hide");
 	}
 
   	if(bRegisterFormPasswordAgainErrorExists)
 	{
-		$("#RegisterForm_passwordAgain").tooltipster("hide");
+		$("#registerPasswordAgainField").tooltipster("hide");
 	}	
 }
 
@@ -173,12 +173,12 @@ function showRegisterFormErrorsIfExist()
 
 	if(bRegisterFormPasswordErrorExists)
 	{
-		$("#RegisterForm_password").tooltipster("show");
+		$("#registerPasswordField").tooltipster("show");
 	}
 
 	if(bRegisterFormPasswordAgainErrorExists)
 	{
-		$("#RegisterForm_passwordAgain").tooltipster("show");
+		$("#registerPasswordAgainField").tooltipster("show");
 	}	
 }
 

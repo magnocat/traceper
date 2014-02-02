@@ -53,7 +53,7 @@
 				 interactive: true,
          	 });
 
-			$("#RegisterForm_password").tooltipster({
+			$("#registerPasswordField").tooltipster({
 	         	 theme: ".tooltipster-error",
 	         	 position: "bottom-left",
 	         	 trigger: "custom",
@@ -63,16 +63,17 @@
 				 offsetX: 130,
          	 });	
 
-			$("#RegisterForm_passwordAgain").tooltipster({
+			$("#registerPasswordAgainField").tooltipster({
 	         	 theme: ".tooltipster-error",
 	         	 position: "right",
 	         	 trigger: "custom",
 	         	 maxWidth: 540,
 	         	 onlyOne: false,
 				 interactive: true,
+				 offsetX: -10,
          	 });
-		</script>	
-	
+		</script>
+
 		<div class="sideMenu">
 			<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
 			<?php //echo $form->labelEx($model,'name'); ?>
@@ -204,7 +205,7 @@
 		</div>							
 
 		<div class="sideMenu">
-			<div style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
+			<div id="registerPasswordField" style="position:absolute;display:inline-block;vertical-align:top;width:49%;">
 			<?php //echo $form->labelEx($model,'password'); ?>
 			<?php echo $form->passwordField($model,'password', array('size'=>'22%','maxlength'=>128,'tabindex'=>11,'placeholder'=>Yii::t('site', 'Password'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
 			<?php $errorMessage = $form->error($model,'password');
@@ -214,7 +215,7 @@
 					?>
 					<script type="text/javascript">
 						bRegisterFormPasswordErrorExists = false;
-						$("#RegisterForm_password").tooltipster('hide');
+						$("#registerPasswordField").tooltipster('hide');
 					</script>
 					<?php				
 				}
@@ -223,15 +224,15 @@
 				?>
 				<script type="text/javascript">
 					bRegisterFormPasswordErrorExists = true;
-		            $("#RegisterForm_password").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-		            $("#RegisterForm_password").tooltipster('show');					
+		            $("#registerPasswordField").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
+		            $("#registerPasswordField").tooltipster('show');					
 				</script>				
 				<?php			
 				}
 			?>
 			</div>
 			
-			<div style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
+			<div id="registerPasswordAgainField" style="position:absolute;left:13.6em;display:inline-block;vertical-align:top;width:49%;">
 			<?php //echo $form->labelEx($model,'passwordAgain'); ?>
 			<?php echo $form->passwordField($model,'passwordAgain', array('size'=>'22%','maxlength'=>128,'tabindex'=>12,'placeholder'=>Yii::t('site', 'Password (Again)'),'class'=>'registerFormField','style'=>'width:145px;')); ?>
 			<?php $errorMessage = $form->error($model,'passwordAgain'); 
@@ -241,7 +242,7 @@
 					?>
 					<script type="text/javascript">
 						bRegisterFormPasswordAgainErrorExists = false;
-						$("#RegisterForm_passwordAgain").tooltipster('hide');
+						$("#registerPasswordAgainField").tooltipster('hide');
 					</script>
 					<?php				
 				}
@@ -250,8 +251,8 @@
 				?>
 				<script type="text/javascript">
 					bRegisterFormPasswordAgainErrorExists = true;
-		            $("#RegisterForm_passwordAgain").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-		            $("#RegisterForm_passwordAgain").tooltipster('show');					
+		            $("#registerPasswordAgainField").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
+		            $("#registerPasswordAgainField").tooltipster('show');					
 				</script>				
 				<?php			
 				}

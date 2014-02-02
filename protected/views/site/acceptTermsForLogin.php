@@ -85,6 +85,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 						
 													$("#tabViewList").html(obj.renderedTabView);
 													$("#userarea").html(obj.renderedUserAreaView);
+													$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
 													$("#loginBlock").html(obj.loginSuccessfulActions);
 												}
 											}

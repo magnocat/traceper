@@ -144,14 +144,7 @@
 // 		'update'=>'#users_tab',
 // 		)
 // 	);
-
-// 	CHtml::ajax(
-// 		array(
-// 		'url'=>Yii::app()->createUrl('users/getFriendList', array('userType'=>array(UserType::RealStaff, UserType::GPSStaff))),
-// 		'update'=>'#staff_tab',
-// 		)
-// 	);
-													
+											
 // 	CHtml::ajax(
 // 		array(
 // 		'url'=> Yii::app()->createUrl('upload/getList', array('fileType'=>0)),
@@ -165,13 +158,7 @@
 // 		'update'=>'#groups_tab',
 // 		)
 // 	);
-													
-// 	CHtml::ajax(
-// 		array(
-// 		'url'=> Yii::app()->createUrl('groups/getGroupList', array('groupType'=>GroupType::StaffGroup)),
-// 		'update'=>'#staff_groups_tab',
-// 		)
-// 	);	
+	
 ?>
 
 <script type="text/javascript">
