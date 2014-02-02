@@ -658,7 +658,10 @@ cursor:pointer;
     color: #acacac;
 }
 
-
+/*Placeholder desteklemeyen browser'larda devreye giren jquery plugin'i ici css degerleri START*/
+input, textarea { color: #000; }
+.placeholder { color: #aaa; }
+/*Placeholder desteklemeyen browser'larda devreye giren jquery plugin'i ici css degerleri END*/
 
 /* *, */
 /* *:after, */

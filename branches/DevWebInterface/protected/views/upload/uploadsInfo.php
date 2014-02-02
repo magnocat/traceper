@@ -35,7 +35,11 @@
 			$("#uploadSearchField").blur(function (){
 				$("#uploadSearchField").tooltipster("hide");
 			});				
-			', CClientScript::POS_HEAD);	
+			', CClientScript::POS_HEAD);
+
+		Yii::app()->clientScript->registerScript('searchPhotoPlaceholderForNonSupportingBrowsers',
+				"$('input, textarea').placeholder(); //Placeholder desteklemeyen browser'lar icin",
+				CClientScript::POS_READY);		
 		 ?>
 		 
 		<div class="row">

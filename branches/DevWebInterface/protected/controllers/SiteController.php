@@ -358,12 +358,34 @@ class SiteController extends Controller
 										//$profilePhotoStatusTooltipMessage = '5';
 									}
 									break;
+							}
+
+							$newRequestsCount = null;
+							$totalRequestsCount = null;
+							
+							Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+
+							if($newRequestsCount > 0)
+							{
+								if($newRequestsCount <= 5)
+								{
+									$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
+								}
+								else
+								{
+									$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
+								}
+							}
+							else
+							{
+								$friendReqTooltip = Yii::t('users', 'Friendship Requests');
 							}							
 							
 							echo CJSON::encode(array(
 									"result"=> "1",
 									"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 									"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
+									"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
 									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, $processOutput),
 							));							
 								
@@ -688,12 +710,34 @@ class SiteController extends Controller
 								//$profilePhotoStatusTooltipMessage = '5';
 							}
 							break;
+					}
+
+					$newRequestsCount = null;
+					$totalRequestsCount = null;
+						
+					Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+					
+					if($newRequestsCount > 0)
+					{
+						if($newRequestsCount <= 5)
+						{
+							$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
+						}
+						else
+						{
+							$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
+						}
+					}
+					else
+					{
+						$friendReqTooltip = Yii::t('users', 'Friendship Requests');
 					}					
 					
 					echo CJSON::encode(array(
 							"result"=> "1",
 							"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 							"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
+							"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
 							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, true),
 					));					
 			
@@ -772,7 +816,7 @@ class SiteController extends Controller
 	 */
 	public function actionChangePassword()
 	{
-		Fb::warn("actionChangePassword() called", "SiteController");
+		//Fb::warn("actionChangePassword() called", "SiteController");
 		
 		$model = new ChangePasswordForm;
 

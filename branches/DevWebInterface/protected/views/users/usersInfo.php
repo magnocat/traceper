@@ -31,7 +31,11 @@
 			$("#userSearchField").tooltipster("hide"); 		
 		});			
 			
-			', CClientScript::POS_HEAD);	
+			', CClientScript::POS_HEAD);
+
+		Yii::app()->clientScript->registerScript('searchUserPlaceholderForNonSupportingBrowsers',
+				"$('input, textarea').placeholder(); //Placeholder desteklemeyen browser'lar icin",
+				CClientScript::POS_READY);		
 		 ?>
 		<div class="row">
 			<?php // echo $form->labelEx($model,'keyword'); ?>
