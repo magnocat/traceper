@@ -5,43 +5,95 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="keywords" content="" />
 <meta name="description" content="Location-based social network and GPS tracking system" />
+
 <link rel="stylesheet" type="text/css"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/css/cssreset-min.css" />
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css"
-	media="screen, projection" />
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />	
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/iconfonts.css" />
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/tooltipMenu.css" />			
+	
+<?php
+if (YII_DEBUG)
+{		
+	?>	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/style.css"
+		media="screen, projection" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/main.css" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/form.css" />	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/iconfonts.css" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/tooltipMenu.css" />
+	<?php
+}
+else //DEPLOYMENT
+{
+	?>	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/style-min.css"
+		media="screen, projection" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/main-min.css" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/form-min.css" />	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/iconfonts-min.css" />
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/tooltipMenu-min.css" />
+	<?php		
+}
+?>				
 					
 <link rel="shortcut icon"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png"
-	type="image/x-icon" />
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/DataOperations.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/MapStructs.js"></script>	
-
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/GMapOperator.js"></script>
+	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon" />
+	
+<?php
+if (YII_DEBUG)
+{		
+	?>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/DataOperations.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/normal/MapStructs.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/normal/GMapOperator.js"></script>	
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/TrackerOperator.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/LanguageOperator.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/svgcheckbx.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/cbpTooltipMenu.js"></script>	
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/jquery.placeholder.js"></script>
+	<?php
+}
+else //DEPLOYMENT
+{
+	?>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/DataOperations.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/min/MapStructs.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/maps/min/GMapOperator.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/TrackerOperator.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/LanguageOperator.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/svgcheckbx.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/cbpTooltipMenu.min.js"></script>		
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/jquery.placeholder.min.js"></script>
+	<?php		
+}
+?>	
 	
 <script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/TrackerOperator.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/LanguageOperator.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgcheckbx.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/modernizr.custom.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/cbpTooltipMenu.js"></script>
-<script type="text/javascript"
-	src="<?php echo Yii::app()->request->baseUrl; ?>/js/jquery.placeholder.js"></script>	
+	src="<?php echo Yii::app()->request->baseUrl; ?>/js/modernizr.custom.js"></script>	
 
 <?php
 
@@ -191,7 +243,15 @@ if (Yii::app()->user->isGuest == false)
 	}	
 }
 
-Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl.'/css/tooltipster.css');
+if (YII_DEBUG)
+{
+	Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl.'/css/normal/tooltipster.css');
+}
+else //DEPLOYMENT
+{
+	Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl.'/css/min/tooltipster-min.css');	
+}
+
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/jquery.tooltipster.min.js', CClientScript::POS_END);
 
 Yii::app()->clientScript->registerScript('formTooltips',
@@ -574,10 +634,22 @@ Yii::app()->clientScript->registerScript('browserDetection',
 
 			//alert("navigator.userAgent: " + navigator.userAgent);
 			//alert("Browser is : " + BrowserDetect.browser + " " + BrowserDetect.version + " / OS: " + BrowserDetect.OS);
+
+		if((BrowserDetect.browser == "Internet Explorer") && (BrowserDetect.version <= 8))
+		{
+			alert("'.Yii::t('layout', 'Your Internet Explorer version is ').'" + BrowserDetect.version + ". " + "'.Yii::t('layout', 'Our website supports Internet Explorer versions higher than 8. Please use an Internet Explorer version of 9, 10 or higher or another modern browser (Chrome, Firefox, Safari...)').'");
+		}		
 		',
 		CClientScript::POS_HEAD);
 
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/bindings.js', CClientScript::POS_END);
+if (YII_DEBUG)
+{
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/normal/bindings.js', CClientScript::POS_END);
+}
+else //DEPLOYMENT
+{
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/min/bindings.min.js', CClientScript::POS_END);
+}
 
 if (Yii::app()->user->isGuest == false)
 {
@@ -659,7 +731,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 10000 /*Users query period*/ /*5000*/, 30000 /*Uploads query period*/ /*30000*/);
 		trackerOp.setLangOperator(langOp);
 		bindElements(langOp, trackerOp);
-		trackerOp.userId = ".$userId.";
+		trackerOp.userId = ".$userId.";		
 	}
 	catch (e) {
 
@@ -705,7 +777,6 @@ else
 	langOp.load("<?php echo $language;?>");  //TODO: itshould be parametric
 	
 	var mapOperator = new MapOperator("<?php echo $language;?>");
-
 
 	var h = $(window).height();
 	var w = $(window).width();
@@ -1733,7 +1804,7 @@ else
 						echo "style='display:none'";
 					}
 					else {
-						echo "style='height:85%;min-height:420px;'";
+						echo "style='height:85%;min-height:420px;padding-top:10px;'";
 					}				
 					?>>										
 							<div class="form" style='height:100%;'>
@@ -2159,7 +2230,7 @@ else
 					echo "style='display:none'";
 				}
 				else {
-					echo "style='display:none'";
+					echo "style='padding-top:10px;'";
 				}				
 				?>>
 					<div class="form"> <!-- Bu aslina form degil, fakat yazi stili ayni olmasi icin -->				
