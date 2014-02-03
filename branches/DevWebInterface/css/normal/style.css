@@ -501,13 +501,11 @@ display: none;
 
 .userOperations a:hover,
 .userOperations a:focus {
-	color: #FF7F00;
 	text-decoration:none;
 }
 
 .appOperations a:hover,
 .appOperations a:focus {
-	color: #FF7F00;
 	text-decoration:none;
 }
 
