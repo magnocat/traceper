@@ -1,9 +1,39 @@
-<link rel="stylesheet" type="text/css"
-	href="<?php echo Yii::app()->request->baseUrl; ?>/css/svgAnim.css" />
+<?php
+if (YII_DEBUG)
+{		
+	?>	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/normal/svgAnim.css" />
+	<?php
+}
+else //DEPLOYMENT
+{
+	?>	
+	<link rel="stylesheet" type="text/css"
+		href="<?php echo Yii::app()->request->baseUrl; ?>/css/min/svgAnim-min.css" />
+	<?php		
+}
+?>
+	
 <script type="text/javascript"
 	src="<?php echo Yii::app()->request->baseUrl; ?>/js/snap.svg-min.js"></script>
-<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgicons-config.js"></script>
-<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/svgicons.js"></script>	
+	
+<?php
+if (YII_DEBUG)
+{		
+	?>	
+	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/svgicons-config.js"></script>
+	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/svgicons.js"></script>
+	<?php
+}
+else //DEPLOYMENT
+{
+	?>	
+	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/svgicons-config.min.js"></script>
+	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/svgicons.min.js"></script>
+	<?php		
+}
+?>	
 
 <?php		
 if ($dataProvider != null) {

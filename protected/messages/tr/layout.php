@@ -89,6 +89,8 @@ return array(
 	'Use my Traceper profile photo' => 'Traceper profil fotoğrafımı kullan',
 	'Use my Facebook profile photo' => 'Facebook profil fotoğrafımı kullan',
 	'Upload a new Traceper profile photo and use it' => 'Yeni bir Traceper profil fotoğrafı yükle ve onu kullan',
+	'Your Internet Explorer version is ' => 'Internet Explorer versiyonunuz ',
+	'Our website supports Internet Explorer versions higher than 8. Please use an Internet Explorer version of 9, 10 or higher or another modern browser (Chrome, Firefox, Safari...)' => 'Web sitemiz Internet Explorer 8\'in üstündeki versiyonlarda düzgün görüntülenmektedir. Lütfen Internet Explorer\'ın daha üst versiyonlarını (9, 10, ...) veya diğer bir modern tarayıcı (Chrome, Firefox, Safari...) kullanınız.',
 	
 	'Traceper Terms' =>
 	'<b>Son Güncelleme: 28 Ekim 2013</b> </br></br>
