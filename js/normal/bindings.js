@@ -13,6 +13,7 @@ var bAppQRCodeTooltipOpened = false;
 
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
+var bCountryInfoExists = false;
 
 var currentUserMarker;
 
@@ -410,6 +411,7 @@ function bindElements(langOperator, trackerOp)
 			}			
 
 			//$('.logo_inFullMap').fadeIn().animate({left:'80px'});
+			
 			$('#sideBar > #content').fadeOut('slow');
 			$('#sideBar').animate({width:'0px'}, 
 							function(){ $('#sideBar > #content').hide();
@@ -418,7 +420,11 @@ function bindElements(langOperator, trackerOp)
 			
 			//$('#map').animate({width:'99%'});
 			$('#map').animate({width:(w - offsetLeft)});
+			
 			$('#bar').animate({left:'0px'});
+			
+			
+			
 		}
 	});
 	

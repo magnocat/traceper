@@ -738,7 +738,7 @@ class Users extends CActiveRecord
 		return $found;
 	}
 	
-	public function getLoginRequiredValues($userId, &$par_minDataSentInterval, &$par_minDistanceInterval, &$par_facebookId, &$par_autoSend, &$par_deviceId, &$par_androidVer, &$par_appVer, &$preferredLanguage)
+	public function getLoginRequiredValues($userId, &$par_minDataSentInterval, &$par_minDistanceInterval, &$par_facebookId, &$par_autoSend, &$par_deviceId, &$par_androidVer, &$par_appVer, &$par_preferredLanguage, &$par_latitude, &$par_longitude)
 	{
 		$user = Users::model()->findByPk($userId);
 		$result = false;
@@ -752,7 +752,9 @@ class Users extends CActiveRecord
 			$par_deviceId = $user->deviceId;
 			$par_androidVer = $user->androidVer;
 			$par_appVer = $user->appVer;
-			$preferredLanguage = $user->preferredLanguage;
+			$par_preferredLanguage = $user->preferredLanguage;
+			$par_latitude = $user->latitude;
+			$par_longitude = $user->longitude;
 	
 			$result = true;
 		}

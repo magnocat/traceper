@@ -208,6 +208,8 @@ class SiteController extends Controller
 			$minDistanceInterval = Yii::app()->params->minDistanceInterval;	 
 			$facebookId = 0; 
 			$autoSend = 0;
+			$latitude = 0;
+			$longitude = 0;
 			
 			$deviceId = null;
 			$androidVer = null;
@@ -222,7 +224,7 @@ class SiteController extends Controller
 				{
 					if($model->login())
 					{
-						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude);
 						
 						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
@@ -386,7 +388,7 @@ class SiteController extends Controller
 									"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 									"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 									"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
-									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, $processOutput),
+									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, $processOutput),
 							));							
 								
 							//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);							
@@ -561,6 +563,8 @@ class SiteController extends Controller
 			$minDistanceInterval = Yii::app()->params->minDistanceInterval;
 			$facebookId = 0;
 			$autoSend = 0;
+			$latitude = 0;
+			$longitude = 0;			
 				
 			$deviceId = null;
 			$androidVer = null;
@@ -574,7 +578,7 @@ class SiteController extends Controller
 			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
 			if($model->login())
 			{
-				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage);
+				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude);
 				
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
@@ -738,7 +742,7 @@ class SiteController extends Controller
 							"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 							"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 							"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
-							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), true/*return instead of being displayed to end users*/, true),
+							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, true),
 					));					
 			
 					//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, true);
@@ -2296,7 +2300,21 @@ class SiteController extends Controller
 		}		
 
 		//Yii::app()->end();
-	}		
+	}
+
+	public function actionNullifyCountryNameSession()
+	{
+		//Fb::warn("actionNullifyCountryNameSession() called", "SiteController");
+		
+		Yii::app()->session['countryName'] = "null";
+	}
+
+	public function actionUpdateCountryNameSessionVar()
+	{
+		Fb::warn("actionUpdateCountryNameSessionVar() called with ".$_POST['country'], "SiteController");
+	
+		Yii::app()->session['countryName'] = "'".$_POST['country']."'";
+	}	
 }
 
 

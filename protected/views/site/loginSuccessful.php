@@ -158,10 +158,11 @@
 // 		'update'=>'#groups_tab',
 // 		)
 // 	);
-	
 ?>
 
 <script type="text/javascript">
+
+
 	$("#logo").hide();
 	$("#logoMini").load();
 	$("#logoMini").show();	
