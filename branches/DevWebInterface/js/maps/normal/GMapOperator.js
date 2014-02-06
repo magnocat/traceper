@@ -14,20 +14,119 @@ function MapOperator(lang) {
 	 */
 	document.write("<script type='text/javascript' src='http://maps.google.com/maps/api/js?sensor=false&language=" + lang + "'></script>");
 	document.write("<link href='http://code.google.com/apis/maps/documentation/javascript/examples/default.css' rel='stylesheet' type='text/css' />");
-
+	
 	/*
 	 * initalizes map, location is, the type in MapStructs.js file, the center of the map
 	 */
-	MAP_OPERATOR.initialize = function(location) {
+	MAP_OPERATOR.initialize = function(location, par_country) {
 		var myOptions = {
 				zoom: 5,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 		};
 		MAP_OPERATOR.map = new google.maps.Map(document.getElementById("map"), myOptions);
+		
+		if(par_country == null)
+		{
+			MAP_OPERATOR.focusOnDefaultLocation(location);
+		}
+		else
+		{
+			MAP_OPERATOR.focusOnCountry(par_country, false);
+		}
+
+//		  // Try HTML5 geolocation
+//		  if(navigator.geolocation) {
+//		    navigator.geolocation.getCurrentPosition(function(position) {
+//		      var pos = new google.maps.LatLng(position.coords.latitude,
+//		                                       position.coords.longitude);
+//
+//		      var infowindow = new google.maps.InfoWindow({
+//		        map: MAP_OPERATOR.map,
+//		        position: pos,
+//		        content: 'Location found using HTML5.'
+//		      });
+//
+//		      MAP_OPERATOR.map.setCenter(pos);
+//		    }, function() {
+//		      handleNoGeolocation(true);
+//		    });
+//		  } else {
+//		    // Browser doesn't support Geolocation
+//		    handleNoGeolocation(false);
+//		  }		
+	}
+		
+	MAP_OPERATOR.focusOnCountryByCoordinates = function(latitude, longitude, defaultLocation) {			
+		var geocoder = new google.maps.Geocoder();			 
+		var latlng = new google.maps.LatLng(latitude, longitude);
+		var country = null;
+
+		//Web uzerinden kayit olmus ve mobil uzerinden hic konum gondermemis kisilerin degeleri 0 olacagindan bu konumu dikkate alma
+		if((latitude != 0) || (longitude != 0))
+		{
+			geocoder.geocode({'latLng':latlng},function(data,status){
+				 
+				if(status == google.maps.GeocoderStatus.OK){
+					//alert("data[0]: " + data[0].formatted_address);
+					//alert("data[1]: " + data[1].formatted_address);
+					//alert("data[2]: " + data[2].formatted_address);				
+				 
+					country = data[2].formatted_address;
+					
+					MAP_OPERATOR.focusOnCountry(country, true);
+				}
+				else
+				{
+					alertMsg("getCountryOfCoordinates(), GeocoderStatus not OK!");
+					
+					MAP_OPERATOR.focusOnDefaultLocation(defaultLocation);
+				}
+			});			
+		}
+		else
+		{
+			alertMsg("getCountryOfCoordinates(), latitude & longitude is 0");
+		}	
+	}	
+
+	MAP_OPERATOR.focusOnDefaultLocation = function(location) {
 		var initialLocation = new google.maps.LatLng(location.latitude, location.longitude);
 		MAP_OPERATOR.map.setCenter(initialLocation);
-	};
-
+	}
+	
+	MAP_OPERATOR.focusOnCountry = function(par_country, par_bSessionToBeUpdated) {			
+		//alert("Country: " + par_country);
+		
+		var address = par_country;
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode( { 'address': address}, function(results, status) {
+		    if (status == google.maps.GeocoderStatus.OK) {
+		    	MAP_OPERATOR.map.setCenter(results[0].geometry.location);
+		    	MAP_OPERATOR.map.fitBounds(results[0].geometry.bounds);
+		    	
+			    	if(par_bSessionToBeUpdated == true)
+			    	{
+			    		$.post('index.php?r=site/updateCountryNameSessionVar', { country:par_country });
+			    		
+			    		//alert("$.post - updateCountryNameSessionVar");
+			    	}
+		    	
+		    	bCountryInfoExists = true;
+		    } else {
+		        //alert("Geocode was not successful for the following reason: " + status);
+				var initialLocation = new google.maps.LatLng(location.latitude, location.longitude);
+				MAP_OPERATOR.map.setCenter(initialLocation);
+				
+				//Session variable null degilse fakat ayni zamanda da alinmis bilgi gecersiz bir konum bilgisiyse
+				//her seferinde hata alip default konuma yonlenmek yerine session variable null'a cekilsin ki direk default konuma gidilsin
+				//$.post('index.php?r=site/nullifyCountryNameSession');
+				
+				$.post('index.php?r=site/nullifyCountryNameSession');
+				
+				bCountryInfoExists = false;
+		    }
+		});
+	}		
 
 	/*
 	 * puts a marker at that coordinate,

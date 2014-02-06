@@ -46,7 +46,7 @@ else //DEPLOYMENT
 					
 <link rel="shortcut icon"
 	href="<?php echo Yii::app()->request->baseUrl; ?>/images/icon.png" type="image/x-icon" />
-	
+
 <?php
 if (YII_DEBUG)
 {		
@@ -718,20 +718,41 @@ $app->language = $language;
 
 Yii::app()->clientScript->registerCoreScript('yiiactiveform');
 
+if(isset(Yii::app()->session['countryName']) == false)
+{
+	$pageContent = file_get_contents('http://freegeoip.net/json/'.$_SERVER['REMOTE_ADDR']);
+	$parsedJson  = json_decode($pageContent);	
+	
+	if((htmlspecialchars($parsedJson->country_name) == "Reserved") || ($parsedJson->country_name == null))
+	{
+		Yii::app()->session['countryName'] = "null";
+	}
+	else
+	{
+		Yii::app()->session['countryName'] = "'".htmlspecialchars($parsedJson->country_name)."'";
+	}	
+}
+
+//Fb::warn(htmlspecialchars($parsedJson->country_name), "main");
+//Fb::warn($pageContent, "main");
+//Fb::warn($parsedJson->country_name, "main");
+
+//Fb::warn(Yii::app()->session['countryName'], "main");
+
 Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	try
 	{
 		var mapStruct = new MapStruct();
 		var initialLoc = new MapStruct.Location({latitude:39.504041,
 		longitude:35.024414});
-		mapOperator.initialize(initialLoc);
+		mapOperator.initialize(initialLoc, ".Yii::app()->session['countryName'].");
 		//TODO: ../index.php should be changed
 		//TODO: updateUserListInterval
 		//TODO: queryIntervalForChangedUsers
 		var trackerOp = new TrackerOperator('index.php', mapOperator, fetchPhotosDefaultValue, 10000 /*Users query period*/ /*5000*/, 30000 /*Uploads query period*/ /*30000*/);
 		trackerOp.setLangOperator(langOp);
 		bindElements(langOp, trackerOp);
-		trackerOp.userId = ".$userId.";		
+		trackerOp.userId = ".$userId.";
 	}
 	catch (e) {
 

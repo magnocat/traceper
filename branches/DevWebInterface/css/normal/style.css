@@ -210,7 +210,16 @@ display: none;
 /* 	float: left; */
 }
 
-#bar:hover{ background-color:#6261d8;}
+#bar:hover{ 
+	background-color:#6261d8;
+	
+   -webkit-transition: background-color 0.3s ease-in-out;
+   -moz-transition: background-color 0.3s ease-in-out;
+   -o-transition: background-color 0.3s ease-in-out;
+   -ms-transition: background-color 0.3s ease-in-out;
+   transition: background-color 0.3s ease-in-out;	
+}
+
 #infoBottomBar {
 	position:absolute;
 	z-index: 200;
