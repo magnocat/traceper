@@ -1697,6 +1697,7 @@ input, textarea { color: #000; }
 }
 .image-view .info {
    background:url(../../images/link.png) center no-repeat;
+   pointer-events: none;
    display: inline-block;
    text-decoration: none;
    bottom:9px;
@@ -1783,6 +1784,7 @@ input, textarea { color: #000; }
 }
 .user-view .info {
    background:url(../../images/link.png) center no-repeat;
+   pointer-events: none;
    display: inline-block;
    text-decoration: none;
    bottom:9px;
