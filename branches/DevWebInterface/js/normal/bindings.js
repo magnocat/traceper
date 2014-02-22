@@ -14,8 +14,10 @@ var bAppQRCodeTooltipOpened = false;
 var bShowPublicPhotosLinkActive = true;
 var uploadsGridViewId = 'publicUploadListView';
 var bCountryInfoExists = false;
-
+ 
+var currentUserId;
 var currentUserMarker;
+var locationlessUserIdArray = new Array();
 
 function alertMsg(par_message) {
 	if(bDeploymentModeOn === false)
@@ -329,11 +331,31 @@ function bindElements(langOperator, trackerOp)
 	 * binding operation to search user
 	 */	
 
- 	$("#RegisterForm_email").focus(function ()	{
+ 	$("#RegisterForm_email").focus(function ()	{ 		
  		//$("#RegisterForm_email").tooltipster('update', '<div id="registerEmailNotificationMessageId">' + TRACKER.langOperator.registerEmailNotificationMessage + '</div>');
  		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
  		$("#RegisterForm_email").tooltipster('show'); 		
 	});
+ 	
+ 	$("#LoginForm_email").focus(function ()	{
+ 		$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
+ 		$("#LoginForm_email").tooltipster('show'); 		
+	});
+
+ 	$("#LoginForm_email").blur(function () {
+ 		$("#LoginForm_email").tooltipster('hide');
+ 	});
+ 	
+ 	$("#LoginForm_password").focus(function ()	{
+ 		$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
+ 		$("#LoginForm_email").tooltipster('show'); 		
+	}); 	
+ 	
+ 	$("#LoginForm_password").blur(function () {
+ 		$("#LoginForm_email").tooltipster('hide');
+ 	}); 	
+ 	
+ 	
  	
 //  Label'lar webkit browser'larda focus almadigindan bu cozum calismiyor, linkler de tiklaninca sayfanin yukarisina gittiginden click cozumu uygulandi
 // 	$("#appQRCodeLink").focus(function (event)	{

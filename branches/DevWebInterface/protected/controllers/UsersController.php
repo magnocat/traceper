@@ -40,11 +40,10 @@ class UsersController extends Controller
 	{
 		return array(
 				array('deny',
-						'actions'=>array('addAsFriend', '',
-								'deleteFriendShip','getFriendRequestList',
-								'getUserPastPointsXML', 'getUserListXML', 'search',
+						'actions'=>array('addAsFriend', 'deleteFriendShip','getFriendRequestList', 'getFriendList',
+								'getUserPastPointsXML', 'getUserListXML', 'search', 'searchJSON',
 								'takeMyLocation', 'getUserInfo',
-								'getUserListJson', 'upload'),
+								'getUserListJson', 'upload', 'updateLocationByGeolocation'),
 						'users'=>array('?'),
 				)
 		);
@@ -127,7 +126,7 @@ class UsersController extends Controller
 					$address = $this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude']);
 					
 					//Address info is also updated with location info if the distance difference is high enough
-					if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, Yii::app()->user->id) == 1)
+					if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
 					{
 						$result = "1"; //Location updated successfully
 					}
@@ -154,7 +153,7 @@ class UsersController extends Controller
 				else
 				{
 					//Only location info (without address info) is updated if the distance difference is smaller than the threshold
-					if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, Yii::app()->user->id) == 1)
+					if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) == 1)
 					{
 						$result = "1"; //Location updated successfully
 					}
@@ -189,6 +188,20 @@ class UsersController extends Controller
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		Yii::app()->end();
 	}
+	
+	public function actionUpdateLocationByGeolocation()
+	{
+		//Fb::warn("actionUpdateLocationByGeolocation() called", "UsersController");
+		
+		//$_POST['altitude'] genelde sifir donuyor, o nedenle NULL kontrolu yapma
+		if (isset($_POST['latitude']) && ($_POST['latitude'] != NULL) && 
+			isset($_POST['longitude']) && ($_POST['longitude'] != NULL))
+		{
+			$address = $this->getaddress($_POST['latitude'], $_POST['longitude']);
+			
+			Users::model()->updateLocationWithAddress($_POST['latitude'], $_POST['longitude'], $_POST['altitude'], $address, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
+		}		
+	}	
 		
 	/*
 	 * this action is used by mobile clients
@@ -317,8 +330,6 @@ class UsersController extends Controller
 		}		
 
 		//Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-
-
 				
 		$this->renderPartial('usersInfo',array('dataProvider'=>$dataProvider,'model'=>new SearchForm(), 'userType'=>$userType), false, false/*true olduğunda sayfa değiştirirken 2 kere ajax sorgusu yapıyor*/);
 	}
@@ -426,10 +437,12 @@ class UsersController extends Controller
 			//Webde kullanicinin kendi ismine tikladiginda kendini konumunu gorebilmesi icin
 			
 			//Burası direk true degil mobilde gelen istekle guncellenmeli
-			$friendCount = $this->getFriendCount(true/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
+			$allFriendCount = $this->getFriendCount(false/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
+			$visibleFriendCount = $this->getFriendCount(true/*$par_onlyVisible*/, $userTypes) + 1; // +1 is for herself
 			//$friendCount = $this->getFriendCount();
 				
-			$friendIdList = $this->getFriendIdList(true/*$par_onlyVisible*/, $userTypes);
+			//$friendIdList = $this->getFriendIdList(true/*$par_onlyVisible*/, $userTypes);
+			$friendIdList = $this->getFriendIdList(false/*$par_onlyVisible*/, $userTypes);
 			
 			//Fb::warn($userTypes, "userTypes");
 			
@@ -458,7 +471,7 @@ class UsersController extends Controller
 			}
 			
 			//Sadece zamansal olarak update olmuslar istendiginde ve visible arkadas sayisi degismediyse onlyUpdated yoksa ALL
-			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($friendCount == Yii::app()->session['visibleFriendCount'])) {
+			if (isset($_REQUEST['list']) && ($_REQUEST['list'] == "onlyUpdated") && ($visibleFriendCount == Yii::app()->session['visibleFriendCount'])) {
 				$time = Yii::app()->session[$this->dataFetchedTimeKey];
 				$updateType = 'onlyUpdated';
 			
@@ -479,14 +492,14 @@ class UsersController extends Controller
 			
 			//Fb::warn("actionGetUserListJson() called", "UsersController");
 			
-			$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $friendCount);
+			$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $allFriendCount);
 			
 			//$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
 			
 			$out = $this->prepareJson($dataProvider, $updateType);
 			
 			Yii::app()->session[$this->dataFetchedTimeKey] = time();
-			Yii::app()->session['visibleFriendCount'] = $friendCount;			
+			Yii::app()->session['visibleFriendCount'] = $visibleFriendCount;			
 			
 			//Fb::warn($out, "Json()");
 			
@@ -574,14 +587,26 @@ class UsersController extends Controller
 		$model = new SearchForm();
 		$result = null;
 		$dataProvider = null;
+		$pageNo = 1;
+		$upTo = 0;
 		
 		if(isset($_REQUEST['SearchForm']))
 		{
 			$model->attributes = $_REQUEST['SearchForm'];
+			
+			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
+				$pageNo = (int)$_REQUEST['pageNo'];
+			}
+			
+			//Verilen sayfa numarasina kadar olan tum sayfalara ait kisi listesi mi isteniyor
+			if (isset($_REQUEST['upTo']) && $_REQUEST['upTo'] > 0) {
+				$upTo = (int)$_REQUEST['upTo'];
+			}			
+						
 			if ($model->validate()) {
 
-				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");
-				$out = $this->prepareSearchUserResultJson($dataProvider);
+				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");				
+				$out = $this->prepareSearchUserResultJson($dataProvider, $pageNo, $upTo);				
 			}
 			else
 			{
@@ -598,6 +623,7 @@ class UsersController extends Controller
 		echo $out;
 		Yii::app()->end();
 	}
+	
 	public function actionDeleteFriendShip(){
 		//$result = 'Missing Data';
 		if (isset($_REQUEST['friendId']))
@@ -1254,35 +1280,94 @@ class UsersController extends Controller
 
 		return $str;
 	}
-
 	
-	private function prepareSearchUserResultJson($dataProvider) {
-		$row = $dataProvider->getData();
-		$itemCount = count($row);
+	private function prepareSearchUserResultJson($dataProvider, $pageNo = 1, $upTo = 0) {
+		$pagination = $dataProvider->getPagination();
 		$str = '';
-		for ($i = 0; $i < $itemCount; $i++) {
-			$row[$i]['id'] = isset($row[$i]['id']) ? $row[$i]['id'] : null;
-			$row[$i]['Name'] = isset($row[$i]['Name']) ? $row[$i]['Name'] : null;
-			$row[$i]['fb_id']= isset($row[$i]['fb_id']) ? $row[$i]['fb_id'] : null;
-			$row[$i]['account_type'] = isset($row[$i]['account_type']) ? $row[$i]['account_type'] : null;
-			$row[$i]['status'] = isset($row[$i]['status']) ? $row[$i]['status'] : null;
-			$row[$i]['requester'] = isset($row[$i]['requester']) ? $row[$i]['requester'] : null;
-			
-			$str .= CJSON::encode(array(
-					'id'=>$row[$i]['id'],
-					'Name'=>$row[$i]['Name'],
-					'fb_id'=>$row[$i]['fb_id'],
-					'account_type'=>$row[$i]['account_type'],
-					'status'=>$row[$i]['status'],
-					'requester'=>$row[$i]['requester'],
-			)).',';
-		}
+		$currentPage = 1;
 		
+		if($upTo == 0) //Sadece ilgili sayfayi don
+		{
+			if(($pageNo > 1) && ($pageNo <= $pagination->pageCount))
+			{
+				$pagination->setCurrentPage($pageNo - 1); //Sets the zero-based index of the current page
+			}
+			
+			$row = $dataProvider->getData(true);
+			$itemCount = count($row);
+			
+			for ($i = 0; $i < $itemCount; $i++) {
+				$row[$i]['id'] = isset($row[$i]['id']) ? $row[$i]['id'] : null;
+				$row[$i]['Name'] = isset($row[$i]['Name']) ? $row[$i]['Name'] : null;
+				$row[$i]['fb_id']= isset($row[$i]['fb_id']) ? $row[$i]['fb_id'] : null;
+				$row[$i]['account_type'] = isset($row[$i]['account_type']) ? $row[$i]['account_type'] : null;
+				$row[$i]['status'] = isset($row[$i]['status']) ? $row[$i]['status'] : null;
+				$row[$i]['requester'] = isset($row[$i]['requester']) ? $row[$i]['requester'] : null;
+				
+				if ($i > 0)  {
+					$str .= ",";
+				}				
+					
+				$str .= CJSON::encode(array(
+						'id'=>$row[$i]['id'],
+						'Name'=>$row[$i]['Name'],
+						'fb_id'=>$row[$i]['fb_id'],
+						'account_type'=>$row[$i]['account_type'],
+						'status'=>$row[$i]['status'],
+						'requester'=>$row[$i]['requester'],
+				));
+			}
+
+			$currentPage = $pagination->currentPage + 1;
+		}
+		else //Verilen sayfa numarasina kadar olan tum sayfalara ait kisi listesi isteniyorsa
+		{
+			$pages = '';
+			
+			for ($j = 0; $j < $pageNo; $j++) 
+			{			
+				if($j < $pagination->pageCount)
+				{
+					$pagination->setCurrentPage($j); //Sets the zero-based index of the current page
+				}
+				
+				$row = $dataProvider->getData(true);
+				$itemCount = count($row);
+
+				for ($i = 0; $i < $itemCount; $i++) {
+					$row[$i]['id'] = isset($row[$i]['id']) ? $row[$i]['id'] : null;
+					$row[$i]['Name'] = isset($row[$i]['Name']) ? $row[$i]['Name'] : null;
+					$row[$i]['fb_id']= isset($row[$i]['fb_id']) ? $row[$i]['fb_id'] : null;
+					$row[$i]['account_type'] = isset($row[$i]['account_type']) ? $row[$i]['account_type'] : null;
+					$row[$i]['status'] = isset($row[$i]['status']) ? $row[$i]['status'] : null;
+					$row[$i]['requester'] = isset($row[$i]['requester']) ? $row[$i]['requester'] : null;
+						
+					if (($j > 0) || ($i > 0))  {
+						$str .= ",";
+					}					
+					
+					$str .= CJSON::encode(array(
+							'id'=>$row[$i]['id'],
+							'Name'=>$row[$i]['Name'],
+							'fb_id'=>$row[$i]['fb_id'],
+							'account_type'=>$row[$i]['account_type'],
+							'status'=>$row[$i]['status'],
+							'requester'=>$row[$i]['requester'],
+					));
+				}
+
+				if ($j > 0)  {
+					$pages .= ",";
+				}
+								
+				$pages .= $j + 1;
+			}
+
+			$currentPage ='['.$pages.']';
+		}
+
 		$result = null;
 		
-		$pagination = $dataProvider->getPagination();
-		$currentPage = $pagination->currentPage + 1;
-				
 		if($pagination->pageCount > 0) //If there exists any result
 		{
 			$result = "1";
@@ -1310,6 +1395,7 @@ class UsersController extends Controller
 			$rows[$i]['dataArrivedTime'] = isset($rows[$i]['dataArrivedTime']) ? $rows[$i]['dataArrivedTime'] : null;
 			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
 			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
+			$rows[$i]['locationSource'] = isset($rows[$i]['locationSource']) ? $rows[$i]['locationSource'] : null;
 			
 			if ($i > 0) {
 				$str .= ',';
@@ -1329,6 +1415,7 @@ class UsersController extends Controller
 						'longitude'=>$rows[$i]['longitude'],
 						'altitude'=>$rows[$i]['altitude'],
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
+					    'locationSource'=>$rows[$i]['locationSource'],
 						'time'=>$rows[$i]['dataArrivedTime'],
 						'deviceId'=>$rows[$i]['deviceId'],
 				));
@@ -1356,11 +1443,13 @@ class UsersController extends Controller
 		$row['userType'] = isset($row['userType']) ? $row['userType'] : "";		
 		$row['status_message'] = isset($row['status_message']) ? $row['status_message'] : "";
 		$row['dataCalculatedTime'] = isset($row['dataCalculatedTime']) ? $row['dataCalculatedTime'] : "";
+		$row['locationSource'] = isset($row['locationSource']) ? $row['locationSource'] : "";
 		$row['gp_image'] = "";
 		$row['fb_id'] = isset($row['fb_id']) ? $row['fb_id'] : "";
 		$row['profilePhotoStatus'] = isset($row['profilePhotoStatus']) ? $row['profilePhotoStatus'] : "";
 		$row['g_id'] = "";
 		$row['account_type'] =  isset($row['account_type']) ? $row['account_type'] : "";
+		$row['isVisible'] =  isset($row['isVisible']) ? $row['isVisible'] : "";
 		
 		//Fb::warn($row['id'], "user");
 		
@@ -1382,6 +1471,7 @@ class UsersController extends Controller
 				'altitude'=>$row['altitude'],
 				'address'=>$row['lastLocationAddress'],
 				'calculatedTime'=>$row['dataCalculatedTime'],
+				'locationSource'=>$row['locationSource'],
 				'time'=>$row['dataArrivedTime'],
 				'message'=>$row['message'],
 				'status_message'=>$row['status_message'],
@@ -1392,6 +1482,7 @@ class UsersController extends Controller
 				'profilePhotoStatus'=>$row['profilePhotoStatus'],
 				'g_id'=>$row['g_id'],
 				'account_type'=>$row['account_type'],
+				'isVisible'=>$row['isVisible']
 		));
 
 		return $bsk;

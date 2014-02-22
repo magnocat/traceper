@@ -122,9 +122,11 @@
 	$('#map').css('min-height', (485 + 100 - 70));
 
 	$("#username").html('<div class="hi-icon-in-list icon-user"></div><a><?php echo $realname ?></a>');
-	$("#userId").html('<?php echo $id ?>');	
+	$("#userId").html('<?php echo $id; ?>');	
 	//$("#tab_view").tabs("load",0);
 	//$("#tab_view").tabs("select",0);
+	
+	currentUserId = <?php echo Yii::app()->user->id; ?>;
 
 	//$('#tab_view').easytabs('select', '#users_tab');
 
@@ -161,8 +163,6 @@
 ?>
 
 <script type="text/javascript">
-
-
 	$("#logo").hide();
 	$("#logoMini").load();
 	$("#logoMini").show();	
@@ -184,5 +184,53 @@
 	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
 	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
 	TRACKER.getImageList(false, true);
+
+	if (navigator.geolocation)
+	{
+		navigator.geolocation.getCurrentPosition(showPosition, showError);
+	}
+	else
+	{
+		
+	}
+ 
+	function showPosition(position)
+	{
+		//alertMsg("latitude:" + position.coords.latitude + " - longitude:" + position.coords.longitude);
+
+		$.post('index.php?r=users/updateLocationByGeolocation', { latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude });
+
+		if(<?php echo Yii::app()->session['countryName']; ?> == null)
+		{
+			var defaultLoc = new MapStruct.Location({latitude:39.504041, longitude:35.024414});
+			MAP_OPERATOR.focusOnCountryByCoordinates(position.coords.latitude, position.coords.longitude, defaultLoc);
+		}
+	}
+
+	function showError(error)
+	{
+		switch(error.code)
+	    {
+		    case error.PERMISSION_DENIED: //User denied the request for Geolocation
+			    //alertMsg("User denied the request for Geolocation");
+			    break;
+			    
+		    case error.POSITION_UNAVAILABLE: //Location information is unavailable
+		    	//alertMsg("Location information is unavailable");
+			    break;
+			    
+		    case error.TIMEOUT: //The request to get user location timed out
+		    	//alertMsg("The request to get user location timed out");
+			    break;
+			    
+		    case error.UNKNOWN_ERROR: //An unknown error occurred
+		    	//alertMsg("An unknown error occurred");
+			    break;
+
+			default: //An undefined error occurred
+				//alertMsg("An undefined error occurred");
+				break;				    
+	    }
+	}		
 </script>		
 

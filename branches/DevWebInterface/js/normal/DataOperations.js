@@ -177,20 +177,20 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		
 	//alertMsg("users.length:" + users.length + " / TRACKER.users.length:" + TRACKER.users.length);
 	
-	var userIdArray = new Array();
+	var userIdArray = new Array();	
 	var newFriend = false;
 
 	$.each(users, function(index, value)
 	{
 		var userId = value.user;
-		userIdArray.push(userId);
-		
+
 		var isFriend =  1;
 		var realname = value.realname;
 		var latitude = value.latitude;
 		var longitude = value.longitude;
 		var address = value.address;
 		var locationCalculatedTime = value.calculatedTime
+		var locationSource = value.locationSource
 		var status_message = value.status_message;
 		var fb_id = value.fb_id;
 		var profilePhotoStatus = value.profilePhotoStatus;
@@ -200,11 +200,39 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		var userType = value.userType;
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		var visible = false;
-
-		if (isFriend == "1") {
-			visible = true;
-		}
 		
+		var locationlessUserIdIndexInArray = locationlessUserIdArray.indexOf(userId);
+		
+		//Hem mobil veri gelmemis hem de IP uzerinden de konum elde edilememise kisiyi haritada gosterme
+		//if(((locationCalculatedTime.indexOf(" 1970 ") != -1) || (locationCalculatedTime == ""))  && (latitude == 0.000000) && (longitude == 0.000000))
+		if(locationSource == "-1")	
+		{
+			if(locationlessUserIdIndexInArray == -1)
+			{
+				locationlessUserIdArray.push(userId);
+			}
+
+			return;
+		}
+		else
+		{
+			if(locationlessUserIdIndexInArray != -1)
+			{
+				locationlessUserIdArray.splice(locationlessUserIdIndexInArray, 1);
+			}
+			
+			//userIdArray.push(userId);
+			
+			if ((value.isVisible == "1") || (currentUserId == userId)) {
+				visible = true;
+				userIdArray.push(userId);
+			}			
+		}	
+
+//		if (isFriend == "1") {
+//			visible = true;
+//		}
+
 		var personPhotoElement;
 		var timeStamp = new Date().getTime();
 		
@@ -250,7 +278,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
 			var userMarker;
-			
+
 			switch(profilePhotoStatus)
 			{
 				case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
@@ -286,8 +314,8 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				default:
 					//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
 					userMarker = MAP.putMarker(location, "images/person.png", visible, false);				
-			}
-			
+			}					
+
 			if(userId === currentUser)
 			{
 				//main.php ve userAreaView.php dosyalarinda kullaniliyor
@@ -312,9 +340,10 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				deviceId:deviceId,
 				userType:userType,
 				mapMarker:new Array(markerInfo),
-				locationCalculatedTime:locationCalculatedTime
-			});
-						
+				locationCalculatedTime:locationCalculatedTime,
+				locationSource:locationSource
+			});				
+
 			var content = 
 				  '<div style="width:280px; height:180px;">'
 				+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
@@ -334,6 +363,18 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			
 			MAP.setMarkerClickListener(TRACKER.users[userId].mapMarker[0].marker,function (){
 				//alertMsg(userId + ". marker clicked");
+				if(TRACKER.users[userId].locationSource == "0")	
+				{
+					if(currentUserId == userId)
+					{
+						TRACKER.showLongMessageDialog(TRACKER.langOperator.yourLocationInfoNotReliable);
+					}
+					else
+					{
+						TRACKER.showLongMessageDialog(TRACKER.langOperator.yourFriendsLocationInfoNotReliable);
+					}
+				}				
+				
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
 			});
@@ -427,6 +468,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			TRACKER.users[userId].longitude = longitude;
 			TRACKER.users[userId].time = time;
 			TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
+			TRACKER.users[userId].locationSource = locationSource;
 			TRACKER.users[userId].deviceId = deviceId;
 			TRACKER.users[userId].userType = userType;
 			TRACKER.users[userId].friendshipStatus = isFriend;	

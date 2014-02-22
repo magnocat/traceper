@@ -67,11 +67,14 @@ function MapOperator(lang) {
 			geocoder.geocode({'latLng':latlng},function(data,status){
 				 
 				if(status == google.maps.GeocoderStatus.OK){
-					//alert("data[0]: " + data[0].formatted_address);
-					//alert("data[1]: " + data[1].formatted_address);
-					//alert("data[2]: " + data[2].formatted_address);				
+//					alert("data[0]: " + data[0].formatted_address);
+//					alert("data[1]: " + data[1].formatted_address);
+//					alert("data[2]: " + data[2].formatted_address);
+//					alert("data[3]: " + data[3].formatted_address);					
+//					alert("data[0].address_components: " + data[0].address_components[6].long_name);
 				 
-					country = data[2].formatted_address;
+					//country = data[2].formatted_address;
+					country = data[0].address_components[6].long_name;
 					
 					MAP_OPERATOR.focusOnCountry(country, true);
 				}

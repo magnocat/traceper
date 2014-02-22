@@ -36,6 +36,7 @@
  * @property string $preferredLanguage
  * @property integer $termsAccepted
  * @property integer $profilePhotoStatus
+ * @property integer $locationSource
  *
  * The followings are the available model relations:
  * @property TraceperFriends[] $traceperFriends
@@ -73,7 +74,7 @@ class Users extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('password, realname, email, account_type', 'required'),
-			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhotoStatus', 'numerical', 'integerOnly'=>true),
+			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhotoStatus, locationSource', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group, latitude, appVer, registrationMedium', 'length', 'max'=>10),
 			array('longitude', 'length', 'max'=>11),
@@ -89,7 +90,7 @@ class Users extends CActiveRecord
 				
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus, locationSource', 'safe', 'on'=>'search'),
 		);		
 	}
 
@@ -147,6 +148,7 @@ class Users extends CActiveRecord
 			'preferredLanguage' => 'Preferred Language',
 			'termsAccepted' => 'Terms Accepted',
 			'profilePhotoStatus' => 'Profile Photo Status',
+			'locationSource' => 'Location Source'	
 		);
 	}
 
@@ -193,6 +195,7 @@ class Users extends CActiveRecord
 		$criteria->compare('preferredLanguage',$this->preferredLanguage,true);
 		$criteria->compare('termsAccepted',$this->termsAccepted);
 		$criteria->compare('profilePhotoStatus',$this->profilePhotoStatus);
+		$criteria->compare('locationSource',$this->locationSource);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -204,7 +207,7 @@ class Users extends CActiveRecord
 	const BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK = 2;
 	const BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER = 3;
 	
-	public function updateLocation($latitude, $longitude, $altitude, $calculatedTime, $userId){
+	public function updateLocation($latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId){
 	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
@@ -213,18 +216,19 @@ class Users extends CActiveRecord
 				.'	longitude = %f , '
 				.'	altitude = %f ,	'
 				.'	dataArrivedTime = NOW(), '
-				.'  dataCalculatedTime = "%s" '
+				.'  dataCalculatedTime = "%s", '
+				.' 	locationSource = %d '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
-				$latitude, $longitude, $altitude, $calculatedTime, $userId);
+				$latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		//$effectedRows = 0;
 		return $effectedRows;
 	}
 	
-	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, $userId){
+	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, $locationSource, $userId){
 	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
@@ -234,11 +238,12 @@ class Users extends CActiveRecord
 				.'	altitude = %f ,	'
 				.'	lastLocationAddress = "%s" , '
 				.'	dataArrivedTime = NOW(), '
-				.'  dataCalculatedTime = "%s" '
+				.'  dataCalculatedTime = "%s", '
+				.' 	locationSource = %d '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
-				$latitude, $longitude, $altitude, $address, $calculatedTime, $userId);
+				$latitude, $longitude, $altitude, $address, $calculatedTime, $locationSource, $userId);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		//$effectedRows = 0;
@@ -497,7 +502,7 @@ class Users extends CActiveRecord
 		u.userType, u.deviceId, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type, u.fb_id, u.profilePhotoStatus
+		u.account_type, u.fb_id, u.profilePhotoStatus, u.locationSource 
 		FROM '.  Users::model()->tableName() . ' u 
 		LEFT JOIN ' . Friends::model()->tableName() . ' f 
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR 
@@ -738,7 +743,7 @@ class Users extends CActiveRecord
 		return $found;
 	}
 	
-	public function getLoginRequiredValues($userId, &$par_minDataSentInterval, &$par_minDistanceInterval, &$par_facebookId, &$par_autoSend, &$par_deviceId, &$par_androidVer, &$par_appVer, &$par_preferredLanguage, &$par_latitude, &$par_longitude)
+	public function getLoginRequiredValues($userId, &$par_minDataSentInterval, &$par_minDistanceInterval, &$par_facebookId, &$par_autoSend, &$par_deviceId, &$par_androidVer, &$par_appVer, &$par_preferredLanguage, &$par_latitude, &$par_longitude, &$par_locationSource)
 	{
 		$user = Users::model()->findByPk($userId);
 		$result = false;
@@ -755,6 +760,7 @@ class Users extends CActiveRecord
 			$par_preferredLanguage = $user->preferredLanguage;
 			$par_latitude = $user->latitude;
 			$par_longitude = $user->longitude;
+			$par_locationSource = $user->locationSource;
 	
 			$result = true;
 		}
@@ -950,5 +956,31 @@ class Users extends CActiveRecord
 		$user = $this->findByPk($userId);
 
 		return $user->profilePhotoStatus;
+	}
+
+	public function isFacebookUser($par_email, &$par_appVersion, &$par_deviceId) {
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+		$result = false;
+		
+		if($user != null)
+		{
+			if ($user->fb_id != 0) {
+				$result = true;
+				$par_appVersion = $user->appVer;
+				$par_deviceId = $user->deviceId;
+			}
+		}
+
+		return $result;
+	}
+
+	//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
+	//sifresini uygulamanin gonderdigi auto-generated sifre ile guncellemek icin kullanilacak	
+	public function updatePassword($par_email, $par_password)
+	{
+		$user = Users::model()->find('email=:email', array(':email'=>$email));
+		$user->password = $par_password;
+	
+		return $user->save();
 	}	
 }

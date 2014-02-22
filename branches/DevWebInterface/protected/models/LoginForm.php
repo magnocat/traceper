@@ -127,6 +127,23 @@ class LoginForm extends CFormModel
 		}
 	}
 	
+	//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni weble login olursa
+	//uygulama versiyonunu guncelleyinceye kadar ayrica authenticate etmeden login et. Sifresini guncelleme, cunku
+	//uygulamayi guncellemezse uygulamadan girememeye baslar	
+	public function directLogin()
+	{
+		if($this->_identity === null)
+		{
+			$this->_identity = new UserIdentity($this->email, $this->password);
+			$this->_identity->directAuthenticate();
+		}
+
+		$duration = $this->rememberMe ? 3600*24*30 : 0; // 30 days
+		Yii::app()->user->login($this->_identity, $duration);
+			
+		return true;
+	}	
+	
 	public function getName() {
 		
 		return $this->_identity->getName();

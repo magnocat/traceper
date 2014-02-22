@@ -42,6 +42,29 @@ class UserIdentity extends CUserIdentity
 		return $this->errorCode;
 	}
 	
+	public function directAuthenticate()
+	{
+		$criteria=new CDbCriteria;
+		$criteria->select='Id,realname,password,fb_id';
+		$criteria->condition='email=:email';
+		$criteria->params=array(':email'=>$this->username);
+		$user = Users::model()->find($criteria); // $params is not needed
+		
+		$result = false;
+		
+		if($user != null)
+		{
+			$this->realname = $user->realname;
+			$this->userId = $user->Id;
+			
+			$this->setState('fb_id', $user->fb_id);
+
+			$result = true;
+		}
+		
+		return $result;
+	}	
+	
 	public function getName() {
 		return $this->realname;
 	}
