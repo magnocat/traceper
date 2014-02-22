@@ -142,6 +142,33 @@ else
 // 		CClientScript::POS_READY
 // 		);
 
+if (Yii::app()->user->isGuest == true)
+{
+	Yii::app()->clientScript->registerScript('geolocationTooltipDeclaration',
+		"  
+		if (navigator.geolocation)
+	    {
+	    	//alert('Browser supports geolocation');
+			
+			$(\"#LoginForm_email\").tooltipster({
+	        	 theme: \".tooltipster-info\",
+	        	 position: \"bottom\",
+	        	 trigger: \"custom\",
+	        	 maxWidth: 500,
+	        	 onlyOne: false,
+				 interactive: true,
+				 offsetX: 100,
+				 offsetY: 10,
+				 arrow:false
+	        	 });			
+	    }
+	  	else
+	  	{
+			//alert('Browser does NOT support geolocation!');
+	  	}
+		", CClientScript::POS_READY);	
+}
+
 if (Yii::app()->user->isGuest == false)
 {
 	$profilePhotoSource = null;
@@ -346,6 +373,10 @@ Yii::app()->clientScript->registerScript('deploymentModeVariableDeclaration',
 
 if (Yii::app()->user->isGuest == false)
 {
+	Yii::app()->clientScript->registerScript('currentUserIdDeclaration',
+			"currentUserId = ".Yii::app()->user->id.";",
+			CClientScript::POS_HEAD);	
+	
 	if($profilePhotoStatus <= 1)
 	{
 		//Bu degiskenin diger upload profile photo error tooltip javascript kodlarindan once tanimlanmasi gerekiyor
@@ -726,16 +757,24 @@ if(isset(Yii::app()->session['countryName']) == false)
 	if((htmlspecialchars($parsedJson->country_name) == "Reserved") || ($parsedJson->country_name == null))
 	{
 		Yii::app()->session['countryName'] = "null";
+		Yii::app()->session['latitude'] = $parsedJson->latitude;
+		Yii::app()->session['longitude'] = $parsedJson->longitude;
 	}
 	else
 	{
 		Yii::app()->session['countryName'] = "'".htmlspecialchars($parsedJson->country_name)."'";
-	}	
+		Yii::app()->session['latitude'] = $parsedJson->latitude;
+		Yii::app()->session['longitude'] = $parsedJson->longitude;
+	}
+	
+	
+
+	//Fb::warn(htmlspecialchars($parsedJson->country_name), "main");
+	//Fb::warn($pageContent, "main");
+	//Fb::warn($parsedJson->country_name, "main");
 }
 
-//Fb::warn(htmlspecialchars($parsedJson->country_name), "main");
-//Fb::warn($pageContent, "main");
-//Fb::warn($parsedJson->country_name, "main");
+
 
 //Fb::warn(Yii::app()->session['countryName'], "main");
 

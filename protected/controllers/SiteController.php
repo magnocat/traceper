@@ -44,6 +44,18 @@ class SiteController extends Controller
 				),			
 		);
 	}
+	
+	private function getaddress($lat,$lng)
+	{
+		$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false';
+		$json = @file_get_contents($url);
+		$data=json_decode($json);
+		$status = $data->status;
+		if($status=="OK")
+			return $data->results[0]->formatted_address;
+		else
+			return null;
+	}	
 
 
 	/**
@@ -210,6 +222,7 @@ class SiteController extends Controller
 			$autoSend = 0;
 			$latitude = 0;
 			$longitude = 0;
+			$locationSource = LocationSource::NoSource;
 			
 			$deviceId = null;
 			$androidVer = null;
@@ -217,14 +230,51 @@ class SiteController extends Controller
 			$preferredLanguage = null;
 
 			$isRecordUpdateRequired = false;
+			$loginSuccessful = false;
 
 			if($model->validate()) {								
 				
 				if(Users::model()->isTermsAccepted($model->email) === true)
 				{
-					if($model->login())
+					if(Users::model()->isFacebookUser($model->email, $appVer, $deviceId))
+					{						
+						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+						{
+							//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
+							//sifresini uygulamanin gonderdigi auto-generated sifre ile guncelleyip direk login oldur
+							if(($appVer <= "1.0.16") && (isset($_REQUEST['appVer']) && ($_REQUEST['appVer'] > "1.0.16")) && (isset($_REQUEST['deviceId']) && ($deviceId == $_REQUEST['deviceId'])))
+							{
+								Users::model()->updatePassword($model->email, md5($model->password));
+								$loginSuccessful = $model->directLogin();
+							}
+							else
+							{
+								$loginSuccessful = $model->login();
+							}							
+						}
+						else //Webden login olan facebook kullanicisi ise, web zaten guncel oldugu icin sadece mevcut uygulama versiyonunu kontrol et
+						{
+							//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni weble login olursa
+							//uygulama versiyonunu guncelleyinceye kadar ayrica authenticate etmeden login et. Sifresini guncelleme, cunku
+							//uygulamayi guncellemezse uygulamadan girememeye baslar
+							if($appVer <= "1.0.16")
+							{
+								$loginSuccessful = $model->directLogin();
+							}
+							else
+							{
+								$loginSuccessful = $model->login();
+							}							
+						}
+					}
+					else
 					{
-						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude);
+						$loginSuccessful = $model->login();
+					}
+					
+					if($loginSuccessful)
+					{
+						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource);
 						
 						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
@@ -297,21 +347,18 @@ class SiteController extends Controller
 							if(strcmp($preferredLanguage, $language) != 0)
 							{
 								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
-							}
-								
-							//echo 'Model NOT valid in SiteController';
-							if (Yii::app()->request->isAjaxRequest)
+							}							
+							
+							//Hiç mobil veya HTML5 Geolocation konum bilgisi mevcut degilse, IP location bilgisini rough estimate olarak kullan
+							//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
+							if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 							{
-								if (YII_DEBUG)
+								if((Yii::app()->session['latitude'] != 0) & (Yii::app()->session['latitude'] != null))
 								{
-									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-								}
-								else
-								{
-									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-								}
+									$address = $this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude']);
+								
+									Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0, $address, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+								}								
 							}
 
 							$profilePhotoSource = null;
@@ -381,6 +428,21 @@ class SiteController extends Controller
 							else
 							{
 								$friendReqTooltip = Yii::t('users', 'Friendship Requests');
+							}
+
+							//echo 'Model NOT valid in SiteController';
+							if (Yii::app()->request->isAjaxRequest)
+							{
+								if (YII_DEBUG)
+								{
+									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+								}
+								else
+								{
+									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+								}
 							}							
 							
 							echo CJSON::encode(array(
@@ -564,7 +626,8 @@ class SiteController extends Controller
 			$facebookId = 0;
 			$autoSend = 0;
 			$latitude = 0;
-			$longitude = 0;			
+			$longitude = 0;
+			$locationSource = LocationSource::NoSource;
 				
 			$deviceId = null;
 			$androidVer = null;
@@ -578,7 +641,7 @@ class SiteController extends Controller
 			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
 			if($model->login())
 			{
-				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude);
+				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource);
 				
 				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 				{
@@ -652,22 +715,19 @@ class SiteController extends Controller
 					{
 						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
 					}
-			
-					//echo 'Model NOT valid in SiteController';
-					if (Yii::app()->request->isAjaxRequest)
+
+					//Hiç mobil veya HTML5 Geolocation konum bilgisi mevcut degilse, IP location bilgisini rough estimate olarak kullan
+					//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
+					if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 					{
-						if (YII_DEBUG)
+						if((Yii::app()->session['latitude'] != 0) & (Yii::app()->session['latitude'] != null))
 						{
-							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-						}
-						else
-						{
-							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						}
-					}
+							$address = $this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude']);
 					
+							Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0, $address, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+						}
+					}					
+
 					$profilePhotoSource = null;
 					$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
 					$profilePhotoStatusTooltipMessage = null;
@@ -735,6 +795,21 @@ class SiteController extends Controller
 					else
 					{
 						$friendReqTooltip = Yii::t('users', 'Friendship Requests');
+					}
+
+					//echo 'Model NOT valid in SiteController';
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
 					}					
 					
 					echo CJSON::encode(array(
@@ -821,7 +896,7 @@ class SiteController extends Controller
 	public function actionChangePassword()
 	{
 		//Fb::warn("actionChangePassword() called", "SiteController");
-		
+
 		$model = new ChangePasswordForm;
 
 		$processOutput = true;
@@ -1308,10 +1383,12 @@ class SiteController extends Controller
 												
 				if($this->SMTP_UTF8_mail(Yii::app()->params->noreplyEmail, 'Traceper', $model->email, $candidateName, Yii::t('site', 'Traceper Activation'), $message))
 				{
+					//Bu cevabi hem web (activationNotReceived.php) hem mobil kullandigindan mobil kontrolu yapma
 					echo CJSON::encode(array("result"=>"1", "email"=>$model->email));
 				}
 				else
 				{
+					//Bu cevabi hem web (activationNotReceived.php) hem mobil kullandigindan mobil kontrolu yapma
 					echo CJSON::encode(array("result"=>"0")); //Error occured while sending e-mail
 				}
 				
@@ -1458,6 +1535,7 @@ class SiteController extends Controller
 					$registrationMedium = 'Web';
 				}				
 		
+				//Facebook kaydol ise
 				if (isset($model->account_type) && $model->account_type != "0") {
 					//Fb::warn("Before saveFacebookUser()", "SiteController");
 					
@@ -1612,7 +1690,7 @@ class SiteController extends Controller
 					}
 					else if($model->getError('email') != null)
 					{
-						$result = $model->getError('email') ;
+						$result = $model->getError('email');
 					}
 					else
 					{
@@ -2048,13 +2126,13 @@ class SiteController extends Controller
 							//$result = Yii::t('site', 'Your account has been activated successfully, you can login now. You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could find the app link just below the "Sign Up" form. After logging into mobile app, you and your friends could see your location on the map.');
 							
 							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
-							$result .= Yii::t('site', 'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, you could not provide location information without using the mobile app. Therefore we strongly recommend you to download and install our mobile app at Google Play. You could download the app by clicking the links {downloadIcon} and {QRCodeIcon} at bottom-left part of the page or by just clicking {downloadAppHere}. After logging into mobile app, you and your friends could see your location on the map.', 
+							$result .= Yii::t('site', 'You have signed up via our web site, so it is possible that you have not installed our mobile application. If so, we strongly recommend you to download and install our mobile app at Google Play so that you could share your location  or whenever you want. You could download the app by clicking the links {downloadIcon} and {QRCodeIcon} at bottom-left part of the page or by just clicking {downloadAppHere}. After logging into mobile app, you and your friends could see your location on the map.', 
 													   array('{downloadIcon}' => '<div class="lo-icon-in-tooltip icon-download1"></div>', '{QRCodeIcon}' => '<div class="lo-icon-in-tooltip icon-qrcode"></div>', '{downloadAppHere}' => CHtml::link(Yii::t('common', 'here'), "https://play.google.com/store/apps/details?id=com.yudu&feature=search_result#?t=W251bGwsMSwxLDEsImNvbS55dWR1Il0.", array())));							
 						}
 						else
 						{
 							$result = Yii::t('site', 'Your account has been activated successfully, you can login now...').'</br></br>';
-							$result .= Yii::t('site', 'You should login at mobile app in order to provide your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.');							
+							$result .= Yii::t('site', 'You should login at mobile app in order to begin providing your location info. On the other hand, you could also use our web site for various common operations in addition to viewing the shared photos and creating friend groups which are available for only web site at the moment.');							
 						}
 						
 						$userCandidate->delete();
@@ -2311,7 +2389,7 @@ class SiteController extends Controller
 
 	public function actionUpdateCountryNameSessionVar()
 	{
-		Fb::warn("actionUpdateCountryNameSessionVar() called with ".$_POST['country'], "SiteController");
+		//Fb::warn("actionUpdateCountryNameSessionVar() called with ".$_POST['country'], "SiteController");
 	
 		Yii::app()->session['countryName'] = "'".$_POST['country']."'";
 	}	

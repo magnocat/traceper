@@ -66,6 +66,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var maxZoomLevel = null;
 		var statusMessage = null;
 		var locationCalculatedTime = null;
+		var locationSource = null;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -517,57 +518,83 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 ////			});	
 //		
 //		true);	
-//	}
+//	}	
 
 	this.trackUser = function(userId){
-		
-		if (typeof TRACKER.users[userId] === "undefined") {
-			alertMsg("Id:" + userId + " is undefined");
-			
-			var params = "r=users/getUserInfoJSON&userId="+ userId +"&"; 
-			TRACKER.ajaxReq(params, function(result){
-				processUsers(MAP, result);
-				if (typeof TRACKER.users[userId]  !== "undefined") {
-					TRACKER.trackUser(userId);
-				}
-				else {
-					TRACKER.users[userId] = null;
-				}
-			}, true);
-		}
-		else if (TRACKER.users[userId] !== null &&
-				 TRACKER.users[userId].friendshipStatus == "1" &&  
-				 TRACKER.users[userId].latitude != "" && TRACKER.users[userId].longitude != "") 
+		//String olarak vermezse bulmuyor
+		if(locationlessUserIdArray.indexOf(userId.toString()) != -1)
 		{
-			//alertMsg("else if");
-			
-			var location = new MapStruct.Location({latitude:TRACKER.users[userId].latitude, longitude:TRACKER.users[userId].longitude});
-			MAP.panMapTo(location);
-			
-			//Kisi kendisi sildiyse preUserId -1'e cekiliyor ve bu kontrol edilmeli
-			if(TRACKER.preUserId != -1)//Check for the first click in order not to take "undefined" error
+			if(currentUserId == userId)
 			{
-				//alertMsg("TRACKER.users[TRACKER.preUserId]: " + TRACKER.users[TRACKER.preUserId]);
-				
-				//Kullanici bilgi disinda arkadasliktan ciktiysa veya konumunu kapattiysa diye "undefined" kontrolu de yapilmali
-				if((typeof TRACKER.users[TRACKER.preUserId] == "undefined") || (TRACKER.users[TRACKER.preUserId] == "undefined"))
-				{
-					//Do not take action
-				}
-				else
-				{
-					MAP.closeInfoWindow(TRACKER.users[TRACKER.preUserId].mapMarker[0].infoWindow);
-					TRACKER.users[TRACKER.preUserId].infoWindowIsOpened = false;					
-				}
+				this.showLongMessageDialog(this.langOperator.youHaveNoValidLocationInfo);
 			}
-			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
-			TRACKER.users[userId].infoWindowIsOpened = true;
-			TRACKER.preUserId = userId;
+			else
+			{
+				this.showLongMessageDialog(this.langOperator.yourFriendHasNoValidLocationInfo);
+			}			
 		}
 		else
 		{
-			alertMsg("else, TRACKER.users[userId]:" + TRACKER.users[userId]);
-		}	
+			if (typeof this.users[userId] === "undefined") {
+				alertMsg("Id:" + userId + " is undefined");
+				
+				var params = "r=users/getUserInfoJSON&userId="+ userId +"&"; 
+				this.ajaxReq(params, function(result){
+					processUsers(MAP, result);
+					if (typeof this.users[userId]  !== "undefined") {
+						this.trackUser(userId);
+					}
+					else {
+						this.users[userId] = null;
+					}
+				}, true);
+			}
+			else if (this.users[userId] !== null &&
+					this.users[userId].friendshipStatus == "1") 
+			{
+				//alertMsg("else if");
+
+				//if((TRACKER.users[userId].locationCalculatedTime.indexOf(" 1970 ") != -1) || (TRACKER.users[userId].locationCalculatedTime == ""))
+				if(this.users[userId].locationSource == "0")	
+				{
+					if(currentUserId == userId)
+					{
+						this.showLongMessageDialog(this.langOperator.yourLocationInfoNotReliable);
+					}
+					else
+					{
+						this.showLongMessageDialog(this.langOperator.yourFriendsLocationInfoNotReliable);
+					}
+				}
+							
+				var location = new MapStruct.Location({latitude:this.users[userId].latitude, longitude:this.users[userId].longitude});
+				MAP.panMapTo(location);
+				
+				//Kisi kendisi sildiyse preUserId -1'e cekiliyor ve bu kontrol edilmeli
+				if(this.preUserId != -1)//Check for the first click in order not to take "undefined" error
+				{
+					//alertMsg("TRACKER.users[TRACKER.preUserId]: " + TRACKER.users[TRACKER.preUserId]);
+					
+					//Kullanici bilgi disinda arkadasliktan ciktiysa veya konumunu kapattiysa diye "undefined" kontrolu de yapilmali
+					if((typeof this.users[TRACKER.preUserId] == "undefined") || (this.users[TRACKER.preUserId] == "undefined"))
+					{
+						//Do not take action
+					}
+					else
+					{
+						MAP.closeInfoWindow(this.users[this.preUserId].mapMarker[0].infoWindow);
+						this.users[this.preUserId].infoWindowIsOpened = false;					
+					}
+				}
+				MAP.openInfoWindow(this.users[userId].mapMarker[0].infoWindow, this.users[userId].mapMarker[0].marker);
+				this.users[userId].infoWindowIsOpened = true;
+				this.preUserId = userId;
+			}
+			else
+			{
+				alertMsg("else, TRACKER.users[userId]:" + TRACKER.users[userId]);
+			}			
+		}
 	};
 
 	this.drawTraceLine = function(userId, pageNo, callback) 
@@ -966,7 +993,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 					  if(xhr.status == 403)
 					  {
-						  alertMsg('403 Forbidden: Forbidden, authorization required!');
+						  //alertMsg('403 Forbidden: Forbidden, authorization required!');
 						  
 						  if(bDeploymentModeOn === true)
 						  {
@@ -984,7 +1011,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 							  TRACKER.ajaxReq(data, null, true);							  
 						  }
 						  						  
-						  //location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin 
+						  location.reload(); //Kullanici log out olmus, sayfayi yenile ki login sayfasi gelsin 
 					  }
 					  else
 					  {

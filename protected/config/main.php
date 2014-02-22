@@ -40,6 +40,14 @@ class PasswordResetStatus
 	const RequestValid   = 1;
 }
 
+/*Location Sources Enumeration in PHP*/
+class LocationSource
+{
+	const NoSource 		 = -1;
+	const WebIP    	     = 0;
+	const Mobile   		 = 1;
+	const WebGeolocation = 2;
+}
 
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
@@ -134,7 +142,9 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-			'schemaCachingDuration'=>3600 // turn on schema caching to improve performance								
+			//'enableProfiling'=>true,
+			//'enableParamLogging'=>true,				
+			'schemaCachingDuration'=>3600 // turn on schema caching to improve performance											
 		),
 		
 		'errorHandler'=>array(
@@ -146,7 +156,7 @@ return array(
 			'routes'=>array(
 				array(
 					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
+					'levels'=>'error, warning', //SQL sorgulari icin listeye profile'i da ekle
 				),
 				// uncomment the following to show log messages on web pages
 				/*
@@ -155,7 +165,7 @@ return array(
 				),
 				*/
 			),
-		),
+		),			
 		
         'fixture'=>array(
             'class'=>'system.test.CDbFixtureManager',
@@ -194,7 +204,7 @@ return array(
 		'adminEmail'=>'contact@traceper.com',
 		'contactEmail'=>'contact@traceper.com',
 		'noreplyEmail'=>'noreply@traceper.com',
-		'itemCountInOnePage'=> 10,  // this is the number of users and groups that are shown in a page
+		'itemCountInOnePage'=> 20,  // this is the number of users and groups that are shown in a page
 		'uploadCountInOnePage'=> 10, // this is the number of images that are shown in a page	
 		'itemCountInDataListPage'=> 10,
 		'minDistanceInterval'=> 500, //meters
