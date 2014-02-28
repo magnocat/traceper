@@ -840,36 +840,22 @@ class SiteController extends Controller
 				}			
 			}
 		}						
-	}	
+	}
 
-	/**
-	 *
-	 * facebook login action
-	 */
-	public function actionFacebooklogin() {
-		Yii::import('ext.facebook.*');
-		$ui = new FacebookUserIdentity('370934372924974', 'c1e85ad2e617b480b69a8e14cfdd16c7');
+	public function actionFacebookLogin()
+	{
+		Fb::warn("actionFacebookLogin() called", "SiteController");
+		
+		$userid = Yii::app()->facebook->getUser();
+		$userinfo = Yii::app()->facebook->getInfo();
+		
+		$fbId = $userinfo["id"];
+		$fbEmail = $userinfo["email"];
 
-		if ($ui->authenticate()) {
-			$user=Yii::app()->user;
-			$user->login($ui);
-
-			$this->FB_Web_Register($nd);
-			if($nd == 0)
-			{					
-				$str=array("email" => Yii::app()->session['facebook_user']['email'] ,"password" => Yii::app()->session['facebook_user']['id']) ;
-					
-				$this->fbLogin($str);
-					
-			}else {
-
-			}
-
-			//exit;
-			$this->redirect($user->returnUrl);
-		} else {
-			throw new CHttpException(401, $ui->error);
-		}
+		Fb::warn("fbId: $fbId", "actionFBLogin()");
+		Fb::warn("fbEmail: $fbEmail", "actionFBLogin()");
+		
+		
 	}
 
 	/**
@@ -1717,6 +1703,7 @@ class SiteController extends Controller
 		}
 	}
 
+	//Bu fonksiyonu mobil uygulama kullanıyor
 	public function actionIsFacebookUserRegistered(){
 
 		$result = "Missing parameter";
@@ -1733,27 +1720,6 @@ class SiteController extends Controller
 		echo CJSON::encode(array(
 				"result"=> $result,
 		));
-	}
-
-	//facebook web register
-	public function FB_Web_Register()
-	{
-		$result = 0;
-			
-		// validate user input and if ok return json data and end application.
-		if(Yii::app()->session['facebook_user']) {
-
-			if (Users::model()->saveFacebookUser(Yii::app()->session['facebook_user']['email'], md5(Yii::app()->session['facebook_user']['id']), Yii::app()->session['facebook_user']['name'], Yii::app()->session['facebook_user']['id'], 1))
-			{
-				$result = 1;
-			}
-			else
-			{
-				$result = 0;
-			}
-
-		}
-		return $result;
 	}
 
 	public function actionRegisterGPSTracker()
@@ -2318,7 +2284,7 @@ class SiteController extends Controller
 
 	public function actionAjaxEmailNotification()
 	{	
-		Fb::warn("actionAjaxEmailNotification() called", "SiteController");		
+		//Fb::warn("actionAjaxEmailNotification() called", "SiteController");		
 
 		$title = null;
 		$message = null;
@@ -2366,12 +2332,12 @@ class SiteController extends Controller
 			if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', $title, $message, false /*Do not add footer for error message*/))
 			{
 				//Mail gönderildi
-				Fb::warn("mail SENT", "actionAjaxEmailNotification()");
+				//Fb::warn("mail SENT", "actionAjaxEmailNotification()");
 			}
 			else
 			{
 				//Mail gönderilirken hata oluştu
-				Fb::warn("mail CANNOT be sent!", "actionAjaxEmailNotification()");
+				//Fb::warn("mail CANNOT be sent!", "actionAjaxEmailNotification()");
 			}
 		
 			Yii::app()->session[$params] = Yii::app()->session[$params] + 1;

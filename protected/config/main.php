@@ -194,7 +194,34 @@ return array(
 				'driver'=>'GD',
 				// ImageMagick setup path
 				//'params'=>array('directory'=>'/opt/local/bin'),
-		),						
+		),
+		'facebook'=>array(
+				'class' => 'ext.yii-facebook-opengraph.SFacebook',
+				
+				//'appId'=>'118597668307459', //PRODUCTION: 'YOUR_FACEBOOK_APP_ID', // needed for JS SDK, Social Plugins and PHP SDK
+				//'secret'=>'7e4c3f814585c845fd85ab21337504e5', //PRODUCTION: 'YOUR_FACEBOOK_APP_SECRET', // needed for the PHP SDK
+				
+				'appId'=>'396574887041318', //TEST: 'YOUR_FACEBOOK_APP_ID', // needed for JS SDK, Social Plugins and PHP SDK
+				'secret'=>'e3dc4912a5429dac709cd11f4a812468', //TEST: 'YOUR_FACEBOOK_APP_SECRET', // needed for the PHP SDK				
+				
+				//'fileUpload'=>false, // needed to support API POST requests which send files
+				//'trustForwarded'=>false, // trust HTTP_X_FORWARDED_* headers ?
+				'locale'=>'en_US', // override locale setting (defaults to en_US)
+				'jsSdk'=>true, // don't include JS SDK
+				'async'=>true, // load JS SDK asynchronously
+				'jsCallback'=>false, // declare if you are going to be inserting any JS callbacks to the async JS SDK loader
+				//'status'=>true, // JS SDK - check login status
+				//'cookie'=>true, // JS SDK - enable cookies to allow the server to access the session
+				'oauth'=>true,  // JS SDK - enable OAuth 2.0
+				//'xfbml'=>true,  // JS SDK - parse XFBML / html5 Social Plugins
+				//'frictionlessRequests'=>true, // JS SDK - enable frictionless requests for request dialogs
+				//'html5'=>true,  // use html5 Social Plugins instead of XFBML
+				//'ogTags'=>array(  // set default OG tags
+				//'og:title'=>'MY_WEBSITE_NAME',
+				//'og:description'=>'MY_WEBSITE_DESCRIPTION',
+				//'og:image'=>'URL_TO_WEBSITE_LOGO',
+				//),
+		)			
 	),
 
 	// application-level parameters that can be accessed

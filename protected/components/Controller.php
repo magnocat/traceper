@@ -50,6 +50,14 @@ class Controller extends CController
 				'CaptchaExtendedValidator' => Yii::getPathOfAlias('ext.captchaExtended').DIRECTORY_SEPARATOR.'CaptchaExtendedValidator.php'
 		));		
 	}
+	
+	protected function afterRender($view, &$output) {
+		parent::afterRender($view,$output);
+		//Yii::app()->facebook->addJsCallback($js); // use this if you are registering any $js code you want to run asyc
+		Yii::app()->facebook->initJs($output); // this initializes the Facebook JS SDK on all pages
+		Yii::app()->facebook->renderOGMetaTags(); // this renders the OG tags
+		return true;
+	}
 
 	public function SMTP_UTF8_mail($fromEmail, $fromName, $toEmail, $toName, $subject, $message, $addFooter = true)
 	{
