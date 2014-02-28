@@ -306,6 +306,15 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
+	public function isUserRegisteredAsTraceperUser($email) {
+		$user = Users::model()->find('email=:email AND fb_id=:facebookId', array(':email'=>$email, ':facebookId'=>0));
+		$result = false;
+		if ($user != null) {
+			$result = true;
+		}
+		return $result;
+	}	
+	
 	public function getNameByEmail($email) {
 		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$name = "";

@@ -881,8 +881,10 @@ else
 	echo '<div id="termsWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Contact Window ///////////////////////////
 	echo '<div id="contactWindow" style="display:none;font-family:Helvetica;"></div>';			
-	///////////////////////////// User Login Window ///////////////////////////
+	///////////////////////////// Accept Terms For Login Window ///////////////////////////
 	echo '<div id="acceptTermsForLoginWindow" style="display:none;font-family:Helvetica;"></div>';
+	///////////////////////////// Accept Terms For Facebook Login Window ///////////////////////////
+	echo '<div id="acceptTermsForFacebookLoginWindow" style="display:none;font-family:Helvetica;"></div>';	
 	///////////////////////////// Register Window ///////////////////////////
 	echo '<div id="registerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
@@ -1294,17 +1296,59 @@ else
 						</div>
 						
 						<div class="upperMenu">
-							<?php 
+							<?php							
+							$successCallback = 'try
+												{
+													var obj = jQuery.parseJSON(msg);
+													
+													if (obj.result)
+													{
+														if (obj.result == "1")
+														{
+															$("#tabViewList").html(obj.renderedTabView);
+															$("#userarea").html(obj.renderedUserAreaView);
+															$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
+															$("#loginBlock").html(obj.loginSuccessfulActions);
+														}
+														else if (obj.result == "0")
+														{
+															TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+														}														
+														else if (obj.result == "-1")
+														{
+															var opt = {
+																autoOpen: false,
+																modal: true,
+																resizable: false,
+																width: 600,
+																title: "'.Yii::t('site', 'Accept Terms to continue').'"
+															};
+															\
+															$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
+															$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView); 
+														}
+														else
+														{
+														
+														}
+													}											
+												}
+												catch (error)
+												{
+												
+												}';							
+							
+							//Facebook'a JS fonksiyonunu verirken tek satirda vermeni istiyor, bu nedenle callback string'i tek satira donusturuluyor
+							$successCallback = str_replace(array("\r", "\n"), '', $successCallback);
+							
 							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
 							'size'=>'large',
 							'text'=>'Log in with facebook',
-							'scope'=>'email', //permissions		
-							'on_login'=>'(function(){ $.post("index.php?r=site/facebookLogin"); })()'
+							'scope'=>'basic_info,email', //permissions		
+							'on_login'=>'(function(){ $.post("index.php?r=site/facebookLogin", function(msg){'.$successCallback.'});})()'
 							//'show_faces'=>true,
 							//'registration_url'=>'http://mysite/index.php/users/facebookregister',
-							)); 
-							
-														
+							));						
 							?>
 						</div>						
 						
