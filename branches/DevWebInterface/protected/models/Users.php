@@ -610,6 +610,7 @@ class Users extends CActiveRecord
 						//'pageSize'=>Yii::app()->params->itemCountInOnePage,
 						'pageSize'=>Yii::app()->session['usersPageSize'],
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
+						'itemCount'=>$count //pagination'daki sayfalarin duzgun calismasini sagliyor, olmazsa pageCount 0 cikiyor 
 				),
 		));
 	

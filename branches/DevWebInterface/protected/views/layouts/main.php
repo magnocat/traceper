@@ -1084,7 +1084,7 @@ else
 						
 					echo CHtml::link('<div id="logoMini"></div>', '#', array(
 							'onclick'=>'location.reload();', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Click here to reload the main page or scroll down to bottom of the page for contact and other info.'),
-					));					
+					));
 				}
 				else
 				{
@@ -1105,7 +1105,7 @@ else
 				<?php	
 				}
 				?>
-
+				
 				<div id="loginBlock"
 				<?php
 				if (Yii::app()->user->isGuest == false) {
@@ -1291,7 +1291,24 @@ else
 										),
 										array('id'=>'loginAjaxButton','type'=>'submit','tabindex'=>3));									
 						?>																					
-						</div>	
+						</div>
+						
+						<div class="upperMenu">
+							<?php 
+							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
+							'size'=>'large',
+							'text'=>'Log in with facebook',
+							'scope'=>'email', //permissions		
+							'on_login'=>'(function(){ $.post("index.php?r=site/facebookLogin"); })()'
+							//'show_faces'=>true,
+							//'registration_url'=>'http://mysite/index.php/users/facebookregister',
+							)); 
+							
+														
+							?>
+						</div>						
+						
+							
 						<?php $this->endWidget(); ?>
 					</div>																		
 
@@ -1698,7 +1715,7 @@ else
 // 									));
 					
 					?>
-					
+
 					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">
 					<?php
 					echo CHtml::ajaxLink('Create Group', $this->createUrl('groups/createGroup'),

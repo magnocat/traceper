@@ -493,7 +493,7 @@ class UsersController extends Controller
 			//Fb::warn("actionGetUserListJson() called", "UsersController");
 			
 			$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, $allFriendCount);
-			
+
 			//$dataProvider = Users::model()->getListDataProviderForJson($friendIdList, $userTypes, $newFriendId,  $time, $offset, Yii::app()->params->itemCountInDataListPage, null);
 			
 			$out = $this->prepareJson($dataProvider, $updateType);
@@ -562,6 +562,11 @@ class UsersController extends Controller
 			$model->attributes = $_REQUEST['SearchForm'];
 			if ($model->validate()) {
 				$dataProvider = Users::model()->getSearchUserDataProvider(null, $model->keyword, "SearchForm[keyword]");
+				
+				//Fb::warn("totalItemCount: $dataProvider->totalItemCount", "actionSearch()");
+				
+				//$pagination = $dataProvider->getPagination();
+				//Fb::warn("pageCount: $pagination->pageCount", "actionSearch()");
 			}
 		}
 		
@@ -596,6 +601,8 @@ class UsersController extends Controller
 			
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int)$_REQUEST['pageNo'];
+				
+				//Fb::warn("pageNo is SET: $pageNo", "actionSearchJSON()");
 			}
 			
 			//Verilen sayfa numarasina kadar olan tum sayfalara ait kisi listesi mi isteniyor
@@ -1286,11 +1293,18 @@ class UsersController extends Controller
 		$str = '';
 		$currentPage = 1;
 		
+// 		Fb::warn("pageNo: $pageNo", "prepareSearchUserResultJson()");
+// 		Fb::warn("pagination->pageCount: $pagination->pageCount", "prepareSearchUserResultJson()");
+// 		Fb::warn("pagination->currentPage: $pagination->currentPage", "prepareSearchUserResultJson()");
+		
 		if($upTo == 0) //Sadece ilgili sayfayi don
 		{
 			if(($pageNo > 1) && ($pageNo <= $pagination->pageCount))
 			{
 				$pagination->setCurrentPage($pageNo - 1); //Sets the zero-based index of the current page
+// 				Fb::warn("pagination->setCurrentPage(pageNo - 1: $pageNo - 1)", "prepareSearchUserResultJson()");
+// 				Fb::warn("pagination->pageCount: $pagination->pageCount", "prepareSearchUserResultJson()");
+// 				Fb::warn("pagination->currentPage: $pagination->currentPage", "prepareSearchUserResultJson()");				
 			}
 			
 			$row = $dataProvider->getData(true);
@@ -1371,7 +1385,7 @@ class UsersController extends Controller
 		if($pagination->pageCount > 0) //If there exists any result
 		{
 			$result = "1";
-			$str = '{"result":"'.$result.'", "userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
+			$str = '{"result":"'.$result.'", "userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'", "totalUserCount":"'.$dataProvider->totalItemCount.'"}';
 		}
 		else
 		{
