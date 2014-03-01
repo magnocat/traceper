@@ -344,6 +344,29 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
+	
+	public function updateTraceperUserAsFacebookUser($email, $password, $name, $fb_id, $preferredLanguage){
+		$result = false;
+
+		if ($fb_id == null || $fb_id == 0) {
+			$result = false;
+		}
+		else
+		{
+			$user = Users::model()->find('email=:email', array(':email'=>$email));
+					
+			$user->password = $password;
+			$user->realname = $name;
+			$user->fb_id = $fb_id;
+			$user->account_type = 1;
+			$user->preferredLanguage = $preferredLanguage;
+
+			$result = $user->save();
+		}
+	
+		return $result;
+	}
+
 	public function saveGPUser($email, $password, $realname, $g_id, $accountType, $gp_image){
 		$users=new Users;
 	
@@ -650,11 +673,7 @@ class Users extends CActiveRecord
 		.' OR (f.friend2='.Yii::app()->user->id.')'
 		.' ) '
 		.' AND STATUS = 1';
-		
-		
-		
-		
-		
+
 		if ($userTypeSqlPart != '') {
 			$sql .= ' AND (' . $userTypeSqlPart. ')';
 		}		

@@ -566,227 +566,45 @@ class SiteController extends Controller
 	
 	//Kullanim sartlari degisiminden once kaydolmus biri login olmaya calistiginda sartları kabul ederse bu fonksiyon ile isleme devam eder
 	public function actionContinueLogin() {
-		$model = new LoginForm;
-
 		// collect user input data
-		if(isset($_REQUEST['LoginForm']) && $_REQUEST['LoginForm'] != NULL)
+		//if(isset($_REQUEST['LoginForm']) && $_REQUEST['LoginForm'] != NULL)
+		if(isset($_REQUEST['LoginForm']['email']) && isset($_REQUEST['LoginForm']['password']))
 		{
-			$model->attributes = $_REQUEST['LoginForm'];
+			$language/*Bunu set edecek*/ = null;
+			$app = Yii::app();
 			
-			$minDataSentInterval = Yii::app()->params->minDataSentInterval;
-			$minDistanceInterval = Yii::app()->params->minDistanceInterval;
-			$facebookId = 0;
-			$autoSend = 0;
-			$latitude = 0;
-			$longitude = 0;
-			$locationSource = LocationSource::NoSource;
-				
-			$deviceId = null;
-			$androidVer = null;
-			$appVer = null;
-			$preferredLanguage = null;
-			
-			$isRecordUpdateRequired = false;
-										
-			Users::model()->setTermsAccepted($model->email);
-			
-			//model daha once validate edildigi icin bir daha validate etmeye gerek yok
-			if($model->login())
+			if (isset($app->session['_lang']))
 			{
-				Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource);
-				
-				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-				{
-					if (isset($_REQUEST['deviceId']))
-					{
-						if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
-						{
-							$deviceId = $_REQUEST['deviceId'];
-							$isRecordUpdateRequired = true;
-						}
-					}
-			
-					if (isset($_REQUEST['androidVer']))
-					{
-						if(strcmp($androidVer, $_REQUEST['androidVer']) != 0)
-						{
-							$androidVer = $_REQUEST['androidVer'];
-							$isRecordUpdateRequired = true;
-						}
-					}
-			
-					if (isset($_REQUEST['appVer']))
-					{
-						if(strcmp($appVer, $_REQUEST['appVer']) != 0)
-						{
-							$appVer = $_REQUEST['appVer'];
-							$isRecordUpdateRequired = true;
-						}
-					}
-			
-					if (isset($_REQUEST['language']))
-					{
-						if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
-						{
-							$preferredLanguage = $_REQUEST['language'];
-							$isRecordUpdateRequired = true;
-						}
-					}
-			
-					if($isRecordUpdateRequired == true)
-					{
-						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
-					}
-			
-					echo CJSON::encode(array(
-							"result"=> "1",
-							"id"=>Yii::app()->user->id,
-							"realname"=> $model->getName(),
-							"minDataSentInterval"=> $minDataSentInterval,
-							"minDistanceInterval"=> $minDistanceInterval,
-							"facebookId"=> $facebookId,
-							"autoSend"=> $autoSend
-					));
-				}
-				else {
-					$app = Yii::app();
-					$language = 'tr';
-			
-					if (isset($app->session['_lang']))
-					{
-						$language = $app->session['_lang'];
-							
-						//echo 'Session VAR';
-					}
-					else
-					{
-						$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-					}
-						
-					if(strcmp($preferredLanguage, $language) != 0)
-					{
-						Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
-					}
-
-					//Hiç mobil veya HTML5 Geolocation konum bilgisi mevcut degilse, IP location bilgisini rough estimate olarak kullan
-					//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
-					if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
-					{
-						if((Yii::app()->session['latitude'] != 0) & (Yii::app()->session['latitude'] != null))
-						{
-							$address = $this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude']);
-					
-							Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0, $address, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
-						}
-					}					
-
-					$profilePhotoSource = null;
-					$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
-					$profilePhotoStatusTooltipMessage = null;
-					$bothPhotoExists = null;
-						
-					switch($profilePhotoStatus)
-					{
-						case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
-							{
-								if(Yii::app()->user->fb_id == 0)
-								{
-									$profilePhotoSource = null;
-									$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
-								}
-								else
-								{
-									$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
-									$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
-								}
-							}
-							break;
-					
-						case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
-							{
-								$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
-								$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
-									
-								//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
-							}
-							break;
-					
-						case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
-							{
-								$bothPhotoExists = 'useFacebook';
-								$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
-								//$profilePhotoStatusTooltipMessage = '4';
-							}
-							break;
-					
-						case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
-							{
-								$bothPhotoExists = 'useTraceper';
-								$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
-								//$profilePhotoStatusTooltipMessage = '5';
-							}
-							break;
-					}
-
-					$newRequestsCount = null;
-					$totalRequestsCount = null;
-						
-					Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
-					
-					if($newRequestsCount > 0)
-					{
-						if($newRequestsCount <= 5)
-						{
-							$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
-						}
-						else
-						{
-							$friendReqTooltip = Yii::t('users', 'Friendship Requests').' ('.$newRequestsCount.' '.Yii::t('users', 'new').(($totalRequestsCount > $newRequestsCount)?Yii::t('users', ' totally ').$totalRequestsCount:'').Yii::t('users', ' friendship request(s) you have').')';
-						}
-					}
-					else
-					{
-						$friendReqTooltip = Yii::t('users', 'Friendship Requests');
-					}
-
-					//echo 'Model NOT valid in SiteController';
-					if (Yii::app()->request->isAjaxRequest)
-					{
-						if (YII_DEBUG)
-						{
-							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-						}
-						else
-						{
-							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-						}
-					}					
-					
-					echo CJSON::encode(array(
-							"result"=> "1",
-							"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
-							"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
-							"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
-							"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, true),
-					));					
-			
-					//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, true);
-				}
-			
-				Yii::app()->end();
+				$language = $app->session['_lang'];
 			}
 			else
 			{
-				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-				{
-					echo CJSON::encode(array("result"=> "-2")); //Unknown login error
-				}
-				else {
-					Yii::app()->end();
-				}			
+				$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
 			}
+			
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				if (isset($_REQUEST['language']) && isset($_REQUEST['deviceId']) && isset($_REQUEST['androidVer']) && isset($_REQUEST['appVer']))
+				{
+					$language = $_REQUEST['language'];
+					//Diger atamalar altta (commonLogin) yapiliyor
+				}
+				else
+				{
+					echo CJSON::encode(array("result"=> "-2")); //Missing parameter
+					Yii::app()->end();
+				}
+			}		
+							
+			Users::model()->setTermsAccepted($_REQUEST['LoginForm']['email']);			
+			$this->commonLogin($_REQUEST['LoginForm']['email'], $_REQUEST['LoginForm']['password'], $language, false/*$directLogin*/);
+		}
+		else
+		{
+			//Fb::warn("email and password NOT SET", "actionContinueLogin()");
+			
+			echo CJSON::encode(array("result"=> "-2")); //Missing parameter
+			Yii::app()->end();			
 		}						
 	}
 
@@ -853,10 +671,89 @@ class SiteController extends Controller
 		//uzeriden girmesi gerekecegi belirtilmeli
 		if(Users::model()->isUserRegisteredAsTraceperUser($fbEmail) == true)
 		{
-			Fb::warn("User is registered as Traceper user", "actionFacebookLogin()");	
+			//Fb::warn("User is registered as Traceper user", "actionFacebookLogin()");
+			
+			//Traceper kullanicisi ayni e-posta ile Facebook logini denerken hic sartlari kabul etmis mi?
+			if(Users::model()->isTermsAccepted($fbEmail) === true)
+			{
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					echo CJSON::encode(array("result"=> "-4")); //Currently Traceper user and ask switch to Facebook login permanently
+				}
+				else
+				{
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+						
+					//Complete solution for blinking problem
+					if (Yii::app()->request->getIsAjaxRequest()) {
+						Yii::app()->clientScript->scriptMap['*.js'] = false;
+						Yii::app()->clientScript->scriptMap['*.css'] = false;
+					}
+				
+					echo CJSON::encode(array(
+							"result"=> "-4", //Currently Traceper user and ask switch to Facebook login permanently
+							"renderedView"=>$this->renderPartial('askForSwitchToFacebookLoginPermanently',array(), true/*return instead of being displayed to end users*/, true),
+					));
+				
+					Yii::app()->end();
+				}				
+			}
+			else
+			{				
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					echo CJSON::encode(array("result"=> "-1")); //Needs to accept terms
+				}
+				else
+				{
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+						
+					//Complete solution for blinking problem
+					if (Yii::app()->request->getIsAjaxRequest()) {
+						Yii::app()->clientScript->scriptMap['*.js'] = false;
+						Yii::app()->clientScript->scriptMap['*.css'] = false;
+					}
+						
+					//Fb::warn("acceptTermsForFacebookLogin oncesi", "actionFacebookLogin()");
+						
+					echo CJSON::encode(array(
+							"result"=> "-1", //Needs to accept terms
+							"renderedView"=>$this->renderPartial('acceptTermsForFacebookLogin',array(), true/*return instead of being displayed to end users*/, true),
+					));
+				}
+				
+				Yii::app()->end();				
+			}				
 		}
-		else if(Users::model()->isFacebookUserRegistered($fbEmail, $fbId) == false) //Facebook kullanisi kayitli degilse once kayıt edilmeli
+		else if((Users::model()->isFacebookUserRegistered($fbEmail, $fbId) == false) || (Users::model()->isTermsAccepted($fbEmail) == false))
 		{			
+			//Facebook kullanisi kayitli degilse once kayıt edilmeli, facebook kullanicis fakat sartlari henuz kabul etmemisse
+			//once sartlari kabul etmeli (her iki durumda da acceptTermsForFacebookLogin render ediliyor)
+			
 			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 			{
 				echo CJSON::encode(array("result"=> "-1")); //Needs to be registered (so accept terms)				
@@ -883,7 +780,7 @@ class SiteController extends Controller
 					Yii::app()->clientScript->scriptMap['*.css'] = false;
 				}
 					
-				Fb::warn("acceptTermsForFacebookLogin oncesi", "actionFacebookLogin()");
+				//Fb::warn("acceptTermsForFacebookLogin oncesi", "actionFacebookLogin()");
 					
 				echo CJSON::encode(array(
 						"result"=> "-1", //Needs to be registered (so accept terms)
@@ -894,77 +791,80 @@ class SiteController extends Controller
 			Yii::app()->end();
 		}
 		
-		$appVer = $deviceId = null;
-		$directLogin = false;
-		Users::model()->getFbUserMobileInfo($fbEmail, $appVer, $deviceId);	
+		//Eski bir facebook kaydolcu kullanici zaten ilk kogin olusunda oncelikle sartlari kabul etmeye zorlanacagindan
+		//asagida yorumlanmis kod actionContinueFacebookLogin() icinde calisacak
 		
-		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-		{
-			//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
-			//sifresini uygulamanin gonderdigi auto-generated sifre ile guncelleyip direk login oldur
-			if((($appVer != null) && ($appVer <= "1.0.16")) && (isset($_REQUEST['appVer']) && ($_REQUEST['appVer'] > "1.0.16")) && (isset($_REQUEST['deviceId']) && ($deviceId == $_REQUEST['deviceId'])))
-			{
-				Users::model()->updatePassword($fbEmail, md5($autoGeneratedPassword));
-				$directLogin = true;
-			}
-			else
-			{
-				$directLogin = false;
-			}
-		}
-		else //Webden login olan facebook kullanicisi ise, web zaten guncel oldugu icin sadece mevcut uygulama versiyonunu kontrol et
-		{
-			//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni weble login olursa
-			//uygulama versiyonunu guncelleyinceye kadar ayrica authenticate etmeden login et. Sifresini guncelleme, cunku
-			//uygulamayi guncellemezse uygulamadan girememeye baslar
-			if(($appVer != null) && ($appVer <= "1.0.16"))
-			{
-				//Kullanici uygulamayi guncelleyinceye kadar webden facebook uzerinden de girmeye calissa guvenlik icin hala sifre girmey zorlansin
+// 		$appVer = $deviceId = null;
+// 		$directLogin = false;
+// 		Users::model()->getFbUserMobileInfo($fbEmail, $appVer, $deviceId);	
+		
+// 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+// 		{
+// 			//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
+// 			//sifresini uygulamanin gonderdigi auto-generated sifre ile guncelleyip direk login oldur
+// 			if((($appVer != null) && ($appVer <= "1.0.16")) && (isset($_REQUEST['appVer']) && ($_REQUEST['appVer'] > "1.0.16")) && (isset($_REQUEST['deviceId']) && ($deviceId == $_REQUEST['deviceId'])))
+// 			{
+// 				Users::model()->updatePassword($fbEmail, md5($autoGeneratedPassword));
+// 				$directLogin = true;
+// 			}
+// 			else
+// 			{
+// 				$directLogin = false;
+// 			}
+// 		}
+// 		else //Webden login olan facebook kullanicisi ise, web zaten guncel oldugu icin sadece mevcut uygulama versiyonunu kontrol et
+// 		{
+// 			//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni weble login olursa
+// 			//uygulama versiyonunu guncelleyinceye kadar ayrica authenticate etmeden login et. Sifresini guncelleme, cunku
+// 			//uygulamayi guncellemezse uygulamadan girememeye baslar
+// 			if(($appVer != null) && ($appVer <= "1.0.16"))
+// 			{
+// 				//Kullanici uygulamayi guncelleyinceye kadar webden facebook uzerinden de girmeye calissa guvenlik icin hala sifre girmey zorlansin
 				
-				//Fb::warn("appVer:$appVer <= 1.0.16", "actionFacebookLogin()");
+// 				//Fb::warn("appVer:$appVer <= 1.0.16", "actionFacebookLogin()");
 				
-				if (Yii::app()->request->isAjaxRequest)
-				{
-					if (YII_DEBUG)
-					{
-						Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-						Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
-					}
-					else
-					{
-						Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
-					}
-				}
+// 				if (Yii::app()->request->isAjaxRequest)
+// 				{
+// 					if (YII_DEBUG)
+// 					{
+// 						Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+// 						Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+// 					}
+// 					else
+// 					{
+// 						Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+// 						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+// 					}
+// 				}
 					
-				//Complete solution for blinking problem
-				if (Yii::app()->request->getIsAjaxRequest()) {
-					Yii::app()->clientScript->scriptMap['*.js'] = false;
-					Yii::app()->clientScript->scriptMap['*.css'] = false;
-				}
+// 				//Complete solution for blinking problem
+// 				if (Yii::app()->request->getIsAjaxRequest()) {
+// 					Yii::app()->clientScript->scriptMap['*.js'] = false;
+// 					Yii::app()->clientScript->scriptMap['*.css'] = false;
+// 				}
 					
-				$model = new LoginForm(true/*$forOnlyPasswordCheck*/);
-				$model->email = $fbEmail;				
+// 				$model = new LoginForm(true/*$forOnlyPasswordCheck*/);
+// 				$model->email = $fbEmail;				
 					
-				echo CJSON::encode(array(
-						"result"=> "-2", //Old Facebook user with app<=1.0.16 has to enter his/her Traceper password
-						"renderedView"=>$this->renderPartial('enterPasswordForOldFacebookUserToLogin', array('model'=>$model), true/*return instead of being displayed to end users*/, true),
-				));
+// 				echo CJSON::encode(array(
+// 						"result"=> "-2", //Old Facebook user with app<=1.0.16 has to enter his/her Traceper password
+// 						"renderedView"=>$this->renderPartial('enterPasswordForOldFacebookUserToLogin', array('model'=>$model), true/*return instead of being displayed to end users*/, true),
+// 				));
 
-				Yii::app()->end();
-			}
-			else
-			{				
-				$directLogin = false;
-			}
-		}		
+// 				Yii::app()->end();
+// 			}
+// 			else
+// 			{				
+// 				$directLogin = false;
+// 			}
+// 		}		
 		
 		$this->commonLogin($fbEmail, $autoGeneratedPassword, $language, $directLogin);
 	}
 		
 	//Kullanici Facebook ile ilk kez login olmaya calistiginda (yani kayit oldugunda) sartları kabul ederse bu fonksiyon ile isleme devam eder
 	//Hem web hem de mobil tarafindan kullaniliyor
-	//Mobilde gonderilecek parametreler: email, fbId, name(Full Name), password, language, deviceId, androidVer, appVer
+	//Mobilden gonderilecek parametreler: email, fbId, name(Full Name), password, language, deviceId, androidVer, appVer
 	public function actionContinueFacebookLogin() 
 	{
 		$fbId = $fbEmail = $name = $password = $autoGeneratedPassword = $registrationMedium = $language/*Bunu set edecek*/ = null;		
@@ -1021,11 +921,123 @@ class SiteController extends Controller
 		
 		$registrationMedium = $registrationMedium.' FB';		
 		
-		Fb::warn("fbId: $fbId", "actionContinueFacebookLogin()");
-		Fb::warn("fbEmail: $fbEmail", "actionContinueFacebookLogin()");
-		Fb::warn("name: $name", "actionContinueFacebookLogin()");		
+// 		Fb::warn("fbId: $fbId", "actionContinueFacebookLogin()");
+// 		Fb::warn("fbEmail: $fbEmail", "actionContinueFacebookLogin()");
+// 		Fb::warn("name: $name", "actionContinueFacebookLogin()");		
 
-		if (Users::model()->saveFacebookUser($fbEmail, md5($autoGeneratedPassword), $name, $fbId, 1/*account_type*/, $registrationMedium, $language)) 
+		//Traceper kullanicisi ayni e-posta ile Facebook logini kullanmak istediginde sarlari kabul etmemise, 
+		//once kabul edip sonra fonksiyna geri donmusse 
+		if(Users::model()->isUserRegisteredAsTraceperUser($fbEmail) == true)
+		{
+			Users::model()->setTermsAccepted($fbEmail);
+			
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				echo CJSON::encode(array("result"=> "-4")); //Currently Traceper user and ask switch to Facebook login permanently
+			}
+			else
+			{
+				if (Yii::app()->request->isAjaxRequest)
+				{
+					if (YII_DEBUG)
+					{
+						Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+						Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+					}
+					else
+					{
+						Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+					}
+				}
+			
+				//Complete solution for blinking problem
+				if (Yii::app()->request->getIsAjaxRequest()) {
+					Yii::app()->clientScript->scriptMap['*.js'] = false;
+					Yii::app()->clientScript->scriptMap['*.css'] = false;
+				}
+			
+				echo CJSON::encode(array(
+						"result"=> "-4", //Currently Traceper user and ask switch to Facebook login permanently
+						"renderedView"=>$this->renderPartial('askForSwitchToFacebookLoginPermanently',array(), true/*return instead of being displayed to end users*/, true),
+				));
+			
+				Yii::app()->end();
+			}			
+		}
+		else if(Users::model()->isFacebookUserRegistered($fbEmail, $fbId) == true)
+		{
+			//Facebook kullanicisi zaten kayitli ise sartlari kabulden buraya geldigi icin sartlari kabul ettir
+			Users::model()->setTermsAccepted($fbEmail);
+			
+			$appVer = $deviceId = null;
+			$directLogin = false;
+			Users::model()->getFbUserMobileInfo($fbEmail, $appVer, $deviceId);	
+			
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
+				//sifresini uygulamanin gonderdigi auto-generated sifre ile guncelleyip direk login oldur
+				if((($appVer != null) && ($appVer <= "1.0.16")) && (isset($_REQUEST['appVer']) && ($_REQUEST['appVer'] > "1.0.16")) && (isset($_REQUEST['deviceId']) && ($deviceId == $_REQUEST['deviceId'])))
+				{
+					Users::model()->updatePassword($fbEmail, md5($autoGeneratedPassword));
+					$directLogin = true;
+				}
+				else
+				{
+					$directLogin = false;
+				}
+			}
+			else //Webden login olan facebook kullanicisi ise, web zaten guncel oldugu icin sadece mevcut uygulama versiyonunu kontrol et
+			{
+				//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni weble login olursa
+				//uygulama versiyonunu guncelleyinceye kadar ayrica authenticate etmeden login et. Sifresini guncelleme, cunku
+				//uygulamayi guncellemezse uygulamadan girememeye baslar
+				if(($appVer != null) && ($appVer <= "1.0.16"))
+				{
+					//Kullanici uygulamayi guncelleyinceye kadar webden facebook uzerinden de girmeye calissa guvenlik icin hala sifre girmey zorlansin
+					
+					//Fb::warn("appVer:$appVer <= 1.0.16", "actionFacebookLogin()");
+					
+					if (Yii::app()->request->isAjaxRequest)
+					{
+						if (YII_DEBUG)
+						{
+							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						}
+						else
+						{
+							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						}
+					}
+						
+					//Complete solution for blinking problem
+					if (Yii::app()->request->getIsAjaxRequest()) {
+						Yii::app()->clientScript->scriptMap['*.js'] = false;
+						Yii::app()->clientScript->scriptMap['*.css'] = false;
+					}
+						
+					$model = new LoginForm(true/*$forOnlyPasswordCheck*/);
+					$model->email = $fbEmail;				
+						
+					echo CJSON::encode(array(
+							"result"=> "-2", //Old Facebook user with app<=1.0.16 has to enter his/her Traceper password
+							"renderedView"=>$this->renderPartial('enterPasswordForOldFacebookUserToLogin', array('model'=>$model), true/*return instead of being displayed to end users*/, true),
+					));
+	
+					Yii::app()->end();
+				}
+				else
+				{				
+					$directLogin = false;
+				}
+			}		
+			
+			$this->commonLogin($fbEmail, $autoGeneratedPassword, $language, $directLogin);
+		}
+		else if (Users::model()->saveFacebookUser($fbEmail, md5($autoGeneratedPassword), $name, $fbId, 1/*account_type*/, $registrationMedium, $language)) 
 		{
 			Fb::warn("saveFacebookUser() successful", "actionContinueFacebookLogin()");			
 			Users::model()->setTermsAccepted($fbEmail);
@@ -1038,8 +1050,7 @@ class SiteController extends Controller
 			Yii::app()->end();
 		}
 	}
-	
-	
+		
 	//Bu fonksiyon sadece web tarafindan kullaniliyor
 	//Henuz uygulamasini guncellememis eski bir Facebook kaydolcu kullanici web Facebook loginden giris yapmaya calisirsa
 	//guvenlik acisindan eski sifresini girmesi isteniyor
@@ -1128,7 +1139,77 @@ class SiteController extends Controller
 			
 			$this->renderPartial('enterPasswordForOldFacebookUserToLogin',array('model'=>$model), false, true);
 		}	
+	}
+
+	//Hem web hem de mobil tarafindan kullaniliyor
+	//Mobilden gonderilecek parametreler: email, fbId, name(Full Name), password, language, deviceId, androidVer, appVer
+	public function actionSwitchToFacebookLoginPermanently()
+	{
+		$fbId = $fbEmail = $name = $password = $autoGeneratedPassword = $language/*Bunu set edecek*/ = null;
+		$app = Yii::app();
+	
+		if (isset($app->session['_lang']))
+		{
+			$language = $app->session['_lang'];
+		}
+		else
+		{
+			$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+		}
+	
+		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+		{
+			if (isset($_REQUEST['email']) && isset($_REQUEST['fbId']) && isset($_REQUEST['name']) && isset($_REQUEST['password']) &&
+					isset($_REQUEST['language']) && isset($_REQUEST['deviceId']) && isset($_REQUEST['androidVer']) && isset($_REQUEST['appVer']))
+			{
+				$fbId = $_REQUEST['fbId'];
+				$fbEmail = $_REQUEST['email'];
+				$name = $_REQUEST['name'];
+				$password = $_REQUEST['password'];
+				$language = $_REQUEST['language'];
+				$autoGeneratedPassword = 'AK'.substr($fbEmail, 0, 3).substr($fbId, -5).'YS';
+	
+				if($password != $autoGeneratedPassword)
+				{
+					echo CJSON::encode(array("result"=> "-3")); //Mobile-generated password and web-generated password do not match
+					Yii::app()->end();
+				}
+	
+				//Diger atamalar altta (commonLogin) yapiliyor
+			}
+			else
+			{
+				echo CJSON::encode(array("result"=> "-2")); //Missing parameter
+				Yii::app()->end();
+			}
+		}
+		else
+		{
+			$userinfo = Yii::app()->facebook->getInfo();
+				
+			$fbId = $userinfo["id"];
+			$fbEmail = $userinfo["email"];
+			$name = $userinfo["name"];
+			$autoGeneratedPassword = 'AK'.substr($fbEmail, 0, 3).substr($fbId, -5).'YS';
+		}
+
+// 		Fb::warn("fbId: $fbId", "actionSwitchToFacebookLoginPermanently()");
+// 		Fb::warn("fbEmail: $fbEmail", "actionSwitchToFacebookLoginPermanently()");
+// 		Fb::warn("name: $name", "actionSwitchToFacebookLoginPermanently()");
+		
+		if (Users::model()->updateTraceperUserAsFacebookUser($fbEmail, md5($autoGeneratedPassword), $name, $fbId, $language))
+		{
+			//Fb::warn("updateTraceperUserAsFacebookUser() successful", "actionSwitchToFacebookLoginPermanently()");
+				
+			//Kullanici bilgisi zaten simdi guncellendiginden ayri bir login kontrolune gerek yok, direk login olabilir
+			$this->commonLogin($fbEmail, $autoGeneratedPassword, $language, true/*$directLogin*/);
+		}
+		else {
+			echo CJSON::encode(array("result"=> "-1")); //User info cannot be updated as Facebook user
+			Yii::app()->end();
+		}
 	}	
+	
 	
 
 	private function commonLogin($email, $password, $language, $directLogin = false)
