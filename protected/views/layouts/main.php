@@ -886,7 +886,9 @@ else
 	///////////////////////////// Accept Terms For Facebook Login Window ///////////////////////////
 	echo '<div id="acceptTermsForFacebookLoginWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Enter Password For Old Facebook User to Log In ///////////////////////////
-	echo '<div id="enterPasswordForOldFacebookUserToLoginWindow" style="display:none;font-family:Helvetica;"></div>';		
+	echo '<div id="enterPasswordForOldFacebookUserToLoginWindow" style="display:none;font-family:Helvetica;"></div>';
+	///////////////////////////// Ask For Switch To Facebook Login Permanently ///////////////////////////
+	echo '<div id="askForSwitchToFacebookLoginPermanentlyWindow" style="display:none;font-family:Helvetica;"></div>';			
 	///////////////////////////// Register Window ///////////////////////////
 	echo '<div id="registerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
@@ -1341,7 +1343,20 @@ else
 															
 															$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
 															$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView); 
-														}														
+														}
+														else if (obj.result == "-4")
+														{
+															var opt = {
+																autoOpen: false,
+																modal: true,
+																resizable: false,
+																width: 600,
+																title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
+															};
+															
+															$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
+															$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView); 
+														}																												
 														else
 														{
 

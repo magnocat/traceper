@@ -88,6 +88,21 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 													$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
 													$("#loginBlock").html(obj.loginSuccessfulActions);
 												}
+												else if (obj.result == "0")
+												{
+													$("#acceptTermsForLoginWindow").dialog("close");
+													TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+												}
+												else if (obj.result == "-2")
+												{
+													$("#acceptTermsForLoginWindow").dialog("close");
+													TRACKER.showMessageDialog("'.Yii::t('site', 'Missing parameter error occured. Please retry the process and if the error persists please contact us.').'");
+												}						
+												else
+												{
+													$("#acceptTermsForLoginWindow").dialog("close");
+													TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+												}													
 											}
 										}
 										catch (error)

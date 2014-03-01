@@ -97,7 +97,42 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 												{
 													$("#acceptTermsForFacebookLoginWindow").dialog("close");
 													TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during register process. Please retry the process and if the error persists please contact us.').'");
-												}												
+												}
+												else if (obj.result == "-2")
+												{
+													$("#acceptTermsForFacebookLoginWindow").dialog("close");
+						
+													var opt = {
+														autoOpen: false,
+														modal: true,
+														resizable: false,
+														width: 600,
+														title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
+													};
+													
+													$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
+													$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView); 
+												}						
+												else if (obj.result == "-4")
+												{
+													$("#acceptTermsForFacebookLoginWindow").dialog("close");
+						
+													var opt = {
+														autoOpen: false,
+														modal: true,
+														resizable: false,
+														width: 600,
+														title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
+													};
+													
+													$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
+													$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView); 
+												}						
+												else
+												{
+													$("#acceptTermsForFacebookLoginWindow").dialog("close");
+													TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+												}																		
 											}
 										}
 										catch (error)
