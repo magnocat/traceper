@@ -884,7 +884,9 @@ else
 	///////////////////////////// Accept Terms For Login Window ///////////////////////////
 	echo '<div id="acceptTermsForLoginWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Accept Terms For Facebook Login Window ///////////////////////////
-	echo '<div id="acceptTermsForFacebookLoginWindow" style="display:none;font-family:Helvetica;"></div>';	
+	echo '<div id="acceptTermsForFacebookLoginWindow" style="display:none;font-family:Helvetica;"></div>';
+	///////////////////////////// Enter Password For Old Facebook User to Log In ///////////////////////////
+	echo '<div id="enterPasswordForOldFacebookUserToLoginWindow" style="display:none;font-family:Helvetica;"></div>';		
 	///////////////////////////// Register Window ///////////////////////////
 	echo '<div id="registerWindow" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Register GPS Tracker Window ///////////////////////////
@@ -1323,13 +1325,26 @@ else
 																width: 600,
 																title: "'.Yii::t('site', 'Accept Terms to continue').'"
 															};
-															\
+															
 															$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
 															$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView); 
 														}
+														else if (obj.result == "-2")
+														{
+															var opt = {
+																autoOpen: false,
+																modal: true,
+																resizable: false,
+																width: 600,
+																title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
+															};
+															
+															$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
+															$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView); 
+														}														
 														else
 														{
-														
+
 														}
 													}											
 												}
@@ -1339,6 +1354,8 @@ else
 												}';							
 							
 							//Facebook'a JS fonksiyonunu verirken tek satirda vermeni istiyor, bu nedenle callback string'i tek satira donusturuluyor
+							//Bu fonksiyonun için de // ile yorum yazinca str_replace() tek satira cevirince kodlar yorumlandigi icin calismiyor,
+							//o nedenle comment koyma
 							$successCallback = str_replace(array("\r", "\n"), '', $successCallback);
 							
 							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
