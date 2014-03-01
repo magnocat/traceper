@@ -69,7 +69,8 @@ return array(
 	'E-mail is already registered!' => 'Bu e-posta zaten kay&#305;tl&#305;!',
 	'Please, enter the field' => 'L&#252;tfen alan&#305; doldurunuz',
 	'Enter the field' => 'Alan&#305; doldurunuz',
-	'Incorrect password or e-mail' => 'Yanl&#305;&#351; &#351;ifre veya e-posta',
+	'Incorrect password or e-mail' => 'Yanlış şifre veya e-posta',
+	'Incorrect password' => 'Şifre yanlış',
 	'This e-mail is registered before' => 'Aynı e-posta ile yalnızca bir kez kayıt olabilirsiniz!',
 	'Registration is completed successfully.\n Click Facebook button to login' => 'Kayıt başarı ile tamamlandı.\n Giriş yapmak için Facebook düğmesine tıklayınız.',
 	'Remember me' => 'Beni hat&#305;rla',
@@ -164,6 +165,8 @@ return array(
 	'There occured an unknown error during upload process. Make sure that you select a proper image file. If the error persists, please contact us.' => 'Yükleme sırasında bilinmeyen bir hata oluştu. Uygun bir resim dosyası seçtiğinizden emin olun. Hata devam ederse, lütfen bizimle iletişime geçiniz.',
 	'You have uploaded your profile photo successfully.' => 'Profil fotoğrafınızı başarıyla yüklediniz.',
 	'You have changed your profile photo successfully.' => 'Profil fotoğrafınızı başarıyla değiştirdiniz.',
+	'Enter Your Traceper Password to Log In' => 'Giriş Yapmak için Traceper Şifrenizi Girin',
+	'We have updated our web site and mobile application. Henceforth, you could directly login with your Facebook account. But for this, your mobile app has to be up-to-date. Since you have not updated your mobile app yet, we require you to enter your Traceper password. After your app is updated, you will not have to enter any password for Facebook login.' => 'Web sitemizi ve mobil uygulamamızı güncelledik. Artık Facebook hesabınızla direk olarak giriş yapabileceksiniz. Fakat bunun için mobil uygulamanızın güncel olması gerekiyor. Uygulamanızı henüz güncellemediğiniz için giriş için Traceper şifrenizi girmenizi istiyoruz. Uygulamanız güncellendikten sonra, Facebook girişi için herhangi bir şifre girmeniz gerekmeyecek.'
 );
 
 /*

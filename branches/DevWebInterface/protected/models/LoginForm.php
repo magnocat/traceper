@@ -10,9 +10,13 @@ class LoginForm extends CFormModel
 	public $email;
 	public $password;
 	public $rememberMe;
-	
 
-	private $_identity;
+	private $_identity;	
+	private $forOnlyPasswordCheck;
+	
+	public function __construct($forOnlyPasswordCheck = false) {
+		$this->forOnlyPasswordCheck = $forOnlyPasswordCheck;
+	}	
 
 	/**
 	 * Declares the validation rules.
@@ -67,8 +71,15 @@ class LoginForm extends CFormModel
 				}
 				else //Her iki tabloda da yoksa
 				{
-					//Aslinda kullanicinin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
-					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
+					if($this->forOnlyPasswordCheck)
+					{
+						$this->addError('password',Yii::t('site', 'Incorrect password'));
+					}
+					else
+					{
+						//Aslinda kullanicinin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
+						$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
+					}					
 				}				
 			}
 		}
@@ -87,8 +98,15 @@ class LoginForm extends CFormModel
 			{
 				//case CUserIdentity::ERROR_USERNAME_INVALID:					
 				case CUserIdentity::ERROR_PASSWORD_INVALID:
-					//Aslinda sifrenin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
-					$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
+					if($this->forOnlyPasswordCheck)
+					{
+						$this->addError('password',Yii::t('site', 'Incorrect password'));
+					}
+					else
+					{
+						//Aslinda kullanicinin hatali oldugu belli, fakat guvenlik acisinda hata boyle veriliyor
+						$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
+					}
 					break;
 					
 // 				case UserIdentity::ERROR_REGISTRATION_UNCOMPLETED:

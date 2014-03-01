@@ -983,6 +983,22 @@ class Users extends CActiveRecord
 
 		return $result;
 	}
+	
+	public function getFbUserMobileInfo($par_email, &$par_appVersion, &$par_deviceId) {
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+		$result = false;
+	
+		if($user != null)
+		{
+			if ($user->fb_id != 0) {
+				$result = true;
+				$par_appVersion = $user->appVer;
+				$par_deviceId = $user->deviceId;
+			}
+		}
+	
+		return $result;
+	}	
 
 	//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
 	//sifresini uygulamanin gonderdigi auto-generated sifre ile guncellemek icin kullanilacak	
