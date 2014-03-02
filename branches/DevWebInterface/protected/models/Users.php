@@ -824,6 +824,42 @@ class Users extends CActiveRecord
 	
 		return $result;
 	}
+	
+	public function getAppVersion($par_email, &$par_appVersion)
+	{
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+		$result = false;
+	
+		if($user != null)
+		{
+			$par_appVersion = $user->appVer; 
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+	
+		return $result;
+	}
+
+	public function setAppVersion($par_email, $par_appVersion)
+	{
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+		$result = false;
+		
+		if($user != null)
+		{
+			$user->appVer = $par_appVersion;
+			$result = $user->save();
+		}
+		else
+		{
+			$result = false;
+		}
+
+		return $result;
+	}	
 
 	public function setTermsAccepted($email)
 	{
@@ -987,7 +1023,7 @@ class Users extends CActiveRecord
 		return $user->profilePhotoStatus;
 	}
 
-	public function isFacebookUser($par_email) {
+	public function isFacebookUser($par_email, &$par_appVersion) {
 		$result = false;
 		$user = Users::model()->find('email=:email', array(':email'=>$par_email));		
 		
@@ -995,6 +1031,7 @@ class Users extends CActiveRecord
 		{
 			if ($user->fb_id != 0) {
 				$result = true;
+				$par_appVersion = $user->appVer;
 			}
 		}
 

@@ -230,10 +230,54 @@ class SiteController extends Controller
 			$preferredLanguage = null;
 
 			$isRecordUpdateRequired = false;
+			
+			//Model dogrulamasinda gunce uygulama versiyonu kullanilmasi gerektiginden en basta mobil icin versiyonda farklilik 
+			//varsa veritabanini guncelle 
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{	
+				if(Users::model()->getAppVersion($model->email, $appVer) == true)
+				{
+					if (isset($_REQUEST['appVer']))
+					{
+						if(strcmp($appVer, $_REQUEST['appVer']) != 0)
+						{
+							Users::model()->setAppVersion($model->email, $_REQUEST['appVer']);
+							$appVer = $_REQUEST['appVer'];
+						}
+					}					
+				}
+				else //Uygulama versiyonu okunamadi
+				{
+					$appVer = null;
+				}
+			}			
 
 			if($model->validate()) {								
 				
-				if(Users::model()->isTermsAccepted($model->email) === true)
+				$checkTermsAcception = true; //Uygulama versiyonu bir sebeple alinamazsa, varsayilan davranis sartlarin kontrol edilmesi olsun
+				
+				//Mobil ise uygulama versiyonuna gore terms acception kontrolu yap veya yapma
+				//Web icinse her zaman kontrol et, cunku web herkes icin guncel olacak
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					if($appVer != null) //Uygulama versiyonu okunabilmisse
+					{
+						if($appVer > "1.0.16")
+						{
+							$checkTermsAcception = true;
+						}
+						else
+						{
+							$checkTermsAcception = false; //Kullanici mobil uygulamasini henuz guncellemediyse terms acception kontrolu yapma
+						}									
+					}
+					else
+					{
+						$checkTermsAcception = true; //Uygulama versiyonu bir sebeple alinamazsa, varsayilan davranis sartlarin kontrol edilmesi olsun
+					}					
+				}
+
+				if(($checkTermsAcception == false) || (Users::model()->isTermsAccepted($model->email) === true))
 				{					
 					if($model->login())
 					{
@@ -519,7 +563,7 @@ class SiteController extends Controller
 					}
 					else if($model->getError('email') == Yii::t('site', 'You are registered as Facebook user for our service. Please use \"Log in with facebook\" button to log in to your Traceper account.'))
 					{
-						$result = "-3";
+						$result = "-4";
 					}
 					else
 					{

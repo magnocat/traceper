@@ -70,9 +70,15 @@ class ActivationNotReceivedForm extends CFormModel
 	{
 		if(!$this->hasErrors())
 		{
-			if(Users::model()->isFacebookUser($this->email))
+			$appVersion = null;
+	
+			if(Users::model()->isFacebookUser($this->email, $appVersion))
 			{
-				$this->addError('email',Yii::t('site', 'You are already registered as Facebook user for our service. You could use "Log in with facebook" button to log in to your Traceper account.'));
+				//1.0.16'dan sonraki uygulamalarda bu kontrolü yap, eski uygulamalari bozma
+				if($appVersion > "1.0.16")
+				{
+					$this->addError('email',Yii::t('site', 'You are already registered as Facebook user for our service. You could use "Log in with facebook" button to log in to your Traceper account.'));
+				}
 			}
 		}
 	}	
