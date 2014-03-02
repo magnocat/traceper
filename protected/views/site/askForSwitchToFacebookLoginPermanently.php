@@ -41,7 +41,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 													$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
 													$("#loginBlock").html(obj.loginSuccessfulActions);
 						
-													TRACKER.showMessageDialog("'.Yii::t('site', 'Your account has been updated for Facebook login permanently. From now on, you could use this e-mail address only with Facebook login to log in to your Traceper account...').'");
+													TRACKER.showLongMessageDialog("'.Yii::t('site', 'Your account has been updated for Facebook login permanently. From now on, you could use this e-mail address only with Facebook login to log in to your Traceper account...').'");
 												}
 												else if (obj.result == "0")
 												{
