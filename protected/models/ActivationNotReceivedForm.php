@@ -18,6 +18,7 @@ class ActivationNotReceivedForm extends CFormModel
 			// email is required
 			array('email', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
+			array('email', 'checkFacebook'),
 			array('email', 'isRegistered'),
 			array('email', 'isNotCandidate'),
 		);
@@ -44,7 +45,7 @@ class ActivationNotReceivedForm extends CFormModel
 			$data = Users::model()->find($criteria);
 	
 			if ($data != null) {
-				$this->addError('email',Yii::t('site', 'You are already registered!'));
+				$this->addError('email',Yii::t('site', 'You are already registered for our service. If you do not remember your password, you could request to determine a new one by the link "Forgot Password?".'));
 			}
 		}
 	}	
@@ -61,6 +62,17 @@ class ActivationNotReceivedForm extends CFormModel
 
 			if ($data == null) {
 				$this->addError('email',Yii::t('site', 'There has been a problem with your registration process. Please try to sign up for Traceper again.'));
+			}
+		}
+	}
+
+	public function checkFacebook($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			if(Users::model()->isFacebookUser($this->email))
+			{
+				$this->addError('email',Yii::t('site', 'You are already registered as Facebook user for our service. You could use "Log in with facebook" button to log in to your Traceper account.'));
 			}
 		}
 	}	

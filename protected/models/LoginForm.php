@@ -36,6 +36,8 @@ class LoginForm extends CFormModel
 			
 			array('email', 'isExists'),
 				
+			array('email', 'checkFacebook'),
+				
 			// password needs to be authenticated
 			array('password', 'authenticate'),
 		);
@@ -81,6 +83,17 @@ class LoginForm extends CFormModel
 						$this->addError('password',Yii::t('site', 'Incorrect password or e-mail'));
 					}					
 				}				
+			}
+		}
+	}
+
+	public function checkFacebook($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			if(Users::model()->isFacebookUser($this->email))
+			{
+				$this->addError('email',Yii::t('site', 'You are registered as Facebook user for our service. Please use \"Log in with facebook\" button to log in to your Traceper account.'));
 			}
 		}
 	}	
