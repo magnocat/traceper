@@ -126,7 +126,7 @@
 					?>					
 				</div>
 					
- 				<div style="margin-top:0px;padding-top:6px;">
+ 				<div style="width:120px;margin-top:0px;padding-top:6px;">
 					<?php
 					echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 										'</div>', $this->createUrl('site/forgotPassword'),

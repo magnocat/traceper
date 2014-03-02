@@ -1178,7 +1178,7 @@ else
 										?>									
 								</div>
 								
-			 					<div style="margin-top:0px;padding-top:6px;">
+			 					<div style="width:120px;margin-top:0px;padding-top:6px;">
 									<?php
 										echo CHtml::ajaxLink('<div id="forgotPassword">'.Yii::t('site', 'Forgot Password?').
 															'</div>', $this->createUrl('site/forgotPassword'),
@@ -1232,7 +1232,7 @@ else
 							</div>
 						</div>							
 													
-						<div class="upperMenu" style="margin-top:0.7em;width:140px;padding-left:138px;padding-right:0px;">								
+						<div class="upperMenu" style="margin-top:14px;width:140px;padding-left:138px;padding-right:0px;">								
 						<?php
 						//Yii butonları <buton> tag'i ile uretmedigi icin boyle yapildi, bu css'ler Yii'nin urettigi <input> ile calismiyor
 						echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-login1" style="'.(($app->language == 'en')?'padding-left:65px;padding-right:25px;':'padding-left:50px').'">'.Yii::t('site', 'Log in').'</button>', $this->createUrl('site/login'),
@@ -1298,8 +1298,12 @@ else
 										array('id'=>'loginAjaxButton','type'=>'submit','tabindex'=>3));									
 						?>																					
 						</div>
+
+						<div class="upperMenu" style="width:auto;margin-top:12px;padding-right:0px;padding-left:10px;font-size:1.6em;">
+							<?php echo CHtml::label(Yii::t('layout', 'or'), false, array('style'=>'cursor:text;')); ?>
+						</div>						
 						
-						<div class="upperMenu">
+						<div class="upperMenu" style="margin-top:20px;padding-right:0px;">
 							<?php							
 							$successCallback = 'try
 												{
@@ -2102,7 +2106,7 @@ else
 								</div>
 								</div>
 								
-								<div class="sideMenu" style="height:25px;font-size:12px;margin-left:0.3em;">
+								<div class="sideMenu" style="height:25px;font-size:12px;margin-left:0.3em;cursor:text;">
 								<?php	
 									echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 											CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
@@ -2377,14 +2381,15 @@ else
 					</div>											
 				</div>							
 				
-				<div id='publicUploadsContent' 
+				<!-- Guest olsa da olmasa da ilk basta gozukmuyor, sonra dan istenirse aciliyor. Bu nedenle ilk olarak display:none -->	
+				<div id='publicUploadsContent' style='display:none' 
 				<?php
-				if (Yii::app()->user->isGuest == false) {
-					echo "style='display:none'";
-				}
-				else {
-					echo "style='padding-top:10px;'";
-				}				
+// 				if (Yii::app()->user->isGuest == false) {
+// 					echo "style='display:none'";
+// 				}
+// 				else {
+// 					echo "style='padding-top:10px;'";
+// 				}				
 				?>>
 					<div class="form"> <!-- Bu aslina form degil, fakat yazi stili ayni olmasi icin -->				
 						<div class="sideMenu">
