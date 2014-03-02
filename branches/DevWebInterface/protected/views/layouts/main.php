@@ -1375,7 +1375,7 @@ else
 							
 							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
 							'size'=>'large',
-							'text'=>'Log in with facebook',
+							'text'=>Yii::t('layout', 'Log in with facebook'),
 							'scope'=>'basic_info,email', //permissions		
 							'on_login'=>'(function(){ $.post("index.php?r=site/facebookLogin", function(msg){'.$successCallback.'});})()'
 							//'show_faces'=>true,

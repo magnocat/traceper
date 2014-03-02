@@ -49,8 +49,10 @@ class RegisterForm extends CFormModel
 			//These attributes should be defined as safe in order to be usable
 			array('ac_id, account_type', 'safe'),
 			
-			array('email', 'isExists'),
+			array('email', 'checkFacebook'),
 				
+			array('email', 'isExists'),
+
 			//array('email', 'checkEmailDomain'),				
 			
 			//array('image', 'isExists')
@@ -100,6 +102,17 @@ class RegisterForm extends CFormModel
 // 			}							
 		}
 	}
+	
+	public function checkFacebook($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			if(Users::model()->isFacebookUser($this->email))
+			{
+				$this->addError('email',Yii::t('site', 'You are already registered as Facebook user for our service. Please use \"Log in with facebook\" button to log in to your Traceper account.'));
+			}
+		}
+	}	
 
 // 	public function checkLength($attribute,$params)
 // 	{

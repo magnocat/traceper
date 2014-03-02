@@ -19,6 +19,7 @@ class ForgotPasswordForm extends CFormModel
 			array('email', 'required','message'=>Yii::t('site', 'Please, enter the field')),
 			array('email', 'email', 'message'=>Yii::t('site', 'E-mail not valid!')),
 			array('email', 'isNotRegistered'),
+			array('email', 'checkFacebook'),
 		);
 	}
 
@@ -50,6 +51,17 @@ class ForgotPasswordForm extends CFormModel
 			{
 				$this->addError('email',Yii::t('site', 'This e-mail is not registered!'));
 			}			
+		}
+	}
+
+	public function checkFacebook($attribute,$params)
+	{
+		if(!$this->hasErrors())
+		{
+			if(Users::model()->isFacebookUser($this->email))
+			{
+				$this->addError('email',Yii::t('site', 'You are registered as Facebook user for our service, therefore you do not have to enter a Traceper password. You could use "Log in with facebook" button to log in to your Traceper account.'));
+			}
 		}
 	}	
 }

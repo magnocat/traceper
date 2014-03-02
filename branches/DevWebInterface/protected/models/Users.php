@@ -987,16 +987,14 @@ class Users extends CActiveRecord
 		return $user->profilePhotoStatus;
 	}
 
-	public function isFacebookUser($par_email, &$par_appVersion, &$par_deviceId) {
-		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+	public function isFacebookUser($par_email) {
 		$result = false;
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));		
 		
 		if($user != null)
 		{
 			if ($user->fb_id != 0) {
 				$result = true;
-				$par_appVersion = $user->appVer;
-				$par_deviceId = $user->deviceId;
 			}
 		}
 
