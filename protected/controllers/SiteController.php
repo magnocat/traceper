@@ -360,7 +360,7 @@ class SiteController extends Controller
 							//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
 							if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 							{
-								if((Yii::app()->session['latitude'] != 0) & (Yii::app()->session['latitude'] != null))
+								if((Yii::app()->session['latitude'] != null) & (Yii::app()->session['longitude'] != null))
 								{
 									$address = $this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude']);
 								
@@ -1349,7 +1349,7 @@ class SiteController extends Controller
 				//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
 				if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 				{
-					if((Yii::app()->session['latitude'] != 0) & (Yii::app()->session['latitude'] != null))
+					if((Yii::app()->session['latitude'] != null) & (Yii::app()->session['longitude'] != null))
 					{
 						$address = $this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude']);
 							

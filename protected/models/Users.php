@@ -1058,7 +1058,7 @@ class Users extends CActiveRecord
 	//sifresini uygulamanin gonderdigi auto-generated sifre ile guncellemek icin kullanilacak	
 	public function updatePassword($par_email, $par_password)
 	{
-		$user = Users::model()->find('email=:email', array(':email'=>$email));
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
 		$user->password = $par_password;
 	
 		return $user->save();
