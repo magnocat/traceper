@@ -201,7 +201,23 @@ class UsersController extends Controller
 			
 			Users::model()->updateLocationWithAddress($_POST['latitude'], $_POST['longitude'], $_POST['altitude'], $address, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
 		}		
-	}	
+	}
+
+	public function actionGetLocationByWebIP()
+	{
+		Fb::warn("actionGetLocationByWebIP() called", "UsersController");
+	
+		if (isset($_POST['countryName']) && ($_POST['countryName'] != NULL) &&
+			isset($_POST['latitude']) && ($_POST['latitude'] != NULL) &&
+			isset($_POST['longitude']) && ($_POST['longitude'] != NULL))
+		{
+			Yii::app()->session['countryName'] = $_POST['countryName'];
+			Yii::app()->session['latitude'] = $_POST['latitude'];
+			Yii::app()->session['longitude'] = $_POST['longitude'];	
+		}
+		
+		//Fb::warn("countryName:".$_POST['countryName'], "actionGetLocationByWebIP()");
+	}
 		
 	/*
 	 * this action is used by mobile clients

@@ -749,34 +749,22 @@ $app->language = $language;
 
 Yii::app()->clientScript->registerCoreScript('yiiactiveform');
 
+//Fb::warn(Yii::app()->session['countryName'], "main");
+
+//unset(Yii::app()->session['countryName']);
+
+$countryName = null;
+
 if(isset(Yii::app()->session['countryName']) == false)
 {
-	$pageContent = file_get_contents('http://freegeoip.net/json/'.$_SERVER['REMOTE_ADDR']);
-	$parsedJson  = json_decode($pageContent);	
-	
-	if((htmlspecialchars($parsedJson->country_name) == "Reserved") || ($parsedJson->country_name == null))
-	{
-		Yii::app()->session['countryName'] = "null";
-		Yii::app()->session['latitude'] = $parsedJson->latitude;
-		Yii::app()->session['longitude'] = $parsedJson->longitude;
-	}
-	else
-	{
-		Yii::app()->session['countryName'] = "'".htmlspecialchars($parsedJson->country_name)."'";
-		Yii::app()->session['latitude'] = $parsedJson->latitude;
-		Yii::app()->session['longitude'] = $parsedJson->longitude;
-	}
-	
-	
-
-	//Fb::warn(htmlspecialchars($parsedJson->country_name), "main");
-	//Fb::warn($pageContent, "main");
-	//Fb::warn($parsedJson->country_name, "main");
+	$countryName = "null";
+}
+else
+{
+	$countryName = "'".Yii::app()->session['countryName']."'";
 }
 
-
-
-//Fb::warn(Yii::app()->session['countryName'], "main");
+//Fb::warn(Yii::app()->session['countryName'], "session['countryName']");
 
 Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	try
@@ -784,7 +772,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 		var mapStruct = new MapStruct();
 		var initialLoc = new MapStruct.Location({latitude:39.504041,
 		longitude:35.024414});
-		mapOperator.initialize(initialLoc, ".Yii::app()->session['countryName'].");
+		mapOperator.initialize(initialLoc, ".$countryName.");
 		//TODO: ../index.php should be changed
 		//TODO: updateUserListInterval
 		//TODO: queryIntervalForChangedUsers
@@ -798,6 +786,64 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	}			
 	",
 	CClientScript::POS_READY);
+
+if(isset(Yii::app()->session['countryName']) == false)
+{
+	Yii::app()->clientScript->registerScript('getGeolocationByIp',
+			"
+			jQuery.getJSON('http://freegeoip.net/json/', function(location) {
+				MAP_OPERATOR.focusOnCountry(location.country_name, false);			
+			
+				$.post('index.php?r=users/getLocationByWebIP', { countryName:location.country_name, latitude:location.latitude, longitude:location.longitude });
+			}) .done(function() {
+
+				})
+				.fail(function() { //freegeoip fail ederse telize den sorgula
+					$.getJSON('http://www.telize.com/geoip?callback=?', function(json) {
+						MAP_OPERATOR.focusOnCountry(json.country, false);
+			
+						$.post('index.php?r=users/getLocationByWebIP', { countryName:json.country, latitude:json.latitude, longitude:json.longitude });
+					}) .done(function() {
+							console.log('second success');
+						})
+						.fail(function() {
+							console.log('error');
+						})
+						.always(function() {
+							console.log('complete');
+						});
+					})
+				.always(function() {
+					//console.log('complete');
+				});
+
+			",
+			CClientScript::POS_READY);
+
+	// 	$pageContent = file_get_contents('http://freegeoip.net/json/'.$_SERVER['REMOTE_ADDR']);
+	// 	$parsedJson  = json_decode($pageContent);
+
+	// 	if((htmlspecialchars($parsedJson->country_name) == "Reserved") || ($parsedJson->country_name == null))
+	// 	{
+	// 		Yii::app()->session['countryName'] = "null";
+	// 		Yii::app()->session['latitude'] = $parsedJson->latitude;
+	// 		Yii::app()->session['longitude'] = $parsedJson->longitude;
+	// 	}
+	// 	else
+	// 	{
+	// 		Yii::app()->session['countryName'] = "'".htmlspecialchars($parsedJson->country_name)."'";
+	// 		Yii::app()->session['latitude'] = $parsedJson->latitude;
+	// 		Yii::app()->session['longitude'] = $parsedJson->longitude;
+	// 	}
+}
+else
+{
+	Yii::app()->clientScript->registerScript('focusOnCountry',
+			"
+			MAP_OPERATOR.focusOnCountry('".Yii::app()->session['countryName']."', false);
+			",
+			CClientScript::POS_READY);
+}
 
 if (Yii::app()->user->isGuest == false)
 {

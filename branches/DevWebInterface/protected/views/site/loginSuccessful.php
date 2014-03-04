@@ -160,6 +160,17 @@
 // 		'update'=>'#groups_tab',
 // 		)
 // 	);
+
+$countryName = null;
+
+if(isset(Yii::app()->session['countryName']) == false)
+{
+	$countryName = "null";
+}
+else
+{
+	$countryName = "'".Yii::app()->session['countryName']."'";
+}
 ?>
 
 <script type="text/javascript">
@@ -200,7 +211,7 @@
 
 		$.post('index.php?r=users/updateLocationByGeolocation', { latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude });
 
-		if(<?php echo Yii::app()->session['countryName']; ?> == null)
+		if(<?php echo $countryName; ?> == null)
 		{
 			var defaultLoc = new MapStruct.Location({latitude:39.504041, longitude:35.024414});
 			MAP_OPERATOR.focusOnCountryByCoordinates(position.coords.latitude, position.coords.longitude, defaultLoc);
