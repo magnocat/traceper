@@ -608,7 +608,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 
 //var uploadIdArray = new Array();
 
-function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbSuffix){
+function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbSuffix, par_isPublic){
 	
 	//alertMsg("processUploads() called");
 	var updateType = 'all';
@@ -706,7 +706,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 						+ "</div>"
 						+ "<div>"
 						+ TRACKER.images[imageId].description + "<br/>"
-						+ "<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"
+						+ ((par_isPublic == false)?("<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"):TRACKER.images[imageId].realname)
 						+ "<br/>"
 						+ TRACKER.images[imageId].time + "<br/>"
 						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude

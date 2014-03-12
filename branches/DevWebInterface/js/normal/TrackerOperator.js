@@ -237,10 +237,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
 					  
-					  "User Info: </br></br>" + 
-					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-					  "User OS: " + BrowserDetect.OS + "</br></br>" +
-					  "'getUserListJson' javascript exception is recovered at " + exceptionForParamsMap['getUserListJson'] + ". trial." + "</br>" +
+					  "User Info: <br/><br/>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+					  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+					  "'getUserListJson' javascript exception is recovered at " + exceptionForParamsMap['getUserListJson'] + ". trial." + "<br/>" +
 					  "&params=" + 'getUserListJsonRecovery'; 
 
 					  //If the javascript exception is recovered, report this situation via e-mail
@@ -267,11 +267,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
 					  
-					  "Exception Info: </br></br>" + 
-					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-					  "User OS: " + BrowserDetect.OS + "</br></br>" +
-					  "Exception in jsonparams: " + jsonparams + "</br>" +
-					  "Error: " + error.message + "</br>" +
+					  "Exception Info: <br/><br/>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+					  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+					  "Exception in jsonparams: " + jsonparams + "<br/>" +
+					  "Error: " + error.message + "<br/>" +
 					  "JSON obj: " + JSON.stringify(obj) + "&params=" + "getUserListJson"; 
 
 					  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
@@ -337,7 +337,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				
 				//alertMsg("pageNo:" + TRACKER.bgImageListPageNo + " - pageCount:" + TRACKER.bgImageListPageCount);
 
-				processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix);
+				processUploads(MAP, obj.deletedlist, obj.uploadlist, obj.updateType, obj.thumbSuffix, isPublic);
 				
 				//alertMsg("processImageXML() called");
 				
@@ -392,10 +392,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
 					  
-					  "User Info: </br></br>" + 
-					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-					  "User OS: " + BrowserDetect.OS + "</br></br>" +
-					  exceptionForParamsMapKey + " javascript exception is recovered at " + exceptionForParamsMap[exceptionForParamsMapKey] + ". trial." + "</br>" +
+					  "User Info: <br/><br/>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+					  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+					  exceptionForParamsMapKey + " javascript exception is recovered at " + exceptionForParamsMap[exceptionForParamsMapKey] + ". trial." + "<br/>" +
 					  "&params=" + exceptionForParamsMapKey + "Recovery"; 
 
 					  //If the javascript exception is recovered, report this situation via e-mail
@@ -422,11 +422,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				{
 					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
 					  
-					  "Exception Info: </br></br>" + 
-					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-					  "User OS: " + BrowserDetect.OS + "</br></br>" +
-					  "Exception in jsonparams: " + jsonparams + "</br>" +
-					  "Error: " + error.message + "</br>" +
+					  "Exception Info: <br/><br/>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+					  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+					  "Exception in jsonparams: " + jsonparams + "<br/>" +
+					  "Error: " + error.message + "<br/>" +
 					  "JSON obj: " + JSON.stringify(obj) + "&params=" + exceptionForParamsMapKey; 
 
 					  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
@@ -632,10 +632,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					{
 						  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
 						  
-						  "User Info: </br></br>" + 
-						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-						  "User OS: " + BrowserDetect.OS + "</br></br>" +
-						  "'getUserPastPointsJSON' javascript exception is recovered at " + exceptionForParamsMap['getUserPastPointsJSON'] + ". trial." + "</br>" +
+						  "User Info: <br/><br/>" + 
+						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+						  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+						  "'getUserPastPointsJSON' javascript exception is recovered at " + exceptionForParamsMap['getUserPastPointsJSON'] + ". trial." + "<br/>" +
 						  "&params=" + 'getUserPastPointsJSONRecovery'; 
 
 						  //If the javascript exception is recovered, report this situation via e-mail
@@ -661,11 +661,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					{
 						  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Occured!&message=" +
 						  
-						  "Exception Info: </br></br>" + 
-						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-						  "User OS: " + BrowserDetect.OS + "</br></br>" +
-						  "Exception in jsonparams: " + jsonparams + "</br>" +
-						  "Error: " + error.message + "</br>" +
+						  "Exception Info: <br/><br/>" + 
+						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+						  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+						  "Exception in jsonparams: " + jsonparams + "<br/>" +
+						  "Error: " + error.message + "<br/>" +
 						  "JSON obj: " + JSON.stringify(obj) + "&params=" + "getUserPastPointsJSON"; 
 
 						  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
@@ -972,11 +972,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					  {
 //						  var errorData = "r=site/ajaxErrorOccured&errorMessage=" +
 //						  
-//						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-//						  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
-//		  				  "xhr.responseText: " + xhr.responseText + "</br>" +
-//						  "xhr.status: " + xhr.status + "</br>" + 
-//						  "error: " + error + "</br>" +						  
+//						  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+//						  "User OS: " + BrowserDetect.OS + "<br/><br/>" +					  
+//		  				  "xhr.responseText: " + xhr.responseText + "<br/>" +
+//						  "xhr.status: " + xhr.status + "<br/>" + 
+//						  "error: " + error + "<br/>" +						  
 //						  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + 
 //						  
 //						  "&params=" + params;	 
@@ -999,12 +999,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						  {
 							  var data = "r=site/ajaxEmailNotification&title=Ajax Error Occured!&message=" +
 							  
-							  "Error Info: </br></br>" + 
-							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-							  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
-			  				  "xhr.responseText: " + xhr.responseText + "</br>" +
-							  "xhr.status: " + xhr.status + "</br>" + 
-							  "error: " + error + "</br>" +						  
+							  "Error Info: <br/><br/>" + 
+							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+							  "User OS: " + BrowserDetect.OS + "<br/><br/>" +					  
+			  				  "xhr.responseText: " + xhr.responseText + "<br/>" +
+							  "xhr.status: " + xhr.status + "<br/>" + 
+							  "error: " + error + "<br/>" +						  
 							  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params; 
 
 							  //If authorization error occurs, report this situation via e-mail
@@ -1026,12 +1026,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						  {
 							  var data = "r=site/ajaxEmailNotification&title=Ajax Error Occured!&message=" +
 							  
-							  "Error Info: </br></br>" + 
-							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "</br>" +
-							  "User OS: " + BrowserDetect.OS + "</br></br>" +					  
-			  				  "xhr.responseText: " + xhr.responseText + "</br>" +
-							  "xhr.status: " + xhr.status + "</br>" + 
-							  "error: " + error + "</br>" +						  
+							  "Error Info: <br/><br/>" + 
+							  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+							  "User OS: " + BrowserDetect.OS + "<br/><br/>" +					  
+			  				  "xhr.responseText: " + xhr.responseText + "<br/>" +
+							  "xhr.status: " + xhr.status + "<br/>" + 
+							  "error: " + error + "<br/>" +						  
 							  "Error in ajax -" + " ajaxUrl:" + TRACKER.ajaxUrl + " - params:" + params + "&params=" + params; 
 
 							  //If more than 5 consecutive ajax queries are erroneous, report this situation via e-mail
@@ -1074,13 +1074,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.showMessageDialog = function(message) {
 		$("#messageDialogOK").show(); 
-		$("#messageDialogText").html('</br>' + message); 
+		$("#messageDialogText").html('<br/>' + message); 
 		$("#messageDialog").dialog("open"); 
 	}
 	
 	this.showLongMessageDialog = function(message, homePage) {
 		$("#longMessageDialogOK").show();
-		$("#longMessageDialogText").html('</br>' + message);
+		$("#longMessageDialogText").html('<br/>' + message);
 		$("#longMessageDialogOKButton").unbind("click");
 		
 		if(typeof homePage !== 'undefined')
@@ -1092,7 +1092,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}	
 	
 //	this.showConfirmationDialog = function(question, callback){
-//		$("#confirmationDialog #question").html('</br>' + question); 
+//		$("#confirmationDialog #question").html('<br/>' + question); 
 //		var buttons = $("#confirmationDialog").dialog( "option", "buttons" );
 //		// dont forget first button is positivie button so below loop works
 //		for(var property in buttons) {
@@ -1106,7 +1106,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	
 	this.showConfirmationDialog = function(question, callback){
 		$("#confirmationDialogButtons").show();
-		$("#confirmationDialog #question").html('</br>' + question);
+		$("#confirmationDialog #question").html('<br/>' + question);
 		$("#confirmationDialogOK").unbind("click"); //Onceden baglanmisları unbind etmezse surekli birikiyor
 		$('#confirmationDialogOK').click(function() { callback(); });
 		$("#confirmationDialog").dialog("open");	

@@ -1,8 +1,7 @@
 <?php
 
 class UsersController extends Controller
-{
-	
+{	
 	private $dataFetchedTimeKey = "UsersController.dataFetchedTime";
 	/**
 	 * This is the default 'index' action that is invoked
@@ -40,14 +39,27 @@ class UsersController extends Controller
 	{
 		return array(
 				array('deny',
+						//'deniedCallback' => array($this, 'deniedAction'),
 						'actions'=>array('addAsFriend', 'deleteFriendShip','getFriendRequestList', 'getFriendList',
 								'getUserPastPointsXML', 'getUserListXML', 'search', 'searchJSON',
-								'takeMyLocation', 'getUserInfo',
-								'getUserListJson', 'upload', 'updateLocationByGeolocation'),
+								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
+								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
+								'useFacebookProfilePhoto', 'viewProfilePhoto'),
 						'users'=>array('?'),
 				)
 		);
 	}
+	
+// 	public function deniedAction($rule){
+// 		if (isset($_REQUEST['latitude']))
+// 		{
+// 			echo "Deneme";
+// 		}
+// 		else
+// 		{
+// 			echo "not mobile";
+// 		}		
+// 	}	
 	
 	private function calculateDistance($lat1, $lon1, $lat2, $lon2, $unit = "K") {
 		$theta = $lon1 - $lon2;
@@ -72,18 +84,26 @@ class UsersController extends Controller
 		}
 		
 		return $distance;
-	}	
-
-	private function getaddress($lat,$lng)
+	}
+	
+	/*
+	 * check whether user guest or not (actually for checking whether session timed out or not)
+	 * Bu fonksiyonu mobil session'in kaybolup kaybolmadigini anlamak icin kullanacak
+	*/
+	public function actionIsUserGuest()
 	{
-		$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false';
-		$json = @file_get_contents($url);
-		$data=json_decode($json);
-		$status = $data->status;
-		if($status=="OK")
-			return $data->results[0]->formatted_address;
+		$out = null;
+		
+		if (Yii::app()->user->isGuest == true)
+		{
+			$out = "1";
+		}
 		else
-			return null;
+		{
+			$out = "0";
+		}
+		
+		echo $out;		
 	}
 	
 	/*
@@ -92,87 +112,113 @@ class UsersController extends Controller
 	public function actionTakeMyLocation()
 	{
 		$result = null;
+		$message = null;
 		
-		if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
-				&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
-				&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
-				&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
-				&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
-		)
+		//if(Yii::app()->request->isPostRequest)
 		{
-			$latitude = (float) $_REQUEST['latitude'];
-			$longitude = (float) $_REQUEST['longitude'];
-			$altitude = (float) $_REQUEST['altitude'];
-			$deviceId = $_REQUEST['deviceId'];
-			$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);			
-
-			if (Yii::app()->user->id != false)
+			if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
+					&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
+					&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
+					&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
+					&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
+			)
 			{
-				$lastLatitude = 0;
-				$lastLongitude = 0; 
-				$lastAltitude = 0; 
-				$minDistanceInterval = 0;
-				$minDataSentInterval = 0;
-
-				Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
-				UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
-				
-				$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
-				$distanceInMs = $distanceInKms * 1000;
-				
-				//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table 
-				if($distanceInMs > $minDistanceInterval)
+				$latitude = (float) $_REQUEST['latitude'];
+				$longitude = (float) $_REQUEST['longitude'];
+				$altitude = (float) $_REQUEST['altitude'];
+				$deviceId = $_REQUEST['deviceId'];
+				$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
+			
+				if (Yii::app()->user->id != false)
 				{
-					$address = $this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude']);
-					
-					//Address info is also updated with location info if the distance difference is high enough
-					if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
+					$lastLatitude = 0;
+					$lastLongitude = 0;
+					$lastAltitude = 0;
+					$minDistanceInterval = 0;
+					$minDataSentInterval = 0;
+			
+					Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+					UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
+			
+					$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
+					$distanceInMs = $distanceInKms * 1000;
+			
+					//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
+					//if($distanceInMs > $minDistanceInterval)
+					if(true)
 					{
-						$result = "1"; //Location updated successfully
+						$address = null;
+						$country = null;
+							
+						$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
+			
+						Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
+			
+						//Address info is also updated with location info if the distance difference is high enough
+						if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
+						{
+							$result = "1"; //Location updated successfully
+						}
+						else
+						{
+							$result = "0"; //Error occured in save operation
+						}
+							
+						//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
+			
+						if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
+						{
+							//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
+			
+							//$result = "1"; //Values updated successfully
+						}
+						else
+						{
+							//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
+			
+							//$result = "0"; //Error occured in save operation
+						}
 					}
 					else
 					{
-						$result = "0"; //Error occured in save operation
-					}					
-					
-					//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
-
-					if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
-					{
-						//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
-						
-						//$result = "1"; //Values updated successfully
+						//Only location info (without address info) is updated if the distance difference is smaller than the threshold
+						if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) == 1)
+						{
+							$result = "1"; //Location updated successfully
+						}
+						else
+						{
+							$result = "0"; //Error occured in save operation
+							
+							$message = "Error occured during location save operation to database";
+							$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+						}
 					}
-					else
-					{
-						//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
-						
-						//$result = "0"; //Error occured in save operation
-					}					
 				}
 				else
 				{
-					//Only location info (without address info) is updated if the distance difference is smaller than the threshold
-					if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) == 1)
-					{
-						$result = "1"; //Location updated successfully
-					}
-					else
-					{
-						$result = "0"; //Error occured in save operation
-					}					
-				}				
+					$result = "-1"; //No valid user Id
+					
+					$message = "User ID is not valid (Guest User)";
+					$this->sendErrorMail('Error in actionTakeMyLocation()', $message);					
+				}
 			}
 			else
 			{
-				$result = "-1"; //No valid user Id
-			}
+				$result = "-2"; //Missing Parameter
+				
+				$message = "Missing Parameter";
+				$this->sendErrorMail('Error in actionTakeMyLocation()', $message);				
+			}			
 		}
-		else
-		{
-			$result = "-2"; //Missing Parameter
-		}
-		
+// 		else
+// 		{
+// 			$result = "-2"; //Missing Parameter
+			
+// 			$message = "Not a POST request! Only post reequests are accepted";
+// 			$this->sendErrorMail('Error in actionTakeMyLocation()', $message);			
+// 		}
+
 		$resultArray = array("result"=>$result);
 		
 		if($result == "1") {
@@ -197,15 +243,17 @@ class UsersController extends Controller
 		if (isset($_POST['latitude']) && ($_POST['latitude'] != NULL) && 
 			isset($_POST['longitude']) && ($_POST['longitude'] != NULL))
 		{
-			$address = $this->getaddress($_POST['latitude'], $_POST['longitude']);
-			
-			Users::model()->updateLocationWithAddress($_POST['latitude'], $_POST['longitude'], $_POST['altitude'], $address, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
+			$address = null;
+			$country = null;
+				
+			$this->getaddress($_POST['latitude'], $_POST['longitude'], $address, $country);			
+			Users::model()->updateLocationWithAddress($_POST['latitude'], $_POST['longitude'], $_POST['altitude'], $address, $country, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
 		}		
 	}
 
 	public function actionGetLocationByWebIP()
 	{
-		Fb::warn("actionGetLocationByWebIP() called", "UsersController");
+		//Fb::warn("actionGetLocationByWebIP() called", "UsersController");
 	
 		if (isset($_POST['countryName']) && ($_POST['countryName'] != NULL) &&
 			isset($_POST['latitude']) && ($_POST['latitude'] != NULL) &&
@@ -215,8 +263,6 @@ class UsersController extends Controller
 			Yii::app()->session['latitude'] = $_POST['latitude'];
 			Yii::app()->session['longitude'] = $_POST['longitude'];	
 		}
-		
-		//Fb::warn("countryName:".$_POST['countryName'], "actionGetLocationByWebIP()");
 	}
 		
 	/*
@@ -225,6 +271,7 @@ class UsersController extends Controller
 	public function actionUpdateProfile()
 	{
 		$result = null;
+		$message = null;
 		
 		$realname =  null;
 		$password = null;
@@ -289,11 +336,17 @@ class UsersController extends Controller
 			else
 			{
 				$result = "-1"; //No valid user Id
+				
+				$message = "User ID is not valid (Guest User)";
+				$this->sendErrorMail('Error in actionUpdateProfile()', $message);				
 			}
 		}
 		else
 		{
 			$result = "-2"; //There is not any parameter which is not null
+			
+			$message = "There is not any parameter which is not null";
+			$this->sendErrorMail('Error in actionUpdateProfile()', $message);			
 		}
 
 		echo CJSON::encode(array(
@@ -405,6 +458,19 @@ class UsersController extends Controller
 	{
 		$out = "Missing parameter";
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
+			
+			//Adres bilgilerinin kullanici diline gore getirilmesi icin
+			if(isset($_REQUEST['language']))
+			{
+				if($_REQUEST['language'] == 'tr')
+				{
+					Yii::app()->language = 'tr';
+				}
+				else
+				{
+					Yii::app()->language = 'en';
+				}
+			}			
 
 			$userId = (int) $_REQUEST['userId'];
 			$friendArray = $this->getFriendArray(true/*$par_onlyVisible*/, null/*userTypes*/); //Burası direk true degil mobilde gelen istekle guncellenmeli
@@ -432,6 +498,19 @@ class UsersController extends Controller
 		{
 			$pageNo = 1;
 			$userTypes = array();
+			
+			//Adres bilgilerinin kullanici diline gore getirilmesi icin
+			if(isset($_REQUEST['language']))
+			{
+				if($_REQUEST['language'] == 'tr')
+				{
+					Yii::app()->language = 'tr';
+				}
+				else
+				{
+					Yii::app()->language = 'en';
+				}
+			}			
 			
 			if(isset(Yii::app()->session['visibleFriendCount']) == false)
 			{
@@ -533,15 +612,7 @@ class UsersController extends Controller
 						
 			if(Yii::app()->session['getUserListJsonErrorCount'] < 3)
 			{
-				if($this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', 'PHP Exception in actionGetUserListJson()', $message, false /*Do not add footer for error message*/))
-				{
-					//Mail gönderildi
-				}
-				else
-				{
-					//Mail gönderilirken hata oluştu
-				}
-
+				$this->sendErrorMail('PHP Exception in actionGetUserListJson()', $message);
 				Yii::app()->session['getUserListJsonErrorCount'] = Yii::app()->session['getUserListJsonErrorCount'] + 1;
 			}			
 		}
@@ -653,6 +724,7 @@ class UsersController extends Controller
 		{
 			$friendId = (int) $_REQUEST['friendId'];
 			$friendShipStatus = -1;
+			$message = null;
 
 			$actionResult = Friends::model()->deleteFriendShip($friendId, $friendShipStatus);
 			
@@ -662,6 +734,16 @@ class UsersController extends Controller
 				//When deleting this friend, also all of the group memberships for the current owner should be deleted
 				UserPrivacyGroupRelation::model()->deleteMemberByGroupOwner(Yii::app()->user->id, $friendId);
 			}
+			else if ($actionResult == 0)
+			{
+				$message = "Friend cannot be deleted!";
+				$this->sendErrorMail('Error in actionDeleteFriendShip()', $message);				
+			}
+			else if ($actionResult == -1)
+			{
+				$message = "Friendship NOT found!";
+				$this->sendErrorMail('Error in actionDeleteFriendShip()', $message);			
+			}			 
 		}
 
 		echo CJSON::encode(array(
@@ -770,6 +852,11 @@ class UsersController extends Controller
 				$result = 1;
 				$this->unsetFriendIdList();
 			}
+			else
+			{
+				$message = "Friendship CANNOT be approved!";
+				$this->sendErrorMail('Error in actionApproveFriendShip()', $message);				
+			}
 		}		
 		echo CJSON::encode(array(
 				"result"=>$result,
@@ -781,6 +868,7 @@ class UsersController extends Controller
 	public function actionAddAsFriend()
 	{
 		$result = "-100";
+		$errorMessage = null;
 
 		if(isset($_REQUEST['friendId'])) 
 		{
@@ -874,11 +962,36 @@ class UsersController extends Controller
 						Yii::app()->language = 'tr';
 					}
 				}				
+			}
+			else
+			{
+				switch ($result) {
+					case 0:
+						$errorMessage = "New friendship record cannot be saved!";
+						break;
+						
+					case -1:
+						$errorMessage = "Duplicate entry exception occured during friendship record save!";
+						break;
+						
+					case -2:
+						$errorMessage = "Unknown exception occured during friendship record save!";
+						break;
+						
+					default:
+						$errorMessage = "Unknown error occured!";
+						break;							
+				}
+
+				$this->sendErrorMail('Error in actionAddAsFriend()', $errorMessage);
 			}						
 		}
 		else
 		{
 			$result = "-3"; //Missing parameter
+			
+			$errorMessage = "Missing parameter!";
+			$this->sendErrorMail('Error in actionAddAsFriend()', $errorMessage);
 		}
 		
 		echo CJSON::encode(array(
@@ -891,6 +1004,7 @@ class UsersController extends Controller
 	public function actionAddAsFriendIfAlreadyMember()
 	{
 		$result = 0;
+		$errorMessage = null;
 		
 		if (isset($_REQUEST['facebookIdOfFriendCandidate']))
 		{
@@ -911,15 +1025,24 @@ class UsersController extends Controller
 			    	}
 			    	else  if ($done == null) {
 			    		$result = -1; //If there occurs a problem during friendship process, return -1
+			    		
+			    		$errorMessage = "Error occured during friendship process";
+			    		$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
 			    	}
 			    	else
 			    	{
 			    		$result = -1; //If there occurs a problem during friendship process, return -1
+			    		
+			    		$errorMessage = "Error occured during friendship process";
+			    		$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
 			    	}					
 			    }
 			    else //The friend candidate with the given Facebook ID is not a Traceper member, so return 0
 			    {
 			    	$result = 0;
+			    	
+			    	$errorMessage = "The friend candidate with the given Facebook ID is not a Traceper member";
+			    	$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    	
 			    }				
 			}			
 		}
@@ -1467,6 +1590,7 @@ class UsersController extends Controller
 		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : "";
 		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : "";
 		$row['lastLocationAddress'] = isset($row['lastLocationAddress']) ? $row['lastLocationAddress'] : "";
+		$row['lastLocationCountry'] = isset($row['lastLocationCountry']) ? $row['lastLocationCountry'] : "";
 		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : "";
 		$row['message'] = isset($row['message']) ? $row['message'] : "";
 		$row['deviceId'] = isset($row['deviceId']) ? $row['deviceId'] : "";
@@ -1499,7 +1623,7 @@ class UsersController extends Controller
 				'latitude'=>$row['latitude'],
 				'longitude'=>$row['longitude'],
 				'altitude'=>$row['altitude'],
-				'address'=>$row['lastLocationAddress'],
+				'address'=>$row['lastLocationAddress'].' '.Yii::t('countries', $row['lastLocationCountry']),
 				'calculatedTime'=>$row['dataCalculatedTime'],
 				'locationSource'=>$row['locationSource'],
 				'time'=>$row['dataArrivedTime'],

@@ -338,7 +338,7 @@ function bindElements(langOperator, trackerOp)
 	});
  	
  	$("#LoginForm_email").focus(function ()	{
- 		$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
+ 		//$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
  		$("#LoginForm_email").tooltipster('show'); 		
 	});
 
@@ -347,7 +347,7 @@ function bindElements(langOperator, trackerOp)
  	});
  	
  	$("#LoginForm_password").focus(function ()	{
- 		$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
+ 		//$("#LoginForm_email").tooltipster('update', TRACKER.langOperator.geolocationNotificationMessage);
  		$("#LoginForm_email").tooltipster('show'); 		
 	}); 	
  	

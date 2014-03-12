@@ -142,33 +142,6 @@ else
 // 		CClientScript::POS_READY
 // 		);
 
-if (Yii::app()->user->isGuest == true)
-{
-	Yii::app()->clientScript->registerScript('geolocationTooltipDeclaration',
-		"  
-		if (navigator.geolocation)
-	    {
-	    	//alert('Browser supports geolocation');
-			
-			$(\"#LoginForm_email\").tooltipster({
-	        	 theme: \".tooltipster-info\",
-	        	 position: \"bottom\",
-	        	 trigger: \"custom\",
-	        	 maxWidth: 500,
-	        	 onlyOne: false,
-				 interactive: true,
-				 offsetX: 100,
-				 offsetY: 10,
-				 arrow:false
-	        	 });			
-	    }
-	  	else
-	  	{
-			//alert('Browser does NOT support geolocation!');
-	  	}
-		", CClientScript::POS_READY);	
-}
-
 if (Yii::app()->user->isGuest == false)
 {
 	$profilePhotoSource = null;
@@ -216,17 +189,24 @@ if (Yii::app()->user->isGuest == false)
 // 								'update'=> '#userarea',
 								
 								'success'=> 'function(msg) {
-												$("#userarea").html(msg);
-
-												$("#uploadProfilePhotoSuccessfulTooltip").css("bottom", "22px");
-												$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("update", "'.Yii::t('site', 'You have changed your profile photo successfully.').'");
-										 		$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("show");
-					
-												var timeStamp = new Date().getTime();													
-												var imageSrc = "profilePhotos/'.Yii::app()->user->id.'.png?random=" + timeStamp;
-					
-												MAP_OPERATOR.updateMarkerImage(currentUserMarker, imageSrc, true);
-												TRACKER.users['.Yii::app()->user->id.'].mapMarker[0].infoWindow.setContent(getContentFor('.Yii::app()->user->id.', imageSrc));								
+												if(msg == "Login Required")
+												{
+													location.reload();
+												}
+												else
+												{
+													$("#userarea").html(msg);
+	
+													$("#uploadProfilePhotoSuccessfulTooltip").css("bottom", "22px");
+													$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("update", "'.Yii::t('site', 'You have changed your profile photo successfully.').'");
+											 		$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("show");
+						
+													var timeStamp = new Date().getTime();													
+													var imageSrc = "profilePhotos/'.Yii::app()->user->id.'.png?random=" + timeStamp;
+						
+													MAP_OPERATOR.updateMarkerImage(currentUserMarker, imageSrc, true);
+													TRACKER.users['.Yii::app()->user->id.'].mapMarker[0].infoWindow.setContent(getContentFor('.Yii::app()->user->id.', imageSrc));				
+												}															
 											}'							
 						),
 						array(
@@ -247,16 +227,23 @@ if (Yii::app()->user->isGuest == false)
 // 								'update'=> '#userarea',
 								
 								'success'=> 'function(msg) {
-												$("#userarea").html(msg);
-												
-												$("#uploadProfilePhotoSuccessfulTooltip").css("bottom", "22px");
-												$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("update", "'.Yii::t('site', 'You have changed your profile photo successfully.').'");
-												$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("show");
-								
-												var imageSrc = "https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square";
-								
-												MAP_OPERATOR.updateMarkerImage(currentUserMarker, imageSrc, true);
-												TRACKER.users['.Yii::app()->user->id.'].mapMarker[0].infoWindow.setContent(getContentFor('.Yii::app()->user->id.', imageSrc));									
+												if(msg == "Login Required")
+												{
+													location.reload();
+												}
+												else
+												{
+													$("#userarea").html(msg);
+													
+													$("#uploadProfilePhotoSuccessfulTooltip").css("bottom", "22px");
+													$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("update", "'.Yii::t('site', 'You have changed your profile photo successfully.').'");
+													$("#uploadProfilePhotoSuccessfulTooltip").tooltipster("show");
+									
+													var imageSrc = "https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square";
+									
+													MAP_OPERATOR.updateMarkerImage(currentUserMarker, imageSrc, true);
+													TRACKER.users['.Yii::app()->user->id.'].mapMarker[0].infoWindow.setContent(getContentFor('.Yii::app()->user->id.', imageSrc));
+												}																	
 											}'								
 						),
 						array(
@@ -787,36 +774,75 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	",
 	CClientScript::POS_READY);
 
+if (Yii::app()->user->isGuest == true)
+{
+	Yii::app()->clientScript->registerScript('geolocationTooltipDeclaration',
+			"
+			if (navigator.geolocation)
+			{
+			//alert('Browser supports geolocation');
+				
+			$(\"#LoginForm_email\").tooltipster({
+			theme: \".tooltipster-info\",
+			content:TRACKER.langOperator.geolocationNotificationMessage,
+			position: \"bottom\",
+			trigger: \"custom\",
+			maxWidth: 500,
+			onlyOne: false,
+			interactive: true,
+			offsetX: 100,
+			offsetY: 10,
+			arrow:false
+});
+}
+			else
+			{
+			//alert('Browser does NOT support geolocation!');
+}
+			", CClientScript::POS_READY);
+}
+
 if(isset(Yii::app()->session['countryName']) == false)
 {
 	Yii::app()->clientScript->registerScript('getGeolocationByIp',
 			"
 			jQuery.getJSON('http://freegeoip.net/json/', function(location) {
+				//alert('freegeoip: location.country_name: ' + location.country_name + ' lat: ' + location.latitude + ' lon: ' + location.longitude);			
 				MAP_OPERATOR.focusOnCountry(location.country_name, false);			
-			
 				$.post('index.php?r=users/getLocationByWebIP', { countryName:location.country_name, latitude:location.latitude, longitude:location.longitude });
 			}) .done(function() {
 
 				})
 				.fail(function() { //freegeoip fail ederse telize den sorgula
 					$.getJSON('http://www.telize.com/geoip?callback=?', function(json) {
-						MAP_OPERATOR.focusOnCountry(json.country, false);
-			
+						MAP_OPERATOR.focusOnCountry(json.country, false);			
 						$.post('index.php?r=users/getLocationByWebIP', { countryName:json.country, latitude:json.latitude, longitude:json.longitude });
 					}) .done(function() {
-							console.log('second success');
+							//console.log('second success');
 						})
 						.fail(function() {
-							console.log('error');
+							//console.log('error');			
+							jQuery.getJSON('http://ip-api.com/json', function(location) { //telize de fail ederse ip-api den sorgula
+								MAP_OPERATOR.focusOnCountry(location.country, false);						
+								$.post('index.php?r=users/getLocationByWebIP', { countryName:location.country, latitude:location.lat, longitude:location.lon });							
+								//alert('ip-api: location.country: ' + location.country + ' location.city: ' + location.city  + ' lat: ' + location.lat + ' lon: ' + location.lon);
+							}) .done(function() {
+									//console.log('success');
+								})
+								.fail(function() { //freegeoip fail ederse telize den sorgula
+									//console.log('error');
+								})
+								.always(function() {
+									//console.log('complete');
+								});				
 						})
 						.always(function() {
-							console.log('complete');
+							//console.log('complete');
 						});
 					})
 				.always(function() {
 					//console.log('complete');
 				});
-
 			",
 			CClientScript::POS_READY);
 
@@ -880,7 +906,7 @@ else
 	var langOp = new LanguageOperator();
 	var fetchPhotosDefaultValue =  1;  //TODO: $fetchPhotosInInitialization;
 	
-	langOp.load("<?php echo $language;?>");  //TODO: itshould be parametric
+	langOp.load("<?php echo $language;?>", "<?php echo "http://".Yii::app()->request->getServerName().Yii::app()->request->getBaseUrl(); ?>");  //TODO: itshould be parametric
 	
 	var mapOperator = new MapOperator("<?php echo $language;?>");
 
@@ -1432,9 +1458,8 @@ else
 							//'registration_url'=>'http://mysite/index.php/users/facebookregister',
 							));						
 							?>
-						</div>						
-						
-							
+						</div>	
+
 						<?php $this->endWidget(); ?>
 					</div>																		
 
@@ -1730,15 +1755,35 @@ else
 					
 					<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">						
 					<?php					
+// 					echo CHtml::ajaxLink('Change Password', $this->createUrl('site/changePassword'),
+// 							array(
+// 									'complete'=> 'function() { $("#changePasswordWindow").dialog("open"); return false;}',
+// 									'update'=> '#changePasswordWindow',
+// 							),
+// 							array(
+// 									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'),
+// 									'class'=>'hi-icon icon-key'
+// 									));
+									
 					echo CHtml::ajaxLink('Change Password', $this->createUrl('site/changePassword'),
 							array(
-									'complete'=> 'function() { $("#changePasswordWindow").dialog("open"); return false;}',
-									'update'=> '#changePasswordWindow',
+									'success'=> 'function(msg) 
+												 {
+													if(msg == "Login Required")
+													{
+														location.reload();
+													}
+													else
+													{
+														$("#changePasswordWindow").html(msg);
+														$("#changePasswordWindow").dialog("open");
+													}
+												 }'
 							),
 							array(
 									'id'=>'showChangePasswordWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Change Password'),
 									'class'=>'hi-icon icon-key'
-									));
+							));					
 					?>
 					</div>
 					
@@ -1751,8 +1796,21 @@ else
 						
 						echo CHtml::ajaxLink('Invite Users', $this->createUrl('site/inviteUsers'),
 								array(
-										'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
-										'update'=> '#inviteUsersWindow',
+										//'complete'=> 'function() { $("#inviteUsersWindow").dialog("open"); return false;}',
+										//'update'=> '#inviteUsersWindow',
+										
+										'success'=> 'function(msg)
+													 {
+														if(msg == "Login Required")
+														{
+															location.reload();
+														}
+														else
+														{
+															$("#inviteUsersWindow").html(msg);
+															$("#inviteUsersWindow").dialog("open");
+														}
+													 }'										
 								),
 								array(
 										'id'=>'showInviteUsersWindow','class'=>'vtip', 'title'=>Yii::t('layout', 'Invite Your Friends to Traceper'),
@@ -1761,7 +1819,7 @@ else
 						?>
 						</div>
 						
-						<?php						
+						<?php
 
 						$newRequestsCount = null;
 						$totalRequestsCount = null;
@@ -1800,8 +1858,22 @@ else
 							{
 								echo CHtml::ajaxLink($newRequestsCount, $this->createUrl('users/GetFriendRequestList'),
 										array(
-												'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
-												'update'=> '#friendRequestsWindow',
+												//'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
+												//'update'=> '#friendRequestsWindow',
+												
+												'success'=> 'function(msg)
+															 {
+																if(msg == "Login Required")
+																{
+																	location.reload();
+																}
+																else
+																{
+																	$("#friendRequestsWindow").html(msg);
+																	$("#friendReqCount").hide();
+																	$("#friendRequestsWindow").dialog("open");
+																}
+															 }'												
 										),
 										array(
 												'id'=>'friendReqCount','class'=>'vtip', 'title'=>$friendReqTooltip,
@@ -1813,8 +1885,22 @@ else
 							
 							echo CHtml::ajaxLink('Friend Requests', $this->createUrl('users/GetFriendRequestList'),
 									array(
-											'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
-											'update'=> '#friendRequestsWindow',
+											//'complete'=> 'function() { $("#friendReqCount").hide(); $("#friendRequestsWindow").dialog("open"); return false;}',
+											//'update'=> '#friendRequestsWindow',
+											
+											'success'=> 'function(msg)
+														 {
+															if(msg == "Login Required")
+															{
+																location.reload();
+															}
+															else
+															{
+																$("#friendRequestsWindow").html(msg);
+																$("#friendReqCount").hide();
+																$("#friendRequestsWindow").dialog("open");
+															}
+														 }'											
 									),
 									array(
 											'id'=>'showFriendRequestsWindow','class'=>'vtip', 'title'=>$friendReqTooltip,
@@ -1846,8 +1932,21 @@ else
 					<?php
 					echo CHtml::ajaxLink('Create Group', $this->createUrl('groups/createGroup'),
 							array(
-									'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
-									'update'=> '#createGroupWindow',
+									//'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
+									//'update'=> '#createGroupWindow',
+									
+									'success'=> 'function(msg)
+												 {
+													if(msg == "Login Required")
+													{
+														location.reload();
+													}
+													else
+													{
+														$("#createGroupWindow").html(msg);
+														$("#createGroupWindow").dialog("open");
+													}
+												 }'									
 							),
 							array(
 									'id'=>'showCreateGroupWindow'/*,'class'=>'vtip', 'title'=>Yii::t('layout', 'Create New Group')*/,

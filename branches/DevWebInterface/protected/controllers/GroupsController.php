@@ -77,6 +77,9 @@ class GroupsController extends Controller
 					else
 					{
 						echo CJSON::encode(array("result"=> "Unknown error"));
+						
+						$errorMessage = "Error occured while saving the group.";
+						$this->sendErrorMail('Error in actionCreateGroup()', $errorMessage);
 					}
 					
 					Yii::app()->end();
@@ -86,6 +89,9 @@ class GroupsController extends Controller
 					if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
 					{
 						echo CJSON::encode(array("result"=> "Duplicate Entry"));
+						
+						$errorMessage = "Duplicate entry error occured while saving the group.";
+						$this->sendErrorMail('Error in actionCreateGroup()', $errorMessage);
 					}
 					Yii::app()->end();
 					
@@ -249,6 +255,10 @@ class GroupsController extends Controller
 								else
 								{
 									echo CJSON::encode(array("result"=> "Unknown error"));
+									
+									$errorMessage = "Error occured while saving the group relation.";
+									$this->sendErrorMail('Error in actionUpdateGroup()', $errorMessage);
+									
 									Yii::app()->end();
 								}
 							}
@@ -257,7 +267,11 @@ class GroupsController extends Controller
 								if($e->getCode() == Yii::app()->params->duplicateEntryDbExceptionCode) //Duplicate Entry
 								{
 									echo CJSON::encode(array("result"=> "Duplicate Entry"));
+									
+									$errorMessage = "Duplicate Entry error occured while saving the group relation.";
+									$this->sendErrorMail('Error in actionUpdateGroup()', $errorMessage);									
 								}
+								
 								Yii::app()->end();
 									
 								//					echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -619,6 +633,18 @@ class GroupsController extends Controller
 		$result = PrivacyGroups::model()->deleteGroup($groupId, Yii::app()->user->id);
 		
 		echo CJSON::encode(array("result"=>$result));
+		
+		if($result == 0)
+		{
+			$errorMessage = "Group deletion failed.";
+			$this->sendErrorMail('Error in actionDeleteGroup()', $errorMessage);
+		}
+		else if($result == -1)
+		{
+			$errorMessage = "The group to be deleted cannot be found!";
+			$this->sendErrorMail('Error in actionDeleteGroup()', $errorMessage);			
+		}
+		
 		Yii::app()->end();
 	}
 	
@@ -646,11 +672,18 @@ class GroupsController extends Controller
 		elseif ($relationQueryResult == 0)
 		{
 			echo CJSON::encode(array("result"=> "Unknown error"));
+			
+			$errorMessage = "Error occured while deleting group memmber!";
+			$this->sendErrorMail('Error in actionDeleteGroupMember()', $errorMessage);
+						
 			Yii::app()->end();
 		}
 		else
 		{
 			//traceper_user_group_relation table has not the desired relation, so do nothing
+			
+			$errorMessage = "The group member to be deleted does not exist!";
+			$this->sendErrorMail('Error in actionDeleteGroupMember()', $errorMessage);			
 		}
 	}	
 	
@@ -707,13 +740,20 @@ class GroupsController extends Controller
 						else
 						{
 							echo CJSON::encode(array("result"=> "0"));
+							
+							$errorMessage = "Error occured while setting firends visibilities!";
+							$this->sendErrorMail('Error in actionSetPrivacyRights()', $errorMessage);							
 						}
+						
 						Yii::app()->end();
-
 					}
 					else
 					{
 						echo CJSON::encode(array("result"=> "0"));
+						
+						$errorMessage = "Error occured while updating privacy settings!";
+						$this->sendErrorMail('Error in actionSetPrivacyRights()', $errorMessage);
+												
 						Yii::app()->end();
 					}					
 					
