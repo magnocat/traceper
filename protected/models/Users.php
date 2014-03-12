@@ -27,6 +27,7 @@
  * @property integer $account_type
  * @property string $gp_image
  * @property string $lastLocationAddress
+ * @property string $lastLocationCountry
  * @property integer $minDataSentInterval
  * @property integer $minDistanceInterval
  * @property integer $autoSend
@@ -86,11 +87,11 @@ class Users extends CActiveRecord
 			array('fb_id, g_id', 'length', 'max'=>50),
 			array('gp_image', 'length', 'max'=>255),
 			array('androidVer, preferredLanguage', 'length', 'max'=>20),
-			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress', 'safe'),
+			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress, lastLocationCountry', 'safe'),
 				
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus, locationSource', 'safe', 'on'=>'search'),
+			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, lastLocationCountry, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus, locationSource', 'safe', 'on'=>'search'),
 		);		
 	}
 
@@ -139,6 +140,7 @@ class Users extends CActiveRecord
 			'account_type' => 'Account Type',
 			'gp_image' => 'Gp Image',
 			'lastLocationAddress' => 'Last Location Address',
+			'lastLocationCountry' => 'Last Location Country',
 			'minDataSentInterval' => 'Min Data Sent Interval',
 			'minDistanceInterval' => 'Min Distance Interval',
 			'autoSend' => 'Auto Send',
@@ -186,6 +188,7 @@ class Users extends CActiveRecord
 		$criteria->compare('account_type',$this->account_type);
 		$criteria->compare('gp_image',$this->gp_image,true);
 		$criteria->compare('lastLocationAddress',$this->lastLocationAddress,true);
+		$criteria->compare('lastLocationCountry',$this->lastLocationCountry,true);
 		$criteria->compare('minDataSentInterval',$this->minDataSentInterval);
 		$criteria->compare('minDistanceInterval',$this->minDistanceInterval);
 		$criteria->compare('autoSend',$this->autoSend);
@@ -228,7 +231,7 @@ class Users extends CActiveRecord
 		return $effectedRows;
 	}
 	
-	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $calculatedTime, $locationSource, $userId){
+	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId){
 	
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
@@ -237,13 +240,14 @@ class Users extends CActiveRecord
 				.'	longitude = %f , '
 				.'	altitude = %f ,	'
 				.'	lastLocationAddress = "%s" , '
+				.'	lastLocationCountry = "%s" , '
 				.'	dataArrivedTime = NOW(), '
 				.'  dataCalculatedTime = "%s", '
 				.' 	locationSource = %d '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
-				$latitude, $longitude, $altitude, $address, $calculatedTime, $locationSource, $userId);
+				$latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		//$effectedRows = 0;
@@ -530,7 +534,7 @@ class Users extends CActiveRecord
 // 		FROM '.  Users::model()->tableName() . ' u
 // 		WHERE ((Id in ('. $IdList.')';
 		
-		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress,
+		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress, u.lastLocationCountry,
 		u.userType, u.deviceId, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,

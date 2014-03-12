@@ -24,6 +24,156 @@ class Controller extends CController
 	 */
 	public $breadcrumbs=array();
 	
+	//Used by UsersController and SiteController
+	protected function getaddress($lat, $lng, &$par_adress, &$par_country)
+	{
+		$isTurkey = false;
+		
+		//Konum Turkiye'de ise
+		if(((35.85 <= $lat) && ($lat <= 42.1)) && ((25.6 <= $lng) && ($lng <= 44.8)))
+		{
+			$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false&language=tr';
+			$isTurkey = true;
+		}
+		else
+		{
+			$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.trim($lat).','.trim($lng).'&sensor=false&language=en';
+		}
+
+		// 		$json = @file_get_contents($url);
+		// 		$data=json_decode($json);
+		// 		$status = $data->status;
+	
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url); //The URL to fetch. This can also be set when initializing a session with curl_init().
+		curl_setopt($ch, CURLOPT_HEADER, 0); // Removes the headers from the output
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly.
+		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5); //The number of seconds to wait while trying to connect.
+		curl_setopt($ch, CURLOPT_FAILONERROR, TRUE); //To fail silently if the HTTP code returned is greater than or equal to 400.
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10); //The maximum number of seconds to allow cURL functions to execute.
+		$response = curl_exec($ch);
+		curl_close($ch);
+	
+		$data = json_decode($response);
+		$status = $data->status;
+	
+		$bSuccess = false;
+
+		if($status=="OK")
+		{
+			//return $data->results[0]->formatted_address;
+			
+// 			Fb::warn(count($data->results), "count");
+// 			Fb::warn(end($data->results)->formatted_address, "end");
+
+			//Fb::warn($data->results[0]->formatted_address, "formatted_address");
+
+			$address = "";
+			$country = "";
+			
+			if($isTurkey)
+			{
+				$addressPieces = explode(", Türkiye", $data->results[0]->formatted_address);
+				$address = $addressPieces[0];
+				$country = "Turkey";
+			}
+			else
+			{
+				$formattedAddress = $data->results[0]->formatted_address;
+				$countryPart = strrchr($formattedAddress, ','); //strrchr() returs the substring from right cut by the specified character
+				$addressPieces = explode($countryPart, $formattedAddress);
+				$address = $addressPieces[0];
+				$countryPieces = explode(", ", $countryPart);
+				$country = $countryPieces[1];
+			}
+			
+			//Fb::warn($address, "getaddress()");
+			//Fb::warn($country, "Country");
+			
+				
+// 			if(end($data->results)->formatted_address == "Turkey")
+// 			{
+// 				//Konuma göre ilgili bolgenin ulke indeksi degisebiliyor, fakat bir kere ulke indeksi bulunduktan sonra
+// 				//diger adres bilesenleri bu indekse gore bulunabiliyor
+// 				$countryIndex = 0;
+// 				$city = null;
+					
+// 				foreach($data->results[0]->address_components as $addressComp)
+// 				{
+// 					if($addressComp->long_name == "Turkey")
+// 					{
+// 						break;
+// 					}
+// 					else if(strpos($addressComp->long_name, "Province"))
+// 					{
+// 						$cityPieces = explode(" Province", $addressComp->long_name);
+// 						$city = $cityPieces[0];	
+
+// 						//Fb::warn($city, "city");
+// 					}
+	
+// 					$countryIndex++;
+// 				}
+	
+// 				$districtIndex = $countryIndex - 4;
+// 				$streetIndex = $countryIndex - 5;
+// 				$cityIndex = $countryIndex - 3;
+// 				$townIndex = $countryIndex - 2;
+// 				$zipCodeIndex = $countryIndex + 1;
+	
+// 				if($districtIndex >= 0)
+// 				{
+// 					$address .= $data->results[0]->address_components[$districtIndex]->long_name;					
+// 				}
+				
+// 				if($streetIndex >= 0)
+// 				{
+// 					$address .= ", ".$data->results[0]->address_components[$streetIndex]->short_name;
+					
+// 					//Cadde bilgisinden once de bilgi oldugu durumda bu bilgiyi de ekle
+// 					if($streetIndex > 0)
+// 					{
+// 						$address .= " ".$data->results[0]->address_components[$streetIndex-1]->long_name;
+// 					}					
+// 				}
+
+// 				if($zipCodeIndex >= 0)
+// 				{
+// 					$address .= ", ".$data->results[0]->address_components[$zipCodeIndex]->long_name." ";
+// 				}
+				
+// 				if($townIndex >= 0)
+// 				{
+// 					$address .= $data->results[0]->address_components[$townIndex]->long_name."/";
+// 				}
+
+// 				//$address .= $data->results[0]->address_components[$cityIndex]->long_name;
+// 				$address .= $city;
+// 			}
+// 			else
+// 			{
+// 				$formattedAddress = $data->results[0]->formatted_address;
+// 				$countryPart = strrchr($formattedAddress, ','); //strrchr() returs the substring from right cut by the specified character
+// 				$addressPieces = explode($countryPart, $formattedAddress);
+// 				$address = $addressPieces[0];
+// 			}
+	
+			//Fb::warn($data->results[0]->formatted_address, "formatted_address");
+			//Fb::warn($address, "getaddress()");
+			//Fb::warn("Turkey", "Country");
+				
+			$par_adress = $address;
+			$par_country = $country;
+			$bSuccess = true;
+		}
+		else
+		{
+			$bSuccess = false;
+		}
+	
+		return $bSuccess;
+	}	
+	
 	function init()
 	{
 		parent::init();
@@ -112,5 +262,52 @@ class Controller extends CController
 		// 			$arr = array ('kmt'=>1);
 		// 			echo json_encode($arr);
 		// 		}
+	}
+
+	public function sendErrorMail($par_subject, $par_message)
+	{
+		//Sunucu localhost degilse mail gonder
+		if(Yii::app()->request->getServerName() != "localhost")
+		{
+			if (Yii::app()->user->isGuest == false)
+			{
+				$message = null;
+				$name = null;
+				$email = null;
+			
+				Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+	
+				$message .= 'User Info: '.'<br/><br/>';
+				$message .= 'Id: '.Yii::app()->user->id.'<br/>';
+				$message .= 'Name: '.$name.'<br/>';
+				$message .= 'E-mail: '.$email;
+				$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+			}
+			
+			$message .= 'Server Info: '.Yii::app()->request->getServerName();
+			$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+			
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				//Fb::warn("client=mobile", "sendErrorMail()");
+				
+				$message .= 'Call Type: MOBILE';
+				$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+			}
+			else
+			{
+				//Fb::warn("ELSE", "sendErrorMail()");
+			}			
+			
+			$message .= $par_message;
+			
+			$this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', $par_subject, $message, false /*Do not add footer for error message*/);
+
+			//Fb::warn("mail SENT", "sendErrorMail()");
+		}
+		else
+		{
+			Fb::warn("mail NOT sent for localhost", "sendErrorMail()");
+		}
 	}	
 }
