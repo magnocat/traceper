@@ -1220,7 +1220,7 @@ else
 						?>
 
 						<div id="forAjaxRefresh">
-							<div class="upperMenu">
+							<div id="loginEmail" class="upperMenu">
 								<div style="height:3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'email'); ?>
 									<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
@@ -1241,10 +1241,10 @@ else
 								</script>									
 							</div>
 
-							<div class="upperMenu" style="width:180px;">
+							<div id="loginPassword" class="upperMenu" style="width:180px;">
 								<div style="height:3em;top:0%;padding:0px;">
 									<?php echo $form->labelEx($model,'password'); ?>
-									<?php echo $form->passwordField($model,'password', array('size'=>'27%','maxlength'=>'30%','tabindex'=>2)); ?>
+									<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
 									<?php 
 											  //$errorMessage = $form->error($model,'password'); 
 	// 										  if (strip_tags($errorMessage) == '') { echo '<div class="errorMessage">&nbsp;</div>'; }
@@ -1306,7 +1306,7 @@ else
 							</div>
 						</div>							
 													
-						<div class="upperMenu" style="margin-top:14px;width:140px;padding-left:138px;padding-right:0px;">								
+						<div id="loginButton" class="upperMenu" style="margin-top:14px;width:140px;padding-left:158px;padding-right:0px;">								
 						<?php
 						//Yii butonları <buton> tag'i ile uretmedigi icin boyle yapildi, bu css'ler Yii'nin urettigi <input> ile calismiyor
 						echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-login1" style="'.(($app->language == 'en')?'padding-left:65px;padding-right:25px;':'padding-left:50px').'">'.Yii::t('site', 'Log in').'</button>', $this->createUrl('site/login'),
@@ -1373,84 +1373,86 @@ else
 						?>																					
 						</div>
 
-						<div class="upperMenu" style="width:auto;margin-top:12px;padding-right:0px;padding-left:10px;font-size:1.6em;">
+						<div id="loginOr" class="upperMenu" style="width:auto;margin-top:12px;padding-right:0px;padding-left:10px;font-size:1.6em;">
 							<?php echo CHtml::label(Yii::t('layout', 'or'), false, array('style'=>'cursor:text;')); ?>
-						</div>						
+						</div>
 						
-						<div class="upperMenu" style="margin-top:20px;padding-right:0px;">
-							<?php							
-							$successCallback = 'try
-												{
-													var obj = jQuery.parseJSON(msg);
-													
-													if (obj.result)
-													{
-														if (obj.result == "1")
-														{
-															$("#tabViewList").html(obj.renderedTabView);
-															$("#userarea").html(obj.renderedUserAreaView);
-															$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
-															$("#loginBlock").html(obj.loginSuccessfulActions);
-														}
-														else if (obj.result == "0")
-														{
-															TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
-														}														
-														else if (obj.result == "-1")
-														{
-															var opt = {
-																autoOpen: false,
-																modal: true,
-																resizable: false,
-																width: 600,
-																title: "'.Yii::t('site', 'Accept Terms to continue').'"
-															};
-															
-															$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
-															$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView); 
-														}
-														else if (obj.result == "-2")
-														{
-															var opt = {
-																autoOpen: false,
-																modal: true,
-																resizable: false,
-																width: 600,
-																title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
-															};
-															
-															$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
-															$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView); 
-														}
-														else if (obj.result == "-4")
-														{
-															var opt = {
-																autoOpen: false,
-																modal: true,
-																resizable: false,
-																width: 600,
-																title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
-															};
-															
-															$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
-															$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView); 
-														}																												
-														else
-														{
-
-														}
-													}											
-												}
-												catch (error)
-												{
-												
-												}';							
+						<?php
+						$successCallback = 'try
+						{
+						var obj = jQuery.parseJSON(msg);
 							
-							//Facebook'a JS fonksiyonunu verirken tek satirda vermeni istiyor, bu nedenle callback string'i tek satira donusturuluyor
-							//Bu fonksiyonun için de // ile yorum yazinca str_replace() tek satira cevirince kodlar yorumlandigi icin calismiyor,
-							//o nedenle comment koyma
-							$successCallback = str_replace(array("\r", "\n"), '', $successCallback);
+						if (obj.result)
+						{
+						if (obj.result == "1")
+						{
+						$("#tabViewList").html(obj.renderedTabView);
+						$("#userarea").html(obj.renderedUserAreaView);
+						$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
+						$("#loginBlock").html(obj.loginSuccessfulActions);
+						}
+						else if (obj.result == "0")
+						{
+						TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+						}
+						else if (obj.result == "-1")
+						{
+						var opt = {
+						autoOpen: false,
+						modal: true,
+						resizable: false,
+						width: 600,
+						title: "'.Yii::t('site', 'Accept Terms to continue').'"
+						};
 							
+						$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
+						$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView);
+						}
+						else if (obj.result == "-2")
+						{
+						var opt = {
+						autoOpen: false,
+						modal: true,
+						resizable: false,
+						width: 600,
+						title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
+						};
+							
+						$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
+						$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView);
+						}
+						else if (obj.result == "-4")
+						{
+						var opt = {
+						autoOpen: false,
+						modal: true,
+						resizable: false,
+						width: 600,
+						title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
+						};
+							
+						$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
+						$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView);
+						}
+						else
+						{
+						
+						}
+						}
+						}
+						catch (error)
+						{
+						
+						}';
+							
+						//Facebook'a JS fonksiyonunu verirken tek satirda vermeni istiyor, bu nedenle callback string'i tek satira donusturuluyor
+						//Bu fonksiyonun için de // ile yorum yazinca str_replace() tek satira cevirince kodlar yorumlandigi icin calismiyor,
+						//o nedenle comment koyma
+						$successCallback = str_replace(array("\r", "\n"), '', $successCallback);
+						?>
+						
+						<div id="loginLongFacebookButton" class="upperMenu" style="margin-top:20px;padding-right:0px;padding-left:15px;">
+							<?php
 							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
 							'size'=>'large',
 							'text'=>Yii::t('layout', 'Log in with facebook'),
@@ -1460,7 +1462,20 @@ else
 							//'registration_url'=>'http://mysite/index.php/users/facebookregister',
 							));						
 							?>
-						</div>	
+						</div>
+						
+						<div id="loginShortFacebookButton" class="upperMenu" style="display:none;margin-top:20px;padding-right:0px;width:80px;padding-left:8px;">
+							<?php
+							$this->widget('ext.yii-facebook-opengraph.plugins.LoginButton', array(
+							'size'=>'large',
+							'text'=>Yii::t('layout', 'Log in'),
+							'scope'=>'basic_info,email', //permissions		
+							'on_login'=>'(function(){ $.post("index.php?r=site/facebookLogin", function(msg){'.$successCallback.'});})()'
+							//'show_faces'=>true,
+							//'registration_url'=>'http://mysite/index.php/users/facebookregister',
+							));						
+							?>
+						</div>							
 
 						<?php $this->endWidget(); ?>
 					</div>																		
