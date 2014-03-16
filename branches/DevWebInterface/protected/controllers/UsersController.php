@@ -144,8 +144,7 @@ class UsersController extends Controller
 					$distanceInMs = $distanceInKms * 1000;
 			
 					//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
-					//if($distanceInMs > $minDistanceInterval)
-					if(true)
+					if($distanceInMs > $minDistanceInterval)
 					{
 						$address = null;
 						$country = null;
