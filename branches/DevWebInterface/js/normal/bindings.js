@@ -18,6 +18,10 @@ var bCountryInfoExists = false;
 var currentUserId;
 var currentUserMarker;
 var locationlessUserIdArray = new Array();
+var loginWidthCheckConstant = 1255;
+var loginWidthMiddleCheckConstant = 1175;
+var windowWidthSize = 2; //En buyuk pencere boyutu
+var preWindowWidth = loginWidthCheckConstant;
 
 function alertMsg(par_message) {
 	if(bDeploymentModeOn === false)
@@ -519,6 +523,100 @@ function bindElements(langOperator, trackerOp)
 	    //alertMsg('Javascript');
 	    
 	    //alertMsg('Height:'+(h)+' Width:'+(w));
+
+	    if(preWindowWidth != w)
+	    {
+	    	var tempWindowWidthSize = 0;
+	    	
+	    	if(w < loginWidthMiddleCheckConstant) //En kucuk pencere boyutu
+	    	{
+	    		tempWindowWidthSize = 0;
+	    	}
+	    	else if(w < loginWidthCheckConstant) //Ortanca pencere boyutu
+	    	{
+	    		tempWindowWidthSize = 1;
+	    	}
+	    	else //En buyuk pencere boyutu
+	    	{
+	    		tempWindowWidthSize = 2;
+	    	}
+	    	
+	    	if(windowWidthSize != tempWindowWidthSize)
+	    	{
+	    		switch(tempWindowWidthSize)
+	    		{
+	    		case 0: //En kucuk
+			    	$("#loginEmail").css("width", "134px");		    	
+			    	document.getElementById('LoginForm_email').size = "20";
+			    	
+			    	$("#loginPassword").css("width", "134px");		    	
+			    	document.getElementById('LoginForm_password').size = "20";	
+			    	
+			    	$("#loginButton").css("padding-left", "134px");
+			    	$("#loginOr").css("padding-left", "4px");
+			    	
+			    	$("#loginLongFacebookButton").hide(); 
+			    	$("#loginShortFacebookButton").show();	    			
+	    			break;
+	    			
+	    		case 1: //Ortancı
+			    	$("#loginEmail").css("width", "164px");		    	
+			    	document.getElementById('LoginForm_email').size = "25";
+			    	
+			    	$("#loginPassword").css("width", "164px");		    	
+			    	document.getElementById('LoginForm_password').size = "25";	
+			    	
+			    	$("#loginButton").css("padding-left", "134px");
+			    	$("#loginOr").css("padding-left", "4px");
+			    	
+			    	$("#loginShortFacebookButton").hide(); 
+			    	$("#loginLongFacebookButton").show();	    			
+	    			break;
+	    			
+	    		case 2: //En buyuk
+			    	$("#loginEmail").css("width", "200px");		    	
+			    	document.getElementById('LoginForm_email').size = "30";	
+
+			    	$("#loginPassword").css("width", "200px");		    	
+			    	document.getElementById('LoginForm_password').size = "30";	
+			    	
+			    	$("#loginButton").css("padding-left", "138px");
+			    	$("#loginOr").css("padding-left", "10px");
+			    	
+			    	$("#loginShortFacebookButton").hide(); 
+			    	$("#loginLongFacebookButton").show();	    			
+	    			break;
+	    			
+	    		default:
+			    	$("#loginEmail").css("width", "200px");		    	
+			    	document.getElementById('LoginForm_email').size = "30";	
+	
+			    	$("#loginPassword").css("width", "200px");		    	
+			    	document.getElementById('LoginForm_password').size = "30";	
+			    	
+			    	$("#loginButton").css("padding-left", "138px");
+			    	$("#loginOr").css("padding-left", "10px");
+			    	
+			    	$("#loginShortFacebookButton").hide(); 
+			    	$("#loginLongFacebookButton").show();	    			
+	    			break;	    			
+	    		}
+	    		
+	    		if(bLoginFormEmailErrorExists)
+	    		{
+	    			$("#LoginForm_email").tooltipster('reposition');
+	    		}
+	    		
+	    		if(bLoginFormPasswordErrorExists)
+	    		{
+	    			$("#LoginForm_password").tooltipster('reposition');
+	    		}	    		
+	    		
+	    		windowWidthSize = tempWindowWidthSize;	    		
+	    	}
+	    	
+	    	preWindowWidth = w;	 
+	    }
 
 	  //If logged in and top bar height decreased
 		if(document.getElementById('topBar').style.height == "70px")

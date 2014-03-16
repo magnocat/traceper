@@ -35,7 +35,7 @@
 				});
 			</script>				
 		
-			<div class="upperMenu">
+			<div id="loginEmail" class="upperMenu">
 				<div style="height:3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'email'); ?>
 					<?php echo $form->textField($model,'email', array('size'=>'30%','maxlength'=>'30%','tabindex'=>1)); ?>
@@ -95,10 +95,10 @@
 				</script>													
 			</div>
 
-			<div class="upperMenu" style="width:180px;">
+			<div id="loginPassword" class="upperMenu" style="width:180px;">
 				<div style="height:3em;top:0%;padding:0px;">
 					<?php echo $form->labelEx($model,'password'); ?>
-					<?php echo $form->passwordField($model,'password', array('size'=>'27%','maxlength'=>'30%','tabindex'=>2)); ?>
+					<?php echo $form->passwordField($model,'password', array('size'=>'30%','maxlength'=>'30%','tabindex'=>2)); ?>
 					<?php $errorMessage = $form->error($model,'password'); 
 						  if (strip_tags($errorMessage) == '') 
 						  { 
@@ -178,7 +178,68 @@
 									'tabindex'=>5));							
 					?>	 					
  				</div>								
-			</div>			
+			</div>
+			
+			<script type="text/javascript">
+    		switch(windowWidthSize)
+    		{
+    		case 0: //En kucuk
+		    	$("#loginEmail").css("width", "134px");		    	
+		    	document.getElementById('LoginForm_email').size = "20";
+		    	
+		    	$("#loginPassword").css("width", "134px");		    	
+		    	document.getElementById('LoginForm_password').size = "20";	
+		    	
+		    	$("#loginButton").css("padding-left", "134px");
+		    	$("#loginOr").css("padding-left", "4px");
+		    	
+		    	$("#loginLongFacebookButton").hide(); 
+		    	$("#loginShortFacebookButton").show();	    			
+    			break;
+    			
+    		case 1: //Ortancı
+		    	$("#loginEmail").css("width", "164px");		    	
+		    	document.getElementById('LoginForm_email').size = "25";
+		    	
+		    	$("#loginPassword").css("width", "164px");		    	
+		    	document.getElementById('LoginForm_password').size = "25";	
+		    	
+		    	$("#loginButton").css("padding-left", "134px");
+		    	$("#loginOr").css("padding-left", "4px");
+		    	
+		    	$("#loginShortFacebookButton").hide(); 
+		    	$("#loginLongFacebookButton").show();	    			
+    			break;
+    			
+    		case 2: //En buyuk
+		    	$("#loginEmail").css("width", "200px");		    	
+		    	document.getElementById('LoginForm_email').size = "30";	
+
+		    	$("#loginPassword").css("width", "200px");		    	
+		    	document.getElementById('LoginForm_password').size = "30";	
+		    	
+		    	$("#loginButton").css("padding-left", "138px");
+		    	$("#loginOr").css("padding-left", "10px");
+		    	
+		    	$("#loginShortFacebookButton").hide(); 
+		    	$("#loginLongFacebookButton").show();	    			
+    			break;
+    			
+    		default:
+		    	$("#loginEmail").css("width", "200px");		    	
+		    	document.getElementById('LoginForm_email').size = "30";	
+
+		    	$("#loginPassword").css("width", "200px");		    	
+		    	document.getElementById('LoginForm_password').size = "30";	
+		    	
+		    	$("#loginButton").css("padding-left", "138px");
+		    	$("#loginOr").css("padding-left", "10px");
+		    	
+		    	$("#loginShortFacebookButton").hide(); 
+		    	$("#loginLongFacebookButton").show();	    			
+    			break;	    			
+    		}
+			</script>						
 		</div>			
 	<?php $this->endWidget(); ?>
 </div>
