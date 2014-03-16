@@ -456,6 +456,9 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'					
 					+ 	'</div>';
 					+ '</div>';	
+					
+					//If user location changed, update marker position
+					TRACKER.users[userId].mapMarker[0].marker.setPosition(new google.maps.LatLng(latitude, longitude));
 			
 				if (isWindowOpen == true) {
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
