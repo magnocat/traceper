@@ -1379,71 +1379,71 @@ else
 						
 						<?php
 						$successCallback = 'try
-						{
-						var obj = jQuery.parseJSON(msg);
-							
-						if (obj.result)
-						{
-						if (obj.result == "1")
-						{
-						$("#tabViewList").html(obj.renderedTabView);
-						$("#userarea").html(obj.renderedUserAreaView);
-						$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
-						$("#loginBlock").html(obj.loginSuccessfulActions);
-						}
-						else if (obj.result == "0")
-						{
-						TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
-						}
-						else if (obj.result == "-1")
-						{
-						var opt = {
-						autoOpen: false,
-						modal: true,
-						resizable: false,
-						width: 600,
-						title: "'.Yii::t('site', 'Accept Terms to continue').'"
-						};
-							
-						$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
-						$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView);
-						}
-						else if (obj.result == "-2")
-						{
-						var opt = {
-						autoOpen: false,
-						modal: true,
-						resizable: false,
-						width: 600,
-						title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
-						};
-							
-						$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
-						$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView);
-						}
-						else if (obj.result == "-4")
-						{
-						var opt = {
-						autoOpen: false,
-						modal: true,
-						resizable: false,
-						width: 600,
-						title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
-						};
-							
-						$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
-						$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView);
-						}
-						else
-						{
-						
-						}
-						}
-						}
-						catch (error)
-						{
-						
-						}';
+											{
+												var obj = jQuery.parseJSON(msg);
+												
+												if (obj.result)
+												{
+													if (obj.result == "1")
+													{
+														$("#tabViewList").html(obj.renderedTabView);
+														$("#userarea").html(obj.renderedUserAreaView);
+														$("#FriendRequestsIconLink").html(obj.renderedFriendshipRequestsView);
+														$("#loginBlock").html(obj.loginSuccessfulActions);
+													}
+													else if (obj.result == "0")
+													{
+														TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during login. Please retry the process and if the error persists please contact us.').'");
+													}
+													else if (obj.result == "-1")
+													{
+														var opt = {
+															autoOpen: false,
+															modal: true,
+															resizable: false,
+															width: 600,
+															title: "'.Yii::t('site', 'Accept Terms to continue').'"
+														};
+												
+														$("#acceptTermsForFacebookLoginWindow").dialog(opt).dialog("open");
+														$("#acceptTermsForFacebookLoginWindow").html(obj.renderedView);
+													}
+													else if (obj.result == "-2")
+													{
+														var opt = {
+															autoOpen: false,
+															modal: true,
+															resizable: false,
+															width: 600,
+															title: "'.Yii::t('site', 'Enter Your Traceper Password to Log In').'"
+														};
+												
+														$("#enterPasswordForOldFacebookUserToLoginWindow").dialog(opt).dialog("open");
+														$("#enterPasswordForOldFacebookUserToLoginWindow").html(obj.renderedView);
+													}
+													else if (obj.result == "-4")
+													{
+														var opt = {
+															autoOpen: false,
+															modal: true,
+															resizable: false,
+															width: 600,
+															title: "'.Yii::t('site', 'Do you want to switch to Facebook login permanently?').'"
+														};
+															
+														$("#askForSwitchToFacebookLoginPermanentlyWindow").dialog(opt).dialog("open");
+														$("#askForSwitchToFacebookLoginPermanentlyWindow").html(obj.renderedView);
+													}
+													else
+													{
+													
+													}
+												}
+											}
+											catch (error)
+											{
+											
+											}';
 							
 						//Facebook'a JS fonksiyonunu verirken tek satirda vermeni istiyor, bu nedenle callback string'i tek satira donusturuluyor
 						//Bu fonksiyonun için de // ile yorum yazinca str_replace() tek satira cevirince kodlar yorumlandigi icin calismiyor,
@@ -1971,7 +1971,7 @@ else
 							));					
 					?>
 					</div>
-					
+										
 					<?php
 					if(Yii::app()->user->id == 160)
 					{
