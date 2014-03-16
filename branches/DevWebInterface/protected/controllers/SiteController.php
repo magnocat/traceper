@@ -39,7 +39,7 @@ class SiteController extends Controller
 	{
 		return array(
 				array('deny',
-						'actions'=>array('changePassword', 'inviteUsers', 'registerGPSTracker'),
+						'actions'=>array('changePassword', 'inviteUsers', 'registerGPSTracker', 'runDatabaseQueries'),
 						'users'=>array('?'),
 				),			
 		);
@@ -1705,8 +1705,12 @@ class SiteController extends Controller
 				{
 					$result = "-3"; //Unknown form error
 					
-					$errorMessage = "Unknown form validation error occured!";
-					$this->sendErrorMail('Error in actionForgotPassword()', $errorMessage);
+					//Webse hatalar kullaniciya gosteriliyor zaten, mobilden ise form hatali olarak gonderilmiyor olmali
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+					{
+						$errorMessage = "Unknown mobile form validation error occured!";
+						$this->sendErrorMail('Error in actionForgotPassword()', $errorMessage);						
+					}
 				}													
 			}
 		}
@@ -1714,7 +1718,14 @@ class SiteController extends Controller
 		{
 			//Update results to be used in mobile
 			
-			$result = "-4"; //Form missing					
+			$result = "-4"; //Form missing
+
+			//Webse form yoksa form diyalogu cikariliyor, mobilden ise form mutlaka gelmeli
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				$errorMessage = "Mobile form missing error occured!";
+				$this->sendErrorMail('Error in actionForgotPassword()', $errorMessage);
+			}			
 		}
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
@@ -2068,9 +2079,13 @@ class SiteController extends Controller
 				else
 				{
 					$result = "-3"; //Unknown form error
-					
-					$errorMessage = "Unknown form validation error occured!";
-					$this->sendErrorMail('Error in actionActivationNotReceived()', $errorMessage);					
+
+					//Webse hatalar kullaniciya gosteriliyor zaten, mobilden ise form hatali olarak gonderilmiyor olmali
+					if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+					{
+						$errorMessage = "Unknown mobile form validation error occured!";
+						$this->sendErrorMail('Error in actionActivationNotReceived()', $errorMessage);
+					}					
 				}
 			}			
 		}
@@ -2079,6 +2094,13 @@ class SiteController extends Controller
 			//Update results to be used in mobile
 				
 			$result = "-4"; //Form missing
+			
+			//Webse form yoksa form diyalogu cikariliyor, mobilden ise form mutlaka gelmeli
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				$errorMessage = "Mobile form missing error occured!";
+				$this->sendErrorMail('Error in actionActivationNotReceived()', $errorMessage);
+			}			
 		}
 				
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
@@ -3006,6 +3028,119 @@ class SiteController extends Controller
 		//Fb::warn("actionUpdateCountryNameSessionVar() called with ".$_POST['country'], "SiteController");
 	
 		Yii::app()->session['countryName'] = $_POST['country'];
+	}
+
+	public function actionRunDatabaseQueries()
+	{
+		Fb::warn("actionRunDatabaseQueries() called", "SiteController");
+	
+		$model = new DatabaseOperationsForm;
+	
+		$processOutput = true;
+		// collect user input data
+		if(isset($_POST['DatabaseOperationsForm']))
+		{
+			$model->attributes=$_POST['DatabaseOperationsForm'];
+			// validate user input and if ok return json data and end application.
+			if($model->validate()) {
+				try
+				{
+					if($model->selectSql != null)
+					{
+						Fb::warn("selectSql is NOT null", "actionRunDatabaseQueries()");
+							
+						$queryResult = Yii::app()->db->createCommand($model->selectSql)->queryRow();
+							
+						Fb::warn($queryResult, "Select Query Result");
+							
+						echo CJSON::encode(array(
+								"result"=> "Select",
+								"queryResult"=>$queryResult
+						));
+					}
+					else if($model->selectAllSql != null)
+					{
+						Fb::warn("selectAllSql is NOT null", "actionRunDatabaseQueries()");
+							
+						$queryResult = Yii::app()->db->createCommand($model->selectAllSql)->queryAll();
+					
+						Fb::warn($queryResult, "Select Query All Result");
+					
+						echo CJSON::encode(array(
+								"result"=> "Select All",
+								"queryResult"=>$queryResult
+						));
+					}
+					else if($model->updateSql != null)
+					{
+						Fb::warn("updateSql is NOT null", "actionRunDatabaseQueries()");
+					
+						$numberOfEffectedRows = Yii::app()->db->createCommand($model->updateSql)->execute();
+					
+						Fb::warn($numberOfEffectedRows, "Updated Row Count");
+					
+						echo CJSON::encode(array(
+								"result"=> "Update",
+								"numberOfEffectedRows"=>$numberOfEffectedRows
+						));
+					}
+					else if($model->deleteSql != null)
+					{
+						Fb::warn("deleteSql is NOT null", "actionRunDatabaseQueries()");
+					
+						$numberOfEffectedRows = Yii::app()->db->createCommand($model->deleteSql)->execute();
+					
+						Fb::warn($numberOfEffectedRows, "Deleted Row Count");
+					
+						echo CJSON::encode(array(
+								"result"=> "Delete",
+								"numberOfEffectedRows"=>$numberOfEffectedRows
+						));
+					}
+					else
+					{
+						echo CJSON::encode(array(
+								"result"=> "No query"
+						));
+					}					
+				}
+				catch(Exception $e)
+				{
+					$message = $e->getMessage();
+					
+					Fb::warn($message, "actionRunDatabaseQueries()");
+					
+					echo CJSON::encode(array(
+							"result"=> "Error",
+							"errorMessage"=>$message
+					));					
+				}
+
+				Yii::app()->end();
+			}
+		}
+	
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			if (YII_DEBUG)
+			{
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+			}
+			else
+			{
+				Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
+				Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+			}
+		}
+	
+		//Complete solution for blinking problem at FireFox
+		if (Yii::app()->request->getIsAjaxRequest()) {
+			Yii::app()->clientScript->scriptMap['*.js'] = false;
+			Yii::app()->clientScript->scriptMap['*.css'] = false;
+		}
+	
+		$this->renderPartial('databaseOperations',array('model'=>$model), false, $processOutput);
 	}	
 }
 

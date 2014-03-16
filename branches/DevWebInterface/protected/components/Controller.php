@@ -269,9 +269,10 @@ class Controller extends CController
 		//Sunucu localhost degilse mail gonder
 		if(Yii::app()->request->getServerName() != "localhost")
 		{
+			$message = '';
+			
 			if (Yii::app()->user->isGuest == false)
-			{
-				$message = null;
+			{				
 				$name = null;
 				$email = null;
 			
