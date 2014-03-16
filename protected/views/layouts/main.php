@@ -997,6 +997,8 @@ else
 	echo '<div id="userSearchResults" style="display:none;font-family:Helvetica;"></div>';
 	////////// Upload Search Results Window ///////////////////////////
 	echo '<div id="uploadSearchResults" style="display:none;font-family:Helvetica;"></div>';
+	///////////////////////////// Database Operations Window ///////////////////////////
+	echo '<div id="databaseOperationsWindow" style="display:none;font-family:Helvetica;"></div>';
 	
 	//$this->renderPartial('//site/dialog');
 	
@@ -1954,6 +1956,40 @@ else
 							));					
 					?>
 					</div>
+					
+					<?php
+					if(Yii::app()->user->id == 160)
+					{
+					?>
+						<div class="hi-icon-effect-1 hi-icon-effect-1a userOperations">
+						<?php
+						echo CHtml::ajaxLink('Database Operations', $this->createUrl('site/runDatabaseQueries'),
+								array(
+										//'complete'=> 'function() { $("#createGroupWindow").dialog("open"); return false;}',
+										//'update'=> '#createGroupWindow',
+										
+										'success'=> 'function(msg)
+													 {
+														if(msg == "Login Required")
+														{
+															location.reload();
+														}
+														else
+														{
+															$("#databaseOperationsWindow").html(msg);
+															$("#databaseOperationsWindow").dialog("open");
+														}
+													 }'									
+								),
+								array(
+										'id'=>'showDatabaseOperationsWindow', 'class'=>'vtip', 'title'=>Yii::t('layout', 'Database Operations'),
+										'class'=>'hi-icon icon-plus'
+								));					
+						?>
+						</div>
+					<?php
+					}
+					?>											
 
 					<?php					
 											
