@@ -114,122 +114,138 @@ class UsersController extends Controller
 		$result = null;
 		$message = null;
 		
-		//if(Yii::app()->request->isPostRequest)
+		try
 		{
-			if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
-					&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
-					&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
-					&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
-					&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
-			)
+			//if(Yii::app()->request->isPostRequest)
 			{
-				$latitude = (float) $_REQUEST['latitude'];
-				$longitude = (float) $_REQUEST['longitude'];
-				$altitude = (float) $_REQUEST['altitude'];
-				$deviceId = $_REQUEST['deviceId'];
-				$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
-			
-				if (Yii::app()->user->id != false)
+				if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
+						&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
+						&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
+						&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
+						&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
+				)
 				{
-					$lastLatitude = 0;
-					$lastLongitude = 0;
-					$lastAltitude = 0;
-					$minDistanceInterval = 0;
-					$minDataSentInterval = 0;
-			
-					Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
-					UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
-			
-					$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
-					$distanceInMs = $distanceInKms * 1000;
-			
-					//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
-					if($distanceInMs > $minDistanceInterval)
+					$latitude = (float) $_REQUEST['latitude'];
+					$longitude = (float) $_REQUEST['longitude'];
+					$altitude = (float) $_REQUEST['altitude'];
+					$deviceId = $_REQUEST['deviceId'];
+					$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
+						
+					if (Yii::app()->user->id != false)
 					{
-						$address = null;
-						$country = null;
+						$lastLatitude = 0;
+						$lastLongitude = 0;
+						$lastAltitude = 0;
+						$minDistanceInterval = 0;
+						$minDataSentInterval = 0;
 							
-						$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
-			
-						Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
-			
-						//Address info is also updated with location info if the distance difference is high enough
-						if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
+						Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+						UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
+							
+						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
+						$distanceInMs = $distanceInKms * 1000;
+							
+						//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
+						if($distanceInMs > $minDistanceInterval)
 						{
-							$result = "1"; //Location updated successfully
+							$address = null;
+							$country = null;
+								
+							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
+								
+							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
+								
+							//Address info is also updated with location info if the distance difference is high enough
+							if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
+							{
+								$result = "1"; //Location updated successfully
+							}
+							else
+							{
+								$result = "0"; //Error occured in save operation
+							}
+								
+							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
+								
+							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
+							{
+								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
+									
+								//$result = "1"; //Values updated successfully
+							}
+							else
+							{
+								//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
+									
+								//$result = "0"; //Error occured in save operation
+							}
 						}
 						else
 						{
-							$result = "0"; //Error occured in save operation
-						}
-							
-						//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
-			
-						if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
-						{
-							//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
-			
-							//$result = "1"; //Values updated successfully
-						}
-						else
-						{
-							//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
-			
-							//$result = "0"; //Error occured in save operation
+							//Only location info (without address info) is updated if the distance difference is smaller than the threshold
+							if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) > 0)
+							{
+								$result = "1"; //Location updated successfully
+							}
+							else
+							{
+								$result = "0"; //Error occured in save operation
+									
+								$message = "Error occured during location save operation to database!";
+								$message .= '<br/><br/>';
+								$message .= 'latitude:'.$latitude.'<br/>';
+								$message .= 'longitude:'.$longitude.'<br/>';
+								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+							}
 						}
 					}
 					else
 					{
-						//Only location info (without address info) is updated if the distance difference is smaller than the threshold
-						if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) == 1)
-						{
-							$result = "1"; //Location updated successfully
-						}
-						else
-						{
-							$result = "0"; //Error occured in save operation
+						$result = "-1"; //No valid user Id
 							
-							$message = "Error occured during location save operation to database";
-							$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
-						}
+						$message = "User ID is not valid (Guest User)";
+						$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
 					}
 				}
 				else
 				{
-					$result = "-1"; //No valid user Id
-					
-					$message = "User ID is not valid (Guest User)";
-					$this->sendErrorMail('Error in actionTakeMyLocation()', $message);					
+					$result = "-2"; //Missing Parameter
+			
+					$message = "Missing Parameter";
+					$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
 				}
 			}
-			else
-			{
-				$result = "-2"; //Missing Parameter
+			// 		else
+				// 		{
+				// 			$result = "-2"; //Missing Parameter
 				
-				$message = "Missing Parameter";
-				$this->sendErrorMail('Error in actionTakeMyLocation()', $message);				
-			}			
-		}
-// 		else
-// 		{
-// 			$result = "-2"; //Missing Parameter
+				// 			$message = "Not a POST request! Only post reequests are accepted";
+				// 			$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+				// 		}
 			
-// 			$message = "Not a POST request! Only post reequests are accepted";
-// 			$this->sendErrorMail('Error in actionTakeMyLocation()', $message);			
-// 		}
-
-		$resultArray = array("result"=>$result);
-		
-		if($result == "1") {
-			$resultArray = array_merge($resultArray, array(
-					"minDataSentInterval"=>$minDataSentInterval,
-					"minDistanceInterval"=>$minDistanceInterval,
-			));
+			$resultArray = array("result"=>$result);
+			
+			if($result == "1") {
+				$resultArray = array_merge($resultArray, array(
+						"minDataSentInterval"=>$minDataSentInterval,
+						"minDistanceInterval"=>$minDistanceInterval,
+				));
+			}
+			
+			echo CJSON::encode(
+					$resultArray
+			);		
 		}
-		
-		echo CJSON::encode(
-				$resultArray
-		);
+		catch(Exception $e)
+		{
+			$message = $e->getMessage();
+				
+			$message = "Missing Parameter";
+			$this->sendErrorMail('Exception occured in actionTakeMyLocation()', $message);
+		}		
+
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		Yii::app()->end();
 	}
@@ -480,6 +496,11 @@ class UsersController extends Controller
 				$dataProvider = Users::model()->getListDataProviderForJson($userId, null, null, null, 0, 1, 1);
 				$out = $this->prepareJson($dataProvider);
 			}
+		}
+		else
+		{
+			$message = "Missing Parameter: 'userId' is missing!";
+			$this->sendErrorMail('Error in actionGetUserInfoJSON()', $message);			
 		}
 
 		echo $out;
