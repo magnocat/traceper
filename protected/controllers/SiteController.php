@@ -2414,6 +2414,12 @@ class SiteController extends Controller
 				$result = "1";
 			}
 		}
+		else
+		{
+			$message = "Missing Parameter: 'email' or 'facebookId' is missing!";
+			$this->sendErrorMail('Error in actionIsFacebookUserRegistered()', $message);
+		}
+		
 		echo CJSON::encode(array(
 				"result"=> $result,
 		));
