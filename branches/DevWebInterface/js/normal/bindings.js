@@ -226,62 +226,78 @@ function bindTooltipActions()
 {
  	$("#RegisterForm_email").blur(function ()	{
  		var enteredEmail = document.getElementById("RegisterForm_email").value;
+ 		var userPart = enteredEmail.substring(0, enteredEmail.indexOf("@")); 		
  		var enteredDomain = enteredEmail.replace(/.*@/, "");
  		var correctedEmail = "";
  		var domainPartsArray = enteredDomain.split(".");
  		var tooltipMessage = "";
  		var bCorrectionRequired = false;
  		
+ 		//alert("userPart:" + userPart + " / " + "0:" + domainPartsArray[0] + " / " + "1:" + domainPartsArray[1]);
+ 		
  		if(domainPartsArray.length >= 2)
  		{
  	 		if((domainPartsArray[0].toLowerCase() === "gmial") || (domainPartsArray[0].toLowerCase() === "gmil") || (domainPartsArray[0].toLowerCase() === "gmal") || (domainPartsArray[0].toLowerCase() === "glail") || (domainPartsArray[0].toLowerCase() === "gamil"))
  	 		{
  	 			bCorrectionRequired = true;
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"gmail");			
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[0],"gmail");
+ 	 			correctedEmail = userPart + "@" + "gmail.com";
  	 		}
  	 		else if((domainPartsArray[0].toLowerCase() === "yaho") || (domainPartsArray[0].toLowerCase() === "yhao") || (domainPartsArray[0].toLowerCase() === "yhaoo") || (domainPartsArray[0].toLowerCase() === "yhoo"))
  	 		{
  	 			bCorrectionRequired = true;
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"yahoo");
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[0],"yahoo");
+ 	 			correctedEmail = userPart + "@" + "yahoo.com";
  	 		}
  	 		else if((domainPartsArray[0].toLowerCase() === "hotmial") || (domainPartsArray[0].toLowerCase() === "hotmal") || (domainPartsArray[0].toLowerCase() === "hotmil") || (domainPartsArray[0].toLowerCase() === "htmail") || (domainPartsArray[0].toLowerCase() === "hotma"))
  	 		{
  	 			bCorrectionRequired = true;
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"hotmail");
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[0],"hotmail");
+ 	 			correctedEmail = userPart + "@" + "hotmail.com";
  	 		}
  	 		else if((domainPartsArray[0].toLowerCase() === "oulook") || (domainPartsArray[0].toLowerCase() === "outlok") || (domainPartsArray[0].toLowerCase() === "outloo") || (domainPartsArray[0].toLowerCase() === "otlook"))
  	 		{
  	 			bCorrectionRequired = true;
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"outlook");
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[0],"outlook");
+ 	 			correctedEmail = userPart + "@" + "outlook.com";
  	 		} 	 		
  	 		else if((domainPartsArray[0].toLowerCase() === "myet") || (domainPartsArray[0].toLowerCase() === "mynt") || (domainPartsArray[0].toLowerCase() === "mymet"))
  	 		{
  	 			bCorrectionRequired = true;
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[0],"mynet");
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[0],"mynet");
+ 	 			correctedEmail = userPart + "@" + "mynet.com";
  	 		}
  	 		else if((domainPartsArray[1].toLowerCase() === "con") || (domainPartsArray[1].toLowerCase() === "co"))
  	 		{
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
  	 			bCorrectionRequired = true;
+ 	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
+ 	 			correctedEmail = userPart + "@" + domainPartsArray[0].toLowerCase() + ".com";
  	 		}
  	 		else if(((domainPartsArray[0].toLowerCase() === "gmail") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "yahoo") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "hotmail") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "mynet") && (domainPartsArray[1].toLowerCase() !== "com")) || ((domainPartsArray[0].toLowerCase() === "outlook") && (domainPartsArray[1].toLowerCase() !== "com")))
  	 		{
- 	 			correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
- 	 			bCorrectionRequired = true;	 			
+ 	 			bCorrectionRequired = true;
+ 	 			//correctedEmail = enteredEmail.replace(domainPartsArray[1],"com");
+ 	 			correctedEmail = userPart + "@" + domainPartsArray[0].toLowerCase() + ".com"; 	 				 			
  	 		}
- 	 				 			 		
+	 			 		
  	 		if(bCorrectionRequired)
  	 		{
- 	 	 		domainPartsArray = correctedEmail.split(".");
- 	 	 		
- 	 	 		if(domainPartsArray[1].toLowerCase() === "com") //These domains all have "com" extension
- 	 	 		{
- 	 	 			//Nothig to do
- 	 	 		}
- 	 	 		else
- 	 	 		{
- 	 	 			correctedEmail = correctedEmail.replace(domainPartsArray[1],"com");
- 	 	 		}
+// 	 	 		domainPartsArray = correctedEmail.split(".");
+// 	 	 		
+// 	 	 		if(domainPartsArray[1].toLowerCase() === "com") //These domains all have "com" extension
+// 	 	 		{
+// 	 	 			//Nothig to do
+// 	 	 		}
+// 	 	 		else if(domainPartsArray[1] === "")
+// 	 	 		{
+// 	 	 			alert("domainPartsArray[1] is null! ");
+// 	 	 		}
+// 	 	 		else
+// 	 	 		{
+// 	 	 			correctedEmail = correctedEmail.replace(domainPartsArray[1],"com");
+// 	 	 		}
+// 	 	 		
+// 	 	 		alert("correctedEmail: " + correctedEmail);
  	 	 		
  				if(LAN_OPERATOR.lang === "en")
  				{

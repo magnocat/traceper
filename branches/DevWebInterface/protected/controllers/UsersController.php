@@ -125,9 +125,9 @@ class UsersController extends Controller
 						&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
 				)
 				{
-					$latitude = (float) $_REQUEST['latitude'];
-					$longitude = (float) $_REQUEST['longitude'];
-					$altitude = (float) $_REQUEST['altitude'];
+					$latitude = round((float) $_REQUEST['latitude'], 6);
+					$longitude = round((float) $_REQUEST['longitude'], 6);
+					$altitude = round((float) $_REQUEST['altitude'], 6);
 					$deviceId = $_REQUEST['deviceId'];
 					$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
 						
@@ -154,15 +154,39 @@ class UsersController extends Controller
 							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
 								
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
+							
+							$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 								
 							//Address info is also updated with location info if the distance difference is high enough
-							if (Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id) == 1)
+							if ($updatedRowCount > 0)
 							{
 								$result = "1"; //Location updated successfully
 							}
 							else
 							{
-								$result = "0"; //Error occured in save operation
+								$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								$message = '';
+								
+								if ($updatedRowCount > 0)
+								{
+									$result = "1"; //Location updated successfully
+									$message = "Error occured at 1. time while location(WITH address) save operation, but update is successful at 2. time!";
+								}
+								else
+								{
+									$result = "0"; //Error occured in save operation
+									$message = "Error occured during location(WITH address) save operation to database (2 times)!";
+								}
+
+								$message .= '<br/><br/>';
+								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
+								$message .= 'latitude:'.$latitude.'<br/>';
+								$message .= 'longitude:'.$longitude.'<br/>';
+								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'adress:'.$address.'<br/>';
+								$message .= 'country:'.$country.'<br/>';
+								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error in actionTakeMyLocation()', $message);								
 							}
 								
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
@@ -182,22 +206,37 @@ class UsersController extends Controller
 						}
 						else
 						{
+							$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+							
 							//Only location info (without address info) is updated if the distance difference is smaller than the threshold
-							if (Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id) > 0)
+							if ($updatedRowCount > 0)
 							{
 								$result = "1"; //Location updated successfully
 							}
 							else
 							{
-								$result = "0"; //Error occured in save operation
-									
-								$message = "Error occured during location save operation to database!";
+								//Veritabanı ilk seferde guncellenemezse ikinci kez dene
+								$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+								$message = '';
+								
+								if ($updatedRowCount > 0)
+								{
+									$result = "1"; //Location updated successfully
+									$message = "Error occured at 1. time while location(without address) save operation, but update is successful at 2. time!";
+								}
+								else
+								{
+									$result = "0"; //Error occured in save operation										
+									$message = "Error occured during location(without address) save operation to database (2 times)!";
+								}
+								
 								$message .= '<br/><br/>';
+								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error in actionTakeMyLocation()', $message);								
 							}
 						}
 					}
@@ -206,7 +245,7 @@ class UsersController extends Controller
 						$result = "-1"; //No valid user Id
 							
 						$message = "User ID is not valid (Guest User)";
-						$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+						$this->sendErrorMail('takeMyLocationInvalidUserID', 'Error in actionTakeMyLocation()', $message);
 					}
 				}
 				else
@@ -214,7 +253,7 @@ class UsersController extends Controller
 					$result = "-2"; //Missing Parameter
 			
 					$message = "Missing Parameter";
-					$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
+					$this->sendErrorMail('takeMyLocationMissingParameter', 'Error in actionTakeMyLocation()', $message);
 				}
 			}
 			// 		else
@@ -243,7 +282,7 @@ class UsersController extends Controller
 			$message = $e->getMessage();
 				
 			$message = "Missing Parameter";
-			$this->sendErrorMail('Exception occured in actionTakeMyLocation()', $message);
+			$this->sendErrorMail('takeMyLocationExceptionOccured', 'Exception occured in actionTakeMyLocation()', $message);
 		}		
 
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
@@ -260,9 +299,22 @@ class UsersController extends Controller
 		{
 			$address = null;
 			$country = null;
+			
+			$latitude = round((float) $_POST['latitude'], 6);
+			$longitude = round((float) $_POST['longitude'], 6);
+			$altitude = 0;
+			
+			if(isset($_POST['altitude']) && ($_POST['altitude'] != NULL))
+			{
+				$altitude = round((float) $_POST['altitude'], 6);
+			}
+			else
+			{
+				$altitude = 0;
+			}
 				
-			$this->getaddress($_POST['latitude'], $_POST['longitude'], $address, $country);			
-			Users::model()->updateLocationWithAddress($_POST['latitude'], $_POST['longitude'], $_POST['altitude'], $address, $country, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
+			$this->getaddress($latitude, $longitude, $address, $country);			
+			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
 		}		
 	}
 
@@ -275,8 +327,8 @@ class UsersController extends Controller
 			isset($_POST['longitude']) && ($_POST['longitude'] != NULL))
 		{
 			Yii::app()->session['countryName'] = $_POST['countryName'];
-			Yii::app()->session['latitude'] = $_POST['latitude'];
-			Yii::app()->session['longitude'] = $_POST['longitude'];	
+			Yii::app()->session['latitude'] = round((float) $_POST['latitude'], 6);
+			Yii::app()->session['longitude'] = round((float) $_POST['longitude'], 6);	
 		}
 	}
 		
@@ -353,7 +405,7 @@ class UsersController extends Controller
 				$result = "-1"; //No valid user Id
 				
 				$message = "User ID is not valid (Guest User)";
-				$this->sendErrorMail('Error in actionUpdateProfile()', $message);				
+				$this->sendErrorMail('updateProfileInvalidUser', 'Error in actionUpdateProfile()', $message);				
 			}
 		}
 		else
@@ -361,7 +413,7 @@ class UsersController extends Controller
 			$result = "-2"; //There is not any parameter which is not null
 			
 			$message = "There is not any parameter which is not null";
-			$this->sendErrorMail('Error in actionUpdateProfile()', $message);			
+			$this->sendErrorMail('updateProfileAllParametersNull', 'Error in actionUpdateProfile()', $message);			
 		}
 
 		echo CJSON::encode(array(
@@ -500,7 +552,7 @@ class UsersController extends Controller
 		else
 		{
 			$message = "Missing Parameter: 'userId' is missing!";
-			$this->sendErrorMail('Error in actionGetUserInfoJSON()', $message);			
+			$this->sendErrorMail('getUserInfoJSONUserIdMissing', 'Error in actionGetUserInfoJSON()', $message);			
 		}
 
 		echo $out;
@@ -625,16 +677,7 @@ class UsersController extends Controller
 		{
 			$message = $e->getMessage();
 			
-			if(isset(Yii::app()->session['getUserListJsonErrorCount']) == false)
-			{
-				Yii::app()->session['getUserListJsonErrorCount'] = 0;
-			}
-						
-			if(Yii::app()->session['getUserListJsonErrorCount'] < 3)
-			{
-				$this->sendErrorMail('PHP Exception in actionGetUserListJson()', $message);
-				Yii::app()->session['getUserListJsonErrorCount'] = Yii::app()->session['getUserListJsonErrorCount'] + 1;
-			}			
+			$this->sendErrorMail('getUserInfoJSONExceptionOccured', 'PHP Exception in actionGetUserListJson()', $message);
 		}
 		
 		Yii::app()->end();
@@ -757,12 +800,12 @@ class UsersController extends Controller
 			else if ($actionResult == 0)
 			{
 				$message = "Friend cannot be deleted!";
-				$this->sendErrorMail('Error in actionDeleteFriendShip()', $message);				
+				$this->sendErrorMail('deleteFriendShipCannotBeDeleted', 'Error in actionDeleteFriendShip()', $message);				
 			}
 			else if ($actionResult == -1)
 			{
 				$message = "Friendship NOT found!";
-				$this->sendErrorMail('Error in actionDeleteFriendShip()', $message);			
+				$this->sendErrorMail('deleteFriendShipNotFound', 'Error in actionDeleteFriendShip()', $message);			
 			}			 
 		}
 
@@ -875,7 +918,7 @@ class UsersController extends Controller
 			else
 			{
 				$message = "Friendship CANNOT be approved!";
-				$this->sendErrorMail('Error in actionApproveFriendShip()', $message);				
+				$this->sendErrorMail('approveFriendShipCannotBeApproved', 'Error in actionApproveFriendShip()', $message);				
 			}
 		}		
 		echo CJSON::encode(array(
@@ -1003,7 +1046,7 @@ class UsersController extends Controller
 						break;							
 				}
 
-				$this->sendErrorMail('Error in actionAddAsFriend()', $errorMessage);
+				$this->sendErrorMail('addAsFriendCannotAdd', 'Error in actionAddAsFriend()', $errorMessage);
 			}						
 		}
 		else
@@ -1011,7 +1054,7 @@ class UsersController extends Controller
 			$result = "-3"; //Missing parameter
 			
 			$errorMessage = "Missing parameter!";
-			$this->sendErrorMail('Error in actionAddAsFriend()', $errorMessage);
+			$this->sendErrorMail('addAsFriendMissingParameter', 'Error in actionAddAsFriend()', $errorMessage);
 		}
 		
 		echo CJSON::encode(array(
@@ -1047,14 +1090,14 @@ class UsersController extends Controller
 			    		$result = -1; //If there occurs a problem during friendship process, return -1
 			    		
 			    		$errorMessage = "Error occured during friendship process";
-			    		$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
+			    		$this->sendErrorMail('addAsFriendIfAlreadyMemberError1', 'Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
 			    	}
 			    	else
 			    	{
 			    		$result = -1; //If there occurs a problem during friendship process, return -1
 			    		
 			    		$errorMessage = "Error occured during friendship process";
-			    		$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
+			    		$this->sendErrorMail('addAsFriendIfAlreadyMemberError2', 'Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    		
 			    	}					
 			    }
 			    else //The friend candidate with the given Facebook ID is not a Traceper member, so return 0
@@ -1062,7 +1105,7 @@ class UsersController extends Controller
 			    	$result = 0;
 			    	
 			    	$errorMessage = "The friend candidate with the given Facebook ID is not a Traceper member";
-			    	$this->sendErrorMail('Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    	
+			    	$this->sendErrorMail('addAsFriendIfAlreadyMemberError3', 'Error in actionAddAsFriendIfAlreadyMember()', $errorMessage);			    	
 			    }				
 			}			
 		}

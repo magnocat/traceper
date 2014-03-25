@@ -999,6 +999,8 @@ else
 	echo '<div id="uploadSearchResults" style="display:none;font-family:Helvetica;"></div>';
 	///////////////////////////// Database Operations Window ///////////////////////////
 	echo '<div id="databaseOperationsWindow" style="display:none;font-family:Helvetica;"></div>';
+	///////////////////////////// Your Email Seems To Be Invalid Window ///////////////////////////
+	echo '<div id="yourEmailSeemsToBeInvalidWindow" style="display:none;font-family:Helvetica;"></div>';	
 	
 	//$this->renderPartial('//site/dialog');
 	
@@ -1971,7 +1973,7 @@ else
 							));					
 					?>
 					</div>
-										
+									
 					<?php
 					if(Yii::app()->user->id == 160)
 					{
@@ -2416,9 +2418,26 @@ else
 																			}
 																			else if (obj.result == "0")
 																			{
-																				TRACKER.showMessageDialog("'.Yii::t('common', 'Sorry, an error occured in operation').'");
+																				TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during sign up. Please retry the process and if the error persists please contact us.').'");
 																			}
-																			}
+																			else if (obj.result == "-1")
+																			{
+																				var opt = {
+																					autoOpen: false,
+																					modal: true,
+																					resizable: false,
+																					width: 600,
+																					title: "'.Yii::t('site', 'Your E-mail Seems To Be Invalid').'"
+																				};
+																		
+																				$("#yourEmailSeemsToBeInvalidWindow").dialog(opt).dialog("open");
+																				$("#yourEmailSeemsToBeInvalidWindow").html(obj.renderedView);																				
+																			}													
+																			else
+																			{
+																				TRACKER.showMessageDialog("'.Yii::t('site', 'An error occured during sign up. Please retry the process and if the error persists please contact us.').'");
+																			}																										
+																		}
 																	}
 																	catch (error)
 																	{

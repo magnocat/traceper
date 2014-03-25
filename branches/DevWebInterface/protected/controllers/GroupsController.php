@@ -79,7 +79,7 @@ class GroupsController extends Controller
 						echo CJSON::encode(array("result"=> "Unknown error"));
 						
 						$errorMessage = "Error occured while saving the group.";
-						$this->sendErrorMail('Error in actionCreateGroup()', $errorMessage);
+						$this->sendErrorMail('createGroupSaveError', 'Error in actionCreateGroup()', $errorMessage);
 					}
 					
 					Yii::app()->end();
@@ -91,7 +91,7 @@ class GroupsController extends Controller
 						echo CJSON::encode(array("result"=> "Duplicate Entry"));
 						
 						$errorMessage = "Duplicate entry error occured while saving the group.";
-						$this->sendErrorMail('Error in actionCreateGroup()', $errorMessage);
+						$this->sendErrorMail('createGroupDuplicateEntry', 'Error in actionCreateGroup()', $errorMessage);
 					}
 					Yii::app()->end();
 					
@@ -257,7 +257,7 @@ class GroupsController extends Controller
 									echo CJSON::encode(array("result"=> "Unknown error"));
 									
 									$errorMessage = "Error occured while saving the group relation.";
-									$this->sendErrorMail('Error in actionUpdateGroup()', $errorMessage);
+									$this->sendErrorMail('updateGroupSaveError', 'Error in actionUpdateGroup()', $errorMessage);
 									
 									Yii::app()->end();
 								}
@@ -269,7 +269,7 @@ class GroupsController extends Controller
 									echo CJSON::encode(array("result"=> "Duplicate Entry"));
 									
 									$errorMessage = "Duplicate Entry error occured while saving the group relation.";
-									$this->sendErrorMail('Error in actionUpdateGroup()', $errorMessage);									
+									$this->sendErrorMail('updateGroupDuplicateEntry', 'Error in actionUpdateGroup()', $errorMessage);									
 								}
 								
 								Yii::app()->end();
@@ -637,12 +637,12 @@ class GroupsController extends Controller
 		if($result == 0)
 		{
 			$errorMessage = "Group deletion failed.";
-			$this->sendErrorMail('Error in actionDeleteGroup()', $errorMessage);
+			$this->sendErrorMail('deleteGroupDeletionFailed', 'Error in actionDeleteGroup()', $errorMessage);
 		}
 		else if($result == -1)
 		{
 			$errorMessage = "The group to be deleted cannot be found!";
-			$this->sendErrorMail('Error in actionDeleteGroup()', $errorMessage);			
+			$this->sendErrorMail('deleteGroupNotFound', 'Error in actionDeleteGroup()', $errorMessage);			
 		}
 		
 		Yii::app()->end();
@@ -674,7 +674,7 @@ class GroupsController extends Controller
 			echo CJSON::encode(array("result"=> "Unknown error"));
 			
 			$errorMessage = "Error occured while deleting group memmber!";
-			$this->sendErrorMail('Error in actionDeleteGroupMember()', $errorMessage);
+			$this->sendErrorMail('deleteGroupMemberError', 'Error in actionDeleteGroupMember()', $errorMessage);
 						
 			Yii::app()->end();
 		}
@@ -683,7 +683,7 @@ class GroupsController extends Controller
 			//traceper_user_group_relation table has not the desired relation, so do nothing
 			
 			$errorMessage = "The group member to be deleted does not exist!";
-			$this->sendErrorMail('Error in actionDeleteGroupMember()', $errorMessage);			
+			$this->sendErrorMail('deleteGroupMemberDoesNotExist', 'Error in actionDeleteGroupMember()', $errorMessage);			
 		}
 	}	
 	
@@ -741,8 +741,8 @@ class GroupsController extends Controller
 						{
 							echo CJSON::encode(array("result"=> "0"));
 							
-							$errorMessage = "Error occured while setting firends visibilities!";
-							$this->sendErrorMail('Error in actionSetPrivacyRights()', $errorMessage);							
+							$errorMessage = "Error occured while setting friends visibilities!";
+							$this->sendErrorMail('setPrivacyRightsFriendVisibilitiesSetError', 'Error in actionSetPrivacyRights()', $errorMessage);							
 						}
 						
 						Yii::app()->end();
@@ -752,7 +752,7 @@ class GroupsController extends Controller
 						echo CJSON::encode(array("result"=> "0"));
 						
 						$errorMessage = "Error occured while updating privacy settings!";
-						$this->sendErrorMail('Error in actionSetPrivacyRights()', $errorMessage);
+						$this->sendErrorMail('setPrivacyRightsPrivacyUpdateError', 'Error in actionSetPrivacyRights()', $errorMessage);
 												
 						Yii::app()->end();
 					}					

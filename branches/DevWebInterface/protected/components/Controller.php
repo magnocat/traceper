@@ -264,47 +264,57 @@ class Controller extends CController
 		// 		}
 	}
 
-	public function sendErrorMail($par_subject, $par_message)
+	public function sendErrorMail($errorLabel, $par_subject, $par_message)
 	{
 		//Sunucu localhost degilse mail gonder
 		if(Yii::app()->request->getServerName() != "localhost")
 		{
-			$message = '';
-			
-			if (Yii::app()->user->isGuest == false)
-			{				
-				$name = null;
-				$email = null;
-			
-				Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
-	
-				$message .= 'User Info: '.'<br/><br/>';
-				$message .= 'Id: '.Yii::app()->user->id.'<br/>';
-				$message .= 'Name: '.$name.'<br/>';
-				$message .= 'E-mail: '.$email;
-				$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
-			}
-			
-			$message .= 'Server Info: '.Yii::app()->request->getServerName();
-			$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
-			
-			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			if(isset(Yii::app()->session[$errorLabel]) == false)
 			{
-				//Fb::warn("client=mobile", "sendErrorMail()");
+				Yii::app()->session[$errorLabel] = 0;
+			}
 				
-				$message .= 'Call Type: MOBILE';
-				$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
-			}
-			else
+			if(Yii::app()->session[$errorLabel] < 1)
 			{
-				//Fb::warn("ELSE", "sendErrorMail()");
-			}			
-			
-			$message .= $par_message;
-			
-			$this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', $par_subject, $message, false /*Do not add footer for error message*/);
-
-			//Fb::warn("mail SENT", "sendErrorMail()");
+				$message = '';
+					
+				if (Yii::app()->user->isGuest == false)
+				{
+					$name = null;
+					$email = null;
+						
+					Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+				
+					$message .= 'User Info: '.'<br/><br/>';
+					$message .= 'Id: '.Yii::app()->user->id.'<br/>';
+					$message .= 'Name: '.$name.'<br/>';
+					$message .= 'E-mail: '.$email;
+					$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+				}
+					
+				$message .= 'Server Info: '.Yii::app()->request->getServerName();
+				$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+					
+				if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+				{
+					//Fb::warn("client=mobile", "sendErrorMail()");
+				
+					$message .= 'Call Type: MOBILE';
+					$message .= '<br/>----------------------------------------------------------------------------------------------<br/>';
+				}
+				else
+				{
+					//Fb::warn("ELSE", "sendErrorMail()");
+				}
+					
+				$message .= $par_message;
+					
+				$this->SMTP_UTF8_mail(Yii::app()->params->contactEmail, 'Traceper Error Handler', Yii::app()->params->contactEmail, 'Traceper', $par_subject, $message, false /*Do not add footer for error message*/);
+				
+				//Fb::warn("mail SENT", "sendErrorMail()");
+								
+				Yii::app()->session[$errorLabel] = Yii::app()->session[$errorLabel] + 1;
+			}
 		}
 		else
 		{
