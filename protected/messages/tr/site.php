@@ -149,7 +149,8 @@ return array(
 	'Allow the HTML browser to view this message!' => 'Bu mesajı görebilmek için HTML tarayıcıya izin verin!',
 	'Your account created successfully, but an error occured while sending your account activation e-mail. You could request your activation e-mail by clicking the link \"Not Received Our Activation E-Mail?\" just below the register form. If the error persists, please contact us about the problem.' => 'Hesabınız başarıyla oluşturuldu, fakat hesap etkinleştirme e-postanız gönderilirken bir hata oluştu. Kayıt formunun hemen altında yer alan \"Aktivasyon E-Postamız Size Ulaşmadı mı?\" bağlantısına tıklayarak hesabınızı etkinleştirebilmek için gerekli e-postanın gönderilmesini isteyebilirsiniz. Hata hala devam ederse, lütfen sorun hakkında bizimle iletişime geçiniz.',
 	'An error occured while sending the e-mail. Please retry the process and if the error persists please contact us.' => 'E-posta gönderilirken bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',	
-	'An error occured during login. Please retry the process and if the error persists please contact us.' => 'Giriş sırasında bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',	
+	'An error occured during login. Please retry the process and if the error persists please contact us.' => 'Giriş sırasında bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',
+	'An error occured during sign up. Please retry the process and if the error persists please contact us.' => 'Kayıt sırasında bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',
 	'Missing parameter error occured. Please retry the process and if the error persists please contact us.' => 'Eksik parametre hatası oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',
 	'An error occured during register process. Please retry the process and if the error persists please contact us.' => 'Kayıt işlemi sırasında bir hata oluştu. Lütfen işlemi yeniden deneyiniz ve hata oluşmaya devam ederse bizimle iletişime geçiniz.',	
 	'Terms of Use' => 'Kullanım Şartları',
@@ -177,7 +178,12 @@ return array(
 	'You are registered as Facebook user for our service, therefore you do not have to enter a Traceper password. You could use "Log in with facebook" button to log in to your Traceper account.' => 'Servisimize Facebook kullanıcısı olarak kayıtlısınız, bu nedenle Traceper şifresi girmeniz gerekmiyor. Traceper hesabınıza giriş yapmak için "Facebook ile giriş yap" düğmesini kullanabilirsiniz.',
 	'You are already registered for our service. If you do not remember your password, you could request to determine a new one by the link "Forgot Password?".' => 'Servisimize zaten kayıtlısınız. Şifrenizi hatırlamıyorsanız, "Şifreni mi Unuttun?" bağlantısını kullanarak yeni bir şifre belirleme talebinde bulunabilirsiniz.',
 	'You are already registered as Facebook user for our service. You could use "Log in with facebook" button to log in to your Traceper account.' => 'Servisimize zaten Facebook kullanıcısı olarak kayıtlısınız. Traceper hesabınıza giriş yapmak için "Facebook ile giriş yap" düğmesini kullanabilirsiniz.',
-	
+	'Your E-mail Seems To Be Invalid' => 'E-posta Adresiniz Yanlış Gibi Gözüküyor',
+	'We think that you might have misentered the domain part of your e-mail address. If so, you could select the first option to correct it as shown and click the "OK" button continue with the corrected address. If not, you could select the second option to continue with the current address. Lastly, you could just close this dialog window and return back to the sign up form by clicking the "Cancel" button in case none of these options suit you:' => 'E-posta adresinizin alan adı bölümünü yanlış girdiğinizi düşünüyoruz. Eğer öyle ise ilk seçeneği seçerek "Tamam" butonuna tıkladığınızda adresin belirtildiği şekilde düzeltilerek işleme devam edilmesini sağlayabilirsiniz. Girdiğiniz adresin doğru olduğunu düşünüyorsanız ikinci seçeneği seçerek mevcut adresle işleme devam edebilirsiniz. Son olarak bu iki seçenek de size uymuyorsa "İptal" butonuna tıklarak bu diyalog penceresini kapatıp kayıt formuna geri dönebilirsiniz:',
+	'Correct as <b>{email}</b> and continue' => '<b>{email}</b> olarak düzelt ve devam et',
+	'Continue with <b>{email}</b>' => '<b>{email}</b> ile devam et',
+	'Close dialog window' => 'Diyalog penceresini kapat',
+	'Please select an option before clicking \"OK\" button' => '\"Tamam\" butonuna basmadan önce lütfen bir seçim yapınız'
 );
 
 /*

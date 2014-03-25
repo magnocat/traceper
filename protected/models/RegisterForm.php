@@ -74,6 +74,14 @@ class RegisterForm extends CFormModel
 			'passwordAgain'=>Yii::t('site', 'Password (Again)'),			
 		);
 	}
+	
+	public function beforeValidate()
+	{
+		$this->email = strtolower($this->email);
+		$this->emailAgain = strtolower($this->emailAgain);
+		
+		return parent::beforeValidate();
+	}
 
 	public function isExists($attribute,$params)
 	{

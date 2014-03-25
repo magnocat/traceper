@@ -1066,5 +1066,85 @@ class Users extends CActiveRecord
 		$user->password = $par_password;
 	
 		return $user->save();
+	}
+
+	public function doesUserEmailNeedToBeCorrected($par_email, &$par_correctedEmail) {
+		$bCorrectionRequired = false;
+		$correctedEmail = null;
+
+		$user = strtok($par_email, "@");
+		$domain = strtok("@");
+		
+		//list($domainName, $extension) = explode('.', $domain);  -> Buna e-mail alanı boşken hata veriyor
+		$domainName = strtok($domain, ".");
+		$extension = strtok(".");	
+
+		//Fb::warn("user:$user - domainName:$domainName - extension:$extension", "doesUserEmailNeedToBeCorrected()");
+		
+		if(($domainName == "gmial") || ($domainName == "gmil") || ($domainName == "gmal") || ($domainName == "glail") || ($domainName == "gamil"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($domainName, "gmail", $par_email);
+			$correctedEmail = $user."@"."gmail.com";
+		}
+		else if(($domainName == "yaho") || ($domainName == "yhao") || ($domainName == "yhaoo") || ($domainName == "yhoo"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($domainName, "yahoo", $par_email);
+			$correctedEmail = $user."@"."yahoo.com";
+		}
+		else if(($domainName == "hotmial") || ($domainName == "hotmal") || ($domainName == "hotmil") || ($domainName == "htmail") || ($domainName == "hotma"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($domainName, "hotmail", $par_email);
+			$correctedEmail = $user."@"."hotmail.com";
+		}
+		else if(($domainName == "oulook") || ($domainName == "outlok") || ($domainName == "outloo") || ($domainName == "otlook"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($domainName, "outlook", $par_email);
+			$correctedEmail = $user."@"."outlook.com";
+		}
+		else if(($domainName == "myet") || ($domainName == "mynt") || ($domainName == "mymet"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($domainName, "mynet", $par_email);
+			$correctedEmail = $user."@"."mynet.com";
+		}
+		else if(($extension == "con") || ($extension == "co"))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($extension, "com", $par_email);
+			$correctedEmail = $user."@".$domainName.".com";
+		}
+		else if((($domainName == "gmail") && ($extension != "com")) || (($domainName == "yahoo") && ($extension != "com")) || (($domainName == "hotmail") && ($extension !== "com")) || (($domainName == "mynet") && ($extension != "com")) || (($domainName == "outlook") && ($extension != "com")))
+		{
+			$bCorrectionRequired = true;
+			//$correctedEmail = str_replace($extension, "com", $par_email);
+			$correctedEmail = $user."@".$domainName.".com";
+		}
+		
+		if($bCorrectionRequired)
+		{
+// 			$correctedEmailFirstPart = strtok($correctedEmail, ".");
+// 			$correctedEmailExtension = strtok(".");			
+				
+// 			if($correctedEmailExtension == "com") //These domains all have "com" extension
+// 			{
+// 				//Nothig to do
+// 			}
+// 			else
+// 			{
+// 				$correctedEmail = str_replace($correctedEmailExtension, "com", $correctedEmail);
+// 			}
+			
+			$par_correctedEmail = $correctedEmail;
+		}
+		else
+		{
+			$par_correctedEmail = null;
+		}
+
+		return $bCorrectionRequired;
 	}	
 }
