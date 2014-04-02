@@ -2,6 +2,7 @@
 var bRegisterFormNameErrorExists = false;
 var bRegisterFormLastNameErrorExists = false;
 var bRegisterFormEmailErrorExists = false;
+var bRegisterFormEmailWarningExists = false;
 var bRegisterFormEmailAgainErrorExists = false;
 var bRegisterFormPasswordErrorExists = false;
 var bRegisterFormPasswordAgainErrorExists = false;
@@ -47,35 +48,71 @@ function changecss(myclass,element,value) {
 
 function resetAllFormErrors()
 {	
-	$("#RegisterForm_name").tooltipster('update', "");
-	$("#RegisterForm_name").tooltipster("hide");
+	if(bRegisterFormNameErrorExists)
+	{
+		$("#RegisterForm_name").tooltipster('update', "");
+		$("#RegisterForm_name").tooltipster("hide");		
+	}
 	
-	$("#RegisterForm_lastName").tooltipster('update', "");
-	$("#RegisterForm_lastName").tooltipster("hide");
+	if(bRegisterFormLastNameErrorExists)
+	{
+		$("#RegisterForm_lastName").tooltipster('update', "");
+		$("#RegisterForm_lastName").tooltipster("hide");		
+	}
 	
-	$("#RegisterForm_email").tooltipster('update', "");
-	$("#RegisterForm_email").tooltipster("hide");
+	if(bRegisterFormEmailErrorExists)
+	{
+		$("#RegisterForm_email").tooltipster('update', "");
+		$("#RegisterForm_email").tooltipster("hide");		
+	}	
+	
+	if(bRegisterFormEmailAgainErrorExists)
+	{
+		$("#RegisterForm_emailAgain").tooltipster('update', "");
+		$("#RegisterForm_emailAgain").tooltipster("hide");		
+	}
 
-	$("#RegisterForm_emailAgain").tooltipster('update', "");
-	$("#RegisterForm_emailAgain").tooltipster("hide");
+	if(bRegisterFormPasswordErrorExists)
+	{
+		$("#registerPasswordField").tooltipster('update', "");
+		$("#registerPasswordField").tooltipster("hide");		
+	}
 	
-	$("#registerPasswordField").tooltipster('update', "");
-	$("#registerPasswordField").tooltipster("hide");
+	if(bRegisterFormPasswordAgainErrorExists)
+	{
+		$("#registerPasswordAgainField").tooltipster('update', "");
+		$("#registerPasswordAgainField").tooltipster("hide");		
+	}	
 	
-	$("#registerPasswordAgainField").tooltipster('update', "");
-	$("#registerPasswordAgainField").tooltipster("hide");
-
-	$("#LoginForm_email").tooltipster('update', "");
-	$("#LoginForm_email").tooltipster("hide");
+	if(bRegisterFormEmailWarningExists)
+	{
+		$("#registerFormTermsText").tooltipster('update', "");
+		$("#registerFormTermsText").tooltipster("hide");		
+	}
 	
-	$("#LoginForm_password").tooltipster('update', "");
-	$("#LoginForm_password").tooltipster("hide");
+	if(bLoginFormEmailErrorExists)
+	{
+		$("#LoginForm_email").tooltipster('update', "");
+		$("#LoginForm_email").tooltipster("hide");		
+	}
 	
-	$("#ResetPasswordForm_newPassword").tooltipster('update', "");
-	$("#ResetPasswordForm_newPassword").tooltipster("hide");
+	if(bLoginFormPasswordErrorExists)
+	{
+		$("#LoginForm_password").tooltipster('update', "");
+		$("#LoginForm_password").tooltipster("hide");		
+	}	
+		
+	if(bResetPasswordFormNewPasswordErrorExists)
+	{
+		$("#ResetPasswordForm_newPassword").tooltipster('update', "");
+		$("#ResetPasswordForm_newPassword").tooltipster("hide");		
+	}
 	
-	$("#ResetPasswordForm_newPasswordAgain").tooltipster('update', "");
-	$("#ResetPasswordForm_newPasswordAgain").tooltipster("hide");	
+	if(bResetPasswordFormNewPasswordAgainErrorExists)
+	{
+		$("#ResetPasswordForm_newPasswordAgain").tooltipster('update', "");
+		$("#ResetPasswordForm_newPasswordAgain").tooltipster("hide");			
+	}
 }
 
 function resetResetPasswordFormErrors()
@@ -120,7 +157,12 @@ function hideRegisterFormErrorsIfExist()
   	if(bRegisterFormPasswordAgainErrorExists)
 	{
 		$("#registerPasswordAgainField").tooltipster("hide");
-	}	
+	}
+  	
+  	if(bRegisterFormEmailWarningExists)
+  	{
+  		$("#registerFormTermsText").tooltipster('hide');
+  	}
 }
 
 function hideLoginFormErrorsIfExist()
@@ -186,7 +228,12 @@ function showRegisterFormErrorsIfExist()
 	if(bRegisterFormPasswordAgainErrorExists)
 	{
 		$("#registerPasswordAgainField").tooltipster("show");
-	}	
+	}
+	
+  	if(bRegisterFormEmailWarningExists)
+  	{
+  		$("#registerFormTermsText").tooltipster('show');
+  	}	
 }
 
 function showLoginFormErrorsIfExist()
@@ -298,15 +345,26 @@ function bindTooltipActions()
 // 	 	 		}
 // 	 	 		
 // 	 	 		alert("correctedEmail: " + correctedEmail);
+ 	 			
+// 	 			if(TRACKER == null)
+// 	 			{
+// 	 				alert("TRACKER is NULL");
+// 	 			}
+// 	 			else
+// 	 			{
+// 	 				alert("TRACKER is NOT null");
+// 	 			}
  	 	 		
  				if(LAN_OPERATOR.lang === "en")
  				{
- 					tooltipMessage = TRACKER.langOperator.didYouMean + " <a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#RegisterForm_email\").tooltipster(\"hide\");'>" + correctedEmail + "</a> ? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;
+ 					tooltipMessage = TRACKER.langOperator.didYouMean + " <a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#registerFormTermsText\").tooltipster(\"hide\"); $(\"#RegisterForm_email\").removeClass(\"warning\"); $(\"#RegisterForm_email\").removeClass(\"error\"); bRegisterFormEmailWarningExists = false;'>" + correctedEmail + "</a> ? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;
  				}
  				else
  				{
- 					tooltipMessage = "<a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#RegisterForm_email\").tooltipster(\"hide\");'>" + correctedEmail + "</a> " + TRACKER.langOperator.didYouMean + "? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;	
+ 					tooltipMessage = "<a style='cursor:pointer;' onclick='document.getElementById(\"RegisterForm_email\").value = \"" + correctedEmail + "\";$(\"#registerFormTermsText\").tooltipster(\"hide\"); $(\"#RegisterForm_email\").removeClass(\"warning\"); $(\"#RegisterForm_email\").removeClass(\"error\"); bRegisterFormEmailWarningExists = false;'>" + correctedEmail + "</a> " + TRACKER.langOperator.didYouMean + "? " + TRACKER.langOperator.ifSoClickOnSuggestedEmail;	
  				}
+
+ 				//alert(tooltipMessage);
  	 		}			
  		}
  		
@@ -314,15 +372,27 @@ function bindTooltipActions()
  				
  		if(bCorrectionRequired)
  		{
- 	 		$("#RegisterForm_email").tooltipster('update', tooltipMessage);
- 	 		$("#RegisterForm_email").tooltipster('show'); 			
+ 			//alert("bCorrectionRequired");
+
+ 			$("#RegisterForm_email").tooltipster('hide');
+ 			$("#registerFormTermsText").tooltipster('update', tooltipMessage);
+ 			//$("#registerFormTermsText").tooltipster('update', 'AAA');
+ 	 		$("#registerFormTermsText").tooltipster('show');
+ 	 		$("#RegisterForm_email").addClass("warning");
+ 	 		bRegisterFormEmailWarningExists = true;
  		}
  		else
  		{
- 			if(bRegisterFormEmailErrorExists === false)
+ 			//alert("NOOO bCorrectionRequired");
+ 			
+ 			if(true == bRegisterFormEmailErrorExists)
  			{
- 				$("#RegisterForm_email").tooltipster('hide');
- 			} 						 			 
+ 				$("#RegisterForm_email").tooltipster('show'); 				
+ 			} 
+ 			
+ 			$("#registerFormTermsText").tooltipster('hide');
+ 			bRegisterFormEmailWarningExists = false;
+ 			$("#RegisterForm_email").removeClass("warning");
  		}
 
 //		$("#RegisterForm_email").tooltipster({
@@ -345,6 +415,28 @@ function bindTooltipActions()
 	});
 }
 
+//function updateRegisterEmailTooltip(par_type, par_message, par_bShow) 
+//{
+//	switch(par_type)
+//	{
+//		case "info":
+//			$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
+//	 		$("#RegisterForm_email").tooltipster('show');
+//	 		break;
+//		  
+//		case "warning":
+//			execute code block 2
+//			break;
+//		  
+//		case "error":
+//			execute code block 2
+//			break;
+//			  
+//		default:
+//			break;
+//	}
+//}
+
 function bindElements(langOperator, trackerOp) 
 {	 		
 	/**
@@ -353,8 +445,12 @@ function bindElements(langOperator, trackerOp)
 
  	$("#RegisterForm_email").focus(function ()	{ 		
  		//$("#RegisterForm_email").tooltipster('update', '<div id="registerEmailNotificationMessageId">' + TRACKER.langOperator.registerEmailNotificationMessage + '</div>');
- 		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
- 		$("#RegisterForm_email").tooltipster('show'); 		
+ 		
+ 		if((false == bRegisterFormEmailWarningExists) && (false == bRegisterFormEmailErrorExists))
+		{
+ 	 		$("#RegisterForm_email").tooltipster('update', TRACKER.langOperator.registerEmailNotificationMessage);
+ 	 		$("#RegisterForm_email").tooltipster('show');		
+		}
 	});
  	
  	$("#LoginForm_email").focus(function ()	{

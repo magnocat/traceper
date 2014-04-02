@@ -196,9 +196,15 @@ else
 	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
 	TRACKER.getImageList(false, true);
 
+	var positionOptions = {
+			  enableHighAccuracy: true,
+			  timeout: 10000,
+			  maximumAge: 0
+			};
+	
 	if (navigator.geolocation)
 	{
-		navigator.geolocation.getCurrentPosition(showPosition, showError);
+		navigator.geolocation.getCurrentPosition(showPosition, showError, positionOptions);
 	}
 	else
 	{
@@ -208,6 +214,8 @@ else
 	function showPosition(position)
 	{
 		//alertMsg("latitude:" + position.coords.latitude + " - longitude:" + position.coords.longitude);
+		
+		//alertMsg("accuracy:" + position.coords.accuracy);
 
 		$.post('index.php?r=users/updateLocationByGeolocation', { latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude });
 

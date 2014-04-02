@@ -66,8 +66,10 @@ if (YII_DEBUG)
 	<script type="text/javascript"
 		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/cbpTooltipMenu.js"></script>	
 	<script type="text/javascript"
-		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/jquery.placeholder.js"></script>
-	<?php
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/jquery.placeholder.js"></script>		
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/normal/jquery.tooltipster.js"></script>		
+	<?php //2.2.3 calisiyor, 2.3.0 calismiyor
 }
 else //DEPLOYMENT
 {
@@ -88,6 +90,8 @@ else //DEPLOYMENT
 		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/cbpTooltipMenu.min.js"></script>		
 	<script type="text/javascript"
 		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/jquery.placeholder.min.js"></script>
+	<script type="text/javascript"
+		src="<?php echo Yii::app()->request->baseUrl; ?>/js/min/jquery.tooltipster.min.js"></script>		
 	<?php		
 }
 ?>	
@@ -266,28 +270,10 @@ else //DEPLOYMENT
 	Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl.'/css/min/tooltipster-min.css');	
 }
 
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/jquery.tooltipster.min.js', CClientScript::POS_END);
+//Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl.'/js/jquery.tooltipster.min.js', CClientScript::POS_END);
 
 Yii::app()->clientScript->registerScript('formTooltips',
 		"
-       	 //$(\"#register-form-main input[type=\"text\"]\").tooltipster({
-         //	 theme: '.tooltipster-noir',
-         //	 position: 'right',
-         //	 trigger: 'custom',
-         //	 maxWidth: 540,
-         //	 onlyOne: false,
-         //	 interactive: true,
-         //});
-
-         //$(\"#login-form-main input[type=\"text\"]\").tooltipster({
-         // 	 theme: '.tooltipster-noir',
-         //  	 position: 'right',
-         //  	 trigger: 'custom',
-         //  	 maxWidth: 540,
-         //  	 onlyOne: false,
-         //  	 interactive: true,
-         //  });
-         
 		//Bunu silme, e-mail field'inin tooltip'inin cikmasini sagliyor
 		$(\"#RegisterForm_email\").tooltipster({
         	 theme: \".tooltipster-info\",
@@ -296,7 +282,18 @@ Yii::app()->clientScript->registerScript('formTooltips',
         	 maxWidth: 500,
         	 onlyOne: false,
 			 interactive: true,
-        	 });		
+        	 });
+
+		$(\"#registerFormTermsText\").tooltipster({
+        	 theme: \".tooltipster-warning\",
+        	 position: \"right\",
+        	 trigger: \"custom\",
+        	 maxWidth: 500,
+        	 offsetX: 1,
+        	 offsetY: 172,
+        	 onlyOne: false,
+			 interactive: true,
+        	 });        	 
 
 		$(\"#showCreateGroupWindow\").tooltipster({
 	       	 theme: \".tooltipster-info\",
@@ -1363,6 +1360,18 @@ else
 															//alert(document.getElementById("ajaxLoginResponse").innerHTML);
 															$("#forAjaxRefresh").html(document.getElementById("ajaxLoginResponse").innerHTML);
 															$("#hiddenAjaxResponseToParse").html("");
+															
+															//Dondukten sonra gostermezsen ilk once geolocation tooltip i gosterilen ID de aynı oldugundan 
+															//kisa sureli gozukuyordu
+															if(bLoginFormEmailErrorExists)
+															{
+																$("#LoginForm_email").tooltipster("show");
+															}
+															
+															if(bLoginFormPasswordErrorExists)
+															{
+																$("#LoginForm_password").tooltipster("show");	
+															}
 										
 															//var form = document.getElementById("loginFormForAjax");
 															//form.parentNode.removeChild(form);
@@ -1973,7 +1982,7 @@ else
 							));					
 					?>
 					</div>
-									
+								
 					<?php
 					if(Yii::app()->user->id == 160)
 					{
@@ -2304,7 +2313,7 @@ else
 								</div>
 								</div>
 								
-								<div class="sideMenu" style="height:25px;font-size:12px;margin-left:0.3em;cursor:text;">
+								<div id="registerFormTermsText" class="sideMenu" style="height:25px;font-size:12px;margin-left:0.3em;cursor:text;">
 								<?php	
 									echo Yii::t('layout', 'By sending the Sign Up form, you agree to our {terms of use}', array('{terms of use}'=>
 											CHtml::ajaxLink(Yii::t('layout', 'Terms of Use'), $this->createUrl('site/terms'),
@@ -2445,7 +2454,37 @@ else
 																		//alert(document.getElementById("ajaxRegisterResponse").innerHTML);
 																		$("#forRegisterRefresh").html(document.getElementById("ajaxRegisterResponse").innerHTML);																		
 																		$("#hiddenAjaxResponseToParse").html("");
-																		$("input, textarea").placeholder(); //Placeholder desteklemeyen browserlar icin																		
+																		$("input, textarea").placeholder(); //Placeholder desteklemeyen browserlar icin	
+
+																		if(bRegisterFormNameErrorExists)
+																		{
+																			$("#RegisterForm_name").tooltipster("show");
+																		}
+																		
+																		if(bRegisterFormLastNameErrorExists)
+																		{
+																			$("#RegisterForm_lastName").tooltipster("show");
+																		}
+																		
+																		if(bRegisterFormEmailErrorExists)
+																		{
+																			$("#RegisterForm_email").tooltipster("show");
+																		}
+																		
+																		if(bRegisterFormEmailAgainErrorExists)
+																		{
+																			 $("#RegisterForm_emailAgain").tooltipster("show");
+																		}
+																		
+																		if(bRegisterFormPasswordErrorExists)
+																		{
+																			$("#registerPasswordField").tooltipster("show");
+																		}
+																		
+																		if(bRegisterFormPasswordAgainErrorExists)
+																		{
+																			$("#registerPasswordAgainField").tooltipster("show");
+																		}
 													
 // 																		$("#forRegisterRefresh").html(msg);
 // 																		setTimeout(function(){document.getElementById("registerButton").className = "btn btn-green btn-green-a icon-signup";}, 10);

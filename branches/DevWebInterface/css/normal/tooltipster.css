@@ -1,7 +1,3 @@
-html {
-	 -webkit-font-smoothing: antialiased;
-}
-
 /* This is the default Tooltipster theme (feel free to modify or duplicate and create multiple themes!): */
 .tooltipster-default {
 	border-radius: 5px; 
@@ -62,13 +58,13 @@ html {
 	padding: 8px 10px;
 }
 
-.tooltipster-success {
+.tooltipster-warning {
 	border-radius: 0px; 
-	border: 3px solid #4CC417;
-	background: #e7fbdf;
+	border: 3px solid #FF7F00;
+	background: #fff2e5;
 	color: #2c2c2c;
 }
-.tooltipster-success .tooltipster-content {
+.tooltipster-warning .tooltipster-content {
 	font-family: Arial,Helvetica,sans-serif;
 	font-size: 12px;
 	letter-spacing: 0px;
@@ -101,8 +97,10 @@ html {
 	font-size: 0;
 	line-height: 0;
 	position: absolute;
-/* 	z-index: 9999999; */
-	z-index: 500;
+	left: 0;
+	top: 0;
+	/* z-index: 9999999; */
+	z-index: 500; /*ADNAN*/
 	pointer-events: none;
 	width: auto;
 	overflow: visible;
@@ -110,6 +108,7 @@ html {
 .tooltipster-base .tooltipster-content {
 	overflow: hidden;
 }
+
 
 /* These next classes handle the styles for the little arrow attached to the tooltip. By default, the arrow will inherit the same colors and border as what is set on the main tooltip itself. */
 .tooltipster-arrow {

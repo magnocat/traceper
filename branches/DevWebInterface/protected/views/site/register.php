@@ -72,6 +72,8 @@
 				 interactive: true,
 				 offsetX: -10,
          	 });
+
+			bindTooltipActions(); //bindings.js'teki gecersiz domain olma kontrolunun register dosyasindaki fieldlar icin de calismasi icin yenide cagirilir      	 
 		</script>
 
 		<div class="sideMenu">
@@ -95,7 +97,7 @@
 					<script type="text/javascript">
 						bRegisterFormNameErrorExists = true;	
 		            	$("#RegisterForm_name").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-			            $("#RegisterForm_name").tooltipster('show');					
+			            //$("#RegisterForm_name").tooltipster('show');					
 					</script>
 					<?php				
 				}
@@ -121,7 +123,7 @@
 					<script type="text/javascript">
 						bRegisterFormLastNameErrorExists = true;
 		            	$("#RegisterForm_lastName").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-			            $("#RegisterForm_lastName").tooltipster('show');					
+			            //$("#RegisterForm_lastName").tooltipster('show');					
 					</script>
 					<?php				
 				}
@@ -140,6 +142,16 @@
 					<script type="text/javascript">
 						bRegisterFormEmailErrorExists = false;
 						$("#RegisterForm_email").tooltipster('hide');
+
+						if(bRegisterFormEmailWarningExists)
+						{
+							$("#RegisterForm_email").addClass("warning");
+						}
+						else
+						{
+							$("#RegisterForm_email").removeClass("warning");
+						}
+						
 					</script>
 					<?php				
 				}
@@ -158,7 +170,7 @@
 	  					bRegisterFormEmailErrorExists = true;	
 	  		            	
 	  		            $("#RegisterForm_email").tooltipster('update', '<?php echo Yii::t('site', 'Your registration incomplete, please first complete it by clicking the link at the activation e-mail. If you have not received our activation e-mail, click {activationNotReceivedClickHere} to request a new one.', array('{activationNotReceivedClickHere}' => $link)); ?>');		  		            	
-	  			        $("#RegisterForm_email").tooltipster('show');					
+	  			        //$("#RegisterForm_email").tooltipster('show');					
 	  				</script>
 	  				<?php						  	 
 			  	}			
@@ -170,7 +182,7 @@
 					<script type="text/javascript">
 						bRegisterFormEmailErrorExists = true;				
 			            $("#RegisterForm_email").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-			            $("#RegisterForm_email").tooltipster('show');					
+			            //$("#RegisterForm_email").tooltipster('show');					
 					</script>				
 					<?php				
 				}
@@ -197,7 +209,7 @@
 					<script type="text/javascript">
 						bRegisterFormEmailAgainErrorExists = true;
 		                $("#RegisterForm_emailAgain").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-			            $("#RegisterForm_emailAgain").tooltipster('show');					
+			            //$("#RegisterForm_emailAgain").tooltipster('show');					
 					</script>				
 					<?php			
 				}
@@ -225,7 +237,7 @@
 				<script type="text/javascript">
 					bRegisterFormPasswordErrorExists = true;
 		            $("#registerPasswordField").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-		            $("#registerPasswordField").tooltipster('show');					
+		            //$("#registerPasswordField").tooltipster('show');					
 				</script>				
 				<?php			
 				}
@@ -252,7 +264,7 @@
 				<script type="text/javascript">
 					bRegisterFormPasswordAgainErrorExists = true;
 		            $("#registerPasswordAgainField").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-		            $("#registerPasswordAgainField").tooltipster('show');					
+		            //$("#registerPasswordAgainField").tooltipster('show');					
 				</script>				
 				<?php			
 				}

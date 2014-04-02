@@ -14,25 +14,25 @@
 			<!-- direk <div id="ajaxLoginResponse"> tag'inib icinde gonderilmesi gerekiyor, buton ajaxla yeniden yuklenmeyince  -->
 			<!-- multiple ajax problemi de olmadigindan uniqid() kullanmaya da gerek kalmiyor.  -->
 			<script type="text/javascript">
-				$("#LoginForm_email").tooltipster({
-					theme: ".tooltipster-error",
-					position: "bottom-right",
-					offsetY: 10,
-					trigger: "custom",
-					maxWidth: 300,
-					onlyOne: false,
-					interactive: true,
-				});
-						
-				$("#LoginForm_password").tooltipster({
-					theme: ".tooltipster-error",
-					position: "bottom-right",
-					offsetY: 10,
-					trigger: "custom",
-					maxWidth: 540,
-					onlyOne: false,
-					interactive: true,
-				});
+			$("#LoginForm_email").tooltipster({
+				theme: ".tooltipster-error",
+				position: "bottom-right",
+				offsetY: 10,
+				trigger: "custom",
+				maxWidth: 300,
+				onlyOne: false,
+				interactive: true
+			});
+					
+			$("#LoginForm_password").tooltipster({
+				theme: ".tooltipster-error",
+				position: "bottom-right",
+				offsetY: 10,
+				trigger: "custom",
+				maxWidth: 208,
+				onlyOne: false,
+				interactive: true
+			});
 			</script>				
 		
 			<div id="loginEmail" class="upperMenu">
@@ -66,7 +66,7 @@
 		  						bLoginFormEmailErrorExists = true;	
 		  		            	
 		  		            	$("#LoginForm_email").tooltipster('update', '<?php echo Yii::t('site', 'Your registration incomplete, please first complete it by clicking the link at the activation e-mail. If you have not received our activation e-mail, click {activationNotReceivedClickHere} to request a new one.', array('{activationNotReceivedClickHere}' => $link)); ?>');		  		            	
-		  			            $("#LoginForm_email").tooltipster('show');					
+		  			            //$("#LoginForm_email").tooltipster('show');					
 		  					</script>
 		  					<?php						  	 
 						  }
@@ -76,9 +76,9 @@
 						  	
 						  	?>
 			  				<script type="text/javascript">
-			  				bLoginFormEmailErrorExists = true;
+			  					bLoginFormEmailErrorExists = true;
 			  		            $("#LoginForm_email").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-			  		            $("#LoginForm_email").tooltipster('show');					
+			  		            //$("#LoginForm_email").tooltipster('show');					
 			  				</script>				
 			  				<?php						  	
 						  }
@@ -117,9 +117,8 @@
 						  	?>
   			  				<script type="text/javascript">
   			  					bLoginFormPasswordErrorExists = true;	
-  			  		            //$("#LoginForm_password").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
-  			  		        	$("#LoginForm_password").tooltipster('update', '<?php echo $errorMessage; ?>');
-  			  			        $("#LoginForm_password").tooltipster('show');					
+  			  		            $("#LoginForm_password").tooltipster('update', "<?php echo strip_tags($errorMessage); ?>");
+  			  			        //$("#LoginForm_password").tooltipster('show');					
   			  				</script>
   			  				<?php						  	 
 						  }

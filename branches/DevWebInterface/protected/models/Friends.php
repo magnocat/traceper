@@ -231,7 +231,7 @@ class Friends extends CActiveRecord
 		FROM '. Friends::model()->tableName() . ' f
 		LEFT JOIN ' . Users::model()->tableName() . ' u
 		ON u.Id = f.friend1
-		WHERE friend2='. $userId .' AND status= 0'  ;
+		WHERE friend2='. $userId .' AND status= 0';
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
@@ -243,6 +243,43 @@ class Friends extends CActiveRecord
 				'pagination'=>array(
 						'pageSize'=>$pageSize,
 				),
+		));
+	
+		return $dataProvider;
+	}
+	
+	public function getNewFriendRequestDataProvider($userId, $pageSize) {
+		// we look at the friend2 field because requester id is stored in friend1 field
+		// and only friend who has been requested to be a friend can approve frienship
+		$sqlCount = 'SELECT count(*)
+			FROM '. Friends::model()->tableName() . ' f
+			WHERE friend2 = '.$userId.'
+			AND status= 0 AND isNew = 1';
+	
+		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
+	
+		/**
+		 * because we use same view in listing users, we put requester field as false
+		 * to make view show approve link,
+		 * requester who make friend request cannot approve request
+		 */
+		$sql = 'SELECT u.Id as id, u.userType as userType, u.realname as Name, f.status, u.fb_id, u.profilePhotoStatus, u.account_type,
+			false as requester
+			FROM '. Friends::model()->tableName() . ' f
+			LEFT JOIN ' . Users::model()->tableName() . ' u
+			ON u.Id = f.friend1
+			WHERE friend2='. $userId .' AND status= 0 AND isNew = 1';
+	
+		$dataProvider = new CSqlDataProvider($sql, array(
+					'totalItemCount'=>$count,
+					'sort'=>array(
+							'attributes'=>array(
+									'id', 'Name',
+		),
+		),
+					'pagination'=>array(
+							'pageSize'=>$pageSize,
+		),
 		));
 	
 		return $dataProvider;
