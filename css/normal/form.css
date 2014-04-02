@@ -110,6 +110,19 @@ div.form select.error
 	margin: 8px 0px 3px 0px;
 }
 
+div.form div.warning input,
+div.form div.warning textarea,
+div.form div.warning select,
+div.form input.warning,
+div.form textarea.warning,
+div.form select.warning
+{
+	background: #fff2e5;
+	border-color: #FF7F00;
+/* 	margin: 0.2em 0 0.4em 0; adnan: Hata alinca text field'in border'i kalinlastigindan margin'i hala ayni kalinca asagidaki elemanlar az asagi kayiyordu, hic kaymamasi icin konuldu. */
+	margin: 8px 0px 3px 0px;
+}
+
 div.form div.success input,
 div.form div.success textarea,
 div.form div.success select,

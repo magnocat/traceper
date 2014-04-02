@@ -129,7 +129,10 @@ class UsersController extends Controller
 					$longitude = round((float) $_REQUEST['longitude'], 6);
 					$altitude = round((float) $_REQUEST['altitude'], 6);
 					$deviceId = $_REQUEST['deviceId'];
-					$calculatedTime = date('Y-m-d H:i:s',  $_REQUEST['time']);
+					$calculatedTime = date('Y-m-d H:i:s', $_REQUEST['time']);
+					$arrivedTime = date('Y-m-d H:i:s');
+					
+					//Fb::warn("lat:$latitude, lon:$longitude, al:$altitude, ct:$calculatedTime, at:$arrivedTime", "actionTakeMyLocation()");
 						
 					if (Yii::app()->user->id != false)
 					{
@@ -155,7 +158,7 @@ class UsersController extends Controller
 								
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
 							
-							$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+							$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 								
 							//Address info is also updated with location info if the distance difference is high enough
 							if ($updatedRowCount > 0)
@@ -164,7 +167,7 @@ class UsersController extends Controller
 							}
 							else
 							{
-								$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 								$message = '';
 								
 								if ($updatedRowCount > 0)
@@ -186,7 +189,7 @@ class UsersController extends Controller
 								$message .= 'adress:'.$address.'<br/>';
 								$message .= 'country:'.$country.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error in actionTakeMyLocation()', $message);								
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error (Users-updateLocationWithAddress) in actionTakeMyLocation()', $message);								
 							}
 								
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
@@ -202,24 +205,42 @@ class UsersController extends Controller
 								//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
 									
 								//$result = "0"; //Error occured in save operation
+								
+								$message = "Error occured during location save operation to UserWasHere table!";
+								
+								$message .= '<br/><br/>';
+								$message .= 'latitude:'.$latitude.'<br/>';
+								$message .= 'longitude:'.$longitude.'<br/>';
+								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'deviceId:'.$deviceId.'<br/>';
+								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$this->sendErrorMail('userWasHereLogLocationError', 'Error (UserWasHere-logLocation) in actionTakeMyLocation()', $message);								
 							}
 						}
 						else
 						{
-							$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+							//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 							
 							//Only location info (without address info) is updated if the distance difference is smaller than the threshold
-							if ($updatedRowCount > 0)
+							//if ($updatedRowCount > 0)
+							if(true == $updateLocationResult)
 							{
 								$result = "1"; //Location updated successfully
+								
+								//Fb::warn('Location updated successfully', "actionTakeMyLocation()");
 							}
 							else
 							{
+								//Fb::warn('Location CANNOT be updated!', "actionTakeMyLocation()");
+								
 								//Veritabanı ilk seferde guncellenemezse ikinci kez dene
-								$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+								//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 								$message = '';
 								
-								if ($updatedRowCount > 0)
+								//if ($updatedRowCount > 0)
+								if(true == $updateLocationResult)
 								{
 									$result = "1"; //Location updated successfully
 									$message = "Error occured at 1. time while location(without address) save operation, but update is successful at 2. time!";
@@ -236,7 +257,7 @@ class UsersController extends Controller
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error in actionTakeMyLocation()', $message);								
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error (Users-updateLocation) in actionTakeMyLocation()', $message);								
 							}
 						}
 					}
@@ -252,7 +273,53 @@ class UsersController extends Controller
 				{
 					$result = "-2"; //Missing Parameter
 			
-					$message = "Missing Parameter";
+					$message = '"Missing Parameter" error occured:'.'<br/><br/>';
+					
+					if(isset($_REQUEST['latitude']) == false)
+					{
+						$message .= '"latitude" is missing!'.'<br/>';						
+					}
+					else if($_REQUEST['latitude'] == NULL)
+					{
+						$message .= '"latitude" is  NULL!'.'<br/>';						
+					}
+
+					if(isset($_REQUEST['longitude']) == false)
+					{
+						$message .= '"longitude" is missing!'.'<br/>';
+					}
+					else if($_REQUEST['longitude'] == NULL)
+					{
+						$message .= '"longitude" is  NULL!'.'<br/>';
+					}
+
+					if(isset($_REQUEST['altitude']) == false)
+					{
+						$message .= '"altitude" is missing!'.'<br/>';
+					}
+					else if($_REQUEST['altitude'] == NULL)
+					{
+						$message .= '"altitude" is  NULL!'.'<br/>';
+					}					
+					
+					if(isset($_REQUEST['deviceId']) == false)
+					{
+						$message .= '"deviceId" is missing!'.'<br/>';
+					}
+					else if($_REQUEST['deviceId'] == NULL)
+					{
+						$message .= '"altitude" is  NULL!'.'<br/>';
+					}					
+					
+					if(isset($_REQUEST['time']) == false)
+					{
+						$message .= '"time" is missing!'.'<br/>';
+					}
+					else if($_REQUEST['time'] == NULL)
+					{
+						$message .= '"time" is  NULL!'.'<br/>';
+					}					
+
 					$this->sendErrorMail('takeMyLocationMissingParameter', 'Error in actionTakeMyLocation()', $message);
 				}
 			}
@@ -313,8 +380,9 @@ class UsersController extends Controller
 				$altitude = 0;
 			}
 				
+			$date = date('Y-m-d H:i:s');
 			$this->getaddress($latitude, $longitude, $address, $country);			
-			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebGeolocation,  Yii::app()->user->id);			
+			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);			
 		}		
 	}
 
@@ -876,8 +944,28 @@ class UsersController extends Controller
 	
 	public function actionGetFriendRequestListJson(){		
 		
-		$dataProvider = Friends::model()->getFriendRequestDataProvider(Yii::app()->user->id, Yii::app()->params->itemCountInOnePage);
+		$callFor = null;
+		$dataProvider = null;
 		
+		if(isset($_REQUEST['callFor']) && ($_REQUEST['callFor'] != NULL))
+		{
+			$callFor = $_REQUEST['callFor'];
+		}
+		else
+		{
+			//Uygulama guncellenince buraya hata maili eklenecek				
+		}
+		
+		if($callFor == "notification")
+		{
+			$dataProvider = Friends::model()->getNewFriendRequestDataProvider(Yii::app()->user->id, Yii::app()->params->itemCountInOnePage);
+		}
+		else
+		{
+			Friends::model()->updateAll(array('isNew' => 0), 'friend2 = '.Yii::app()->user->id.' AND status = 0 AND isNew = 1');
+			$dataProvider = Friends::model()->getFriendRequestDataProvider(Yii::app()->user->id, Yii::app()->params->itemCountInOnePage);
+		}
+
 		$out = $this->prepareSearchUserResultJson($dataProvider);
 		//$out = $this-> prepareJson($sql, "userSearch" ,$userId);
 		echo $out;
