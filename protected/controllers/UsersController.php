@@ -759,11 +759,11 @@ class UsersController extends Controller
 			$pageNo = 1;
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int) $_REQUEST['pageNo'];
-				Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
+				//Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
 			}
 			else
 			{
-				Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
+				//Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
 			}
 			
 			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
@@ -773,7 +773,7 @@ class UsersController extends Controller
 				
 			$out = $this->preparePastPointsJson($dataProvider);
 			
-			Fb::warn($out, "actionGetUserPastPointsJSON()");
+			//Fb::warn($out, "actionGetUserPastPointsJSON()");
 		}
 		
 		echo $out;
@@ -1749,13 +1749,7 @@ class UsersController extends Controller
 
 			if(Yii::app()->language == 'tr')
 			{
-				//$timestamp = strtotime($rows[$i]['dataArrivedTime']);
 				$rows[$i]['dataArrivedTime'] = strftime("%d ", $dataArrivedTimestamp).Yii::t('common', strftime("%b", $dataArrivedTimestamp)).strftime(" %Y %H:%M:%S", $dataArrivedTimestamp);
-				
-				//Fb::warn("timeAgo:".$this->get_timeago($timestamp), "preparePastPointsJson()");
-				//Fb::warn("timestamp:".$timestamp, "preparePastPointsJson()");
-			
-				//$timestamp = strtotime($rows[$i]['dataCalculatedTime']);
 				$rows[$i]['dataCalculatedTime'] = strftime("%d ", $dataCalculatedTimestamp).Yii::t('common', strftime("%b", $dataCalculatedTimestamp)).strftime(" %Y %H:%M:%S", $dataCalculatedTimestamp);
 			}			
 			
