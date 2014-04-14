@@ -19,6 +19,8 @@ MapStruct.Location = function (){
 MapStruct.MapMarker = function(){
 	var marker;
 	var infoWindow;
+	var point;
+	var pointAdded;
 	
 	for (var n in arguments[0]) { 
 		this[n] = arguments[0][n]; 

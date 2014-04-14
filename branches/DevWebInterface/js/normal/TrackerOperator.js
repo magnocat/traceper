@@ -12,11 +12,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.fetchPhotosInInitialization = Number(fetchPhotosInInitial);
 	this.updateFriendListPageNo = 1;
 	this.updateFriendListPageCount = 0;
-	this.pastPointsPageNo = 0;
+	this.pastPointsPageNo = []; //this.pastPointsPageNo = 0;
 	//page no initial value is important
 	this.bgImageListPageNo = 1;
 	this.bgImageListPageCount = 0;
-	this.pastPointsPageCount = null;
+	this.pastPointsPageCount = []; //this.pastPointsPageCount = null;
+	this.bAllLinesCleared = [];
 	this.updateInterval = interval;
 	this.timer;
 	this.imageTimer;
@@ -599,35 +600,60 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.drawTraceLine = function(userId, pageNo, callback) 
 	{
+		//alert("drawTraceLine() called with pageNo:" + pageNo);
+		
 		// hide any polyline if it is drawed
 		if (TRACKER.traceLineDrawedUserId != null &&
-				userId != TRACKER.traceLineDrawedUserId &&
+				//userId != TRACKER.traceLineDrawedUserId &&
 				typeof TRACKER.users[TRACKER.traceLineDrawedUserId].polyline != "undefined")
 		{			
-			TRACKER.clearTraceLines(TRACKER.traceLineDrawedUserId);
-		}		
-		if (typeof TRACKER.users[userId].polyline == "undefined" ||
-				pageNo > TRACKER.pastPointsPageNo ) 
+			//TRACKER.clearTraceLines(TRACKER.traceLineDrawedUserId);
+			
+			//alert("drawTraceLine - 1");
+		}
+		
+		if(TRACKER.pastPointsPageNo[userId] == undefined)
 		{
-			if (pageNo > TRACKER.pastPointsPageCount) {
-				
-			}
-			var jsonparams = "r=users/getUserPastPointsJSON&userId=" + userId + "&page=" + pageNo;
+			TRACKER.pastPointsPageNo[userId] = 0;
+		}		
+
+		if (typeof TRACKER.users[userId].polyline == "undefined" ||
+				pageNo > TRACKER.pastPointsPageNo[userId] ) 
+		{
+			//alert("drawTraceLine - 2 if(undefined) - pastPointsPageNo[userId]:" + TRACKER.pastPointsPageNo[userId]);
+			
+//			if (pageNo > TRACKER.pastPointsPageCount[userId]) {
+//				
+//			}
+			
+			var jsonparams = "r=users/getUserPastPointsJSON&userId=" + userId + "&pageNo=" + pageNo;
 			
 			TRACKER.ajaxReq(jsonparams, function(obj){
 				try
 				{
 					//var obj = $.parseJSON(result);
 
-					TRACKER.pastPointsPageNo =  obj.pageNo;
-					TRACKER.pastPointsPageCount =  obj.pageCount;
+					TRACKER.pastPointsPageNo[userId] =  obj.pageNo;
+					TRACKER.pastPointsPageCount[userId] =  obj.pageCount;
 					
-					var str = processUserPastLocations(MAP, obj.userwashere, userId);
+					if(obj.userwashere.length > 0)
+					{
+						processUserPastLocations(MAP, obj.userwashere, userId);
+						TRACKER.bAllLinesCleared[userId] = false;
 
-					if (typeof callback == "function") {
-						callback();
+						if (typeof callback == "function") {
+							callback();
+						}						
 					}
-					
+					else if(1 == pageNo) //Daha ilk sayfada bile hic past point yoksa
+					{
+						TRACKER.showMessageDialog(TRACKER.langOperator.noPastDataAvailable);
+					}
+					else
+					{
+						TRACKER.showMessageDialog(TRACKER.langOperator.noMorePastDataAvailable);
+					}
+
 					if(exceptionForParamsMap['getUserPastPointsJSON'] > 5)
 					{
 						  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +
@@ -680,6 +706,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}, true);			
 		}
 		else {			
+			//alert("drawTraceLine - 3 else(undefined)");
+			
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			
 			for (var i in TRACKER.users[userId].mapMarker) { 
@@ -702,10 +730,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				if (TRACKER.users[userId].mapMarker[i].marker != null) {
 					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
+					TRACKER.users[userId].mapMarker[i].pointAdded = false;
 					TRACKER.users[userId].infoWindowIsOpened = false;
 					
 				}
 			}
+			
+			MAP.removePolyline(TRACKER.users[userId].polyline);
+			delete TRACKER.users[userId].polyline;
+			TRACKER.users[userId].polyline = null;
+			TRACKER.bAllLinesCleared[userId] = true;
 		}
 	};
 	
@@ -781,17 +815,38 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	 * this function is used to open info windows of markers when next point or
 	 * previous point are clicked.
 	 */
-	this.showPointGMarkerInfoWin = function(currentMarkerIndex,nextMarkerIndex, userId){
+	this.showPointGMarkerInfoWin = function(currentMarkerIndex, nextMarkerIndex, userId){
+
+		if(TRACKER.bAllLinesCleared[userId] == undefined)
+		{
+			TRACKER.bAllLinesCleared[userId] = true;
+		}
 		
-		if (typeof TRACKER.users[userId].mapMarker == "undefined" ||	
-				typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined") 
+		//alert("showPointGMarkerInfoWin - TRACKER.bAllLinesCleared[userId]:" + TRACKER.bAllLinesCleared[userId]);
+		
+		//if (typeof TRACKER.users[userId].mapMarker == "undefined" || typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined")
+		if(true == TRACKER.bAllLinesCleared[userId])	
 		{ 
-			if (nextMarkerIndex == "1") {
-				TRACKER.pastPointsPageNo = 0;
-			}
-			var reqPageNo = Number(TRACKER.pastPointsPageNo) + 1;
+			//alert("showPointGMarkerInfoWin - if");
 			
-			if (TRACKER.pastPointsPageCount == null || reqPageNo <= TRACKER.pastPointsPageCount) {
+			if (nextMarkerIndex == "0") {
+				TRACKER.pastPointsPageNo[userId] = 0;
+			}
+			else if(TRACKER.pastPointsPageNo[userId] == undefined)
+			{
+				TRACKER.pastPointsPageNo[userId] = 0;
+			}
+			
+			var reqPageNo = Number(TRACKER.pastPointsPageNo[userId]) + 1;
+			
+			if(TRACKER.pastPointsPageCount[userId] == undefined)
+			{
+				TRACKER.pastPointsPageCount[userId] = null;
+			}
+
+			//alert("pastPointsPageCount:" + TRACKER.pastPointsPageCount[userId] + " - reqPageNo:" + reqPageNo);
+			
+			if (TRACKER.pastPointsPageCount[userId] == null || reqPageNo <= TRACKER.pastPointsPageCount[userId]) {
 				TRACKER.drawTraceLine(userId, reqPageNo, function(){
 					// if it goes into this if statement it means that there is no available
 					// past point in database
@@ -805,23 +860,33 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					else {
 						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
 						TRACKER.users[userId].infoWindowIsOpened = false;
+						MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
+						
+						if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
+						{
+							MAP.addPointToPolyline(TRACKER.users[userId].polyline, TRACKER.users[userId].mapMarker[nextMarkerIndex].point);
+							TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded = true;
+						}
+						
 						MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, 'click');
-					}			
-
+					}
 				});
 			}
 			else {
-				TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
-				
+				//TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+				TRACKER.showMessageDialog(TRACKER.langOperator.noMorePastDataAvailable);				
 			}
 		}
 		else if (TRACKER.users[userId].mapMarker[nextMarkerIndex] == null){
-			TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+			//TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+			TRACKER.showMessageDialog(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {
-			if (nextMarkerIndex == "1") {
-				nextMarkerIndex = 0;
-			}			
+			//alert("showPointGMarkerInfoWin - else");
+			
+//			if (nextMarkerIndex == "1") {
+//				nextMarkerIndex = 0;
+//			}			
 			
 			if (userId != TRACKER.traceLineDrawedUserId ) // ||
 			{				
@@ -833,6 +898,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
 			TRACKER.users[userId].infoWindowIsOpened = false;
+			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
+			
+			if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
+			{
+				MAP.addPointToPolyline(TRACKER.users[userId].polyline, TRACKER.users[userId].mapMarker[nextMarkerIndex].point);
+				TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded = true;
+			}
+
 			MAP.trigger(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, "click");			
 		}
 	}

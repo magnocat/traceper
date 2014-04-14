@@ -157,7 +157,7 @@ function MapOperator(lang) {
 //		return marker;
 //	}
 	
-	MAP_OPERATOR.putMarker = function(location, image, visible, toBeScaled) {
+	MAP_OPERATOR.putMarker = function(location, image, visible, toBeScaled, offsetX, offsetY) {
  
 	    var pinImage = null;
 	    
@@ -167,15 +167,21 @@ function MapOperator(lang) {
 		    		image,
 		    	    null, /* size is determined at runtime */
 		    	    null, /* origin is 0,0 */
-		    	    null, /* anchor is bottom center of the scaled image */
+		    	    new google.maps.Point(offsetX, offsetY),
 		    	    new google.maps.Size(33, 36) //scaledSize
 		    	);	    	
 	    }
 	    else
 	    {
-	    	pinImage = {
-	    		url: image
-	    	};	    	
+//	    	pinImage = {
+//	    		url: image
+//	    	};
+	    	
+		    pinImage = new google.maps.MarkerImage(
+		    		image,
+	                null, /* size is determined at runtime */
+	                null, /* origin is 0,0 */
+	                new google.maps.Point(offsetX, offsetY));		    
 	    }
 
 		if (typeof(visible) == "undefined") {
@@ -328,7 +334,13 @@ function MapOperator(lang) {
 		var location = new google.maps.LatLng(loc.latitude, loc.longitude);
 
 		path.push(location);
+		
+		//alert("addPointToPolyline() called");
 	}
+	
+	MAP_OPERATOR.removePolyline = function(poly) {
+		poly.setMap(null);
+	}	
 
 	/*
 	 * insert point to the polyline at specified index 

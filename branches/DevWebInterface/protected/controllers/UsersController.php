@@ -118,11 +118,11 @@ class UsersController extends Controller
 		{
 			//if(Yii::app()->request->isPostRequest)
 			{
-				if (isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
-						&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
-						&& isset($_REQUEST['altitude']) && $_REQUEST['altitude'] != NULL
-						&& isset($_REQUEST['deviceId']) && $_REQUEST['deviceId'] != NULL
-						&& isset($_REQUEST['time']) && $_REQUEST['time'] != NULL
+				if (isset($_REQUEST['latitude']) && ($_REQUEST['latitude'] != NULL)
+						&& isset($_REQUEST['longitude']) && ($_REQUEST['longitude'] != NULL)
+						&& isset($_REQUEST['altitude']) && ($_REQUEST['altitude'] != NULL)
+						&& isset($_REQUEST['deviceId']) && ($_REQUEST['deviceId'] != NULL)
+						&& isset($_REQUEST['time']) && ($_REQUEST['time'] != NULL)
 				)
 				{
 					$latitude = round((float) $_REQUEST['latitude'], 6);
@@ -759,6 +759,11 @@ class UsersController extends Controller
 			$pageNo = 1;
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int) $_REQUEST['pageNo'];
+				Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
+			}
+			else
+			{
+				Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
 			}
 			
 			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
@@ -767,7 +772,10 @@ class UsersController extends Controller
 			$dataProvider = UserWasHere::model()->getPastPointsDataProvider($userId, $pageNo, Yii::app()->params->itemCountInDataListPage);
 				
 			$out = $this->preparePastPointsJson($dataProvider);
+			
+			Fb::warn($out, "actionGetUserPastPointsJSON()");
 		}
+		
 		echo $out;
 	}
 	
@@ -1686,6 +1694,37 @@ class UsersController extends Controller
 		return $str;
 	}
 	
+	private function get_timeago($ptime)
+	{
+		$etime = time() - $ptime;
+	
+		if( $etime < 1 )
+		{
+			return Yii::t('users', 'less than 1 second ago');
+			//return 'less than 1 second ago';
+		}
+	
+		$a = array( 12 * 30 * 24 * 60 * 60  => Yii::t('users', 'year'),
+		30 * 24 * 60 * 60       => Yii::t('users', 'month'),
+		24 * 60 * 60            => Yii::t('users', 'day'),
+		60 * 60             => Yii::t('users', 'hour'),
+		60                  => Yii::t('users', 'minute'),
+		1                   => Yii::t('users', 'second')
+		);
+		
+		foreach( $a as $secs => $str )
+		{
+			$d = $etime / $secs;
+	
+			if( $d >= 1 )
+			{
+				$r = round( $d );
+				return $r . ' ' . $str . ( $r > 1 ? Yii::t('common', 'plural') : '' ) . ' ' .Yii::t('users', 'ago');
+				//return $r . ' ' . $str . ( $r > 1 ? 's' : '' ) . ' ' .'ago';
+			}
+		}
+	}	
+	
 	private function preparePastPointsJson($dataProvider) {
 		$rows = $dataProvider->getData();
 		$itemCount = count($rows);
@@ -1704,14 +1743,20 @@ class UsersController extends Controller
 			if ($i > 0) {
 				$str .= ',';
 			}
+			
+			$dataArrivedTimestamp = strtotime($rows[$i]['dataArrivedTime']);
+			$dataCalculatedTimestamp = strtotime($rows[$i]['dataCalculatedTime']);
 
 			if(Yii::app()->language == 'tr')
 			{
-				$timestamp = strtotime($rows[$i]['dataArrivedTime']);
-				$rows[$i]['dataArrivedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+				//$timestamp = strtotime($rows[$i]['dataArrivedTime']);
+				$rows[$i]['dataArrivedTime'] = strftime("%d ", $dataArrivedTimestamp).Yii::t('common', strftime("%b", $dataArrivedTimestamp)).strftime(" %Y %H:%M:%S", $dataArrivedTimestamp);
+				
+				//Fb::warn("timeAgo:".$this->get_timeago($timestamp), "preparePastPointsJson()");
+				//Fb::warn("timestamp:".$timestamp, "preparePastPointsJson()");
 			
-				$timestamp = strtotime($rows[$i]['dataCalculatedTime']);
-				$rows[$i]['dataCalculatedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+				//$timestamp = strtotime($rows[$i]['dataCalculatedTime']);
+				$rows[$i]['dataCalculatedTime'] = strftime("%d ", $dataCalculatedTimestamp).Yii::t('common', strftime("%b", $dataCalculatedTimestamp)).strftime(" %Y %H:%M:%S", $dataCalculatedTimestamp);
 			}			
 			
 			$str .= CJSON::encode(array(
@@ -1721,6 +1766,7 @@ class UsersController extends Controller
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
 					    'locationSource'=>$rows[$i]['locationSource'],
 						'time'=>$rows[$i]['dataArrivedTime'],
+						'timeAgo'=>$this->get_timeago($dataArrivedTimestamp),
 						'deviceId'=>$rows[$i]['deviceId'],
 				));
 		}

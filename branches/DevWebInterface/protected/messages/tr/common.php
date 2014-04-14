@@ -58,7 +58,7 @@ return array(
 	'Dec' => 'Ara',
 	'here' => 'buradan',
 	'Your settings have been saved.' => 'Ayarlarınız kaydedilmiştir.',
-											
+	'plural' => ' '
 );
 
 
