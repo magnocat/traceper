@@ -25,6 +25,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.showImagesOnTheMap = true;
 	this.showUsersOnTheMap = false;
 	
+	this.monthNames = [];
+	
 	this.showImagesOnTheMapJustToggled = false;
 	/*
 	 * After all users info is got, only users whose location changed is queried every
@@ -57,8 +59,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var realname;
 		var latitude;
 		var longitude;
+		var address;
 		var friendshipStatus;
 		var time;
+		var locationTimeStamp;
 		var deviceId;
 		var message;
 		var mapMarker;
@@ -92,7 +96,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 	
 	this.setLangOperator = function(langOperator) {
-		TRACKER.langOperator = langOperator;		
+		TRACKER.langOperator = langOperator;
+		
+		this.monthNames = [this.langOperator.jan, this.langOperator.feb, this.langOperator.mar, this.langOperator.apr, 
+		                   this.langOperator.may, this.langOperator.jun, this.langOperator.jul, this.langOperator.aug, 
+		                   this.langOperator.sep, this.langOperator.oct, this.langOperator.nov, this.langOperator.dec];
 	}
 	
 	this.updateFriendListWithDeletion = function(deletedFriendId){
@@ -825,7 +833,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		//alert("showPointGMarkerInfoWin - TRACKER.bAllLinesCleared[userId]:" + TRACKER.bAllLinesCleared[userId]);
 		
 		//if (typeof TRACKER.users[userId].mapMarker == "undefined" || typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined")
-		if(true == TRACKER.bAllLinesCleared[userId])	
+		if((true == TRACKER.bAllLinesCleared[userId]) || (typeof TRACKER.users[userId].mapMarker[nextMarkerIndex] == "undefined"))	
 		{ 
 			//alert("showPointGMarkerInfoWin - if");
 			
@@ -874,11 +882,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			}
 			else {
 				//TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+				//alert("noMorePastDataAvailable - 1");
 				TRACKER.showMessageDialog(TRACKER.langOperator.noMorePastDataAvailable);				
 			}
 		}
 		else if (TRACKER.users[userId].mapMarker[nextMarkerIndex] == null){
 			//TRACKER.showInfoBar(TRACKER.langOperator.noMorePastDataAvailable);
+			//alert("noMorePastDataAvailable - 2");
 			TRACKER.showMessageDialog(TRACKER.langOperator.noMorePastDataAvailable);
 		}
 		else {

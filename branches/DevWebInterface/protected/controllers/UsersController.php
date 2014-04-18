@@ -85,6 +85,25 @@ class UsersController extends Controller
 		
 		return $distance;
 	}
+
+	private function string2upper($str) {
+		$convertedString = null;
+		
+		if(Yii::app()->language == 'tr')
+		{
+			$str = str_replace(array('i', 'ı', 'ü', 'ğ', 'ş', 'ö', 'ç'), array('İ', 'I', 'Ü', 'Ğ', 'Ş', 'Ö', 'Ç'), $str);			
+		}
+		else
+		{
+			//Nothing to do special	
+		}
+		
+		$convertedString = strtoupper($str);
+		
+		return $convertedString;
+	}
+	
+	
 	
 	/*
 	 * check whether user guest or not (actually for checking whether session timed out or not)
@@ -114,6 +133,12 @@ class UsersController extends Controller
 		$result = null;
 		$message = null;
 		
+		//Bu degiskenleri fonksiyonun en sonunda result:1 ise gondereceginden burada tanimla
+		$minDistanceInterval = 0;
+		$minDataSentInterval = 0;
+		$address = null;
+		$country = null;				
+		
 		try
 		{
 			//if(Yii::app()->request->isPostRequest)
@@ -139,38 +164,41 @@ class UsersController extends Controller
 						$lastLatitude = 0;
 						$lastLongitude = 0;
 						$lastAltitude = 0;
-						$minDistanceInterval = 0;
-						$minDataSentInterval = 0;
+						$lastAddress = null;
 							
 						Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
-						UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude);
+						UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress);
 							
 						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 						$distanceInMs = $distanceInKms * 1000;
+						
+						$bLogAsPastLocation = false;
 							
 						//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
 						if($distanceInMs > $minDistanceInterval)
-						{
-							$address = null;
-							$country = null;
-								
+						{								
 							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
-								
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
 							
-							$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
-								
+							//Madem adres alindi, mevcut konum (Users tablosu) adres karsilastirmasi yapilmadan guncellensin
+							
+							//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+							
 							//Address info is also updated with location info if the distance difference is high enough
-							if ($updatedRowCount > 0)
+							//if ($updatedRowCount > 0)
+							if(true == $updateLocationResult)
 							{
 								$result = "1"; //Location updated successfully
 							}
 							else
 							{
-								$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 								$message = '';
-								
-								if ($updatedRowCount > 0)
+									
+								//if ($updatedRowCount > 0)
+								if(true == $updateLocationResult)
 								{
 									$result = "1"; //Location updated successfully
 									$message = "Error occured at 1. time while location(WITH address) save operation, but update is successful at 2. time!";
@@ -180,7 +208,7 @@ class UsersController extends Controller
 									$result = "0"; //Error occured in save operation
 									$message = "Error occured during location(WITH address) save operation to database (2 times)!";
 								}
-
+									
 								$message .= '<br/><br/>';
 								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
 								$message .= 'latitude:'.$latitude.'<br/>';
@@ -189,36 +217,23 @@ class UsersController extends Controller
 								$message .= 'adress:'.$address.'<br/>';
 								$message .= 'country:'.$country.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error (Users-updateLocationWithAddress) in actionTakeMyLocation()', $message);								
-							}
-								
-							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
-								
-							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime))
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error (Users-updateLocationWithAddress) in actionTakeMyLocation()', $message);
+							}							
+							
+							//Son gecmis izin adres bilgisi ile anlik adres bilgisi farkli ise yeni bir gecmis iz olarak kaydet
+							if(strncmp($lastAddress, $address, 300) != 0)
 							{
-								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
-									
-								//$result = "1"; //Values updated successfully
+								$bLogAsPastLocation = true;
 							}
 							else
 							{
-								//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
-									
-								//$result = "0"; //Error occured in save operation
-								
-								$message = "Error occured during location save operation to UserWasHere table!";
-								
-								$message .= '<br/><br/>';
-								$message .= 'latitude:'.$latitude.'<br/>';
-								$message .= 'longitude:'.$longitude.'<br/>';
-								$message .= 'altitude:'.$altitude.'<br/>';
-								$message .= 'deviceId:'.$deviceId.'<br/>';
-								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('userWasHereLogLocationError', 'Error (UserWasHere-logLocation) in actionTakeMyLocation()', $message);								
+								$bLogAsPastLocation = false;
 							}
 						}
 						else
 						{
+							$bLogAsPastLocation = false;
+							
 							//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 							
@@ -227,18 +242,18 @@ class UsersController extends Controller
 							if(true == $updateLocationResult)
 							{
 								$result = "1"; //Location updated successfully
-								
+									
 								//Fb::warn('Location updated successfully', "actionTakeMyLocation()");
 							}
 							else
 							{
 								//Fb::warn('Location CANNOT be updated!', "actionTakeMyLocation()");
-								
+									
 								//Veritabanı ilk seferde guncellenemezse ikinci kez dene
 								//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 								$message = '';
-								
+									
 								//if ($updatedRowCount > 0)
 								if(true == $updateLocationResult)
 								{
@@ -247,18 +262,52 @@ class UsersController extends Controller
 								}
 								else
 								{
-									$result = "0"; //Error occured in save operation										
+									$result = "0"; //Error occured in save operation
 									$message = "Error occured during location(without address) save operation to database (2 times)!";
 								}
-								
+									
 								$message .= '<br/><br/>';
 								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
-								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error (Users-updateLocation) in actionTakeMyLocation()', $message);								
+								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error (Users-updateLocation) in actionTakeMyLocation()', $message);
+							}							
+						}
+						
+						if(true == $bLogAsPastLocation)
+						{
+							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
+							
+							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country))
+							{
+								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
+							
+								//$result = "1"; //Values updated successfully
 							}
+							else
+							{
+								//Fb::warn('UserWasHere::model()->logLocation() ERROR', "UsersController");
+							
+								//$result = "0"; //Error occured in save operation
+							
+								$message = "Error occured during location save operation to UserWasHere table!";
+							
+								$message .= '<br/><br/>';
+								$message .= 'latitude:'.$latitude.'<br/>';
+								$message .= 'longitude:'.$longitude.'<br/>';
+								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'deviceId:'.$deviceId.'<br/>';
+								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$message .= 'address:'.$address.'<br/>';
+								$message .= 'country:'.$country.'<br/>';
+								$this->sendErrorMail('userWasHereLogLocationError', 'Error (UserWasHere-logLocation) in actionTakeMyLocation()', $message);
+							}							
+						}
+						else
+						{
+							//Ayni adres bilgisiyle yeni bir kayit olusturma	
 						}
 					}
 					else
@@ -329,28 +378,29 @@ class UsersController extends Controller
 				
 				// 			$message = "Not a POST request! Only post reequests are accepted";
 				// 			$this->sendErrorMail('Error in actionTakeMyLocation()', $message);
-				// 		}
-			
-			$resultArray = array("result"=>$result);
-			
-			if($result == "1") {
-				$resultArray = array_merge($resultArray, array(
-						"minDataSentInterval"=>$minDataSentInterval,
-						"minDistanceInterval"=>$minDistanceInterval,
-				));
-			}
-			
-			echo CJSON::encode(
-					$resultArray
-			);		
+				// 		}					
 		}
 		catch(Exception $e)
 		{
+			$result = "-3"; //Exception occured
 			$message = $e->getMessage();
 				
-			$message = "Missing Parameter";
 			$this->sendErrorMail('takeMyLocationExceptionOccured', 'Exception occured in actionTakeMyLocation()', $message);
-		}		
+		}
+
+		$resultArray = array("result"=>$result);
+			
+		if($result == "1") {
+			$resultArray = array_merge($resultArray, array(
+					"minDataSentInterval"=>$minDataSentInterval,
+					"minDistanceInterval"=>$minDistanceInterval,
+					"address"=>$address
+			));
+		}
+			
+		echo CJSON::encode(
+				$resultArray
+		);		
 
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		Yii::app()->end();
@@ -592,6 +642,7 @@ class UsersController extends Controller
 	public function actionGetUserInfoJSON()
 	{
 		$out = "Missing parameter";
+		
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 			
 			//Adres bilgilerinin kullanici diline gore getirilmesi icin
@@ -616,11 +667,18 @@ class UsersController extends Controller
 				$dataProvider = Users::model()->getListDataProviderForJson($userId, null, null, null, 0, 1, 1);
 				$out = $this->prepareJson($dataProvider);
 			}
+			else
+			{
+				$out = "No permission to get this user location";
+				
+				$message = "No permission to get this user($userId) location (not the requester or one of his/her friends) !";
+				$this->sendErrorMail('getUserInfoJSON()', 'Error in actionGetUserInfoJSON()', $message);			
+			}			
 		}
 		else
 		{
 			$message = "Missing Parameter: 'userId' is missing!";
-			$this->sendErrorMail('getUserInfoJSONUserIdMissing', 'Error in actionGetUserInfoJSON()', $message);			
+			$this->sendErrorMail('getUserInfoJSON()', 'Error in actionGetUserInfoJSON()', $message);			
 		}
 
 		echo $out;
@@ -759,11 +817,11 @@ class UsersController extends Controller
 			$pageNo = 1;
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int) $_REQUEST['pageNo'];
-				//Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
+				Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
 			}
 			else
 			{
-				//Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
+				Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
 			}
 			
 			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
@@ -773,7 +831,7 @@ class UsersController extends Controller
 				
 			$out = $this->preparePastPointsJson($dataProvider);
 			
-			//Fb::warn($out, "actionGetUserPastPointsJSON()");
+			Fb::warn($out, "actionGetUserPastPointsJSON()");
 		}
 		
 		echo $out;
@@ -1738,7 +1796,9 @@ class UsersController extends Controller
 			$rows[$i]['dataArrivedTime'] = isset($rows[$i]['dataArrivedTime']) ? $rows[$i]['dataArrivedTime'] : null;
 			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
 			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
-			$rows[$i]['locationSource'] = isset($rows[$i]['locationSource']) ? $rows[$i]['locationSource'] : null;
+			//$rows[$i]['locationSource'] = isset($rows[$i]['locationSource']) ? $rows[$i]['locationSource'] : null;
+			$rows[$i]['address'] = isset($rows[$i]['address']) ? $rows[$i]['address'] : Yii::t('users', 'There is no address info');  
+			$rows[$i]['country'] = isset($rows[$i]['country']) ? $rows[$i]['country'] : null;
 			
 			if ($i > 0) {
 				$str .= ',';
@@ -1758,10 +1818,12 @@ class UsersController extends Controller
 						'longitude'=>$rows[$i]['longitude'],
 						'altitude'=>$rows[$i]['altitude'],
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
-					    'locationSource'=>$rows[$i]['locationSource'],
-						'time'=>$rows[$i]['dataArrivedTime'],
-						'timeAgo'=>$this->get_timeago($dataArrivedTimestamp),
+					    //'locationSource'=>$rows[$i]['locationSource'],
+						'time'=>$dataArrivedTimestamp,
+						'timestamp'=>$dataArrivedTimestamp,
+						//'timeAgo'=>$this->get_timeago($dataArrivedTimestamp),
 						'deviceId'=>$rows[$i]['deviceId'],
+						'address'=>$rows[$i]['address'].(($rows[$i]['country'] != null)?(' / '.$this->string2upper(Yii::t('countries', $rows[$i]['country']))):"")
 				));
 		}
 		
@@ -1798,13 +1860,13 @@ class UsersController extends Controller
 		
 		//Fb::warn($row['id'], "user");
 		
+		$dataArrivedTimestamp = strtotime($row['dataArrivedTime']);
+		$dataCalculatedTimestamp = strtotime($row['dataCalculatedTime']);		
+		
 		if(Yii::app()->language == 'tr')
 		{
-			$timestamp = strtotime($row['dataArrivedTime']);
-			$row['dataArrivedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
-
-			$timestamp = strtotime($row['dataCalculatedTime']);
-			$row['dataCalculatedTime'] = strftime("%d ", $timestamp).Yii::t('common', strftime("%b", $timestamp)).strftime(" %Y %H:%M:%S", $timestamp);
+			$row['dataArrivedTime'] = strftime("%d ", $dataArrivedTimestamp).Yii::t('common', strftime("%b", $dataArrivedTimestamp)).strftime(" %Y %H:%M:%S", $dataArrivedTimestamp);
+			$row['dataCalculatedTime'] = strftime("%d ", $dataCalculatedTimestamp).Yii::t('common', strftime("%b", $dataCalculatedTimestamp)).strftime(" %Y %H:%M:%S", $dataCalculatedTimestamp);
 		}
 				
 		$bsk=   CJSON::encode( array(
@@ -1814,10 +1876,12 @@ class UsersController extends Controller
 				'latitude'=>$row['latitude'],
 				'longitude'=>$row['longitude'],
 				'altitude'=>$row['altitude'],
-				'address'=>$row['lastLocationAddress'].' '.Yii::t('countries', $row['lastLocationCountry']),
+				'address'=>$row['lastLocationAddress'].' / '.$this->string2upper(Yii::t('countries', $row['lastLocationCountry'])),
 				'calculatedTime'=>$row['dataCalculatedTime'],
 				'locationSource'=>$row['locationSource'],
-				'time'=>$row['dataArrivedTime'],
+				//'time'=>$row['dataArrivedTime'],
+				'time'=>$dataArrivedTimestamp,
+				'timestamp'=>$dataArrivedTimestamp,
 				'message'=>$row['message'],
 				'status_message'=>$row['status_message'],
 				'deviceId'=>$row['deviceId'],

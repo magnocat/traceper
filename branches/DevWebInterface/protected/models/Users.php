@@ -288,25 +288,38 @@ class Users extends CActiveRecord
 	
 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId){
 	
-		$sql = sprintf('UPDATE '
-		. $this->tableName() .'
-					SET
-					latitude = %f , '
-		.'	longitude = %f , '
-		.'	altitude = %f ,	'
-		.'	lastLocationAddress = "%s" , '
-		.'	lastLocationCountry = "%s" , '
-		.'	dataArrivedTime = "%s", '
-		.'  dataCalculatedTime = "%s", '
-		.' 	locationSource = %d '
-		.' WHERE '
-		.' 	Id = %d '
-		.' LIMIT 1;',
-		$latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
+// 		$sql = sprintf('UPDATE '
+// 		. $this->tableName() .'
+// 					SET
+// 					latitude = %f , '
+// 		.'	longitude = %f , '
+// 		.'	altitude = %f ,	'
+// 		.'	lastLocationAddress = "%s" , '
+// 		.'	lastLocationCountry = "%s" , '
+// 		.'	dataArrivedTime = "%s", '
+// 		.'  dataCalculatedTime = "%s", '
+// 		.' 	locationSource = %d '
+// 		.' WHERE '
+// 		.' 	Id = %d '
+// 		.' LIMIT 1;',
+// 		$latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
 	
-		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-		//$effectedRows = 0;
-		return $effectedRows;
+// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+// 		//$effectedRows = 0;
+// 		return $effectedRows;
+		
+		$user = Users::model()->findByPk($userId);
+		
+		$user->latitude = $latitude;
+		$user->longitude = $longitude;
+		$user->altitude = $altitude;		
+		$user->lastLocationAddress = $address;
+		$user->lastLocationCountry = $country;		
+		$user->dataArrivedTime = $arrivedTime;
+		$user->dataCalculatedTime = $calculatedTime;
+		$user->locationSource = $locationSource;
+		
+		return $user->save();		
 	}	
 	
 	public function updateLocationTime($userId, $par_time)
