@@ -4,6 +4,110 @@
  * server doesn't return the last available point of user in past locations xml
  */
 
+//date: in seconds
+function timeAgo(date) {
+	
+	var now = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
+    var seconds = Math.floor(now - date);
+    var returnString = "";
+    
+    //alert("timeAgo(), date:" + date + " now:" + now + " - seconds:" + seconds + " - interval:" + interval);
+    var interval = Math.floor(seconds / 31536000);
+    
+    if (interval > 0) {
+    	if(interval == 1)
+    	{
+    		returnString = interval + " " + TRACKER.langOperator.year;
+    	}
+    	else
+    	{
+    		returnString = interval + " " + TRACKER.langOperator.year + TRACKER.langOperator.pluralSuffix;
+    	}
+    }
+    else
+    {
+    	interval = Math.floor(seconds / 2592000);
+    	
+        if (interval > 0) {
+        	if(interval == 1)
+        	{
+        		returnString = interval + " " + TRACKER.langOperator.month;
+        	}
+        	else
+        	{
+        		returnString = interval + " " + TRACKER.langOperator.month + TRACKER.langOperator.pluralSuffix;
+        	}
+        }
+        else
+        {
+        	interval = Math.floor(seconds / 86400);
+        	
+            if (interval > 0) {
+            	if(interval == 1)
+            	{
+            		returnString = interval + " " + TRACKER.langOperator.day;
+            	}
+            	else
+            	{
+            		returnString = interval + " " + TRACKER.langOperator.day + TRACKER.langOperator.pluralSuffix;
+            	}
+            }
+            else
+            {
+            	interval = Math.floor(seconds / 3600);
+            	
+                if (interval > 0) {
+                	if(interval == 1)
+                	{
+                		returnString = interval + " " + TRACKER.langOperator.hour;
+                	}
+                	else
+                	{
+                		returnString = interval + " " + TRACKER.langOperator.hour + TRACKER.langOperator.pluralSuffix;
+                	}
+                }
+                else
+                {
+                	interval = Math.floor(seconds / 60);
+                	
+                    if (interval > 0) {
+                    	if(interval == 1)
+                    	{
+                    		returnString = interval + " " + TRACKER.langOperator.minute;
+                    	}
+                    	else
+                    	{
+                    		returnString = interval + " " + TRACKER.langOperator.minute + TRACKER.langOperator.pluralSuffix;
+                    	}
+                    }
+                    else
+                    {
+                    	interval = Math.floor(seconds);
+                    	
+                    	if(interval == 1)
+                    	{
+                    		returnString = interval + " " + TRACKER.langOperator.second;
+                    	}
+                    	else
+                    	{
+                    		returnString = interval + " " + TRACKER.langOperator.seconds + TRACKER.langOperator.pluralSuffix;
+                    	}                   	
+                    }
+                }                
+            }
+        }   	
+    }
+
+    return returnString + " " + TRACKER.langOperator.ago;
+}
+
+function getLocalDateTime(unixTimeStamp)
+{
+	var date = new Date(unixTimeStamp*1000);
+	
+	return date.getDate() + ' ' + TRACKER.monthNames[date.getMonth()] + ' ' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+}
+
 function processUserPastLocations(MAP, locations, userId){
 	//var pastPoints = []; 
 	var mapMarker = [];
@@ -27,9 +131,11 @@ function processUserPastLocations(MAP, locations, userId){
 		var longitude = value.longitude;
 		var altitude = value.altitude;
 		var time = value.time;
-		var timeAgo = value.timeAgo;
+		var timestamp = value.timestamp;
+		//var timeAgo = value.timeAgo;
 		var deviceId = value.deviceId;
-		var userType = value.userType;
+		//var userType = value.userType;
+		var address = value.address;
 		
 		//alert("key:" + key + " - time:" + value.time);
 
@@ -51,33 +157,33 @@ function processUserPastLocations(MAP, locations, userId){
 			
 			var deviceIdInfo = "";
 			
-			if(userType == 1/*GPS Device*/)
-			{
-				deviceIdInfo = TRACKER.langOperator.deviceId + ": " + deviceId;
-			}
+//			if(userType == 1/*GPS Device*/)
+//			{
+//				deviceIdInfo = TRACKER.langOperator.deviceId + ": " + deviceId;
+//			}
 			
 			var userWasHereString = null;
 			
 			if(LAN_OPERATOR.lang == 'en')
 			{
-				userWasHereString = TRACKER.langOperator.wasHere + ' ' + timeAgo;
+				userWasHereString = TRACKER.langOperator.wasHere + ' ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ';
 			}
 			else
 			{
-				userWasHereString = timeAgo + ' ' + TRACKER.langOperator.wasHere;
+				userWasHereString = timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + TRACKER.langOperator.wasHere;
 			}
 
 			var content = 
 				  '<div style="width:280px; height:180px;">'
-				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;"><b><font size="4">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="4">' +  userWasHereString  + ':' + '</font></div>'  
+				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font></div>'  
 				+ 	'</br></br>'
-				+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
-				//+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
+				//+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
+				+ 	'<div style="cursor:text;">' + address + '</div>'				
 				+ 	'</br>'				
 				+ 	'<div style="position:absolute;bottom:10px;">'
 				+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +','+ previousGMarkerIndex +','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
 				+		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" style="margin-left:5px;" href="javascript:TRACKER.showPointGMarkerInfoWin('+ tr +',' + nextGMarkerIndex +','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-right vtip" title="' + TRACKER.langOperator.nextPoint + '"></div>' + '</a>'
-				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:76px;" href="javascript:TRACKER.clearTraceLines('+ userId +')">'+ '<div class="med-icon icon-close vtip" title="' + TRACKER.langOperator.clearTraceLines + '"></div>' + '</a>'
+				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:76px;" href="javascript:TRACKER.clearTraceLines('+ userId +')">'+ '<div class="med-icon icon-eraser vtip" title="' + TRACKER.langOperator.clearTraceLines + '"></div>' + '</a>'
 				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
 				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
 				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
@@ -95,8 +201,7 @@ function processUserPastLocations(MAP, locations, userId){
 	});
 
 	var tmp = TRACKER.users[userId].mapMarker;		
-	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);
-	
+	TRACKER.users[userId].mapMarker = tmp.concat(mapMarker);	
 }
 
 function getContentFor(userId, imageSrc) {
@@ -183,6 +288,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		var fb_id = value.fb_id;
 		var profilePhotoStatus = value.profilePhotoStatus;
 		var dataArrivedTime = value.time;
+		var locationTimeStamp = value.timestamp;
 		var message = value.message;
 		var deviceId = value.deviceId;
 		var userType = value.userType;
@@ -323,20 +429,21 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				friendshipStatus:isFriend,
 				//time:time,
 				time:dataArrivedTime,
+				locationTimeStamp:locationTimeStamp,
 				message:message,
-				status_message:status_message,
+				statusMessage:status_message,
 				deviceId:deviceId,
 				userType:userType,
 				mapMarker:new Array(markerInfo),
 				locationCalculatedTime:locationCalculatedTime,
 				locationSource:locationSource
-			});				
+			});
 
 			var content = 
 				  '<div style="width:280px; height:180px;">'
 				+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
 				+ 	'</br>'
-				+ 	'<div style="cursor:text;">' + TRACKER.users[userId].time + ' - (' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + ')' + '</div>'
+				+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
 				+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
 				+ 	'</br>'				
 				+ 	'<div style="position:absolute;bottom:10px;">'
@@ -361,7 +468,25 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 					{
 						TRACKER.showLongMessageDialog(TRACKER.langOperator.yourFriendsLocationInfoNotReliable);
 					}
-				}				
+				}
+				
+				//Sayfayi yenilemede marker'a her tikladiginda time ago string'inin guncellenmesi icin pencereyi her acmadan once tekra hesapla
+				var content = 
+					  '<div style="width:280px; height:180px;">'
+					+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+					+ 	'</br>'
+					+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
+					+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
+					+ 	'</br>'				
+					+ 	'<div style="position:absolute;bottom:10px;">'
+					+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
+					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
+					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
+					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
+					+ 	'</div>';
+					+ '</div>';				
+								
+				MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);
 				
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				TRACKER.users[userId].infoWindowIsOpened = true;
@@ -432,9 +557,9 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 								
 				var content = 
 					  '<div style="width:280px; height:180px;">'
-					+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + realname + '</font></b></div></div>'  
+					+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
 					+ 	'</br>'
-					+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
+					+ 	'<div style="cursor:text;">' + getLocalDateTime(locationTimeStamp) + ' (' + timeAgo(locationTimeStamp) + ')' + '</div>'				
 					+ 	'<div style="cursor:text;">' + address + '</div>'
 					+ 	'</br>'				
 					+ 	'<div style="position:absolute;bottom:10px;">'
@@ -443,10 +568,10 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
 					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'					
 					+ 	'</div>';
-					+ '</div>';	
+					+ '</div>';					
 					
-					//If user location changed, update marker position
-					TRACKER.users[userId].mapMarker[0].marker.setPosition(new google.maps.LatLng(latitude, longitude));
+				//If user location changed, update marker position
+				TRACKER.users[userId].mapMarker[0].marker.setPosition(new google.maps.LatLng(latitude, longitude));
 			
 				if (isWindowOpen == true) {
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)

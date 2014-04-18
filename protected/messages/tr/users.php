@@ -71,7 +71,8 @@ return array(
 	'minute' => 'dakika',
 	'second' => 'saniye',
 	'ago' => 'önce',
-	'less than 1 second ago' => '1 saniyeden önce'
+	'less than 1 second ago' => '1 saniyeden önce',
+	'There is no address info' => 'Adres bilgisi mevcut değil'
 	
 	
 	
