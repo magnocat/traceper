@@ -134,5 +134,39 @@ class UserCandidates extends CActiveRecord
 		}
 	
 		return $result;
+	}
+
+	public function isUserCandidate($email) 
+	{
+		$userCandidate = UserCandidates::model()->find('email=:email', array(':email'=>$email));
+		$result = false;
+		
+		if($userCandidate != null) 
+		{
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}	
+		
+		return $result;
+	}
+
+	public function deleteCandidate($email)
+	{
+		$userCandidate = UserCandidates::model()->find('email=:email', array(':email'=>$email));
+		$result = false;
+		
+		if($userCandidate != null) 
+		{
+			$result = $userCandidate->delete();
+		}
+		else
+		{
+			$result = false;
+		}
+		
+		return $result;
 	}	
 }

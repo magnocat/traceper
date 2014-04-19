@@ -93,6 +93,16 @@ class GroupsController extends Controller
 						$errorMessage = "Duplicate entry error occured while saving the group.";
 						$this->sendErrorMail('createGroupDuplicateEntry', 'Error in actionCreateGroup()', $errorMessage);
 					}
+					else
+					{
+						echo CJSON::encode(array("result"=> "Exception occured"));
+						
+						$errorMessage = "An exception occured during creating a group.".'</br></br>';
+						$errorMessage .= "Exception code: ".$e->getCode().'</br></br>';
+						$errorMessage .= "Exception message: ".$e->getMessage();
+						$this->sendErrorMail('createGroupException', 'Error in actionCreateGroup()', $errorMessage);						
+					}
+					
 					Yii::app()->end();
 					
 //					echo 'Caught exception: ',  $e->getMessage(), "\n";    				
@@ -270,6 +280,15 @@ class GroupsController extends Controller
 									
 									$errorMessage = "Duplicate Entry error occured while saving the group relation.";
 									$this->sendErrorMail('updateGroupDuplicateEntry', 'Error in actionUpdateGroup()', $errorMessage);									
+								}
+								else
+								{
+									echo CJSON::encode(array("result"=> "Exception occured"));
+									
+									$errorMessage = "An exception occured during updating a group.".'</br></br>';
+									$errorMessage .= "Exception code: ".$e->getCode().'</br></br>';
+									$errorMessage .= "Exception message: ".$e->getMessage();
+									$this->sendErrorMail('updateGroupException', 'Error in actionUpdateGroup()', $errorMessage);									
 								}
 								
 								Yii::app()->end();

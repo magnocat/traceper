@@ -169,6 +169,20 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														$("#createGroupWindow").dialog("close");
 														TRACKER.showMessageDialog("'.Yii::t('groups', 'A group with this name already exists!').'");
 													}
+													else if(obj.result)
+													{
+														$("#hiddenAjaxResponseForCreateGroup").html(result);
+														$("#ajaxCreateGroupResponse").html($("#hiddenAjaxResponseForCreateGroup #ajaxCreateGroupResponse").html());
+														$("#hiddenAjaxResponseForCreateGroup").html("");
+												
+														$("#createGroupWindow").dialog("close");
+														TRACKER.showMessageDialog("obj.result");																						
+													}
+													else
+													{
+														$("#createGroupWindow").dialog("close");
+														TRACKER.showMessageDialog("Unknown error occured, if the problem persists please contact us.");
+													}								
 												}
 												catch (error){
 													//$("#createGroupWindow").html(result);

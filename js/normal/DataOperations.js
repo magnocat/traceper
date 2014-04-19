@@ -90,7 +90,7 @@ function timeAgo(date) {
                     	}
                     	else
                     	{
-                    		returnString = interval + " " + TRACKER.langOperator.seconds + TRACKER.langOperator.pluralSuffix;
+                    		returnString = interval + " " + TRACKER.langOperator.second + TRACKER.langOperator.pluralSuffix;
                     	}                   	
                     }
                 }                

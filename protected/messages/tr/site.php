@@ -183,7 +183,8 @@ return array(
 	'Correct as <b>{email}</b> and continue' => '<b>{email}</b> olarak düzelt ve devam et',
 	'Continue with <b>{email}</b>' => '<b>{email}</b> ile devam et',
 	'Close dialog window' => 'Diyalog penceresini kapat',
-	'Please select an option before clicking \"OK\" button' => '\"Tamam\" butonuna basmadan önce lütfen bir seçim yapınız'
+	'Please select an option before clicking \"OK\" button' => '\"Tamam\" butonuna basmadan önce lütfen bir seçim yapınız',
+	'Sorry, an error occured during activating your account. If the error persists, please contact us.' => 'Üzgünüz, hesabınızı etkinleştirme sırasında bir hata oluştu. Hata devam ederse, lütfen bizimle iletişime geçin.'
 );
 
 /*
