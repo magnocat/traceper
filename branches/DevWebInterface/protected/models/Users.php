@@ -1094,6 +1094,25 @@ class Users extends CActiveRecord
 
 		return $user->profilePhotoStatus;
 	}
+	
+	public function getUserAddressInfo($userId, &$par_address, &$par_country)
+	{
+		$result = false;
+		$user = $this->findByPk($userId);
+		
+		if($user != null)
+		{
+			$par_address = $user->lastLocationAddress;
+			$par_country = $user->lastLocationCountry;
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+	
+		return $result;
+	}	
 
 	public function isFacebookUser($par_email, &$par_appVersion) {
 		$result = false;
