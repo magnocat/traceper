@@ -81,13 +81,13 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 // 														if (obj.result && obj.result == "1")
 // 														{
 // 															$("#groupSettingsWindow").dialog("close");
-// 															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'")
+// 															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
 // 														}
 // 														else if(obj.result && obj.result == "Duplicate Entry")
 // 														{
 // 															$("#groupSettingsWindow").html(result);													
 // 															$("#groupSettingsWindow").dialog("close");
-// 															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
+// 															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'");
 // 														}
 // 													}
 // 													catch(error)
@@ -112,13 +112,25 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 														if (obj.result && obj.result == "1")
 														{
 															$("#groupSettingsWindow").dialog("close");
-															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'")
+															TRACKER.showMessageDialog("'.Yii::t('common', 'Your settings have been saved.').'");
 														}
 														else if(obj.result && obj.result == "Duplicate Entry")
 														{
 															$("#groupSettingsWindow").html(result);
 															$("#groupSettingsWindow").dialog("close");
-															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'")
+															TRACKER.showMessageDialog("'.Yii::t('groups', 'Select only one privacy group!').'");
+														}
+														else if(obj.result)
+														{
+															$("#groupSettingsWindow").html(result);
+															$("#groupSettingsWindow").dialog("close");
+															TRACKER.showMessageDialog("obj.result");				
+														}
+														else
+														{
+															$("#groupSettingsWindow").html(result);
+															$("#groupSettingsWindow").dialog("close");
+															TRACKER.showMessageDialog("Unknown error occured, if the problem persists please contact us.");				
 														}
 													}
 													catch(error)
