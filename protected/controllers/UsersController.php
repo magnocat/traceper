@@ -137,7 +137,8 @@ class UsersController extends Controller
 		$minDistanceInterval = 0;
 		$minDataSentInterval = 0;
 		$address = null;
-		$country = null;				
+		$country = null;
+		$bLogAsPastLocation = false;
 		
 		try
 		{
@@ -171,9 +172,7 @@ class UsersController extends Controller
 							
 						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 						$distanceInMs = $distanceInKms * 1000;
-						
-						$bLogAsPastLocation = false;
-							
+
 						//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
 						if($distanceInMs > $minDistanceInterval)
 						{								
@@ -224,10 +223,14 @@ class UsersController extends Controller
 							if(strncmp($lastAddress, $address, 300) != 0)
 							{
 								$bLogAsPastLocation = true;
+								
+								//Fb::warn("Log past loc", "actionTakeMyLocation()");
 							}
 							else
 							{
 								$bLogAsPastLocation = false;
+								
+								//Fb::warn("NOT Log past loc", "actionTakeMyLocation()");
 							}
 						}
 						else
@@ -387,17 +390,31 @@ class UsersController extends Controller
 				
 			$this->sendErrorMail('takeMyLocationExceptionOccured', 'Exception occured in actionTakeMyLocation()', $message);
 		}
+		
+ 		$formattedAddress = null;
+		
+// 		if($address != null)
+// 		{
+// 			Users::model()->getUserAddressInfo(Yii::app()->user->id, );
+// 		}
+
+		if(true == $bLogAsPastLocation) //Adres bilgisi degismis ise
+		{
+			$formattedAddress = $address.' / '.$this->string2upper(Yii::t('countries', $country));
+		}
+		else
+		{
+			$formattedAddress = null;
+		}
 
 		$resultArray = array("result"=>$result);
 			
 		if($result == "1") {
 			$resultArray = array_merge($resultArray, array(
-					"minDataSentInterval"=>$minDataSentInterval,
-					"minDistanceInterval"=>$minDistanceInterval,
-					"address"=>$address
+					"address"=>$formattedAddress
 			));
 		}
-			
+
 		echo CJSON::encode(
 				$resultArray
 		);		
