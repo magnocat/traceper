@@ -194,7 +194,7 @@ function processUserPastLocations(MAP, locations, userId){
 			
 			MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow,content);			
 			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
-			TRACKER.users[userId].infoWindowIsOpened = true;
+			TRACKER.users[userId].mapMarker[tr].infoWindowIsOpened = true;
 		});
 
 		mapMarker.push(markerInfoWindow);
@@ -489,7 +489,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);
 				
 				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
-				TRACKER.users[userId].infoWindowIsOpened = true;
+				TRACKER.users[userId].mapMarker[0].infoWindowIsOpened = true;
 			});
 
 			//MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
@@ -553,7 +553,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			
 			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null) && ((TRACKER.users[userId].latitude != latitude) ||
 					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].time != time))){
-				var isWindowOpen = TRACKER.users[userId].infoWindowIsOpened;
+				var isWindowOpen = TRACKER.users[userId].mapMarker[0].infoWindowIsOpened;
 								
 				var content = 
 					  '<div style="width:280px; height:180px;">'
@@ -613,7 +613,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
 			
 	    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
-	    	if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
+	    	if(TRACKER.users[key].mapMarker[0].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
 			{
 				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
 			}	
@@ -629,10 +629,12 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	    		
 	    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
 	    		
-	    		if(TRACKER.users[key].infoWindowIsOpened)
+	    		if(TRACKER.users[key].mapMarker[0].infoWindowIsOpened)
 	    		{
 	    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
 	    		}
+	    		
+	    		TRACKER.clearTraceLines(key);
 	
 	    		delete TRACKER.users[key];		    		
 	    		anyDeletedFriend = true;

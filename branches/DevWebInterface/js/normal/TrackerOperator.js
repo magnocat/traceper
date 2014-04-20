@@ -66,7 +66,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var deviceId;
 		var message;
 		var mapMarker;
-		var infoWindowIsOpened = false;
+		//var infoWindowIsOpened = false;
 		var polyline = null;		
 		var maxZoomLevel = null;
 		var statusMessage = null;
@@ -116,10 +116,12 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
 		//alertMsg("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
 		
-		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
+		if(TRACKER.users[deletedFriendId].mapMarker[0].infoWindowIsOpened)
 		{
 			MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0].infoWindow)			
 		}
+		
+		TRACKER.clearTraceLines(deletedFriendId);
 		
 		if(TRACKER.preUserId == deletedFriendId)
 		{
@@ -592,11 +594,11 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					else
 					{
 						MAP.closeInfoWindow(this.users[this.preUserId].mapMarker[0].infoWindow);
-						this.users[this.preUserId].infoWindowIsOpened = false;					
+						this.users[this.preUserId].mapMarker[0].infoWindowIsOpened = false;					
 					}
 				}
 				MAP.openInfoWindow(this.users[userId].mapMarker[0].infoWindow, this.users[userId].mapMarker[0].marker);
-				this.users[userId].infoWindowIsOpened = true;
+				this.users[userId].mapMarker[0].infoWindowIsOpened = true;
 				this.preUserId = userId;
 			}
 			else
@@ -608,7 +610,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.drawTraceLine = function(userId, pageNo, callback) 
 	{
-		//alert("drawTraceLine() called with pageNo:" + pageNo);
+		//alert("drawTraceLine() called with pageNo:" + pageNo);		
+		//alert("TRACKER.users[userId].mapMarker.length:" + TRACKER.users[userId].mapMarker.length);
 		
 		// hide any polyline if it is drawed
 		if (TRACKER.traceLineDrawedUserId != null &&
@@ -729,27 +732,84 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 
 	this.clearTraceLines = function (userId)
 	{
-		if (typeof TRACKER.users[userId].polyline != 'undefined')
+		if ((typeof TRACKER.users[userId].polyline != 'undefined') && (TRACKER.users[userId].polyline != null))
 		{
 			MAP.setPolylineVisibility(TRACKER.users[userId].polyline, false);
 			var len = TRACKER.users[userId].mapMarker.length;
 
 			for (var i = 1; i < len; i++) { 
-				if (TRACKER.users[userId].mapMarker[i].marker != null) {
+				if ((typeof TRACKER.users[userId].mapMarker[i] != 'undefined') && (TRACKER.users[userId].mapMarker[i].marker != null)) {
 					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
 					TRACKER.users[userId].mapMarker[i].pointAdded = false;
-					TRACKER.users[userId].infoWindowIsOpened = false;
-					
+					TRACKER.users[userId].mapMarker[i].infoWindowIsOpened = false;
+				}
+				else
+				{
+					//alert("TRACKER.users[userId].mapMarker[i:" + i + "]:" + TRACKER.users[userId].mapMarker[i]);
 				}
 			}
+			
+			//splice() metodunu for icinde degil en sonunda cagir. Cunku bu direk array'den elemanlari cikarinca
+			//for icinde devam eden elemanların indexleri gecersiz duruma dusebiliyor. Yani splice() array'in iceriğini degistirdigi
+			//icin islemlerin en sonunda cagirarak array'den elema cikarimi yap.
+			TRACKER.users[userId].mapMarker.splice(1, len-1);
 			
 			MAP.removePolyline(TRACKER.users[userId].polyline);
 			delete TRACKER.users[userId].polyline;
 			TRACKER.users[userId].polyline = null;
 			TRACKER.bAllLinesCleared[userId] = true;
+			TRACKER.pastPointsPageNo[userId] = 0;
 		}
 	};
+	
+	this.clearAllUsersTraceLinesExceptCurrent = function (userId)
+	{
+		//alert("clearAllUsersTraceLinesExceptCurrent() called with userId:" + userId);
+		
+		for (var key in TRACKER.users) {	    			
+			if((typeof TRACKER.users[key] != "undefined") && (TRACKER.users[key] != null) && (key != userId))
+			{
+				if ((typeof TRACKER.users[key].polyline != 'undefined') && (TRACKER.users[key].polyline != null))
+				{
+					//alert("key:" + key);
+					
+					MAP.setPolylineVisibility(TRACKER.users[key].polyline, false);
+					var len = TRACKER.users[key].mapMarker.length;
+
+					for (var i = 1; i < len; i++) { 
+						if (TRACKER.users[key].mapMarker[i].marker != null) {
+							MAP.setMarkerVisible(TRACKER.users[key].mapMarker[i].marker, false);
+							MAP.closeInfoWindow(TRACKER.users[key].mapMarker[i].infoWindow);
+							TRACKER.users[key].mapMarker[i].pointAdded = false;
+							TRACKER.users[key].mapMarker[i].infoWindowIsOpened = false;							
+						}
+					}
+				}
+			}
+		}		
+	};
+	
+	this.redrawAllUsersTraceLinesExceptCurrent = function (userId)
+	{
+		for (var key in TRACKER.users) {	    			
+			if((typeof TRACKER.users[key] != "undefined") && (TRACKER.users[key] != null) && (key != userId))
+			{
+				if ((typeof TRACKER.users[key].polyline != 'undefined') && (TRACKER.users[key].polyline != null))
+				{
+					MAP.setPolylineVisibility(TRACKER.users[key].polyline, true);
+					var len = TRACKER.users[key].mapMarker.length;
+
+					for (var i = 1; i < len; i++) { 
+						if (TRACKER.users[key].mapMarker[i].marker != null) {
+							MAP.setMarkerVisible(TRACKER.users[key].mapMarker[i].marker, true);
+							TRACKER.users[key].mapMarker[i].pointAdded = true;
+						}
+					}
+				}
+			}
+		}		
+	};	
 	
 	/*
 	 * sending GeoFence points to the server
@@ -799,7 +859,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	};
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
-		TRACKER.users[userId].infoWindowIsOpened = false;
+		TRACKER.users[userId].mapMarker[0].infoWindowIsOpened = false;
 	};
 
 	this.zoomPoint = function (latitude, longitude) {
@@ -864,10 +924,14 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						// but it is required to check value if it is null when hiding or
 						// showing markers...
 						TRACKER.users[userId].mapMarker[nextMarkerIndex] = null;
+						
+						//alert("if 2");
 					}
 					else {
+						//alert("else 2");
+						
 						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
-						TRACKER.users[userId].infoWindowIsOpened = false;
+						TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindowIsOpened = false;
 						MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 						
 						if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
@@ -907,7 +971,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			}
 			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
-			TRACKER.users[userId].infoWindowIsOpened = false;
+			TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindowIsOpened = false;
 			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 			
 			if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)

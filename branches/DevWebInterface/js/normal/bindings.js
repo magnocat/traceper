@@ -871,19 +871,22 @@ function bindElements(langOperator, trackerOp)
         {
 		   	 case "users_tab": //Friends
 		   	 {
-		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);		   		 
+		   		 TRACKER.redrawAllUsersTraceLinesExceptCurrent(currentUserId);
 		   	 }
 		   	 break;
 		   	   
 		   	 case "photos_tab": //Uploads
 		   	 {
-		   		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   		 TRACKER.showImagesOnTheMap = true; TRACKER.showUsersOnTheMap = false; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);		   		 
+		   		 TRACKER.clearAllUsersTraceLinesExceptCurrent(currentUserId);
 		   	 }
 		   	 break;
 		   	   
 		   	 case "groups_tab": //Groups
 		   	 {
-		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);
+		   		 TRACKER.showImagesOnTheMap = false; TRACKER.showUsersOnTheMap = true; TRACKER.getImageList(); TRACKER.getFriendList(1, 0/*UserType::RealUser*/);		   		 
+		   		 TRACKER.redrawAllUsersTraceLinesExceptCurrent(currentUserId);
 		   	 }
 		   	 break;       
         }
