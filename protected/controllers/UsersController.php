@@ -41,7 +41,7 @@ class UsersController extends Controller
 				array('deny',
 						//'deniedCallback' => array($this, 'deniedAction'),
 						'actions'=>array('addAsFriend', 'deleteFriendShip','getFriendRequestList', 'getFriendList',
-								'getUserPastPointsXML', 'getUserListXML', 'search', 'searchJSON',
+								'getUserPastPointsJSON', 'search', 'searchJSON',
 								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
 								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
 								'useFacebookProfilePhoto', 'viewProfilePhoto'),
@@ -662,18 +662,18 @@ class UsersController extends Controller
 		
 		if (isset($_REQUEST['userId']) && $_REQUEST['userId'] > 0) {
 			
-			//Adres bilgilerinin kullanici diline gore getirilmesi icin
-			if(isset($_REQUEST['language']))
-			{
-				if($_REQUEST['language'] == 'tr')
-				{
-					Yii::app()->language = 'tr';
-				}
-				else
-				{
-					Yii::app()->language = 'en';
-				}
-			}			
+// 			//Adres bilgilerinin kullanici diline gore getirilmesi icin
+// 			if(isset($_REQUEST['language']))
+// 			{
+// 				if($_REQUEST['language'] == 'tr')
+// 				{
+// 					Yii::app()->language = 'tr';
+// 				}
+// 				else
+// 				{
+// 					Yii::app()->language = 'en';
+// 				}
+// 			}			
 
 			$userId = (int) $_REQUEST['userId'];
 			$friendArray = $this->getFriendArray(true/*$par_onlyVisible*/, null/*userTypes*/); //Burası direk true degil mobilde gelen istekle guncellenmeli
@@ -714,18 +714,18 @@ class UsersController extends Controller
 			$pageNo = 1;
 			$userTypes = array();
 			
-			//Adres bilgilerinin kullanici diline gore getirilmesi icin
-			if(isset($_REQUEST['language']))
-			{
-				if($_REQUEST['language'] == 'tr')
-				{
-					Yii::app()->language = 'tr';
-				}
-				else
-				{
-					Yii::app()->language = 'en';
-				}
-			}			
+// 			//Adres bilgilerinin kullanici diline gore getirilmesi icin
+// 			if(isset($_REQUEST['language']))
+// 			{
+// 				if($_REQUEST['language'] == 'tr')
+// 				{
+// 					Yii::app()->language = 'tr';
+// 				}
+// 				else
+// 				{
+// 					Yii::app()->language = 'en';
+// 				}
+// 			}			
 			
 			if(isset(Yii::app()->session['visibleFriendCount']) == false)
 			{
@@ -828,6 +828,8 @@ class UsersController extends Controller
 
 	public function actionGetUserPastPointsJSON(){
 
+		$out = null;
+		
 		if (isset($_REQUEST['userId']))
 		{
 			$userId = (int) $_REQUEST['userId'];
@@ -849,6 +851,10 @@ class UsersController extends Controller
 			$out = $this->preparePastPointsJson($dataProvider);
 			
 			Fb::warn($out, "actionGetUserPastPointsJSON()");
+		}
+		else
+		{
+			$out = "userId is NOT set!";
 		}
 		
 		echo $out;
@@ -1128,45 +1134,45 @@ class UsersController extends Controller
 				$friendCandidateEmail = null;
 				Users::model()->getUserInfo($friendId, $friendCandidateName, $friendCandidateEmail);
 					
-				$isTranslationRequired = false;
+// 				$isTranslationRequired = false;
 					
-				if($mobileLang != null)
-				{
-					if($mobileLang == 'tr')
-					{
-						if(Yii::app()->language == 'tr')
-						{
-							$isTranslationRequired = false;
-						}
-						else
-						{
-							$isTranslationRequired = true;
-						}
-					}
-					else
-					{
-						if(Yii::app()->language == 'tr')
-						{
-							$isTranslationRequired = true;
-						}
-						else
-						{
-							$isTranslationRequired = false;
-						}
-					}
-				}
+// 				if($mobileLang != null)
+// 				{
+// 					if($mobileLang == 'tr')
+// 					{
+// 						if(Yii::app()->language == 'tr')
+// 						{
+// 							$isTranslationRequired = false;
+// 						}
+// 						else
+// 						{
+// 							$isTranslationRequired = true;
+// 						}
+// 					}
+// 					else
+// 					{
+// 						if(Yii::app()->language == 'tr')
+// 						{
+// 							$isTranslationRequired = true;
+// 						}
+// 						else
+// 						{
+// 							$isTranslationRequired = false;
+// 						}
+// 					}
+// 				}
 					
-				if($isTranslationRequired == true)
-				{
-					if($mobileLang == 'tr')
-					{
-						Yii::app()->language = 'tr';
-					}
-					else
-					{
-						Yii::app()->language = 'en';
-					}
-				}
+// 				if($isTranslationRequired == true)
+// 				{
+// 					if($mobileLang == 'tr')
+// 					{
+// 						Yii::app()->language = 'tr';
+// 					}
+// 					else
+// 					{
+// 						Yii::app()->language = 'en';
+// 					}
+// 				}
 				
 				$message = Yii::t('site', 'Hi').' '.$friendCandidateName.',<br/><br/>';
 				$message .= $requesterName.', ';
@@ -1184,18 +1190,18 @@ class UsersController extends Controller
 					//Mail gönderilirken hata oluştu
 				}
 				
-				//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
-				if($isTranslationRequired == true) //Recover the language if needed for mobile
-				{
-					if($mobileLang == 'tr')
-					{
-						Yii::app()->language = 'en';
-					}
-					else
-					{
-						Yii::app()->language = 'tr';
-					}
-				}				
+// 				//Language recovery should be done after sending the mail, because some generic message is added also in SMTP_UTF8_mail()
+// 				if($isTranslationRequired == true) //Recover the language if needed for mobile
+// 				{
+// 					if($mobileLang == 'tr')
+// 					{
+// 						Yii::app()->language = 'en';
+// 					}
+// 					else
+// 					{
+// 						Yii::app()->language = 'tr';
+// 					}
+// 				}				
 			}
 			else
 			{

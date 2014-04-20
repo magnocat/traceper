@@ -19,6 +19,7 @@ MapStruct.Location = function (){
 MapStruct.MapMarker = function(){
 	var marker;
 	var infoWindow;
+	var infoWindowIsOpened;
 	var point;
 	var pointAdded;
 	
