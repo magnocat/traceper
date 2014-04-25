@@ -191,25 +191,6 @@ class SiteController extends Controller
 			
 		$processOutput = true;
 		$errorMessage = null;
-		
-		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
-		{
-			if(isset($_REQUEST['language']))
-			{
-				$app = Yii::app();
-				
-				if($_REQUEST['language'] == 'tr')
-				{										
-					$app->language = 'tr';
-					$app->session['_lang'] = 'tr';
-				}
-				else 
-				{
-					$app->language = 'en';
-					$app->session['_lang'] = 'en';					
-				}
-			}			
-		}
 
 		// collect user input data
 		if(isset($_REQUEST['LoginForm']))
@@ -290,7 +271,7 @@ class SiteController extends Controller
 						
 						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
-							if (isset($_REQUEST['deviceId']))
+							if (isset($_REQUEST['deviceId']) && ($_REQUEST['deviceId'] != NULL))
 							{
 								if(strcmp($deviceId, $_REQUEST['deviceId']) != 0)
 								{
@@ -299,7 +280,7 @@ class SiteController extends Controller
 								}
 							}
 								
-							if (isset($_REQUEST['androidVer']))
+							if (isset($_REQUEST['androidVer']) && ($_REQUEST['androidVer'] != NULL))
 							{
 								if(strcmp($androidVer, $_REQUEST['androidVer']) != 0)
 								{
@@ -308,7 +289,7 @@ class SiteController extends Controller
 								}
 							}
 								
-							if (isset($_REQUEST['appVer']))
+							if (isset($_REQUEST['appVer']) && ($_REQUEST['appVer'] != NULL))
 							{
 								if(strcmp($appVer, $_REQUEST['appVer']) != 0)
 								{
@@ -319,18 +300,44 @@ class SiteController extends Controller
 								
 							if (isset($_REQUEST['language']))
 							{
-								if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
+								if($_REQUEST['language'] != NULL)
 								{
-									$preferredLanguage = $_REQUEST['language'];
-									$isRecordUpdateRequired = true;
+									if(strcmp($preferredLanguage, $_REQUEST['language']) != 0)
+									{
+										$preferredLanguage = $_REQUEST['language'];
+										$isRecordUpdateRequired = true;
+									}
+									
+									$app = Yii::app();
+										
+									if($_REQUEST['language'] == 'tr')
+									{
+										$app->language = 'tr';
+										$app->session['_lang'] = 'tr';
+									}
+									else
+									{
+										$app->language = 'en';
+										$app->session['_lang'] = 'en';
+									}									
+								}
+								else
+								{
+									$errorMessage = "language parameter is NULL !";
+									$this->sendErrorMail('nullLanguageParameterInLogin', 'Error in actionLogin()', $errorMessage);									
 								}
 							}
-						
+							else
+							{
+								$errorMessage = "language parameter is missing !";
+								$this->sendErrorMail('missingLanguageParameterInLogin', 'Error in actionLogin()', $errorMessage);
+							}
+							
 							if($isRecordUpdateRequired == true)
 							{
 								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
 							}
-						
+
 							echo CJSON::encode(array(
 									"result"=> "1",
 									"id"=>Yii::app()->user->id,
@@ -687,7 +694,7 @@ class SiteController extends Controller
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{
-			if(isset($_REQUEST['language']))
+			if(isset($_REQUEST['language']) && ($_REQUEST['language'] != NULL))
 			{
 				$app = Yii::app();
 		
@@ -1913,7 +1920,7 @@ class SiteController extends Controller
 	
 		$processOutput = true;
 				
-		$mobileLang = null;
+		$mobileLang = null;		
 		
 		if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 		{

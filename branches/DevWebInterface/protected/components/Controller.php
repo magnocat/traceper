@@ -184,17 +184,17 @@ class Controller extends CController
 			$app->language = $_POST['_lang'];
 			//$app->session['_lang'] = $app->language;
 		}
-		else if(isset($_REQUEST['language']))
-		{
-			if($_REQUEST['language'] == 'tr')
-			{
-				Yii::app()->language = 'tr';
-			}
-			else
-			{
-				Yii::app()->language = 'en';
-			}
-		}		
+// 		else if(isset($_REQUEST['language']))
+// 		{
+// 			if($_REQUEST['language'] == 'tr')
+// 			{
+// 				Yii::app()->language = 'tr';
+// 			}
+// 			else
+// 			{
+// 				Yii::app()->language = 'en';
+// 			}
+// 		}		
 		else if (isset($app->session['_lang']))
 		{
 			$app->language = $app->session['_lang'];

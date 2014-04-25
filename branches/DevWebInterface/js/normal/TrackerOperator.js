@@ -597,6 +597,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						this.users[this.preUserId].mapMarker[0].infoWindowIsOpened = false;					
 					}
 				}
+				
 				MAP.openInfoWindow(this.users[userId].mapMarker[0].infoWindow, this.users[userId].mapMarker[0].marker);
 				this.users[userId].mapMarker[0].infoWindowIsOpened = true;
 				this.preUserId = userId;
