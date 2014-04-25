@@ -44,7 +44,7 @@ class UsersController extends Controller
 								'getUserPastPointsJSON', 'search', 'searchJSON',
 								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
 								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
-								'useFacebookProfilePhoto', 'viewProfilePhoto'),
+								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile'),
 						'users'=>array('?'),
 				)
 		);
@@ -103,8 +103,29 @@ class UsersController extends Controller
 		return $convertedString;
 	}
 	
-	
-	
+	private function getFullAddress($par_address, $par_country) 
+	{
+		$fullAddress = null;
+		
+		if($par_address != null)
+		{
+			if($par_country == null)
+			{
+				$fullAddress = $par_address;
+			}
+			else
+			{
+				$fullAddress = $par_address.' / '.$this->string2upper(Yii::t('countries', $par_country));
+			}			
+		}
+		else
+		{
+			$fullAddress = Yii::t('users', 'There is no address info');
+		}
+		
+		return $fullAddress;
+	}	
+
 	/*
 	 * check whether user guest or not (actually for checking whether session timed out or not)
 	 * Bu fonksiyonu mobil session'in kaybolup kaybolmadigini anlamak icin kullanacak
@@ -138,7 +159,9 @@ class UsersController extends Controller
 		$minDataSentInterval = 0;
 		$address = null;
 		$country = null;
-		$bLogAsPastLocation = false;
+		$updateLocationResult = false;
+		$bLogAsPastLocation = false;		
+		$arrivedTime = null;		
 		
 		try
 		{
@@ -279,7 +302,8 @@ class UsersController extends Controller
 							}							
 						}
 						
-						if(true == $bLogAsPastLocation)
+						//Anlık konum kaydi basarili ise gecmis konum olarak da kaydet
+						if((true == $bLogAsPastLocation) && (true == $updateLocationResult))
 						{
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 							
@@ -400,7 +424,7 @@ class UsersController extends Controller
 
 		if(true == $bLogAsPastLocation) //Adres bilgisi degismis ise
 		{
-			$formattedAddress = $address.' / '.$this->string2upper(Yii::t('countries', $country));
+			$formattedAddress = $this->getFullAddress($address, $country);
 		}
 		else
 		{
@@ -411,7 +435,8 @@ class UsersController extends Controller
 			
 		if($result == "1") {
 			$resultArray = array_merge($resultArray, array(
-					"address"=>$formattedAddress
+					"address"=>$formattedAddress,
+					"timestamp"=>strtotime($arrivedTime)
 			));
 		}
 
@@ -832,15 +857,38 @@ class UsersController extends Controller
 		
 		if (isset($_REQUEST['userId']))
 		{
+// 			if($_REQUEST['userId'] == 160)
+// 			{
+// 				$app = Yii::app();
+// 				if (isset($app->session['deneme5']))
+// 				{
+// 					$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'Session', 'actionGetUserPastPointsJSON() - session deneme5 is SET');
+// 				}
+// 				else
+// 				{
+// 					$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'Session', 'actionGetUserPastPointsJSON() - session deneme5 is NOT set !');
+// 				}	
+
+// 				if(Yii::app()->user->hasState('language'))
+// 				{
+// 					$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'Session', 'actionGetUserPastPointsJSON() - state language is SET as '.Yii::app()->user->getState('language'));
+// 				}
+// 				else
+// 				{
+// 					$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'Session', 'actionGetUserPastPointsJSON() - state language is NOT set!');
+// 				}				
+// 			}
+
 			$userId = (int) $_REQUEST['userId'];
 			$pageNo = 1;
+			
 			if (isset($_REQUEST['pageNo']) && $_REQUEST['pageNo'] > 0) {
 				$pageNo = (int) $_REQUEST['pageNo'];
-				Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
+				//Fb::warn("pageNo is SET:$pageNo", "actionGetUserPastPointsJSON()");
 			}
 			else
 			{
-				Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
+				//Fb::warn("pageNo is NOT set!", "actionGetUserPastPointsJSON()");
 			}
 			
 			$offset = ($pageNo - 1) * Yii::app()->params->itemCountInDataListPage;
@@ -850,7 +898,7 @@ class UsersController extends Controller
 				
 			$out = $this->preparePastPointsJson($dataProvider);
 			
-			Fb::warn($out, "actionGetUserPastPointsJSON()");
+			//Fb::warn($out, "actionGetUserPastPointsJSON()");
 		}
 		else
 		{
@@ -1846,7 +1894,7 @@ class UsersController extends Controller
 						'timestamp'=>$dataArrivedTimestamp,
 						//'timeAgo'=>$this->get_timeago($dataArrivedTimestamp),
 						'deviceId'=>$rows[$i]['deviceId'],
-						'address'=>$rows[$i]['address'].(($rows[$i]['country'] != null)?(' / '.$this->string2upper(Yii::t('countries', $rows[$i]['country']))):"")
+						'address'=>$this->getFullAddress($rows[$i]['address'], $rows[$i]['country'])											
 				));
 		}
 		
@@ -1899,7 +1947,7 @@ class UsersController extends Controller
 				'latitude'=>$row['latitude'],
 				'longitude'=>$row['longitude'],
 				'altitude'=>$row['altitude'],
-				'address'=>$row['lastLocationAddress'].' / '.$this->string2upper(Yii::t('countries', $row['lastLocationCountry'])),
+				'address'=>$this->getFullAddress($row['lastLocationAddress'], $row['lastLocationCountry']),
 				'calculatedTime'=>$row['dataCalculatedTime'],
 				'locationSource'=>$row['locationSource'],
 				//'time'=>$row['dataArrivedTime'],

@@ -209,16 +209,16 @@ function getContentFor(userId, imageSrc) {
 		  '<div style="width:280px; height:180px;">'
 		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" width="44px" height="48px"/>' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
 		+ 	'</br>'
-		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].time + ' - (' + TRACKER.users[userId].latitude + ", " + TRACKER.users[userId].longitude + ')' + '</div>'
+		+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
 		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
 		+ 	'</br>'				
 		+ 	'<div style="position:absolute;bottom:10px;">'
-		+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
 		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
 		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
-		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
 		+ 	'</div>';
-		+ '</div>';
+		+ '</div>';		
 		
 	return content;	
 }
@@ -584,10 +584,12 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			TRACKER.users[userId].longitude = longitude;
 			TRACKER.users[userId].time = time;
 			TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
+			TRACKER.users[userId].locationTimeStamp = locationTimeStamp;
 			TRACKER.users[userId].locationSource = locationSource;
 			TRACKER.users[userId].deviceId = deviceId;
 			TRACKER.users[userId].userType = userType;
-			TRACKER.users[userId].friendshipStatus = isFriend;	
+			TRACKER.users[userId].friendshipStatus = isFriend;
+			TRACKER.users[userId].address = address;
 		}
 	});
 	
