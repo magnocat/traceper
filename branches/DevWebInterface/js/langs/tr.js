@@ -109,5 +109,6 @@ LAN_OPERATOR.addIndexes({
 			minute:'dakika',
 			second:'saniye',
 			pluralSuffix:'',
-			ago:'önce'
+			ago:'önce',
+			thisPhotoIsUnavailable:'Bu fotoğrafa maalesef erişilemiyor...'
 		});

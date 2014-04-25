@@ -372,7 +372,8 @@ class UploadController extends Controller
 				if ($insertToDB == true) {
 									
 					$result = "Unknown Error";
-					$uploadId = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $publicData, $description, $isLive, $liveKey);
+					$uploadTime = date('Y-m-d H:i:s');
+					$uploadId = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey);
 					
 					if($uploadId > 0)
 					{
@@ -839,9 +840,11 @@ class UploadController extends Controller
 				'latitude'=>$row['latitude'],
 				'longitude'=>$row['longitude'],
 				'rating'=>$row['rating'],
-				'time'=>$row['uploadTime']				
+				'time'=>$row['uploadTime'],
+				'timestamp'=>strtotime($row['uploadTime']),
+				'fileExists'=>file_exists($this->getFileName($row['id'], 0))				
 		));
-	
+
 		return $bsk;
 	}	
 
