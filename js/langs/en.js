@@ -110,5 +110,6 @@ LAN_OPERATOR.addIndexes({
 			minute:'minute',
 			second:'second',
 			pluralSuffix:'s',
-			ago:'ago'
+			ago:'ago',
+			thisPhotoIsUnavailable:'This photo is unavailable unfortunately...'
 	});

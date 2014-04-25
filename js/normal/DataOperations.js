@@ -773,8 +773,10 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		var latitude = value.latitude;
 		var longitude = value.longitude;
 		var time = value.time;
+		var timestamp = value.timestamp;
 		var rating = value.rating;
-		var description = ""; //value.description; //$(image).attr('description');
+		var description = value.description; //value.description; //$(image).attr('description');
+		var fileExists = value.fileExists;
 		
 		//alertMsg(value.description);
 		
@@ -804,6 +806,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 				latitude:latitude,
 				longitude:longitude,
 				time:time,
+				timestamp:timestamp,
 				rating:rating,
 				mapMarker:markerInfoWindow,
 				description:description,
@@ -816,52 +819,103 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 				var image = new Image();
 
 				image.src= TRACKER.images[imageId].imageURL + "&fileType=0"; // + TRACKER.imageOrigSuffix;
-				//$("#loading").show();
-				$(image).load(function(){
-					//$("#loading").hide();
-					
-					var content = "<div class='origImageContainer'>"
-						+ "<div>"
-						+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
-						+ "</div>"
-						+ "<div>"
-						+ TRACKER.images[imageId].description + "<br/>"
-						+ ((par_isPublic == false)?("<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"):TRACKER.images[imageId].realname)
-						+ "<br/>"
-						+ TRACKER.images[imageId].time + "<br/>"
-						+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
-						+ "</div>"
-						+ '<ul class="sf-menu"> '
-						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-						+ TRACKER.langOperator.zoom
-						+'</a>'+ '</li>'
-						+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
-						+ TRACKER.langOperator.zoomMax
-						+'</a>'+'</li>'
-						+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
-						+'</a>'+'</li>'
-						+'</li>'
-						+ '</ul>'
-						+ "</div>";
-					
-					
-					//var content = "<video id='my_video_2' class='video-js vjs-default-skin' controls preload='auto' width='320' height='264'><source src='http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4' type='video/mp4'></video>";
-					
-					//var content = "<div> Deneme </div>";
-					
-					//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
 
-					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
-					
-					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
-					TRACKER.images[imageId].infoWindowIsOpened = true;	
-					
-					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
-						if ($('#showPhotosOnMap').attr('checked') == false){
-							MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
-						}				
-					});
-				});				
+				if(fileExists === true)
+				{
+					//$("#loading").show();
+					$(image).load(function(){
+						//$("#loading").hide();
+						
+//						var content = "<div class='origImageContainer'>"
+//							+ "<div>"
+//							+ "<img src='"+ image.src +"' height='"+ image.height +"' width='"+ image.width +"' class='origImage' />"
+//							+ "</div>"
+//							+ "<div>"
+//							+ TRACKER.images[imageId].description + "<br/>"
+//							+ ((par_isPublic == false)?("<a href='javascript:TRACKER.trackUser("+ TRACKER.images[imageId].userId +")' class='uploader'>" + TRACKER.images[imageId].realname + "</a>"):TRACKER.images[imageId].realname)
+//							+ "<br/>"
+//							+ TRACKER.images[imageId].time + "<br/>"
+//							+ TRACKER.images[imageId].latitude + ", " + TRACKER.images[imageId].longitude
+//							+ "</div>"
+//							+ '<ul class="sf-menu"> '
+//							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+//							+ TRACKER.langOperator.zoom
+//							+'</a>'+ '</li>'
+//							+ '<li>'+'<a class="infoWinOperations" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'
+//							+ TRACKER.langOperator.zoomMax
+//							+'</a>'+'</li>'
+//							+'<li>'+'<a href="javascript:TRACKER.showCommentWindow(1,1,null)" id="commentsWindow"> Display Comments</a>'
+//							+'</a>'+'</li>'
+//							+'</li>'
+//							+ '</ul>'
+//							+ "</div>";
+						
+						var userSharedThisPhoto = null;
+						
+						if(LAN_OPERATOR.lang == 'en')
+						{
+							userSharedThisPhoto = ' shared this photo ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
+							
+//							if(par_isPublic == true)
+//							{
+//								userSharedThisPhoto = ' shared this photo publicly ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
+//							}
+//							else
+//							{
+//								userSharedThisPhoto = ' shared this photo ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
+//							}
+						}
+						else
+						{
+							userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile paylaştı.';
+							
+//							if(par_isPublic == true)
+//							{
+//								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile "Herkese Açık" olarak paylaştı.';
+//							}
+//							else
+//							{
+//								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile paylaştı.';
+//							}	
+						}						
+											
+						var content = 
+							  //'<div style="width:280px; height:180px;">'
+							  '<div style="width:400px; height:440px;">'
+							//+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'
+							+ 	'<div><img src="' + image.src + '" width="400px" height="300px"/></div>'
+							+ 	'</br>'				
+							+ 	'<div style="cursor:text;word-wrap: break-word;">' + '<b>' + TRACKER.images[imageId].realname + '</b>' + userSharedThisPhoto + '</div>'	
+							+ 	'</br>'				
+							+ 	'<div style="position:absolute;bottom:10px;">'						
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:162px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
+							+ 	'</div>';
+							+ '</div>';						
+
+						//var content = "<video id='my_video_2' class='video-js vjs-default-skin' controls preload='auto' width='320' height='264'><source src='http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4' type='video/mp4'></video>";
+						
+						//var content = "<div> Deneme </div>";
+						
+						//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
+
+						MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
+						
+						MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
+						TRACKER.images[imageId].infoWindowIsOpened = true;	
+						
+						MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
+							if ($('#showPhotosOnMap').attr('checked') == false){
+								MAP.setMarkerVisible(TRACKER.images[imageId].mapMarker.marker,false);
+							}				
+						});
+					});					
+				}
+				else
+				{
+					TRACKER.showMessageDialog(TRACKER.langOperator.thisPhotoIsUnavailable);
+				}
 			});		
 		}
 		else

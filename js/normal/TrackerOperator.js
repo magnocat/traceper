@@ -85,6 +85,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var latitude;
 		var longitude;
 		var time;
+		var timestamp;
 		var rating;
 		var mapMarker;
 		var infoWindowIsOpened = false;
