@@ -72,6 +72,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var statusMessage = null;
 		var locationCalculatedTime = null;
 		var locationSource = null;
+		var fb_id = null;
+		var profilePhotoStatus = null;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -90,6 +92,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var mapMarker;
 		var infoWindowIsOpened = false;
 		var description;
+		var isPublic;
 
 		for (var n in arguments[0]) { 
 			this[n] = arguments[0][n]; 
@@ -599,6 +602,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					}
 				}
 				
+				
+				MAP.setContentOfInfoWindow(this.users[userId].mapMarker[0].infoWindow, getUserContent(userId, getPersonPhotoElement(userId, currentUserId)));
 				MAP.openInfoWindow(this.users[userId].mapMarker[0].infoWindow, this.users[userId].mapMarker[0].marker);
 				this.users[userId].mapMarker[0].infoWindowIsOpened = true;
 				this.preUserId = userId;
@@ -848,12 +853,18 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.showMediaWindow = function(uploadId, isPublic){
 		if (typeof TRACKER.images[uploadId] == "undefined") {
 			TRACKER.getImageList(isPublic, true, function(){
+				var location = new MapStruct.Location({latitude:this.images[uploadId].latitude, longitude:this.images[uploadId].longitude});
+				MAP.panMapTo(location);				
+				
 				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
 			});
 			
 			//alertMsg("showMediaWindow 111");
 		}
 		else {		
+			var location = new MapStruct.Location({latitude:this.images[uploadId].latitude, longitude:this.images[uploadId].longitude});
+			MAP.panMapTo(location);			
+			
 			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');
 			
 			//alertMsg("showMediaWindow 222");

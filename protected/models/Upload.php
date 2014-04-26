@@ -373,7 +373,7 @@ class Upload extends CActiveRecord
     public function getUploadList($fileType,$userID,$friendList,$time,$offset) {
     	if ($time != NULL)
     	{
-    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude, u.publicData
     		FROM '. Upload::model()->tableName() . ' u
     		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .')
@@ -387,7 +387,7 @@ class Upload extends CActiveRecord
     	}
     	else
     	{
-    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude, u.publicData
     		FROM '. Upload::model()->tableName() . ' u
     		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     		WHERE (fileType = '.$fileType.') AND (userId in ('. $friendList .') OR
@@ -407,7 +407,7 @@ class Upload extends CActiveRecord
     public function getPublicUploadList($fileType,$time,$offset) {
     	if ($time != NULL)
     	{
-    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude, u.publicData
     		FROM '. Upload::model()->tableName() . ' u
     		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)
@@ -417,7 +417,7 @@ class Upload extends CActiveRecord
     	}
     	else
     	{
-    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude
+    		$sql = 'SELECT u.Id as id, u.description, s.realname, s.Id as userId, date_format(u.uploadTime,"%d %b %Y %T") as uploadTime, u.altitude, u.latitude, u.longitude, u.publicData
     		FROM '. Upload::model()->tableName() . ' u
     		LEFT JOIN  '. Users::model()->tableName() . ' s ON s.Id = u.userId
     		WHERE (fileType = '.$fileType.') AND (publicData = 1)
