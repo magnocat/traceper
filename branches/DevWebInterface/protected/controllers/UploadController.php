@@ -827,6 +827,7 @@ class UploadController extends Controller
 		$row['realname'] = isset($row['realname']) ? $row['realname'] : null;
 		$row['rating'] = isset($row['rating']) ? $row['rating'] : null;
 		$row['description'] = isset($row['description']) ? $row['description'] : null;
+		$row['publicData'] = isset($row['publicData']) ? $row['publicData'] : null;
 		
 		//Fb::warn(Yii::app()->homeUrl .urlencode('?r=upload/get&id='. $row['id']), "url()");
 	
@@ -842,7 +843,8 @@ class UploadController extends Controller
 				'rating'=>$row['rating'],
 				'time'=>$row['uploadTime'],
 				'timestamp'=>strtotime($row['uploadTime']),
-				'fileExists'=>file_exists($this->getFileName($row['id'], 0))				
+				'fileExists'=>file_exists($this->getFileName($row['id'], 0)),
+				'isPublic'=>$row['publicData']				
 		));
 
 		return $bsk;

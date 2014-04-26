@@ -223,6 +223,70 @@ function getContentFor(userId, imageSrc) {
 	return content;	
 }
 
+function getPersonPhotoElement(userId, currentUser)
+{
+	var personPhotoElement;
+	var timeStamp = new Date().getTime();	
+	
+	switch(TRACKER.users[userId].profilePhotoStatus)
+	{
+		case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
+		{
+			if((TRACKER.users[userId].fb_id != 0) && (typeof TRACKER.users[userId].fb_id != "undefined")){			
+				personPhotoElement = '<img src="https://graph.facebook.com/'+ TRACKER.users[userId].fb_id +'/picture?type=square" width="44px" height="48px" />';
+			}else{
+				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+			}
+		}
+		break;
+
+		case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
+		case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
+		{
+			if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
+			{
+				personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';											
+			}
+			else //Diger kullanicilar icin cache kullan
+			{
+				personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';						
+			}					
+		}
+		break;
+
+		case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
+		{
+			personPhotoElement = '<img src="https://graph.facebook.com/'+ TRACKER.users[userId].fb_id +'/picture?type=square" width="44px" height="48px"/>';
+		}
+		break;
+
+		default:
+			//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
+			personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';				
+	}
+	
+	return personPhotoElement;
+}
+
+function getUserContent(userId, personPhotoElement) {	
+	var content = 
+		  '<div style="width:280px; height:180px;">'
+		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+		+ 	'</br>'
+		+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
+		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
+		+ 	'</br>'				
+		+ 	'<div style="position:absolute;bottom:10px;">'
+		+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
+		+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
+		+ 	'</div>';
+		+ '</div>';		
+		
+	return content;	
+}
+
 /**
  * this function process users array returned when actions are search user, get user list, update list,
  * updated list...
@@ -234,26 +298,6 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	
 	//Default value implementation in JS
 	//deletedFriendId = typeof deletedFriendId !== 'undefined' ? deletedFriendId : null;
-		
-//	//if(deletedFriendId != null)
-//	if(typeof deletedFriendId !== 'undefined')
-//	{
-//		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
-//		//alertMsg("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
-//		
-//		if(TRACKER.users[deletedFriendId].infoWindowIsOpened)
-//		{
-//			MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0].infoWindow)
-//			
-//		}
-//		
-//		if(TRACKER.preUserId == deletedFriendId)
-//		{
-//			TRACKER.preUserId = -1;
-//		}
-//		
-//		delete TRACKER.users[deletedFriendId];
-//	}
 	
 	var updateType = 'all';
 	
@@ -322,57 +366,14 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				userIdArray.push(userId);
 			}			
 		}	
-
-//		if (isFriend == "1") {
-//			visible = true;
-//		}
-
-		var personPhotoElement;
-		var timeStamp = new Date().getTime();
-		
-		switch(profilePhotoStatus)
-		{
-			case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
-			{
-				if((fb_id != 0) && (typeof fb_id != "undefined")){			
-					personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px" />';
-				}else{
-					personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
-				}
-			}
-			break;
-
-			case "1": //Users::TRACEPER_PROFILE_PHOTO_EXISTS
-			case "3": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER
-			{
-				if(userId === currentUser) //Current user ise cache kullanma (foto degistirirse hemen gorebilsin diye) 
-				{
-					personPhotoElement = '<img src="profilePhotos/' + userId + '.png' + '?random=' + timeStamp + '" />';											
-				}
-				else //Diger kullanicilar icin cache kullan
-				{
-					personPhotoElement = '<img src="profilePhotos/' + userId + '.png" />';						
-				}					
-			}
-			break;
-
-			case "2": //Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK
-			{
-				personPhotoElement = '<img src="https://graph.facebook.com/'+ fb_id +'/picture?type=square" width="44px" height="48px"/>';
-			}
-			break;
-
-			default:
-				//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
-				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';				
-		}		
 		
 		//alertMsg("userId:" + userId);		
 
 		if (typeof TRACKER.users[userId] == "undefined") 
 		{		
 			var userMarker;
-
+			var timeStamp = new Date().getTime();
+			
 			switch(profilePhotoStatus)
 			{
 				case "0": //Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS
@@ -436,23 +437,13 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				userType:userType,
 				mapMarker:new Array(markerInfo),
 				locationCalculatedTime:locationCalculatedTime,
-				locationSource:locationSource
+				locationSource:locationSource,
+				fb_id:fb_id,
+				profilePhotoStatus:profilePhotoStatus
 			});
-
-			var content = 
-				  '<div style="width:280px; height:180px;">'
-				+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
-				+ 	'</br>'
-				+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
-				+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
-				+ 	'</br>'				
-				+ 	'<div style="position:absolute;bottom:10px;">'
-				+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
-				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
-				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
-				+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
-				+ 	'</div>';
-				+ '</div>';								
+	
+			var personPhotoElement = getPersonPhotoElement(userId, currentUser);
+			var content = getUserContent(userId, personPhotoElement);	
 				
 			TRACKER.users[userId].mapMarker[0].infoWindow = MAP.initializeInfoWindow(content);
 			
@@ -469,22 +460,8 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 						TRACKER.showLongMessageDialog(TRACKER.langOperator.yourFriendsLocationInfoNotReliable);
 					}
 				}
-				
-				//Sayfayi yenilemede marker'a her tikladiginda time ago string'inin guncellenmesi icin pencereyi her acmadan once tekra hesapla
-				var content = 
-					  '<div style="width:280px; height:180px;">'
-					+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
-					+ 	'</br>'
-					+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
-					+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
-					+ 	'</br>'				
-					+ 	'<div style="position:absolute;bottom:10px;">'
-					+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+0+','+1+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.users[userId].latitude +','+ TRACKER.users[userId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
-					+ 	'</div>';
-					+ '</div>';				
+	
+				var content = getUserContent(userId, personPhotoElement);	
 								
 				MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);
 				
@@ -552,30 +529,30 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //			}
 			
 			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null) && ((TRACKER.users[userId].latitude != latitude) ||
-					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].time != time))){
+					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].locationTimeStamp != locationTimeStamp) || true))
+			{
+				TRACKER.users[userId].latitude = latitude;
+				TRACKER.users[userId].longitude = longitude;
+				TRACKER.users[userId].time = time;
+				TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
+				TRACKER.users[userId].locationTimeStamp = locationTimeStamp;
+				TRACKER.users[userId].locationSource = locationSource;
+				TRACKER.users[userId].deviceId = deviceId;
+				TRACKER.users[userId].userType = userType;
+				TRACKER.users[userId].friendshipStatus = isFriend;
+				TRACKER.users[userId].address = address;				
+				
 				var isWindowOpen = TRACKER.users[userId].mapMarker[0].infoWindowIsOpened;
 								
-				var content = 
-					  '<div style="width:280px; height:180px;">'
-					+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
-					+ 	'</br>'
-					+ 	'<div style="cursor:text;">' + getLocalDateTime(locationTimeStamp) + ' (' + timeAgo(locationTimeStamp) + ')' + '</div>'				
-					+ 	'<div style="cursor:text;">' + address + '</div>'
-					+ 	'</br>'				
-					+ 	'<div style="position:absolute;bottom:10px;">'
-					+ 		'<a class="infoWinOperations med-icon-bordered-effect med-icon-effect-a" href="javascript:TRACKER.showPointGMarkerInfoWin('+1+','+2+','+ userId +')">'+ '<div class="med-icon-bordered icon-arrow-left vtip" title="' + TRACKER.langOperator.previousPoint + '"></div>' + '</a>'
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:145px;" href="javascript:TRACKER.zoomPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
-					+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ latitude +','+ longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'					
-					+ 	'</div>';
-					+ '</div>';					
-					
+				var personPhotoElement = getPersonPhotoElement(userId, currentUser);
+				var content = getUserContent(userId, personPhotoElement);
+
 				//If user location changed, update marker position
 				TRACKER.users[userId].mapMarker[0].marker.setPosition(new google.maps.LatLng(latitude, longitude));
 			
 				if (isWindowOpen == true) {
 					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
-					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow,content);			
+					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);			
 					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
 				}
 			}
@@ -777,6 +754,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		var rating = value.rating;
 		var description = value.description; //value.description; //$(image).attr('description');
 		var fileExists = value.fileExists;
+		var isPublic = value.isPublic;
 		
 		//alertMsg(value.description);
 		
@@ -810,6 +788,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 				rating:rating,
 				mapMarker:markerInfoWindow,
 				description:description,
+				isPublic:isPublic
 			});
 			
 			//alertMsg("MAP.setMarkerVisible(true)");
@@ -851,32 +830,28 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 //							+ "</div>";
 						
 						var userSharedThisPhoto = null;
-						
+
 						if(LAN_OPERATOR.lang == 'en')
 						{
-							userSharedThisPhoto = ' shared this photo ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
-							
-//							if(par_isPublic == true)
-//							{
-//								userSharedThisPhoto = ' shared this photo publicly ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
-//							}
-//							else
-//							{
-//								userSharedThisPhoto = ' shared this photo ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
-//							}
+							if(isPublic == "1")
+							{
+								userSharedThisPhoto = ' shared this photo as "Public" ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
+							}
+							else
+							{
+								userSharedThisPhoto = ' shared this photo ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') with the comment "' + TRACKER.images[imageId].description + '".';
+							}
 						}
 						else
 						{
-							userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile paylaştı.';
-							
-//							if(par_isPublic == true)
-//							{
-//								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile "Herkese Açık" olarak paylaştı.';
-//							}
-//							else
-//							{
-//								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile paylaştı.';
-//							}	
+							if(isPublic == "1")
+							{
+								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile "Herkese Açık" olarak paylaştı.';
+							}
+							else
+							{
+								userSharedThisPhoto = ' bu fotoğrafı ' + timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + '"' + TRACKER.images[imageId].description + '" yorumu ile paylaştı.';
+							}	
 						}						
 											
 						var content = 
@@ -888,9 +863,9 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 							+ 	'<div style="cursor:text;word-wrap: break-word;">' + '<b>' + TRACKER.images[imageId].realname + '</b>' + userSharedThisPhoto + '</div>'	
 							+ 	'</br>'				
 							+ 	'<div style="position:absolute;bottom:10px;">'						
-							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:162px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
-							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
-							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:142px;" href="javascript:TRACKER.zoomPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomIn1 vtip" title="' + TRACKER.langOperator.zoom + '"></div>' + '</a>'				
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:20px;" href="javascript:TRACKER.zoomOutPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomOut1 vtip" title="' + TRACKER.langOperator.zoomOut + '"></div>' + '</a>'
+							+ 		'<a class="infoWinOperations med-icon-effect med-icon-effect-a" style="margin-left:20px;" href="javascript:TRACKER.zoomMaxPoint('+ TRACKER.images[imageId].latitude +','+ TRACKER.images[imageId].longitude +')">'+ '<div class="med-icon icon-zoomMax5 vtip" title="' + TRACKER.langOperator.zoomMax + '"></div>' + '</a>'		
 							+ 	'</div>';
 							+ '</div>';						
 

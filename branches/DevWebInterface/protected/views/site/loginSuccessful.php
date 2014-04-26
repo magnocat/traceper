@@ -189,12 +189,6 @@ else
 	$("#lists").show();	
 	//$("#content").load();
 	$("#content").show();
-	
-	TRACKER.showImagesOnTheMap = false;
-	TRACKER.showUsersOnTheMap = true;
-	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
-	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
-	TRACKER.getImageList(false, true);
 
 	var positionOptions = {
 			  enableHighAccuracy: true,
@@ -210,6 +204,12 @@ else
 	{
 		
 	}
+
+	TRACKER.showImagesOnTheMap = false;
+	TRACKER.showUsersOnTheMap = true;
+	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
+	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
+	TRACKER.getImageList(false, true);
  
 	function showPosition(position)
 	{
@@ -217,7 +217,9 @@ else
 		
 		//alertMsg("accuracy:" + position.coords.accuracy);
 
-		$.post('index.php?r=users/updateLocationByGeolocation', { latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude });
+		$.post('index.php?r=users/updateLocationByGeolocation', 
+				{ latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude }, 
+	             function(data){ TRACKER.getFriendList(1, 0/*UserType::RealUser*/); });
 
 		if(<?php echo $countryName; ?> == null)
 		{
