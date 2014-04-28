@@ -378,7 +378,7 @@ class SiteController extends Controller
 									$country = null;
 										
 									$this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], $address, $country);
-									Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+									Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
 								}								
 							}
 
@@ -1704,7 +1704,7 @@ class SiteController extends Controller
 						$country = null;
 						
 						$this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], $address, $country);
-						Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+						Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
 					}
 				}
 					

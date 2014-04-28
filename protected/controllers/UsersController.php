@@ -177,6 +177,7 @@ class UsersController extends Controller
 					$latitude = round((float) $_REQUEST['latitude'], 6);
 					$longitude = round((float) $_REQUEST['longitude'], 6);
 					$altitude = round((float) $_REQUEST['altitude'], 6);
+					$accuracy = $_REQUEST['accuracy'];
 					$deviceId = $_REQUEST['deviceId'];
 					$calculatedTime = date('Y-m-d H:i:s', $_REQUEST['time']);
 					$arrivedTime = date('Y-m-d H:i:s');
@@ -205,7 +206,7 @@ class UsersController extends Controller
 							//Madem adres alindi, mevcut konum (Users tablosu) adres karsilastirmasi yapilmadan guncellensin
 							
 							//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
-							$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 							
 							//Address info is also updated with location info if the distance difference is high enough
 							//if ($updatedRowCount > 0)
@@ -216,7 +217,7 @@ class UsersController extends Controller
 							else
 							{
 								//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
-								$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
 								$message = '';
 									
 								//if ($updatedRowCount > 0)
@@ -261,7 +262,7 @@ class UsersController extends Controller
 							$bLogAsPastLocation = false;
 							
 							//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
-							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 							
 							//Only location info (without address info) is updated if the distance difference is smaller than the threshold
 							//if ($updatedRowCount > 0)
@@ -277,7 +278,7 @@ class UsersController extends Controller
 									
 								//Veritabanı ilk seferde guncellenemezse ikinci kez dene
 								//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
-								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
 								$message = '';
 									
 								//if ($updatedRowCount > 0)
@@ -297,6 +298,7 @@ class UsersController extends Controller
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'accuracy:'.$accuracy.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
 								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error (Users-updateLocation) in actionTakeMyLocation()', $message);
 							}							
@@ -325,6 +327,7 @@ class UsersController extends Controller
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'accuracy:'.$accuracy.'<br/>';
 								$message .= 'deviceId:'.$deviceId.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
 								$message .= 'address:'.$address.'<br/>';
@@ -460,8 +463,9 @@ class UsersController extends Controller
 			$country = null;
 			
 			$latitude = round((float) $_POST['latitude'], 6);
-			$longitude = round((float) $_POST['longitude'], 6);
+			$longitude = round((float) $_POST['longitude'], 6);			
 			$altitude = 0;
+			$accuracy = 0;
 			
 			if(isset($_POST['altitude']) && ($_POST['altitude'] != NULL))
 			{
@@ -471,10 +475,19 @@ class UsersController extends Controller
 			{
 				$altitude = 0;
 			}
+			
+			if(isset($_POST['accuracy']) && ($_POST['accuracy'] != NULL))
+			{
+				$accuracy = $_POST['accuracy'];
+			}
+			else
+			{
+				$accuracy = 0;
+			}			
 				
 			$date = date('Y-m-d H:i:s');
 			$this->getaddress($latitude, $longitude, $address, $country);			
-			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);			
+			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);			
 		}		
 	}
 
@@ -1913,6 +1926,7 @@ class UsersController extends Controller
 		$row['latitude'] = isset($row['latitude']) ? $row['latitude'] : "";
 		$row['longitude'] = isset($row['longitude']) ? $row['longitude'] : "";
 		$row['altitude'] = isset($row['altitude']) ? $row['altitude'] : "";
+		$row['accuracy'] = isset($row['accuracy']) ? $row['accuracy'] : "";
 		$row['lastLocationAddress'] = isset($row['lastLocationAddress']) ? $row['lastLocationAddress'] : "";
 		$row['lastLocationCountry'] = isset($row['lastLocationCountry']) ? $row['lastLocationCountry'] : "";
 		$row['dataArrivedTime'] = isset($row['dataArrivedTime']) ? $row['dataArrivedTime'] : "";
@@ -1947,6 +1961,7 @@ class UsersController extends Controller
 				'latitude'=>$row['latitude'],
 				'longitude'=>$row['longitude'],
 				'altitude'=>$row['altitude'],
+				'accuracy'=>$row['accuracy'],
 				'address'=>$this->getFullAddress($row['lastLocationAddress'], $row['lastLocationCountry']),
 				'calculatedTime'=>$row['dataCalculatedTime'],
 				'locationSource'=>$row['locationSource'],
