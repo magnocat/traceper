@@ -177,10 +177,15 @@ class UsersController extends Controller
 					$latitude = round((float) $_REQUEST['latitude'], 6);
 					$longitude = round((float) $_REQUEST['longitude'], 6);
 					$altitude = round((float) $_REQUEST['altitude'], 6);
-					$accuracy = $_REQUEST['accuracy'];
+					$accuracy = 0;
 					$deviceId = $_REQUEST['deviceId'];
 					$calculatedTime = date('Y-m-d H:i:s', $_REQUEST['time']);
 					$arrivedTime = date('Y-m-d H:i:s');
+					
+					if(isset($_REQUEST['accuracy']) && ($_REQUEST['accuracy'] != NULL))
+					{
+						$accuracy = $_REQUEST['accuracy'];
+					}
 					
 					//Fb::warn("lat:$latitude, lon:$longitude, al:$altitude, ct:$calculatedTime, at:$arrivedTime", "actionTakeMyLocation()");
 						
