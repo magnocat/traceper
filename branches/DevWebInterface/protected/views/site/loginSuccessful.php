@@ -218,7 +218,7 @@ else
 		//alertMsg("accuracy:" + position.coords.accuracy);
 
 		$.post('index.php?r=users/updateLocationByGeolocation', 
-				{ latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude }, 
+				{ latitude:position.coords.latitude, longitude:position.coords.longitude, altitude:position.coords.altitude, accuracy:position.coords.accuracy }, 
 	             function(data){ TRACKER.getFriendList(1, 0/*UserType::RealUser*/); });
 
 		if(<?php echo $countryName; ?> == null)

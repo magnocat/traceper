@@ -10,6 +10,7 @@
  * @property string $latitude
  * @property string $longitude
  * @property string $altitude
+ * @property integer $accuracy
  * @property integer $publicPosition
  * @property integer $authorityLevel
  * @property string $realname
@@ -49,16 +50,6 @@
 class Users extends CActiveRecord
 {
 	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return Users the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
@@ -75,7 +66,7 @@ class Users extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('password, realname, email, account_type', 'required'),
-			array('publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhotoStatus, locationSource', 'numerical', 'integerOnly'=>true),
+			array('accuracy, publicPosition, authorityLevel, status_source, gender, userType, account_type, minDataSentInterval, minDistanceInterval, autoSend, termsAccepted, profilePhotoStatus, locationSource', 'numerical', 'integerOnly'=>true),
 			array('password', 'length', 'max'=>32),
 			array('group, latitude, appVer, registrationMedium', 'length', 'max'=>10),
 			array('longitude', 'length', 'max'=>11),
@@ -88,13 +79,12 @@ class Users extends CActiveRecord
 			array('gp_image', 'length', 'max'=>255),
 			array('androidVer, preferredLanguage', 'length', 'max'=>20),
 			array('dataArrivedTime, status_message_time, dataCalculatedTime, lastLocationAddress, lastLocationCountry', 'safe'),
-				
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('Id, password, group, latitude, longitude, altitude, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, lastLocationCountry, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus, locationSource', 'safe', 'on'=>'search'),
-		);		
+			// @todo Please remove those attributes that should not be searched.
+			array('Id, password, group, latitude, longitude, altitude, accuracy, publicPosition, authorityLevel, realname, email, dataArrivedTime, deviceId, status_message, status_source, status_message_time, dataCalculatedTime, fb_id, g_id, gender, userType, account_type, gp_image, lastLocationAddress, lastLocationCountry, minDataSentInterval, minDistanceInterval, autoSend, androidVer, appVer, registrationMedium, preferredLanguage, termsAccepted, profilePhotoStatus, locationSource', 'safe', 'on'=>'search'),
+		);
 	}
-
+	
 	/**
 	 * @return array relational rules.
 	 */
@@ -110,7 +100,7 @@ class Users extends CActiveRecord
 			'traceperUserWasHeres' => array(self::HAS_MANY, 'TraceperUserWasHere', 'userId'),
 		);
 	}
-
+	
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
@@ -123,6 +113,7 @@ class Users extends CActiveRecord
 			'latitude' => 'Latitude',
 			'longitude' => 'Longitude',
 			'altitude' => 'Altitude',
+			'accuracy' => 'Accuracy',
 			'publicPosition' => 'Public Position',
 			'authorityLevel' => 'Authority Level',
 			'realname' => 'Realname',
@@ -150,18 +141,25 @@ class Users extends CActiveRecord
 			'preferredLanguage' => 'Preferred Language',
 			'termsAccepted' => 'Terms Accepted',
 			'profilePhotoStatus' => 'Profile Photo Status',
-			'locationSource' => 'Location Source'	
+			'locationSource' => 'Location Source',
 		);
 	}
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 *
+	 * Typical usecase:
+	 * - Initialize the model fields with values from filter form.
+	 * - Execute this method to get CActiveDataProvider instance which will filter
+	 * models according to data in model fields.
+	 * - Pass data provider to CGridView, CListView or any similar widget.
+	 *
+	 * @return CActiveDataProvider the data provider that can return the models
+	 * based on the search/filter conditions.
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
+		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
 
@@ -171,6 +169,7 @@ class Users extends CActiveRecord
 		$criteria->compare('latitude',$this->latitude,true);
 		$criteria->compare('longitude',$this->longitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
+		$criteria->compare('accuracy',$this->accuracy);
 		$criteria->compare('publicPosition',$this->publicPosition);
 		$criteria->compare('authorityLevel',$this->authorityLevel);
 		$criteria->compare('realname',$this->realname,true);
@@ -204,123 +203,136 @@ class Users extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	/**
+	 * Returns the static model of the specified AR class.
+	 * Please note that you should have this exact method in all your CActiveRecord descendants!
+	 * @param string $className active record class name.
+	 * @return Users the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
 	
 	const NO_TRACEPER_PROFILE_PHOTO_EXISTS = 0;
 	const TRACEPER_PROFILE_PHOTO_EXISTS = 1;
 	const BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK = 2;
 	const BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER = 3;
 	
-// 	public function updateLocation($latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId){
+	// 	public function updateLocation($latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId){
 	
-// 		$sql = sprintf('UPDATE '
-// 				. $this->tableName() .'
-// 				SET
-// 				latitude = %f , '
-// 				.'	longitude = %f , '
-// 				.'	altitude = %f ,	'
-// 				.'	dataArrivedTime = NOW(), '
-// 				.'  dataCalculatedTime = "%s", '
-// 				.' 	locationSource = %d '
-// 				.' WHERE '
-// 				.' 	Id = %d '
-// 				.' LIMIT 1;',
-// 				$latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId);
+	// 		$sql = sprintf('UPDATE '
+	// 				. $this->tableName() .'
+	// 				SET
+	// 				latitude = %f , '
+	// 				.'	longitude = %f , '
+	// 				.'	altitude = %f ,	'
+	// 				.'	dataArrivedTime = NOW(), '
+	// 				.'  dataCalculatedTime = "%s", '
+	// 				.' 	locationSource = %d '
+	// 				.' WHERE '
+	// 				.' 	Id = %d '
+	// 				.' LIMIT 1;',
+	// 				$latitude, $longitude, $altitude, $calculatedTime, $locationSource, $userId);
 	
-// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-// 		//$effectedRows = 0;
-// 		return $effectedRows;
-// 	}
+	// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+	// 		//$effectedRows = 0;
+	// 		return $effectedRows;
+	// 	}
 	
-	public function updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, $locationSource, $userId){
+	public function updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId){
 	
-// 		$sql = sprintf('UPDATE '
-// 		. $this->tableName() .'
-// 					SET
-// 					latitude = %f , '
-// 		.'	longitude = %f , '
-// 		.'	altitude = %f ,	'
-// 		.'	dataArrivedTime = "%s", '
-// 		.'  dataCalculatedTime = "%s", '
-// 		.' 	locationSource = %d '
-// 		.' WHERE '
-// 		.' 	Id = %d '
-// 		.' LIMIT 1;',
-// 		$latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, $locationSource, $userId);
+		// 		$sql = sprintf('UPDATE '
+		// 		. $this->tableName() .'
+		// 					SET
+		// 					latitude = %f , '
+		// 		.'	longitude = %f , '
+		// 		.'	altitude = %f ,	'
+		// 		.'	dataArrivedTime = "%s", '
+		// 		.'  dataCalculatedTime = "%s", '
+		// 		.' 	locationSource = %d '
+		// 		.' WHERE '
+		// 		.' 	Id = %d '
+		// 		.' LIMIT 1;',
+		// 		$latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, $locationSource, $userId);
 	
-// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-// 		//$effectedRows = 0;
-// 		return $effectedRows;
-				
+		// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		// 		//$effectedRows = 0;
+		// 		return $effectedRows;
+	
 		$user = Users::model()->findByPk($userId);
 	
 		$user->latitude = $latitude;
 		$user->longitude = $longitude;
 		$user->altitude = $altitude;
+		$user->accuracy = $accuracy;
 		$user->dataArrivedTime = $arrivedTime;
 		$user->dataCalculatedTime = $calculatedTime;
 		$user->locationSource = $locationSource;
 	
-		return $user->save();		
-	}	
+		return $user->save();
+	}
 	
-// 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId){
+	// 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId){
 	
-// 		$sql = sprintf('UPDATE '
-// 				. $this->tableName() .'
-// 				SET
-// 				latitude = %f , '
-// 				.'	longitude = %f , '
-// 				.'	altitude = %f ,	'
-// 				.'	lastLocationAddress = "%s" , '
-// 				.'	lastLocationCountry = "%s" , '
-// 				.'	dataArrivedTime = NOW(), '
-// 				.'  dataCalculatedTime = "%s", '
-// 				.' 	locationSource = %d '
-// 				.' WHERE '
-// 				.' 	Id = %d '
-// 				.' LIMIT 1;',
-// 				$latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId);
+	// 		$sql = sprintf('UPDATE '
+	// 				. $this->tableName() .'
+	// 				SET
+	// 				latitude = %f , '
+	// 				.'	longitude = %f , '
+	// 				.'	altitude = %f ,	'
+	// 				.'	lastLocationAddress = "%s" , '
+	// 				.'	lastLocationCountry = "%s" , '
+	// 				.'	dataArrivedTime = NOW(), '
+	// 				.'  dataCalculatedTime = "%s", '
+	// 				.' 	locationSource = %d '
+	// 				.' WHERE '
+	// 				.' 	Id = %d '
+	// 				.' LIMIT 1;',
+	// 				$latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId);
 	
-// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-// 		//$effectedRows = 0;
-// 		return $effectedRows;
-// 	}
+	// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+	// 		//$effectedRows = 0;
+	// 		return $effectedRows;
+	// 	}
 	
-	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId){
+	public function updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId){
 	
-// 		$sql = sprintf('UPDATE '
-// 		. $this->tableName() .'
-// 					SET
-// 					latitude = %f , '
-// 		.'	longitude = %f , '
-// 		.'	altitude = %f ,	'
-// 		.'	lastLocationAddress = "%s" , '
-// 		.'	lastLocationCountry = "%s" , '
-// 		.'	dataArrivedTime = "%s", '
-// 		.'  dataCalculatedTime = "%s", '
-// 		.' 	locationSource = %d '
-// 		.' WHERE '
-// 		.' 	Id = %d '
-// 		.' LIMIT 1;',
-// 		$latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
+		// 		$sql = sprintf('UPDATE '
+		// 		. $this->tableName() .'
+		// 					SET
+		// 					latitude = %f , '
+		// 		.'	longitude = %f , '
+		// 		.'	altitude = %f ,	'
+		// 		.'	lastLocationAddress = "%s" , '
+		// 		.'	lastLocationCountry = "%s" , '
+		// 		.'	dataArrivedTime = "%s", '
+		// 		.'  dataCalculatedTime = "%s", '
+		// 		.' 	locationSource = %d '
+		// 		.' WHERE '
+		// 		.' 	Id = %d '
+		// 		.' LIMIT 1;',
+		// 		$latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
 	
-// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-// 		//$effectedRows = 0;
-// 		return $effectedRows;
-		
+		// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		// 		//$effectedRows = 0;
+		// 		return $effectedRows;
+	
 		$user = Users::model()->findByPk($userId);
-		
+	
 		$user->latitude = $latitude;
 		$user->longitude = $longitude;
-		$user->altitude = $altitude;		
+		$user->altitude = $altitude;
+		$user->accuracy = $accuracy;
 		$user->lastLocationAddress = $address;
-		$user->lastLocationCountry = $country;		
+		$user->lastLocationCountry = $country;
 		$user->dataArrivedTime = $arrivedTime;
 		$user->dataCalculatedTime = $calculatedTime;
 		$user->locationSource = $locationSource;
-		
-		return $user->save();		
-	}	
+	
+		return $user->save();
+	}
 	
 	public function updateLocationTime($userId, $par_time)
 	{
@@ -385,7 +397,7 @@ class Users extends CActiveRecord
 			$result = true;
 		}
 		return $result;
-	}	
+	}
 	
 	public function getNameByEmail($email) {
 		$user = Users::model()->find('email=:email', array(':email'=>$email));
@@ -411,7 +423,7 @@ class Users extends CActiveRecord
 		$users->registrationMedium = $registrationMedium;
 		$users->preferredLanguage = $preferredLanguage;
 		$users->termsAccepted = 1;
-
+	
 		$result = $users->save();
 		return $result;
 	}
@@ -419,26 +431,26 @@ class Users extends CActiveRecord
 	
 	public function updateTraceperUserAsFacebookUser($email, $password, $name, $fb_id, $preferredLanguage){
 		$result = false;
-
+	
 		if ($fb_id == null || $fb_id == 0) {
 			$result = false;
 		}
 		else
 		{
 			$user = Users::model()->find('email=:email', array(':email'=>$email));
-					
+				
 			$user->password = $password;
 			$user->realname = $name;
 			$user->fb_id = $fb_id;
 			$user->account_type = 1;
 			$user->preferredLanguage = $preferredLanguage;
-
+	
 			$result = $user->save();
 		}
 	
 		return $result;
 	}
-
+	
 	public function saveGPUser($email, $password, $realname, $g_id, $accountType, $gp_image){
 		$users=new Users;
 	
@@ -535,7 +547,7 @@ class Users extends CActiveRecord
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
 		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
 		WHERE ((u.Id in ('. $IdList.')';
-
+	
 		$doubleCloseParanthesisSql = '))';
 		$sqlCount .= $doubleCloseParanthesisSql;
 		$sql .= $doubleCloseParanthesisSql;
@@ -555,7 +567,7 @@ class Users extends CActiveRecord
 		{
 			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
 		}
-		
+	
 		//Fb::warn(Yii::app()->session['usersPageSize'], "getListDataProvider() - usersPageSize");
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
@@ -572,7 +584,7 @@ class Users extends CActiveRecord
 		));
 	
 		return $dataProvider;
-	}	
+	}
 	
 	public function getListDataProviderForJson($IdList, $userType=null, $newFriendId=null, $time=null, $offset=null, $itemCount=null, $totalItemCount = null)
 	{
@@ -593,31 +605,31 @@ class Users extends CActiveRecord
 		$sqlCount = 'SELECT count(*)
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE ((Id in ('. $IdList.')';
-		
-// 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress,
-// 		u.userType, u.deviceId,
-// 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
-// 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-// 		u.account_type, u.fb_id
-// 		FROM '.  Users::model()->tableName() . ' u
-// 		WHERE ((Id in ('. $IdList.')';
-		
-		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress, u.lastLocationCountry,
+	
+		// 		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.lastLocationAddress,
+		// 		u.userType, u.deviceId,
+		// 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
+		// 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
+		// 		u.account_type, u.fb_id
+		// 		FROM '.  Users::model()->tableName() . ' u
+		// 		WHERE ((Id in ('. $IdList.')';
+	
+		$sql = 'SELECT  u.Id as id, u.realname as Name, u.latitude, u.longitude, u.altitude, u.accuracy, u.lastLocationAddress, u.lastLocationCountry,
 		u.userType, u.deviceId, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime,
-		u.account_type, u.fb_id, u.profilePhotoStatus, u.locationSource 
-		FROM '.  Users::model()->tableName() . ' u 
-		LEFT JOIN ' . Friends::model()->tableName() . ' f 
-		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR 
-		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .') 
-		WHERE ((u.Id in ('. $IdList.')';		
+		u.account_type, u.fb_id, u.profilePhotoStatus, u.locationSource
+		FROM '.  Users::model()->tableName() . ' u
+		LEFT JOIN ' . Friends::model()->tableName() . ' f
+		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
+		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
+		WHERE ((u.Id in ('. $IdList.')';
 	
 		if ($time != null) {
 			$timeSql = ' AND unix_timestamp(u.dataArrivedTime) >= '. $time.')';
 			$sqlCount .= $timeSql;
 			$sql .= $timeSql;
-				
+	
 			if ($newFriendId != null) {
 				$newFriendIdSql = ' OR Id = '.$newFriendId.')';
 				$sqlCount .= $newFriendIdSql;
@@ -652,11 +664,11 @@ class Users extends CActiveRecord
 		if ($count == null) {
 			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 		}
-		
+	
 		if(isset(Yii::app()->session['usersPageSize']) == false)
 		{
 			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
-		}		
+		}
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
@@ -686,7 +698,7 @@ class Users extends CActiveRecord
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id ; //Aramada kullanıcının kendisi çıkmasın diye
 	
-		$sql = 'SELECT  u.Id as id, u.realname as Name, 
+		$sql = 'SELECT  u.Id as id, u.realname as Name,
 		u.userType, u.fb_id, u.profilePhotoStatus, u.account_type, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		IFNULL(f.status, -1) as status, IF(f.friend1 = '.Yii::app()->user->id.', true, false) as requester
 		FROM '.  Users::model()->tableName() . ' u
@@ -694,13 +706,13 @@ class Users extends CActiveRecord
 		ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
 		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .')
 		WHERE '. $IdListSql .' u.realname like "%'. $text .'%" AND u.Id <> '.Yii::app()->user->id; //Aramada kullanıcının kendisi çıkmasın diye
-		
+	
 		$count = Yii::app()->db->createCommand($sqlCount)->queryScalar();
-		
+	
 		if(isset(Yii::app()->session['usersPageSize']) == false)
 		{
 			Yii::app()->session['usersPageSize'] = Yii::app()->params->itemCountInOnePage;
-		}		
+		}
 	
 		$dataProvider = new CSqlDataProvider($sql, array(
 				'totalItemCount'=>$count,
@@ -714,7 +726,7 @@ class Users extends CActiveRecord
 						//'pageSize'=>Yii::app()->params->itemCountInOnePage,
 						'pageSize'=>Yii::app()->session['usersPageSize'],
 						'params'=>array(CHtml::encode('SearchForm[keyword]')=>$text),
-						'itemCount'=>$count //pagination'daki sayfalarin duzgun calismasini sagliyor, olmazsa pageCount 0 cikiyor 
+						'itemCount'=>$count //pagination'daki sayfalarin duzgun calismasini sagliyor, olmazsa pageCount 0 cikiyor
 				),
 		));
 	
@@ -733,23 +745,23 @@ class Users extends CActiveRecord
 				}
 				$userTypeSqlPart .= ' u.userType = "'.$friendUserType[$i].'" ';
 			}
-		}		
-		
+		}
+	
 		//TODO: this function should be moved to Friends model
 		$sql = 'SELECT IF( f.friend1 != '. $Id.', f.friend1, f.friend2 ) as friend '
-		.' FROM ' .  Friends::model()->tableName(). ' f		
+		.' FROM ' .  Friends::model()->tableName(). ' f
 		LEFT JOIN ' . Users::model()->tableName() . ' u
-		ON IF( f.friend1 != '. $Id.', (u.Id = f.friend1), (u.Id = f.friend2) ) '		
+		ON IF( f.friend1 != '. $Id.', (u.Id = f.friend1), (u.Id = f.friend2) ) '
 		.' WHERE '
 		.' ((f.friend1='.Yii::app()->user->id.')'
 		.' OR (f.friend2='.Yii::app()->user->id.')'
 		.' ) '
 		.' AND STATUS = 1';
-
+	
 		if ($userTypeSqlPart != '') {
 			$sql .= ' AND (' . $userTypeSqlPart. ')';
-		}		
-		
+		}
+	
 		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
 	
 		//echo "Friend Count: ".count($friendsResult);
@@ -769,29 +781,29 @@ class Users extends CActiveRecord
 				}
 				$userTypeSqlPart .= ' u.userType = "'.$friendUserType[$i].'" ';
 			}
-		}		
-		
+		}
+	
 		//TODO: this function should be moved to Friends model
 		$sql = 'SELECT IF( f.friend1 != '. $Id.', f.friend1, f.friend2 ) as friend '
 		.' FROM ' .  Friends::model()->tableName() .' f
 		LEFT JOIN ' . Users::model()->tableName() . ' u
-		ON IF( f.friend1 != '. $Id.', (u.Id = f.friend1), (u.Id = f.friend2) ) '		
+		ON IF( f.friend1 != '. $Id.', (u.Id = f.friend1), (u.Id = f.friend2) ) '
 		.' WHERE '
 		.' ((f.friend1='.Yii::app()->user->id.' AND f.friend2Visibility=1)'
 		.' OR (f.friend2='.Yii::app()->user->id.' AND f.friend1Visibility=1)'
 		.' ) '
 		.' AND STATUS = 1';
-		
+	
 		if ($userTypeSqlPart != '') {
 			$sql .= ' AND (' . $userTypeSqlPart. ')';
 		}
-				
-		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();		
+	
+		$friendsResult = Yii::app()->db->createCommand($sql)->queryAll();
 	
 		//echo "Friend Count: ".count($friendsResult);
 	
 		return $friendsResult;
-	}	
+	}
 	
 	public function setUserPositionPublicity($userId, $isPublic)
 	{
@@ -887,7 +899,7 @@ class Users extends CActiveRecord
 			else
 			{
 				$result = false;
-			}	
+			}
 		}
 		else
 		{
@@ -904,7 +916,7 @@ class Users extends CActiveRecord
 	
 		if($user != null)
 		{
-			$par_appVersion = $user->appVer; 
+			$par_appVersion = $user->appVer;
 			$result = true;
 		}
 		else
@@ -914,12 +926,12 @@ class Users extends CActiveRecord
 	
 		return $result;
 	}
-
+	
 	public function setAppVersion($par_email, $par_appVersion)
 	{
 		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
 		$result = false;
-		
+	
 		if($user != null)
 		{
 			$user->appVer = $par_appVersion;
@@ -929,17 +941,17 @@ class Users extends CActiveRecord
 		{
 			$result = false;
 		}
-
+	
 		return $result;
-	}	
-
+	}
+	
 	public function setTermsAccepted($email)
 	{
-		$user = Users::model()->find('email=:email', array(':email'=>$email));		
+		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$user->termsAccepted = 1;
-
+	
 		return $user->save();
-	}	
+	}
 	
 	public function getMinimumIntervalValues($userId, &$par_minDistanceInterval, &$par_minDataSentInterval)
 	{
@@ -1075,8 +1087,8 @@ class Users extends CActiveRecord
 		}
 	
 		return $result;
-	}	
-
+	}
+	
 	public function setProfilePhotoStatus($userId, $status)
 	{
 		$result = false;
@@ -1091,7 +1103,7 @@ class Users extends CActiveRecord
 	public function getProfilePhotoStatus($userId)
 	{
 		$user = $this->findByPk($userId);
-
+	
 		return $user->profilePhotoStatus;
 	}
 	
@@ -1099,7 +1111,7 @@ class Users extends CActiveRecord
 	{
 		$result = false;
 		$user = $this->findByPk($userId);
-		
+	
 		if($user != null)
 		{
 			$par_address = $user->lastLocationAddress;
@@ -1112,12 +1124,12 @@ class Users extends CActiveRecord
 		}
 	
 		return $result;
-	}	
-
+	}
+	
 	public function isFacebookUser($par_email, &$par_appVersion) {
 		$result = false;
-		$user = Users::model()->find('email=:email', array(':email'=>$par_email));		
-		
+		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
+	
 		if($user != null)
 		{
 			if ($user->fb_id != 0) {
@@ -1125,7 +1137,7 @@ class Users extends CActiveRecord
 				$par_appVersion = $user->appVer;
 			}
 		}
-
+	
 		return $result;
 	}
 	
@@ -1143,10 +1155,10 @@ class Users extends CActiveRecord
 		}
 	
 		return $result;
-	}	
-
+	}
+	
 	//1.0.16 veya alti bir versiyonda facebook kaydol ile kaydolmus biri yeni uygulamayla ilk login oldugunda
-	//sifresini uygulamanin gonderdigi auto-generated sifre ile guncellemek icin kullanilacak	
+	//sifresini uygulamanin gonderdigi auto-generated sifre ile guncellemek icin kullanilacak
 	public function updatePassword($par_email, $par_password)
 	{
 		$user = Users::model()->find('email=:email', array(':email'=>$par_email));
@@ -1154,20 +1166,20 @@ class Users extends CActiveRecord
 	
 		return $user->save();
 	}
-
+	
 	public function doesUserEmailNeedToBeCorrected($par_email, &$par_correctedEmail) {
 		$bCorrectionRequired = false;
 		$correctedEmail = null;
-
+	
 		$user = strtok($par_email, "@");
 		$domain = strtok("@");
-		
+	
 		//list($domainName, $extension) = explode('.', $domain);  -> Buna e-mail alanı boşken hata veriyor
 		$domainName = strtok($domain, ".");
-		$extension = strtok(".");	
-
+		$extension = strtok(".");
+	
 		//Fb::warn("user:$user - domainName:$domainName - extension:$extension", "doesUserEmailNeedToBeCorrected()");
-		
+	
 		if(($domainName == "gmial") || ($domainName == "gmil") || ($domainName == "gmal") || ($domainName == "glail") || ($domainName == "gamil"))
 		{
 			$bCorrectionRequired = true;
@@ -1210,28 +1222,28 @@ class Users extends CActiveRecord
 			//$correctedEmail = str_replace($extension, "com", $par_email);
 			$correctedEmail = $user."@".$domainName.".com";
 		}
-		
+	
 		if($bCorrectionRequired)
 		{
-// 			$correctedEmailFirstPart = strtok($correctedEmail, ".");
-// 			$correctedEmailExtension = strtok(".");			
+			// 			$correctedEmailFirstPart = strtok($correctedEmail, ".");
+			// 			$correctedEmailExtension = strtok(".");
+	
+			// 			if($correctedEmailExtension == "com") //These domains all have "com" extension
+			// 			{
+			// 				//Nothig to do
+				// 			}
+				// 			else
+					// 			{
+					// 				$correctedEmail = str_replace($correctedEmailExtension, "com", $correctedEmail);
+					// 			}
 				
-// 			if($correctedEmailExtension == "com") //These domains all have "com" extension
-// 			{
-// 				//Nothig to do
-// 			}
-// 			else
-// 			{
-// 				$correctedEmail = str_replace($correctedEmailExtension, "com", $correctedEmail);
-// 			}
-			
 			$par_correctedEmail = $correctedEmail;
 		}
 		else
 		{
 			$par_correctedEmail = null;
 		}
-
+	
 		return $bCorrectionRequired;
 	}	
 }
