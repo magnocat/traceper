@@ -31,7 +31,7 @@ function MapOperator(lang) {
 		}
 		else
 		{
-			MAP_OPERATOR.focusOnCountry(par_country, false);
+			MAP_OPERATOR.focusOnCountry(par_country, false, location.latitude, location.longitude);
 		}
 
 //		  // Try HTML5 geolocation
@@ -76,7 +76,7 @@ function MapOperator(lang) {
 					//country = data[2].formatted_address;
 					country = data[0].address_components[6].long_name;
 					
-					MAP_OPERATOR.focusOnCountry(country, true);
+					MAP_OPERATOR.focusOnCountry(country, true, defaultLocation.latitude, defaultLocation.longitude);
 				}
 				else
 				{
@@ -97,7 +97,7 @@ function MapOperator(lang) {
 		MAP_OPERATOR.map.setCenter(initialLocation);
 	}
 	
-	MAP_OPERATOR.focusOnCountry = function(par_country, par_bSessionToBeUpdated) {			
+	MAP_OPERATOR.focusOnCountry = function(par_country, par_bSessionToBeUpdated, par_latitude, par_longitude) {			
 		//alert("Country: " + par_country);
 		
 		var address = par_country;
@@ -117,7 +117,7 @@ function MapOperator(lang) {
 		    	bCountryInfoExists = true;
 		    } else {
 		        //alert("Geocode was not successful for the following reason: " + status);
-				var initialLocation = new google.maps.LatLng(location.latitude, location.longitude);
+				var initialLocation = new google.maps.LatLng(par_latitude, par_longitude);
 				MAP_OPERATOR.map.setCenter(initialLocation);
 				
 				//Session variable null degilse fakat ayni zamanda da alinmis bilgi gecersiz bir konum bilgisiyse

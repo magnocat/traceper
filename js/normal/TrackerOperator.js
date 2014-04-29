@@ -302,6 +302,30 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		}, true);		
 	};
 	
+	this.resetImagesList = function()
+	{
+		this.bgImageListPageNo = 1;
+		this.bgImageListPageCount = 0;
+		
+		clearTimeout(TRACKER.imageTimer);
+		
+		for (var key in TRACKER.images) {	    			
+			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
+			{
+				if(TRACKER.images[key].infoWindowIsOpened)
+				{
+					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+				}
+				
+				TRACKER.images[key].mapMarker.marker.setMap(null);
+			}
+		}		
+
+		this.allImagesFetched = false;
+		this.images = [];
+		this.imageIds = [];			
+	}
+	
 	this.getImageList = function(isPublic, updateAll, callback){
 		var jsonparams;
 		var exceptionForParamsMapKey;
@@ -851,25 +875,35 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	}
 
 	this.showMediaWindow = function(uploadId, isPublic){
+		//alert("111");
 		if (typeof TRACKER.images[uploadId] == "undefined") {
+			//alert("222 - isPublic:" + isPublic);
+			
 			TRACKER.getImageList(isPublic, true, function(){
-				var location = new MapStruct.Location({latitude:this.images[uploadId].latitude, longitude:this.images[uploadId].longitude});
+				var location = new MapStruct.Location({latitude:TRACKER.images[uploadId].latitude, longitude:TRACKER.images[uploadId].longitude});
 				MAP.panMapTo(location);				
 				
-				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');			
+				MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');
+				
+				//alert("333 - MAP.trigger(click)");
 			});
 			
 			//alertMsg("showMediaWindow 111");
 		}
-		else {		
-			var location = new MapStruct.Location({latitude:this.images[uploadId].latitude, longitude:this.images[uploadId].longitude});
+		else {
+			//alert("444");
+			
+			var location = new MapStruct.Location({latitude:TRACKER.images[uploadId].latitude, longitude:TRACKER.images[uploadId].longitude});
 			MAP.panMapTo(location);			
 			
 			MAP.trigger(TRACKER.images[uploadId].mapMarker.marker, 'click');
 			
 			//alertMsg("showMediaWindow 222");
-		}		
+		}
+		
+		//alert("555");
 	};
+	
 	this.closeMarkerInfoWindow = function (userId) {
 		TRACKER.users[userId].gmarker.closeInfoWindow();
 		TRACKER.users[userId].mapMarker[0].infoWindowIsOpened = false;

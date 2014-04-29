@@ -739,7 +739,7 @@ Yii::app()->clientScript->registerCoreScript('yiiactiveform');
 
 $countryName = null;
 
-if(isset(Yii::app()->session['countryName']) == false)
+if((isset(Yii::app()->session['countryName']) == false) || (Yii::app()->session['countryName'] == NULL))
 {
 	$countryName = "null";
 }
@@ -754,8 +754,7 @@ Yii::app()->clientScript->registerScript('appStart',"var checked = false;
 	try
 	{
 		var mapStruct = new MapStruct();
-		var initialLoc = new MapStruct.Location({latitude:39.504041,
-		longitude:35.024414});
+		var initialLoc = new MapStruct.Location({latitude:39.504041, longitude:35.024414});
 		mapOperator.initialize(initialLoc, ".$countryName.");
 		//TODO: ../index.php should be changed
 		//TODO: updateUserListInterval
@@ -799,34 +798,34 @@ if (Yii::app()->user->isGuest == true)
 			", CClientScript::POS_READY);
 }
 
-if(isset(Yii::app()->session['countryName']) == false)
+if((isset(Yii::app()->session['countryName']) == false) || (Yii::app()->session['countryName'] == NULL))
 {
 	Yii::app()->clientScript->registerScript('getGeolocationByIp',
 			"
 			jQuery.getJSON('http://freegeoip.net/json/', function(location) {
 				//alert('freegeoip: location.country_name: ' + location.country_name + ' lat: ' + location.latitude + ' lon: ' + location.longitude);			
-				MAP_OPERATOR.focusOnCountry(location.country_name, false);			
+				MAP_OPERATOR.focusOnCountry(location.country_name, false, location.latitude, location.longitude);			
 				$.post('index.php?r=users/getLocationByWebIP', { countryName:location.country_name, latitude:location.latitude, longitude:location.longitude });
 			}) .done(function() {
 
 				})
 				.fail(function() { //freegeoip fail ederse telize den sorgula
 					$.getJSON('http://www.telize.com/geoip?callback=?', function(json) {
-						MAP_OPERATOR.focusOnCountry(json.country, false);			
+						MAP_OPERATOR.focusOnCountry(json.country, false, json, json.latitude, json.longitude);			
 						$.post('index.php?r=users/getLocationByWebIP', { countryName:json.country, latitude:json.latitude, longitude:json.longitude });
 					}) .done(function() {
 							//console.log('second success');
 						})
-						.fail(function() {
+						.fail(function() { //telize da fail ederse ip-api den sorgula
 							//console.log('error');			
 							jQuery.getJSON('http://ip-api.com/json', function(location) { //telize de fail ederse ip-api den sorgula
-								MAP_OPERATOR.focusOnCountry(location.country, false);						
+								MAP_OPERATOR.focusOnCountry(location.country, false, location.lat, location.lon);						
 								$.post('index.php?r=users/getLocationByWebIP', { countryName:location.country, latitude:location.lat, longitude:location.lon });							
 								//alert('ip-api: location.country: ' + location.country + ' location.city: ' + location.city  + ' lat: ' + location.lat + ' lon: ' + location.lon);
 							}) .done(function() {
 									//console.log('success');
 								})
-								.fail(function() { //freegeoip fail ederse telize den sorgula
+								.fail(function() {
 									//console.log('error');
 								})
 								.always(function() {
@@ -863,7 +862,7 @@ else
 {
 	Yii::app()->clientScript->registerScript('focusOnCountry',
 			"
-			MAP_OPERATOR.focusOnCountry('".Yii::app()->session['countryName']."', false);
+			MAP_OPERATOR.focusOnCountry('".Yii::app()->session['countryName']."', false, 39.504041 /*default lat*/, 35.024414/*default lon*/);
 			",
 			CClientScript::POS_READY);
 }

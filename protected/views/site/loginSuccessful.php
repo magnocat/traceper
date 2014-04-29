@@ -190,6 +190,14 @@ else
 	//$("#content").load();
 	$("#content").show();
 
+	TRACKER.showImagesOnTheMap = false;
+	TRACKER.showUsersOnTheMap = true;
+	TRACKER.resetImagesList();
+	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
+	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
+	//TRACKER.getImageList(false, true);
+	TRACKER.getImageList();	
+
 	var positionOptions = {
 			  enableHighAccuracy: true,
 			  timeout: 10000,
@@ -205,12 +213,6 @@ else
 		
 	}
 
-	TRACKER.showImagesOnTheMap = false;
-	TRACKER.showUsersOnTheMap = true;
-	TRACKER.userId = <?php echo Yii::app()->user->id; ?>;		
-	TRACKER.getFriendList(1, 0/*UserType::RealUser*/);	
-	TRACKER.getImageList(false, true);
- 
 	function showPosition(position)
 	{
 		//alertMsg("latitude:" + position.coords.latitude + " - longitude:" + position.coords.longitude);
