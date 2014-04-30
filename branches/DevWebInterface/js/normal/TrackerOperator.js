@@ -20,10 +20,13 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.bAllLinesCleared = [];
 	this.updateInterval = interval;
 	this.timer;
+	this.checkUserTimer;
+	this.setUserCheckIntervalTimer;
 	this.imageTimer;
 	this.traceLineDrawedUserId = null;
 	this.showImagesOnTheMap = true;
 	this.showUsersOnTheMap = false;
+	this.userQueryInterval = 12*30*24*60*60; //En buyuk sayiyla ilkle
 	
 	this.monthNames = [];
 	
@@ -172,8 +175,47 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 //		alertMsg("allKeys AFTER deletion: " + allKeys);		
 	}
 	
-	var exceptionForParamsMap = {'getUserListJson':0, 'getPublicUploadListJson':0, 'getUploadListJson':0, 'getUserPastPointsJSON':0, 'sendGeofenceData':0};
+	this.setUserQueryInterval = function(par_interval){
+		this.userQueryInterval = par_interval;
+		
+		//alert("setUserQueryInterval(" + par_interval + ") called");
+	}	
+	
+	this.checkUsers = function(){
+		//alert("checkUsers() called");
+		
+		$.fn.yiiGridView.update("userListView");
+		
+		//1 katsayısından sonra round() kullanılıyor, yani 1.5dk 2dk olarak gosteriliyor. Bu nedenle ilk tip geciside normal araligin
+		//yarisi kadar timeout kuruluyor, sonrasinde ise bu timeout normal seviyeye cekilmeli yani 2 ile carpilmali
+		
+		if(this.userQueryInterval == 60*1000/2)
+		{
+			this.userQueryInterval = 60*1000;
+		}
+		else if(this.userQueryInterval == 60*60*1000/2)
+		{
+			this.userQueryInterval = 60*60*1000;
+		}
+		else if(this.userQueryInterval == 24*60*60*1000/2)
+		{
+			this.userQueryInterval = 24*60*60*1000;
+		}
+		else if(this.userQueryInterval == 30*24*60*60*1000/2)
+		{
+			this.userQueryInterval = 30*24*60*60*1000;
+		}			
+		else if(this.userQueryInterval == 12*30*24*60*60*1000/2)
+		{
+			this.userQueryInterval = 12*30*24*60*60*1000;
+		}		
 
+		clearTimeout(this.checkUserTimer);
+		this.checkUserTimer = setTimeout(function() {TRACKER.checkUsers();}, this.userQueryInterval);	
+	}	
+	
+	var exceptionForParamsMap = {'getUserListJson':0, 'getPublicUploadListJson':0, 'getUploadListJson':0, 'getUserPastPointsJSON':0, 'sendGeofenceData':0};
+			
 	/**
 	 * 
 	 */
@@ -247,7 +289,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				
 				//newFriendId ve deletedFriendId parametreleri sadece bu islemler yapildiginda userList.php tarafindan verilmeli diger durumlarda verilmemeli
 				TRACKER.timer = setTimeout(function() {TRACKER.getFriendList(pageNo, userType);}, TRACKER.updateInterval);
-				
+
 				if(exceptionForParamsMap['getUserListJson'] > 5)
 				{
 					  var data = "r=site/ajaxEmailNotification&title=Javascript Exception Recovered&message=" +

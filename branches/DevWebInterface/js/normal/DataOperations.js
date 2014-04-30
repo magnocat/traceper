@@ -5,30 +5,36 @@
  */
 
 //date: in seconds
-function timeAgo(date) {
-	
+function timeAgo(date) 
+{	
 	var now = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
     var seconds = Math.floor(now - date);
     var returnString = "";
     
     //alert("timeAgo(), date:" + date + " now:" + now + " - seconds:" + seconds + " - interval:" + interval);
-    var interval = Math.floor(seconds / 31536000);
+    var temp = seconds / 31536000;
+    var interval = Math.floor(temp);
     
     if (interval > 0) {
+    	interval = Math.round(temp);
+    	
     	if(interval == 1)
     	{
     		returnString = interval + " " + TRACKER.langOperator.year;
     	}
-    	else
+    	else // > 1
     	{
     		returnString = interval + " " + TRACKER.langOperator.year + TRACKER.langOperator.pluralSuffix;
     	}
     }
     else
     {
-    	interval = Math.floor(seconds / 2592000);
+    	temp = seconds / 2592000;
+    	interval = Math.floor(temp);
     	
         if (interval > 0) {
+        	interval = Math.round(temp);
+        	
         	if(interval == 1)
         	{
         		returnString = interval + " " + TRACKER.langOperator.month;
@@ -40,9 +46,12 @@ function timeAgo(date) {
         }
         else
         {
-        	interval = Math.floor(seconds / 86400);
+        	temp = seconds / 86400;
+        	interval = Math.floor(temp);
         	
             if (interval > 0) {
+            	interval = Math.round(temp);
+            	
             	if(interval == 1)
             	{
             		returnString = interval + " " + TRACKER.langOperator.day;
@@ -54,9 +63,12 @@ function timeAgo(date) {
             }
             else
             {
-            	interval = Math.floor(seconds / 3600);
+            	temp = seconds / 3600;
+            	interval = Math.floor(temp);
             	
                 if (interval > 0) {
+                	interval = Math.round(temp);
+                	
                 	if(interval == 1)
                 	{
                 		returnString = interval + " " + TRACKER.langOperator.hour;
@@ -68,9 +80,12 @@ function timeAgo(date) {
                 }
                 else
                 {
-                	interval = Math.floor(seconds / 60);
+                	temp = seconds / 60;
+                	interval = Math.floor(temp);
                 	
                     if (interval > 0) {
+                    	interval = Math.round(temp);
+                    	
                     	if(interval == 1)
                     	{
                     		returnString = interval + " " + TRACKER.langOperator.minute;
@@ -97,6 +112,8 @@ function timeAgo(date) {
             }
         }   	
     }
+    
+    //alert(returnString + " " + TRACKER.langOperator.ago);
 
     return returnString + " " + TRACKER.langOperator.ago;
 }
@@ -287,6 +304,78 @@ function getUserContent(userId, personPhotoElement) {
 	return content;	
 }
 
+function checkAndUpdateUserQueryInterval(par_timestamp) 
+{		
+	var now = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
+    var seconds = Math.floor(now - par_timestamp);
+    
+    if(seconds < 60)
+    {
+    	if(TRACKER.userQueryInterval > 1000)
+    	{
+    		TRACKER.userQueryInterval = 1000;
+    		TRACKER.checkUsers();
+   		
+    		//1 katsayısından sonra round() kullanılıyor, yani 1.5dk 2dk olarak gosteriliyor. Bu nedenle ilk tip geciside normal araligin
+    		//yarisi kadar timeout kuruluyor, sonrasinde ise bu timeout normal seviyeye cekilmeli yani 2 ile carpilmali    		
+    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
+    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(60*1000/2);}, (60-seconds)*1000);
+    	}
+    }
+    else if(seconds < 60*60)
+    {
+    	if(TRACKER.userQueryInterval > 60*1000)
+    	{
+    		TRACKER.userQueryInterval = 60*1000;
+    		TRACKER.checkUsers();
+
+    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
+    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(60*60*1000/2);}, (60*60-seconds)*1000);
+    	}
+    }
+    else if(seconds < 24*60*60)
+    {
+    	if(TRACKER.userQueryInterval > 60*60*1000)
+    	{
+    		TRACKER.userQueryInterval = 60*60*1000;
+    		TRACKER.checkUsers();
+    		
+    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
+    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(24*60*60*1000/2);}, (24*60*60-seconds)*1000);     		
+    	}
+    }
+    else if(seconds < 30*24*60*60)
+    {
+    	if(TRACKER.userQueryInterval > 24*60*60*1000)
+    	{
+    		TRACKER.userQueryInterval = 24*60*60*1000;
+    		TRACKER.checkUsers();
+    		
+    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
+    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(30*24*60*60*1000/2);}, (30*24*60*60-seconds)*1000);     		
+    	}
+    }
+    else if(seconds < 12*30*24*60*60)
+    {
+    	if(TRACKER.userQueryInterval > 30*24*60*60*1000)
+    	{
+    		TRACKER.userQueryInterval = 30*24*60*60*1000;
+    		TRACKER.checkUsers();
+    		
+    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
+    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(12*30*24*60*60*1000/2);}, (12*30*24*60*60-seconds)*1000);    		
+    	}
+    }
+    else
+    {
+    	if(TRACKER.userQueryInterval > 12*30*24*60*60*1000)
+    	{
+        	TRACKER.userQueryInterval = 12*30*24*60*60*1000;
+    		TRACKER.checkUsers();    		
+    	}
+    }
+}
+
 /**
  * this function process users array returned when actions are search user, get user list, update list,
  * updated list...
@@ -339,6 +428,11 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		var location = new MapStruct.Location({latitude:latitude, longitude:longitude});
 		var visible = false;
 		
+		if(userId != currentUser)
+		{
+			checkAndUpdateUserQueryInterval(locationTimeStamp);
+		}
+
 		var locationlessUserIdIndexInArray = locationlessUserIdArray.indexOf(userId);
 		
 		//Hem mobil veri gelmemis hem de IP uzerinden de konum elde edilememise kisiyi haritada gosterme
