@@ -1,5 +1,5 @@
 <?php
-
+ 
 class UploadController extends Controller
 {
 	const thumbSuffix = '_thumb';
@@ -316,7 +316,7 @@ class UploadController extends Controller
 	{		
 		$result = "Missing parameter";
 		$uploadId = 0;
-				
+		
 		if (isset($_FILES["upload"])
 			&& isset($_REQUEST['latitude']) && $_REQUEST['latitude'] != NULL
 			&& isset($_REQUEST['longitude']) && $_REQUEST['longitude'] != NULL
@@ -333,92 +333,130 @@ class UploadController extends Controller
 */								
 								)
 		{
-			$result = "Upload Error";
-			if ($_FILES["upload"]["error"] == UPLOAD_ERR_OK )
+			try
 			{
-				$latitude = (float) $_REQUEST['latitude'];
-				$longitude = (float) $_REQUEST['longitude'];
-				$altitude = (float) $_REQUEST['altitude'];
-				$description = htmlspecialchars($_REQUEST['description']);
-				$fileType = (int) $_REQUEST['fileType'];
-
-				$publicData = 0;
-				if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
-					$tmp = (int) $_REQUEST['publicData'];
-					if ($tmp == 1) {
-						$publicData = 1;
+				$result = "Upload Error";
+				
+				if ($_FILES["upload"]["error"] == UPLOAD_ERR_OK )
+				{
+					$latitude = (float) $_REQUEST['latitude'];
+					$longitude = (float) $_REQUEST['longitude'];
+					$altitude = (float) $_REQUEST['altitude'];
+					$description = htmlspecialchars($_REQUEST['description']);
+					$fileType = (int) $_REQUEST['fileType'];
+				
+					$publicData = 0;
+					if (isset($_REQUEST['publicData']) && $_REQUEST['publicData'] != NULL) {
+						$tmp = (int) $_REQUEST['publicData'];
+						if ($tmp == 1) {
+							$publicData = 1;
+						}
 					}
-				}
 				
-				$isLive = 0;
-				$insertToDB = true;
-				$liveKey = 0;
+					$isLive = 0;
+					$insertToDB = true;
+					$liveKey = 0;
 				
-				if (isset($_REQUEST['isLive']) && $_REQUEST['isLive'] == "1"){
+					if (isset($_REQUEST['isLive']) && $_REQUEST['isLive'] == "1"){
 				
-					$isLive = 1;
-					$insertToDB = false;
-					if (isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] == "0") {
-						$insertToDB = true;
+						$isLive = 1;
+						$insertToDB = false;
+						if (isset($_REQUEST['partIndex']) && $_REQUEST['partIndex'] == "0") {
+							$insertToDB = true;
+						}
+						$liveKey = trim($_REQUEST['uniqueId']);
 					}
-					$liveKey = trim($_REQUEST['uniqueId']);
-				}
 				
-				$extension = '.jpg';
-				if ($fileType == 1) {
-					$extension = '.mp4';
-				}
-
-				if ($insertToDB == true) {
+					$extension = '.jpg';
+					if ($fileType == 1) {
+						$extension = '.mp4';
+					}
+				
+					if ($insertToDB == true) {
+							
+						$result = "Unknown Error";
+						$uploadTime = date('Y-m-d H:i:s');
+						$uploadId = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey);
+							
+						if($uploadId > 0)
+						{
+							$result = "Error in moving uploading file";
+							$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
+				
+							if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
+							{
+								if ($fileType == 1) {
+									$newFileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . '.flv';
+									$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
+									$out = shell_exec($command);
+									//echo $out;
+				
+								}
 									
-					$result = "Unknown Error";
-					$uploadTime = date('Y-m-d H:i:s');
-					$uploadId = Upload::model()->addNewRecord($fileType, Yii::app()->user->id, $latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey);
-					
-					if($uploadId > 0)
+								$result = "1";
+							}
+							else
+							{
+								$message = "Upload CANNOT be moved !".'<br/>';
+								$this->sendErrorMail('uploadCannotBeMoved', 'Error (UploadController) in actionUpload()', $message);
+							}
+						}
+						else
+						{
+							$message = "New record CANNOT be added !".'<br/>';
+							$this->sendErrorMail('newRecordCannotBeAdded', 'Error (UploadController) in actionUpload()', $message);
+						}
+					}
+					else if ($isLive == 1)
 					{
-						$result = "Error in moving uploading file";
-						$fileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . $extension;
-						
+						$partIndex = $_REQUEST['partIndex'];
+						if ($_REQUEST['isLastPacket'] == "1"){
+				
+						}
+				
+						$fileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . $extension;
 						if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
 						{
-							if ($fileType == 1) {
-								$newFileName = Yii::app()->params->uploadPath .'/'. Yii::app()->db->lastInsertID . '.flv';
-								$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
-								$out = shell_exec($command);
-								//echo $out;
-								
-							}
-							
+							$newFileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . '.flv';
+							$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
+							$out = shell_exec($command);
+							$videoId = Upload::model()->getId($liveKey);
+							$previousVideoFileName = Yii::app()->params->uploadPath .'/' . $videoId .'.flv';
+							$this->getCombineFlvVideosCommand($previousVideoFileName, $newFileName);
+				
 							$result = "1";
 						}
 					}
 				}
-				else if ($isLive == 1)
+				else
 				{
-					$partIndex = $_REQUEST['partIndex'];
-					if ($_REQUEST['isLastPacket'] == "1"){
-				
-					}
-				
-					$fileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . $extension;
-					if (move_uploaded_file($_FILES["upload"]["tmp_name"], $fileName))
-					{
-						$newFileName = Yii::app()->params->uploadPath .'/'. $liveKey . $partIndex . '.flv';
-						$command = 'ffmpeg -i '. $fileName . ' -sameq -ar 22050 ' . $newFileName;
-						$out = shell_exec($command);
-						$videoId = Upload::model()->getId($liveKey);
-						$previousVideoFileName = Yii::app()->params->uploadPath .'/' . $videoId .'.flv';
-						$this->getCombineFlvVideosCommand($previousVideoFileName, $newFileName);
-				
-						$result = "1";
-					}
-				}		
+					$message = "Upload Error !".'<br/>';
+					$this->sendErrorMail('uploadError', 'Error (UploadController) in actionUpload()', $message);
+				}				
 			}
+			catch(Exception $e)
+			{
+				$result = "Exception occured";
+				$message = $e->getMessage();
+			
+				$this->sendErrorMail('uploadExceptionOccured', 'Exception (UploadController) in actionUpload()', $message);
+			}			
 		}
-		echo CJSON::encode(array("result"=>$result, "uploadId"=>$uploadId));
+		else
+		{
+			$message = "Variables NOT set !".'<br/>';
+			$this->sendErrorMail('uploadVariablesNotSet', 'Error (UploadController) in actionUpload()', $message);			
+		}	
+			
+		echo CJSON::encode(array("result"=>$result, "uploadId"=>$uploadId));				
 		Yii::app()->end();
 	}
+	
+// 	public function actionTempUpload()
+// 	{
+// 		$uploadTime = date('Y-m-d H:i:s');
+// 		$uploadId = Upload::model()->addNewRecord(0, Yii::app()->user->id, 39.9117, 32.8403, 1000, $uploadTime, 0, 'Deneme', 0, 0);
+// 	}
 	
 	private function getCombineFlvVideosCommand($file1, $file2)
 	{
@@ -456,42 +494,69 @@ class UploadController extends Controller
 		return $fileName;
 	}
 
-	private function createThumb($uploadId, $fileType) {
-		// Set maximum height and width
-		$width  = 36;
-		$height = 36;
-		$filename =  $this->getFileName($uploadId, $fileType);
+// 	private function createThumb($uploadId, $fileType) {
+// 		// Set maximum height and width
+// 		$width  = 36;
+// 		$height = 36;
+// 		$filename =  $this->getFileName($uploadId, $fileType);
 
-		if (file_exists($filename) === true) {
-			//Fb::warn("file_exists(): true");			
-			//Fb::warn($fileType, "File Type");
+// 		if (file_exists($filename) === true) {
+// 			//Fb::warn("file_exists(): true");			
+// 			//Fb::warn($fileType, "File Type");
 			
-			if($fileType == 0) //Image
-			{								
-				// Get new dimensions
-				list($width_orig, $height_orig) = getimagesize($filename);
-				$width = ($height / $height_orig) * $width_orig;
+// 			if($fileType == 0) //Image
+// 			{								
+// 				// Get new dimensions
+// 				list($width_orig, $height_orig) = getimagesize($filename);
+// 				$width = ($height / $height_orig) * $width_orig;
 		
-				// Resample
-				$image_p = imagecreatetruecolor($width, $height);
-				$image   = imagecreatefromjpeg($filename);
-				imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+// 				// Resample
+// 				$image_p = imagecreatetruecolor($width, $height);
+// 				$image   = imagecreatefromjpeg($filename);
+// 				imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+// 				$filenameThumb =  $this->getFileName($uploadId, $fileType, true);
+// 				touch($filenameThumb);
+// 				// Output
+// 				imagejpeg($image_p, $filenameThumb);
+// 				imagedestroy($image);
+// 			}
+// 			else //Video
+// 			{
+			
+// 			}			
+// 		}
+// 		else
+// 		{
+// 			//Fb::warn("file_exists(): false");
+// 		}
+// 	}
+	
+	private function createThumb($uploadId, $fileType) 
+	{
+		$filename =  $this->getFileName($uploadId, $fileType);
+	
+		if (file_exists($filename) === true) 
+		{
+			//Fb::warn("file_exists(): true");
+			//Fb::warn($fileType, "File Type");
+				
+			if($fileType == 0) //Image
+			{
+				$image = Yii::app()->image->load($filename);
+				$image->smart_resize(48, 36)->quality(75);
 				$filenameThumb =  $this->getFileName($uploadId, $fileType, true);
-				touch($filenameThumb);
-				// Output
-				imagejpeg($image_p, $filenameThumb);
-				imagedestroy($image);
+				$image->save($filenameThumb);
 			}
 			else //Video
 			{
-			
-			}			
+					
+			}
 		}
 		else
 		{
 			//Fb::warn("file_exists(): false");
 		}
-	}
+	}	
 
 	//public function actionGetUploadListXML()
 	public function actionGetUploadListJson()

@@ -133,7 +133,8 @@ class Upload extends CActiveRecord
     }
     
     //Returns the Id of the last inserted upload
-    public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey) {
+    public function addNewRecord($fileType,$userID,$latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey) 
+    {
 //     	$sql = sprintf('INSERT INTO '
 //     			. Upload::model()->tableName() .'
 //     			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description, isLive, liveKey)
@@ -143,7 +144,7 @@ class Upload extends CActiveRecord
     	$sql = sprintf('INSERT INTO '
     			. Upload::model()->tableName() .'
     			(fileType, userId, latitude, longitude, altitude, uploadtime, publicData, description, isLive, liveKey)
-    			VALUES(%d, %d, %s, %s, %s, %s, %d, "%s", %d, %d)',
+    			VALUES(%d, %d, %s, %s, %s, "%s", %d, "%s", %d, %d)',
     			$fileType, $userID, $latitude, $longitude, $altitude, $uploadTime, $publicData, $description, $isLive, $liveKey);    	
 		
     	$effectedRows = Yii::app()->db->createCommand($sql)->execute();
@@ -156,6 +157,22 @@ class Upload extends CActiveRecord
     	{
     		$uploadId = 0;
     	}
+    	
+//     	$upload = new Upload();
+    	
+//     	$upload->fileType = $userID;
+//     	$upload->userId = $fileType;
+//     	$upload->latitude = $latitude;
+//     	$upload->longitude = $longitude;
+//     	$upload->altitude = $altitude;
+//     	$upload->uploadtime = $uploadTime;
+//     	$upload->publicData = $publicData;
+//     	$upload->description = description;
+//     	$upload->isLive = $isLive;
+//     	$upload->liveKey = $liveKey;
+
+    	
+//     	return $upload->save();    	
     	   	
     	return $uploadId;
     }
