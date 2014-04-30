@@ -339,10 +339,10 @@ if ($dataProvider != null) {
 		*/       
 
 		array(            // display 'create_time' using an expression
-				    'name'=>Yii::t('common', 'Name'),
+				    'name'=>Yii::t('users', 'My Friend @ Where?'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
-		            'value'=> $isFriendList ? '($data["isVisible"] == 1)?CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',
+		            'value'=> $isFriendList ? '($data["isVisible"] == 1)?(CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))).(($data["address"] != NULL)?(" ".$this->grid->owner->get_timeago(strtotime($data["time"]))." @ "."<div style=\"font-size:10px;\">".$this->grid->owner->getFullAddress($data["address"], $data["country"])."</div>"):"")):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',
 					'htmlOptions'=>array('width'=>'200px'),
 
 // 					'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' :

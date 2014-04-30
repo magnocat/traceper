@@ -103,7 +103,7 @@ class UsersController extends Controller
 		return $convertedString;
 	}
 	
-	private function getFullAddress($par_address, $par_country) 
+	public function getFullAddress($par_address, $par_country) 
 	{
 		$fullAddress = null;
 		
@@ -1841,7 +1841,7 @@ class UsersController extends Controller
 		return $str;
 	}
 	
-	private function get_timeago($ptime)
+	public function get_timeago($ptime)
 	{
 		$etime = time() - $ptime;
 	
@@ -1870,8 +1870,8 @@ class UsersController extends Controller
 				//return $r . ' ' . $str . ( $r > 1 ? 's' : '' ) . ' ' .'ago';
 			}
 		}
-	}	
-	
+	}
+
 	private function preparePastPointsJson($dataProvider) {
 		$rows = $dataProvider->getData();
 		$itemCount = count($rows);

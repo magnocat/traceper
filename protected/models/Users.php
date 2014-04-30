@@ -539,7 +539,7 @@ class Users extends CActiveRecord
 		FROM '.  Users::model()->tableName() . ' u
 		WHERE ((Id in ('. $IdList.')';
 	
-		$sql = 'SELECT  u.Id as id, u.realname as Name,
+		$sql = 'SELECT  u.Id as id, u.realname as Name, u.lastLocationAddress as address, u.lastLocationCountry as country, u.dataArrivedTime as time,
 		u.userType, IF(f.friend1 = '.Yii::app()->user->id.', f.friend2Visibility, f.friend1Visibility) as isVisible,
 		u.profilePhotoStatus, u.fb_id
 		FROM '.  Users::model()->tableName() . ' u
