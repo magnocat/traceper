@@ -125,13 +125,20 @@ class UserWasHere extends CActiveRecord
 		return parent::model($className);
 	}
 	
-	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country){
+	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country){
+// 		$sql = sprintf('INSERT INTO '
+// 				. $this->tableName() . '
+// 				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
+// 				VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s", "%s", "%s")
+// 				',
+// 				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country);
+		
 		$sql = sprintf('INSERT INTO '
 				. $this->tableName() . '
 				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
-				VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s", "%s", "%s")
+				VALUES(%d,	%f, %f, %f, "%s", "%s", "%s", "%s", "%s")
 				',
-				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country);
+				$userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country);		
 		
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 	

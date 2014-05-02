@@ -405,6 +405,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	
 	var userIdArray = new Array();	
 	var newFriend = false;
+	var newestTimestamp = 0;
 
 	$.each(users, function(index, value)
 	{
@@ -430,7 +431,10 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		
 		if(userId != currentUser)
 		{
-			checkAndUpdateUserQueryInterval(locationTimeStamp);
+			if(locationTimeStamp > newestTimestamp)
+			{
+				newestTimestamp = locationTimeStamp;
+			}
 		}
 
 		var locationlessUserIdIndexInArray = locationlessUserIdArray.indexOf(userId);
@@ -663,6 +667,8 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			TRACKER.users[userId].address = address;
 		}
 	});
+	
+	checkAndUpdateUserQueryInterval(newestTimestamp);
 	
 	//alertMsg("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
 	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
