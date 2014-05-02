@@ -1,5 +1,16 @@
 <?php
 
+function getTimeAgo($unixTimeStamp){
+
+	?>
+	<script type="text/javascript">
+	"1"
+	</script>
+	<?php ;
+
+	
+}
+
 function getFriendPhoto($data, $row, $isFriendList){
 	$value = null;
 
@@ -342,7 +353,8 @@ if ($dataProvider != null) {
 				    'name'=>Yii::t('users', 'My Friend @ Where?'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
-		            'value'=> $isFriendList ? '($data["isVisible"] == 1)?(CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))).(($data["address"] != NULL)?(" ".$this->grid->owner->get_timeago(strtotime($data["time"]))." @ "."<div style=\"font-size:10px;\">".$this->grid->owner->getFullAddress($data["address"], $data["country"])."</div>"):"")):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',
+		            //'value'=> $isFriendList ? '($data["isVisible"] == 1)?(CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))).(($data["address"] != NULL)?(" ".$this->grid->owner->get_timeago(strtotime($data["time"]))." @ "."<div style=\"font-size:10px;\">".$this->grid->owner->getFullAddress($data["address"], $data["country"])."</div>"):"")):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',					
+					'value'=> $isFriendList ? '($data["isVisible"] == 1)?(CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))).(($data["address"] != NULL)?(" "."<span id=\"userTimeAgo_".$data["id"]."\">".$this->grid->owner->get_timeago(strtotime($data["time"]))."</span><span id=\"userTimestamp_".$data["id"]."\" style=\"display:none;\">".((string)strtotime($data["time"]))."</span>"." @ "."<div style=\"font-size:10px;\">".$this->grid->owner->getFullAddress($data["address"], $data["country"])."</div>"):"")):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',
 					'htmlOptions'=>array('width'=>'200px'),
 
 // 					'value'=> $isFriendList ? 'CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map")))' :

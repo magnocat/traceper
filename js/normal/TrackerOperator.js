@@ -184,7 +184,16 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 	this.checkUsers = function(){
 		//alert("checkUsers() called");
 		
-		$.fn.yiiGridView.update("userListView");
+		//$.fn.yiiGridView.update("userListView");
+		
+		//$("#userTimeAgo_1").html(timeAgo($('#userTimestamp_1').html()));
+		
+		for (var key in TRACKER.users) {	    			
+			if((typeof TRACKER.users[key] !== "undefined") && (TRACKER.users[key] !== null))
+			{
+				$("#userTimeAgo_" + key).html(timeAgo($("#userTimestamp_" + key).html()));
+			}
+		}		
 		
 		//1 katsayısından sonra round() kullanılıyor, yani 1.5dk 2dk olarak gosteriliyor. Bu nedenle ilk tip geciside normal araligin
 		//yarisi kadar timeout kuruluyor, sonrasinde ise bu timeout normal seviyeye cekilmeli yani 2 ile carpilmali

@@ -314,7 +314,7 @@ class UsersController extends Controller
 						{
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 							
-							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country))
+							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country))
 							{
 								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
 							
