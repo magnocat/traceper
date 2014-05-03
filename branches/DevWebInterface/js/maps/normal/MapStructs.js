@@ -22,6 +22,8 @@ MapStruct.MapMarker = function(){
 	var infoWindowIsOpened;
 	var point;
 	var pointAdded;
+	var timeAgoTimer;
+	var timeAgoTimerInterval;
 	
 	for (var n in arguments[0]) { 
 		this[n] = arguments[0][n]; 

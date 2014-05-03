@@ -66,6 +66,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var friendshipStatus;
 		var time;
 		var locationTimeStamp;
+		var timeAgoTimer;
+		var timeAgoTimerInterval = 12*30*24*60*60;
 		var deviceId;
 		var message;
 		var mapMarker;
@@ -93,7 +95,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		var timestamp;
 		var rating;
 		var mapMarker;
-		var infoWindowIsOpened = false;
+		//var infoWindowIsOpened = false;
 		var description;
 		var isPublic;
 
@@ -122,11 +124,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 		MAP.setMarkerVisible(TRACKER.users[deletedFriendId].mapMarker[0].marker, false);
 		//alertMsg("setMarkerVisible(false) for deletedFriendId:" + deletedFriendId);
-		
-		if(TRACKER.users[deletedFriendId].mapMarker[0].infoWindowIsOpened)
-		{
-			MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0].infoWindow)			
-		}
+		MAP.closeInfoWindow(TRACKER.users[deletedFriendId].mapMarker[0]);
+		clearTimeout(TRACKER.users[deletedFriendId].mapMarker[0].timeAgoTimer);
 		
 		TRACKER.clearTraceLines(deletedFriendId);
 		
@@ -158,11 +157,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		
 		MAP.setMarkerVisible(TRACKER.images[deletedImageId].mapMarker.marker, false);
 		//alertMsg("setMarkerVisible(false) for deletedImageId:" + deletedImageId);
-		
-		if(TRACKER.images[deletedImageId].infoWindowIsOpened)
-		{
-			MAP.closeInfoWindow(TRACKER.images[deletedImageId].mapMarker.infoWindow)			
-		}
+		MAP.closeInfoWindow(TRACKER.images[deletedImageId].mapMarker);
 		
 		delete TRACKER.images[deletedImageId];
 		
@@ -193,7 +188,10 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			{
 				$("#userTimeAgo_" + key).html(timeAgo($("#userTimestamp_" + key).html()));
 			}
-		}		
+		}				
+
+		clearTimeout(this.checkUserTimer);
+		this.checkUserTimer = setTimeout(function() {TRACKER.checkUsers();}, this.userQueryInterval);
 		
 		//1 katsayısından sonra round() kullanılıyor, yani 1.5dk 2dk olarak gosteriliyor. Bu nedenle ilk tip geciside normal araligin
 		//yarisi kadar timeout kuruluyor, sonrasinde ise bu timeout normal seviyeye cekilmeli yani 2 ile carpilmali
@@ -218,9 +216,6 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		{
 			this.userQueryInterval = 12*30*24*60*60*1000;
 		}		
-
-		clearTimeout(this.checkUserTimer);
-		this.checkUserTimer = setTimeout(function() {TRACKER.checkUsers();}, this.userQueryInterval);	
 	}	
 	
 	var exceptionForParamsMap = {'getUserListJson':0, 'getPublicUploadListJson':0, 'getUploadListJson':0, 'getUserPastPointsJSON':0, 'sendGeofenceData':0};
@@ -363,11 +358,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 		for (var key in TRACKER.images) {	    			
 			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
 			{
-				if(TRACKER.images[key].infoWindowIsOpened)
-				{
-					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
-				}
-				
+				MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);				
 				TRACKER.images[key].mapMarker.marker.setMap(null);
 			}
 		}		
@@ -672,15 +663,15 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					}
 					else
 					{
-						MAP.closeInfoWindow(this.users[this.preUserId].mapMarker[0].infoWindow);
-						this.users[this.preUserId].mapMarker[0].infoWindowIsOpened = false;					
+						MAP.closeInfoWindow(this.users[this.preUserId].mapMarker[0]);
+						clearTimeout(this.users[this.preUserId].mapMarker[0].timeAgoTimer);
 					}
 				}
-				
-				
-				MAP.setContentOfInfoWindow(this.users[userId].mapMarker[0].infoWindow, getUserContent(userId, getPersonPhotoElement(userId, currentUserId)));
-				MAP.openInfoWindow(this.users[userId].mapMarker[0].infoWindow, this.users[userId].mapMarker[0].marker);
-				this.users[userId].mapMarker[0].infoWindowIsOpened = true;
+								
+				var personPhotoElement = getPersonPhotoElement(userId, currentUserId);
+				MAP.setContentOfInfoWindow(this.users[userId].mapMarker[0].infoWindow, getUserContent(userId, personPhotoElement));
+				MAP.openInfoWindow(this.users[userId].mapMarker[0]);
+				checkAndUpdateUserInfoWindow(this.users[userId].locationTimeStamp, this.users[userId].mapMarker[0], userId, personPhotoElement);
 				this.preUserId = userId;
 			}
 			else
@@ -822,9 +813,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			for (var i = 1; i < len; i++) { 
 				if ((typeof TRACKER.users[userId].mapMarker[i] != 'undefined') && (TRACKER.users[userId].mapMarker[i].marker != null)) {
 					MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[i].marker, false);
-					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i].infoWindow);
+					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[i]);
+					clearTimeout(this.users[userId].mapMarker[i].timeAgoTimer);
 					TRACKER.users[userId].mapMarker[i].pointAdded = false;
-					TRACKER.users[userId].mapMarker[i].infoWindowIsOpened = false;
 				}
 				else
 				{
@@ -862,9 +853,9 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					for (var i = 1; i < len; i++) { 
 						if (TRACKER.users[key].mapMarker[i].marker != null) {
 							MAP.setMarkerVisible(TRACKER.users[key].mapMarker[i].marker, false);
-							MAP.closeInfoWindow(TRACKER.users[key].mapMarker[i].infoWindow);
-							TRACKER.users[key].mapMarker[i].pointAdded = false;
-							TRACKER.users[key].mapMarker[i].infoWindowIsOpened = false;							
+							MAP.closeInfoWindow(TRACKER.users[key].mapMarker[i]);
+							clearTimeout(this.users[key].mapMarker[i].timeAgoTimer);
+							TRACKER.users[key].mapMarker[i].pointAdded = false;							
 						}
 					}
 				}
@@ -1028,8 +1019,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 					else {
 						//alert("else 2");
 						
-						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
-						TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindowIsOpened = false;
+						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex]);
+						clearTimeout(this.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
 						MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 						
 						if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
@@ -1068,8 +1059,8 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 			{
 				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			}
-			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindow);
-			TRACKER.users[userId].mapMarker[currentMarkerIndex].infoWindowIsOpened = false;
+			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex]);
+			clearTimeout(this.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
 			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 			
 			if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)

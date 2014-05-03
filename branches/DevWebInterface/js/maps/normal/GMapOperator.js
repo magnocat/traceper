@@ -103,18 +103,60 @@ function MapOperator(lang) {
 		var address = par_country;
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode( { 'address': address}, function(results, status) {
-		    if (status == google.maps.GeocoderStatus.OK) {
-		    	MAP_OPERATOR.map.setCenter(results[0].geometry.location);
-		    	MAP_OPERATOR.map.fitBounds(results[0].geometry.bounds);
-		    	
+		    if (status == google.maps.GeocoderStatus.OK) 
+		    {
+		    	try
+		    	{
+			    	MAP_OPERATOR.map.setCenter(results[0].geometry.location);
+			    	MAP_OPERATOR.map.fitBounds(results[0].geometry.bounds);
+			    	
 			    	if(par_bSessionToBeUpdated == true)
 			    	{
 			    		$.post('index.php?r=site/updateCountryNameSessionVar', { country:par_country });
 			    		
 			    		//alert("$.post - updateCountryNameSessionVar");
 			    	}
-		    	
-		    	bCountryInfoExists = true;
+			    	
+			    	bCountryInfoExists = true;			    	
+		    	}
+				catch(error)
+				{
+					alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
+						  'Error: ' + error.message + '\n' + 
+						  'JSON obj: ' + JSON.stringify(obj));
+					
+					  var data = "r=site/ajaxEmailNotification&title=Focus on Country Exception Occured!&message=" +
+					  
+					  "Exception Info: <br/><br/>" + 
+					  "User Browser: " + BrowserDetect.browser + " " + BrowserDetect.version + "<br/>" +
+					  "User OS: " + BrowserDetect.OS + "<br/><br/>" +
+					  "Error: " + error.message + "<br/>";
+
+					  //If 5 consecutive ajax queries are erroneous, report this situation via e-mail
+					  TRACKER.ajaxReq(data, null, true);
+					  
+					  try
+					  {
+						  MAP_OPERATOR.map.setCenter(results[0].geometry.location);
+						  
+					      if(par_bSessionToBeUpdated == true)
+					      {
+					    	 $.post('index.php?r=site/updateCountryNameSessionVar', { country:par_country });
+					    		
+					    		//alert("$.post - updateCountryNameSessionVar");
+					      }
+					    	
+					      bCountryInfoExists = true;						  
+					  }
+					  catch(error)
+					  {
+						  var initialLocation = new google.maps.LatLng(par_latitude, par_longitude);
+						  MAP_OPERATOR.map.setCenter(initialLocation);
+						  
+						  $.post('index.php?r=site/nullifyCountryNameSession');							
+						  bCountryInfoExists = false;						  
+					  }
+				}
 		    } else {
 		        //alert("Geocode was not successful for the following reason: " + status);
 				var initialLocation = new google.maps.LatLng(par_latitude, par_longitude);
@@ -124,8 +166,7 @@ function MapOperator(lang) {
 				//her seferinde hata alip default konuma yonlenmek yerine session variable null'a cekilsin ki direk default konuma gidilsin
 				//$.post('index.php?r=site/nullifyCountryNameSession');
 				
-				$.post('index.php?r=site/nullifyCountryNameSession');
-				
+				$.post('index.php?r=site/nullifyCountryNameSession');				
 				bCountryInfoExists = false;
 		    }
 		});
@@ -261,19 +302,35 @@ function MapOperator(lang) {
 	 * marker is the type where open the infowindow
 	 * there is no close function for infowindow
 	 */
-	MAP_OPERATOR.openInfoWindow = function(infowindow,marker) {
+//	MAP_OPERATOR.openInfoWindow = function(infowindow, marker) 
+//	{
+//		infowindow.open(MAP_OPERATOR.map,marker);		
+//	}
 
-		infowindow.open(MAP_OPERATOR.map,marker);		
+	MAP_OPERATOR.openInfoWindow = function(mapMarker) 
+	{
+		if(false == mapMarker.infoWindowIsOpened)
+		{
+			mapMarker.infoWindow.open(MAP_OPERATOR.map, mapMarker.marker);
+			mapMarker.infoWindowIsOpened = true;
+		}		
 	}
-
-
 	/*
 	 *
 	 */
-	MAP_OPERATOR.closeInfoWindow = function(infowindow) {
-
-		infowindow.close();		
-	}
+//	MAP_OPERATOR.closeInfoWindow = function(infowindow) {
+//
+//		infowindow.close();		
+//	}
+	
+	MAP_OPERATOR.closeInfoWindow = function(mapMarker) 
+	{
+		if(true == mapMarker.infoWindowIsOpened)
+		{
+			mapMarker.infoWindow.close();
+			mapMarker.infoWindowIsOpened = false;
+		}		
+	}	
 
 	/*
 	 * infoWindow is the type that returns from initializeInfoWindow

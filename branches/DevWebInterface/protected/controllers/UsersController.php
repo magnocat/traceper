@@ -1865,7 +1865,8 @@ class UsersController extends Controller
 	
 			if( $d >= 1 )
 			{
-				$r = round( $d );
+				//$r = round( $d );
+				$r = floor( $d );
 				return $r . ' ' . $str . ( $r > 1 ? Yii::t('common', 'plural') : '' ) . ' ' .Yii::t('users', 'ago');
 				//return $r . ' ' . $str . ( $r > 1 ? 's' : '' ) . ' ' .'ago';
 			}

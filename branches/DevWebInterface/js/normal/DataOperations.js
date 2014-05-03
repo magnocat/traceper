@@ -16,7 +16,7 @@ function timeAgo(date)
     var interval = Math.floor(temp);
     
     if (interval > 0) {
-    	interval = Math.round(temp);
+    	//interval = Math.round(temp);
     	
     	if(interval == 1)
     	{
@@ -33,7 +33,7 @@ function timeAgo(date)
     	interval = Math.floor(temp);
     	
         if (interval > 0) {
-        	interval = Math.round(temp);
+        	//interval = Math.round(temp);
         	
         	if(interval == 1)
         	{
@@ -50,7 +50,7 @@ function timeAgo(date)
         	interval = Math.floor(temp);
         	
             if (interval > 0) {
-            	interval = Math.round(temp);
+            	//interval = Math.round(temp);
             	
             	if(interval == 1)
             	{
@@ -67,7 +67,7 @@ function timeAgo(date)
             	interval = Math.floor(temp);
             	
                 if (interval > 0) {
-                	interval = Math.round(temp);
+                	//interval = Math.round(temp);
                 	
                 	if(interval == 1)
                 	{
@@ -84,7 +84,7 @@ function timeAgo(date)
                 	interval = Math.floor(temp);
                 	
                     if (interval > 0) {
-                    	interval = Math.round(temp);
+                    	//interval = Math.round(temp);
                     	
                     	if(interval == 1)
                     	{
@@ -161,7 +161,7 @@ function processUserPastLocations(MAP, locations, userId){
 
 		var gmarker = MAP.putMarker(myPoint, "images/marker.png", false, false, 10, 10); //var gmarker = MAP.putMarker(point);
 		var iWindow = MAP.initializeInfoWindow();
-		var markerInfoWindow = new MapStruct.MapMarker({marker:gmarker, infoWindow:iWindow, point:myPoint, pointAdded:false});
+		var markerInfoWindow = new MapStruct.MapMarker({marker:gmarker, infoWindow:iWindow, infoWindowIsOpened:false, point:myPoint, pointAdded:false});
 
 		MAP.setMarkerClickListener(gmarker,function (){
 
@@ -210,8 +210,7 @@ function processUserPastLocations(MAP, locations, userId){
 			//MAP.addPointToPolyline(TRACKER.users[userId].polyline, point);
 			
 			MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow,content);			
-			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr].infoWindow, TRACKER.users[userId].mapMarker[tr].marker);
-			TRACKER.users[userId].mapMarker[tr].infoWindowIsOpened = true;
+			MAP.openInfoWindow(TRACKER.users[userId].mapMarker[tr]);
 		});
 
 		mapMarker.push(markerInfoWindow);
@@ -304,76 +303,143 @@ function getUserContent(userId, personPhotoElement) {
 	return content;	
 }
 
-function checkAndUpdateUserQueryInterval(par_timestamp) 
+function checkAndUpdateUserQueryInterval(par_user, par_userId) 
 {		
-	var now = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
-    var seconds = Math.floor(now - par_timestamp);
+	var nowInSeconds = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
+    var timeInSeconds = Math.floor(nowInSeconds - par_user.locationTimeStamp);
+    var residualSeconds; //artık sn
     
-    if(seconds < 60)
+    $("#userTimeAgo_" + par_userId).html(timeAgo($("#userTimestamp_" + par_userId).html()));
+    
+    if(timeInSeconds < 60)
     {
-    	if(TRACKER.userQueryInterval > 1000)
+    	par_user.timeAgoTimerInterval = 1000;
+    }
+    else if(timeInSeconds < 60*60)
+    {
+    	if(par_user.timeAgoTimerInterval < 60*1000) //Saniyeden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
     	{
-    		TRACKER.userQueryInterval = 1000;
-    		TRACKER.checkUsers();
-   		
-    		//1 katsayısından sonra round() kullanılıyor, yani 1.5dk 2dk olarak gosteriliyor. Bu nedenle ilk tip geciside normal araligin
-    		//yarisi kadar timeout kuruluyor, sonrasinde ise bu timeout normal seviyeye cekilmeli yani 2 ile carpilmali    		
-    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
-    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(60*1000/2);}, (60-seconds)*1000);
+    		par_user.timeAgoTimerInterval = 60*1000;
+    	}
+    	else //Sayfa acildiginda dk ise, once bir sonraki dk ya kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 60;
+    		par_user.timeAgoTimerInterval = (60-residualSeconds)*1000;
     	}
     }
-    else if(seconds < 60*60)
+    else if(timeInSeconds < 24*60*60)
     {
-    	if(TRACKER.userQueryInterval > 60*1000)
+    	if(par_user.timeAgoTimerInterval < 60*60*1000) //Dakikadan gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
     	{
-    		TRACKER.userQueryInterval = 60*1000;
-    		TRACKER.checkUsers();
-
-    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
-    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(60*60*1000/2);}, (60*60-seconds)*1000);
+    		par_user.timeAgoTimerInterval =  60*60*1000;
+    	}
+    	else //Sayfa acildiginda saat ise, once bir sonraki saate kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 60*60;
+    		par_user.timeAgoTimerInterval = (60-residualSeconds)*1000;
     	}
     }
-    else if(seconds < 24*60*60)
+    else if(timeInSeconds < 30*24*60*60)
     {
-    	if(TRACKER.userQueryInterval > 60*60*1000)
+    	if(par_user.timeAgoTimerInterval < 24*60*60*1000) //Saatten gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
     	{
-    		TRACKER.userQueryInterval = 60*60*1000;
-    		TRACKER.checkUsers();
-    		
-    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
-    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(24*60*60*1000/2);}, (24*60*60-seconds)*1000);     		
+    		par_user.timeAgoTimerInterval =  24*60*60*1000;
+    	}
+    	else //Sayfa acildiginda gun ise, once bir sonraki gune kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 24*60*60;
+    		par_user.timeAgoTimerInterval = (60-residualSeconds)*1000;
     	}
     }
-    else if(seconds < 30*24*60*60)
+    else if(timeInSeconds < 12*30*24*60*60)
     {
-    	if(TRACKER.userQueryInterval > 24*60*60*1000)
+    	if(par_user.timeAgoTimerInterval < 30*24*60*60*1000) //Gunden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
     	{
-    		TRACKER.userQueryInterval = 24*60*60*1000;
-    		TRACKER.checkUsers();
-    		
-    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
-    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(30*24*60*60*1000/2);}, (30*24*60*60-seconds)*1000);     		
+    		par_user.timeAgoTimerInterval =  30*24*60*60*1000;
     	}
-    }
-    else if(seconds < 12*30*24*60*60)
-    {
-    	if(TRACKER.userQueryInterval > 30*24*60*60*1000)
+    	else //Sayfa acildiginda ay ise, once bir sonraki aya kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
     	{
-    		TRACKER.userQueryInterval = 30*24*60*60*1000;
-    		TRACKER.checkUsers();
-    		
-    		clearTimeout(TRACKER.setUserCheckIntervalTimer);
-    		TRACKER.setUserCheckIntervalTimer = setTimeout(function() {TRACKER.setUserQueryInterval(12*30*24*60*60*1000/2);}, (12*30*24*60*60-seconds)*1000);    		
+    		residualSeconds = timeInSeconds % 30*24*60*60;
+    		par_user.timeAgoTimerInterval = (60-residualSeconds)*1000;
     	}
     }
     else
     {
-    	if(TRACKER.userQueryInterval > 12*30*24*60*60*1000)
+    	par_user.timeAgoTimerInterval =  12*30*24*60*60*1000;
+    }
+    
+	clearTimeout(par_user.timeAgoTimer);
+	par_user.timeAgoTimer = setTimeout(function() {checkAndUpdateUserQueryInterval(par_user, par_userId);}, par_user.timeAgoTimerInterval);
+}
+
+function checkAndUpdateUserInfoWindow(par_timestamp, par_mapMarker, par_userId, par_personPhotoElement) 
+{		
+	var nowInSeconds = (new Date().getTime())/1000; //in milliseconds so convert to seconds 	
+    var timeInSeconds = Math.floor(nowInSeconds - par_timestamp);
+    var residualSeconds; //artık sn
+    
+	var content = getUserContent(par_userId, par_personPhotoElement);		
+	MAP.setContentOfInfoWindow(par_mapMarker.infoWindow, content);
+    
+    if(timeInSeconds < 60)
+    {
+    	par_mapMarker.timeAgoTimerInterval = 1000;
+    }
+    else if(timeInSeconds < 60*60)
+    {
+    	if(par_mapMarker.timeAgoTimerInterval < 60*1000) //Saniyeden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
     	{
-        	TRACKER.userQueryInterval = 12*30*24*60*60*1000;
-    		TRACKER.checkUsers();    		
+    		par_mapMarker.timeAgoTimerInterval = 60*1000;
+    	}
+    	else //Sayfa acildiginda dk ise, once bir sonraki dk ya kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 60;
+    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
     	}
     }
+    else if(timeInSeconds < 24*60*60)
+    {
+    	if(par_mapMarker.timeAgoTimerInterval < 60*60*1000) //Dakikadan gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	{
+    		par_mapMarker.timeAgoTimerInterval = 60*60*1000;
+    	}
+    	else //Sayfa acildiginda saat ise, once bir sonraki saate kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 60*60;
+    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    	}
+    }
+    else if(timeInSeconds < 30*24*60*60)
+    {
+    	if(par_mapMarker.timeAgoTimerInterval < 24*60*60*1000) //Saatten gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	{
+    		par_mapMarker.timeAgoTimerInterval = 24*60*60*1000;
+    	}
+    	else //Sayfa acildiginda gun ise, once bir sonraki gune kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 24*60*60;
+    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    	}
+    }
+    else if(timeInSeconds < 12*30*24*60*60)
+    {
+    	if(par_mapMarker.timeAgoTimerInterval < 30*24*60*60*1000) //Gunden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	{
+    		par_mapMarker.timeAgoTimerInterval = 30*24*60*60*1000;
+    	}
+    	else //Sayfa acildiginda ay ise, once bir sonraki aya kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	{
+    		residualSeconds = timeInSeconds % 30*24*60*60;
+    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    	}
+    }
+    else
+    {
+    	par_mapMarker.timeAgoTimerInterval = 12*30*24*60*60*1000;
+    }
+    
+	clearTimeout(par_mapMarker.timeAgoTimer);
+	par_mapMarker.timeAgoTimer = setTimeout(function() {checkAndUpdateUserInfoWindow(par_timestamp, par_mapMarker, par_userId, par_personPhotoElement);}, par_mapMarker.timeAgoTimerInterval);
 }
 
 /**
@@ -406,6 +472,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	var userIdArray = new Array();	
 	var newFriend = false;
 	var newestTimestamp = 0;
+	var isAnyTimestampChanged = false;
 
 	$.each(users, function(index, value)
 	{
@@ -518,7 +585,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			newFriend = true;
 			//alertMsg('userId:' + userId + ' added');
 	
-			var markerInfo= new MapStruct.MapMarker({marker:userMarker});
+			var markerInfo= new MapStruct.MapMarker({marker:userMarker, infoWindowIsOpened:false, timeAgoTimerInterval:0});
 			
 			TRACKER.users[userId] = new TRACKER.User( {//username:username,
 				realname:realname,
@@ -539,6 +606,8 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				fb_id:fb_id,
 				profilePhotoStatus:profilePhotoStatus
 			});
+			
+			checkAndUpdateUserQueryInterval(TRACKER.users[userId], userId);
 	
 			var personPhotoElement = getPersonPhotoElement(userId, currentUser);
 			var content = getUserContent(userId, personPhotoElement);	
@@ -561,10 +630,9 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	
 				var content = getUserContent(userId, personPhotoElement);	
 								
-				MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);
-				
-				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
-				TRACKER.users[userId].mapMarker[0].infoWindowIsOpened = true;
+				MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);				
+				MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0]);
+				checkAndUpdateUserInfoWindow(TRACKER.users[userId].locationTimeStamp, TRACKER.users[userId].mapMarker[0], userId, personPhotoElement);
 			});
 
 			//MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[0].marker, TRACKER.showUsersOnTheMap);
@@ -572,7 +640,6 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 			
 			//TODO: kullanıcının pencresi açıkken konum bilgisi güncellediğinde
 			//pencerenin yeni konumda da açık olmasının sağlanması
-
 		}
 		else
 		{						
@@ -625,22 +692,34 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 //					MAP.setMarkerVisible(userMarker, false)						
 //				}
 //			}
-			
-			if ((TRACKER.users[userId].mapMarker[0].infoWindow != null) && ((TRACKER.users[userId].latitude != latitude) ||
-					(TRACKER.users[userId].longitude != longitude) || (TRACKER.users[userId].locationTimeStamp != locationTimeStamp) || true))
-			{
+
+			if ((TRACKER.users[userId].latitude != latitude) || (TRACKER.users[userId].longitude != longitude) || 
+				(TRACKER.users[userId].locationTimeStamp != locationTimeStamp)/* || true*/)
+			{				
+				if(TRACKER.users[userId].locationTimeStamp != locationTimeStamp)
+				{
+					if(false == isAnyTimestampChanged) //Sadece ilk degisimde view'i update et yai bir kere sunucuyla etkilesime gir
+					{
+						$.fn.yiiGridView.update("userListView");
+						isAnyTimestampChanged = true;
+					}					
+					
+					TRACKER.users[userId].locationTimeStamp = locationTimeStamp;
+					checkAndUpdateUserQueryInterval(TRACKER.users[userId], userId);
+				}				
+				
 				TRACKER.users[userId].latitude = latitude;
 				TRACKER.users[userId].longitude = longitude;
 				TRACKER.users[userId].time = time;
 				TRACKER.users[userId].locationCalculatedTime = locationCalculatedTime;
-				TRACKER.users[userId].locationTimeStamp = locationTimeStamp;
+				//TRACKER.users[userId].locationTimeStamp = locationTimeStamp;
 				TRACKER.users[userId].locationSource = locationSource;
 				TRACKER.users[userId].deviceId = deviceId;
 				TRACKER.users[userId].userType = userType;
 				TRACKER.users[userId].friendshipStatus = isFriend;
 				TRACKER.users[userId].address = address;				
 				
-				var isWindowOpen = TRACKER.users[userId].mapMarker[0].infoWindowIsOpened;
+				//var isWindowOpen = TRACKER.users[userId].mapMarker[0].infoWindowIsOpened;
 								
 				var personPhotoElement = getPersonPhotoElement(userId, currentUser);
 				var content = getUserContent(userId, personPhotoElement);
@@ -648,11 +727,12 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 				//If user location changed, update marker position
 				TRACKER.users[userId].mapMarker[0].marker.setPosition(new google.maps.LatLng(latitude, longitude));
 			
-				if (isWindowOpen == true) {
-					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow)
-					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);			
-					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, TRACKER.users[userId].mapMarker[0].marker);
-				}
+//				if (isWindowOpen == true) {
+//					MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[0]);
+//					MAP.setContentOfInfoWindow(TRACKER.users[userId].mapMarker[0].infoWindow, content);			
+//					MAP.openInfoWindow(TRACKER.users[userId].mapMarker[0]);
+//					checkAndUpdateUserInfoWindow(locationTimeStamp, TRACKER.users[userId].mapMarker[0], userId, personPhotoElement);
+//				}
 			}
 						
 			TRACKER.users[userId].latitude = latitude;
@@ -668,8 +748,7 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 		}
 	});
 	
-	checkAndUpdateUserQueryInterval(newestTimestamp);
-	
+	//checkAndUpdateUserQueryInterval(newestTimestamp);
 	//alertMsg("processUsers(), stop - TRACKER.users.length:" + TRACKER.users.length);
 	//var size = TRACKER.users.filter(function(value) { return value !== undefined }).length;	
 	//alertMsg('TRACKER.users.size:' + size);
@@ -692,9 +771,10 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	    	MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, (key==TRACKER.userId)?true:TRACKER.showUsersOnTheMap);
 			
 	    	//if(TRACKER.users[key].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false))
-	    	if(TRACKER.users[key].mapMarker[0].infoWindowIsOpened && (TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
+	    	if((TRACKER.showUsersOnTheMap == false) && (key != TRACKER.userId))
 			{
-				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow)
+				MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0]);
+				clearTimeout(TRACKER.users[key].mapMarker[0].timeAgoTimer);
 			}	
 	
 	    	if((updateType === 'all') && (userIdArray.indexOf(key) === -1))
@@ -706,12 +786,9 @@ function processUsers(MAP, users, currentUser, par_updateType, deletedFriendId) 
 	    			TRACKER.preUserId = -1;
 	    		}
 	    		
-	    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);
-	    		
-	    		if(TRACKER.users[key].mapMarker[0].infoWindowIsOpened)
-	    		{
-	    			MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0].infoWindow);
-	    		}
+	    		MAP.setMarkerVisible(TRACKER.users[key].mapMarker[0].marker, false);	    		
+	    		MAP.closeInfoWindow(TRACKER.users[key].mapMarker[0]);
+	    		clearTimeout(TRACKER.users[key].mapMarker[0].timeAgoTimer);
 	    		
 	    		TRACKER.clearTraceLines(key);
 	
@@ -875,7 +952,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 			//image = imageURL + "&fileType=0&thumb=ok";
 			var userMarker = MAP.putMarker(location, image, false, false, 0, 0);
 			var iWindow = MAP.initializeInfoWindow();
-			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow, infoWindowIsOpened:false});
 			
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -975,10 +1052,8 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 						
 						//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
 
-						MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
-						
-						MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
-						TRACKER.images[imageId].infoWindowIsOpened = true;	
+						MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);						
+						MAP.openInfoWindow(TRACKER.images[imageId].mapMarker);	
 						
 						MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 							if ($('#showPhotosOnMap').attr('checked') == false){
@@ -1021,9 +1096,9 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
 		{
 	    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
 			
-			if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
+			if(TRACKER.showImagesOnTheMap == false)
 			{
-				MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
+				MAP.closeInfoWindow(TRACKER.images[key].mapMarker);
 			}				
 		}
 	}	
@@ -1079,11 +1154,7 @@ function processUploads(MAP, deletedUploads, uploads, par_updateType, par_thumbS
     		anyDeletedUpload = true;
     		
     		MAP.setMarkerVisible(TRACKER.images[uploadId].mapMarker.marker, false);	
-    		
-    		if(TRACKER.images[uploadId].infoWindowIsOpened)
-    		{
-    			MAP.closeInfoWindow(TRACKER.images[uploadId].mapMarker.infoWindow);
-    		}
+    		MAP.closeInfoWindow(TRACKER.images[uploadId].mapMarker);
 
 //    		if(typeof $.fn.yiiGridView != "undefined")
 //    		{
@@ -1174,7 +1245,7 @@ function processImageXML(MAP, xml){
 			//image = imageURL + "&fileType=0&thumb=ok";
 			var userMarker = MAP.putMarker(location, image, false, false, 0, 0);
 			var iWindow = MAP.initializeInfoWindow();
-			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow});
+			var markerInfoWindow = new MapStruct.MapMarker({marker:userMarker, infoWindow:iWindow, infoWindowIsOpened:false});
 			
 			TRACKER.images[imageId] = new TRACKER.Img({imageId:imageId,
 				imageURL:imageURL,
@@ -1230,10 +1301,8 @@ function processImageXML(MAP, xml){
 					
 					//var content = '<video id="my_video_2" class="video-js vjs-default-skin" controls preload="auto" width="320" height="264" data-setup="{}"><source src="http://localhost/traceper/branches/DevWebInterface/upload/oceans-clip.mp4" type="video/mp4"></video>'; 
 
-					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);									
-					
-					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow, TRACKER.images[imageId].mapMarker.marker);					
-					TRACKER.images[imageId].infoWindowIsOpened = true;	
+					MAP.setContentOfInfoWindow(TRACKER.images[imageId].mapMarker.infoWindow,content);					
+					MAP.openInfoWindow(TRACKER.images[imageId].mapMarker);	
 					
 					MAP.setInfoWindowCloseListener(TRACKER.images[imageId].mapMarker.infoWindow, function (){
 						if ($('#showPhotosOnMap').attr('checked') == false){
@@ -1268,21 +1337,13 @@ function processImageXML(MAP, xml){
 			if((typeof TRACKER.images[key] !== "undefined") && (TRACKER.images[key] !== null))
 			{
 		    	MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, TRACKER.showImagesOnTheMap); //ADNAN	
-				
-				if(TRACKER.images[key].infoWindowIsOpened && (TRACKER.showImagesOnTheMap == false))
-				{
-					MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow)
-				}
+		    	MAP.closeInfoWindow(TRACKER.images[key].mapMarker);
 				
 		    	if((updateType === 'all') && (uploadIdArray.indexOf(key) === -1))
 		    	{
 		    		//alertMsg('uploadId:' + key + 'deleted');
 		    		MAP.setMarkerVisible(TRACKER.images[key].mapMarker.marker, false);	
-		    		
-		    		if(TRACKER.images[key].infoWindowIsOpened)
-		    		{
-		    			MAP.closeInfoWindow(TRACKER.images[key].mapMarker.infoWindow);
-		    		}
+		    		MAP.closeInfoWindow(TRACKER.images[key].mapMarker);
 
 		    		if((typeof $.fn.yiiGridView == "undefined") || (typeof $.fn.yiiGridView.settings[uploadsGridViewId] == "undefined"))	
 		    		{
