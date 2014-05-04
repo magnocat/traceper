@@ -112,6 +112,6 @@ LAN_OPERATOR.addIndexes({
 			ago:'önce',
 			thisPhotoIsUnavailable:'Bu fotoğrafa maalesef erişilemiyor...',
 			locationInfoSourceUnknown:'Konum bilgisi kaynağı bilinmiyor',
-			thisLocationInfoSentFromWebSite:'Bu konum bilgisi web sitesinden gönderilmiş',
-			thisLocationInfoSentFromMobileDevice:'Bu konum bilgisi mobil cihazdan gönderilmiş'
+			thisLocationInfoSentFromWebSite:'Bu konum bilgisi web sitesinden gönderildi',
+			thisLocationInfoSentFromMobileDevice:'Bu konum bilgisi mobil cihazdan gönderildi'
 		});

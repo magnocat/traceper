@@ -491,8 +491,51 @@ class UsersController extends Controller
 			}			
 				
 			$date = date('Y-m-d H:i:s');
-			$this->getaddress($latitude, $longitude, $address, $country);			
-			Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);			
+						
+			$minDistanceInterval = 0;
+			$minDataSentInterval = 0;			
+			$lastLatitude = 0;
+			$lastLongitude = 0;
+			$lastAltitude = 0;
+			$lastAddress = null;
+			$updateLocationResult = false;
+			$bLogAsPastLocation = false;
+				
+			Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+			UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress);
+				
+			$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
+			$distanceInMs = $distanceInKms * 1000;
+			
+			//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
+			if($distanceInMs > $minDistanceInterval)
+			{
+				$this->getaddress($latitude, $longitude, $address, $country);
+				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);
+					
+				//Son gecmis izin adres bilgisi ile anlik adres bilgisi farkli ise yeni bir gecmis iz olarak kaydet
+				if(strncmp($lastAddress, $address, 300) != 0)
+				{
+					$bLogAsPastLocation = true;
+				}
+				else
+				{
+					$bLogAsPastLocation = false;
+				}
+			}
+			else
+			{
+				$bLogAsPastLocation = false;
+					
+				$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $date, $date, LocationSource::WebGeolocation, Yii::app()->user->id);
+					
+			}
+			
+			//Anlık konum kaydi basarili ise gecmis konum olarak da kaydet
+			if((true == $bLogAsPastLocation) && (true == $updateLocationResult))
+			{
+				UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, 0/*$deviceId*/, $date, $date, $address, $country, LocationSource::WebGeolocation);
+			}			
 		}		
 	}
 
