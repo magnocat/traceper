@@ -217,7 +217,7 @@ function processUserPastLocations(MAP, locations, userId){
 
 			var content = 
 				  '<div style="width:280px; height:180px;">'
-				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;max-width:240px;word-wrap:break-word;line-height:20px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font> <div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div> </div>'  
+				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;max-width:230px;word-wrap:break-word;line-height:20px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font> <div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div> </div>'  
 				+ 	'</br></br>'
 				//+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
 				+ 	'<div style="cursor:text;">' + address + '</div>'				
@@ -300,7 +300,8 @@ function getPersonPhotoElement(userId, currentUser)
 			if((TRACKER.users[userId].fb_id != 0) && (typeof TRACKER.users[userId].fb_id != "undefined")){			
 				personPhotoElement = '<img src="https://graph.facebook.com/'+ TRACKER.users[userId].fb_id +'/picture?type=square" width="44px" height="48px" />';
 			}else{
-				personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+				//personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+				personPhotoElement = '<img src="images/UserIcon.png" width="44px" height="48px" />';
 			}
 		}
 		break;
@@ -327,7 +328,8 @@ function getPersonPhotoElement(userId, currentUser)
 
 		default:
 			//alertMsg("processUsers(), undefined profilePhotoStatus:" + profilePhotoStatus);
-			personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';				
+			//personPhotoElement = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+			personPhotoElement = '<img src="images/UserIcon.png" width="44px" height="48px" />';
 	}
 	
 	return personPhotoElement;
