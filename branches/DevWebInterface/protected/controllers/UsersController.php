@@ -314,7 +314,7 @@ class UsersController extends Controller
 						{
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 							
-							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country))
+							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, LocationSource::Mobile))
 							{
 								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
 							
@@ -1886,7 +1886,7 @@ class UsersController extends Controller
 			$rows[$i]['dataArrivedTime'] = isset($rows[$i]['dataArrivedTime']) ? $rows[$i]['dataArrivedTime'] : null;
 			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
 			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
-			//$rows[$i]['locationSource'] = isset($rows[$i]['locationSource']) ? $rows[$i]['locationSource'] : null;
+			$rows[$i]['locationSource'] = isset($rows[$i]['locationSource']) ? $rows[$i]['locationSource'] : null;
 			$rows[$i]['address'] = isset($rows[$i]['address']) ? $rows[$i]['address'] : Yii::t('users', 'There is no address info');  
 			$rows[$i]['country'] = isset($rows[$i]['country']) ? $rows[$i]['country'] : null;
 			
@@ -1908,7 +1908,7 @@ class UsersController extends Controller
 						'longitude'=>$rows[$i]['longitude'],
 						'altitude'=>$rows[$i]['altitude'],
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
-					    //'locationSource'=>$rows[$i]['locationSource'],
+					    'locationSource'=>$rows[$i]['locationSource'],
 						'time'=>$dataArrivedTimestamp,
 						'timestamp'=>$dataArrivedTimestamp,
 						//'timeAgo'=>$this->get_timeago($dataArrivedTimestamp),

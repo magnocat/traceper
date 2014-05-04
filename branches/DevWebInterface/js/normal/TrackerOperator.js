@@ -1020,7 +1020,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 						//alert("else 2");
 						
 						MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex]);
-						clearTimeout(this.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
+						clearTimeout(TRACKER.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
 						MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 						
 						if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
@@ -1060,7 +1060,7 @@ function TrackerOperator(url, map, fetchPhotosInInitial, interval, qUpdatedUserI
 				MAP.setPolylineVisibility(TRACKER.users[userId].polyline, true);
 			}
 			MAP.closeInfoWindow(TRACKER.users[userId].mapMarker[currentMarkerIndex]);
-			clearTimeout(this.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
+			clearTimeout(TRACKER.users[userId].mapMarker[currentMarkerIndex].timeAgoTimer);
 			MAP.setMarkerVisible(TRACKER.users[userId].mapMarker[nextMarkerIndex].marker, true);
 			
 			if(false == TRACKER.users[userId].mapMarker[nextMarkerIndex].pointAdded)
