@@ -324,6 +324,93 @@
 }
 
 
+.icon-profile:before {
+	content: "\e60b";
+}
+.icon-qrcode:before {
+	content: "\e60c";
+}
+.icon-screen:before {
+	content: "\e60d";
+}
+.icon-mobile:before {
+	content: "\e60e";
+}
+.icon-mobile2:before {
+	content: "\e60f";
+}
+.icon-user:before {
+	content: "\e610";
+}
+.icon-users:before {
+	content: "\e611";
+}
+.icon-search:before {
+	content: "\e63d";
+}
+.icon-key:before {
+	content: "\e612";
+}
+.icon-cog:before {
+	content: "\e61f";
+}
+.icon-wand:before {
+	content: "\e63e";
+}
+.icon-signup:before {
+	content: "\e613";
+}
+.icon-warning:before {
+	content: "\e624";
+}
+.icon-question2:before {
+	content: "\e625";
+}
+.icon-spam:before {
+	content: "\e626";
+}
+.icon-close:before {
+	content: "\e627";
+}
+.icon-checkmark:before {
+	content: "\e628";
+}
+.icon-plus:before {
+	content: "\e63f";
+}
+.icon-enter:before {
+	content: "\e614";
+}
+.icon-exit:before {
+	content: "\e615";
+}
+.icon-arrow-right:before {
+	content: "\e616";
+}
+.icon-arrow-left:before {
+	content: "\e617";
+}
+.icon-arrow-right2:before {
+	content: "\e61d";
+}
+.icon-arrow-left2:before {
+	content: "\e61e";
+}
+.icon-checkmark2:before {
+	content: "\e62b";
+}
+.icon-x:before {
+	content: "\e62f";
+}
+.icon-iphone:before {
+	content: "\e600";
+}
+.icon-monitor:before {
+	content: "\e601";
+}
+.icon-iphone2:before {
+	content: "\e602";
+}
 .icon-download1:before {
 	content: "\e61b";
 }
@@ -332,9 +419,6 @@
 }
 .icon-eraser:before {
 	content: "\e629";
-}
-.icon-eraser2:before {
-	content: "\e62a";
 }
 .icon-zoomIn1:before {
 	content: "\e62c";
@@ -348,95 +432,35 @@
 .icon-envelope:before {
 	content: "\e61a";
 }
-.icon-camera:before {
-	content: "\e600";
+.icon-monitor2:before {
+	content: "\e630";
 }
-.icon-camera2:before {
-	content: "\e601";
+.icon-mobile3:before {
+	content: "\e631";
 }
-.icon-profile:before {
-	content: "\e602";
-}
-.icon-qrcode:before {
-	content: "\e61d";
-}
-.icon-bubbles:before {
+.icon-mobile32:before {
 	content: "\e604";
 }
-.icon-user:before {
+.icon-monitor22:before {
 	content: "\e605";
 }
-.icon-users:before {
-	content: "\e606";
-}
-.icon-user2:before {
-	content: "\e607";
-}
-.icon-search:before {
-	content: "\e60b";
-}
-.icon-zoom-in:before {
-	content: "\e609";
-}
-.icon-zoom-out:before {
-	content: "\e60a";
-}
-.icon-key:before {
-	content: "\e60c";
+.icon-cog2:before {
+	content: "\e632";
 }
 .icon-lock:before {
-	content: "\e60d";
+	content: "\e633";
 }
-.icon-cog:before {
-	content: "\e60e";
+.icon-clipboard:before {
+	content: "\e635";
 }
-.icon-remove:before {
-	content: "\e60f";
+.icon-clipboard2:before {
+	content: "\e636";
 }
-.icon-switch:before {
-	content: "\e610";
+.icon-clipboard3:before {
+	content: "\e637";
 }
-.icon-signup:before {
-	content: "\e628";
-}
-.icon-cancel-circle:before {
-	content: "\e614";
-}
-.icon-checkmark-circle:before {
-	content: "\e615";
-}
-.icon-close:before {
-	content: "\e611";
-}
-.icon-checkmark:before {
-	content: "\e612";
-}
-.icon-plus:before {
-	content: "\e613";
-}
-.icon-login1:before {
-	content: "\e61e";
-}
-.icon-exit:before {
-	content: "\e61f";
-}
-.icon-arrow-right:before {
-	content: "\e624";
-}
-.icon-arrow-left:before {
-	content: "\e625";
-}
-.icon-arrow-right2:before {
-	content: "\e626";
-}
-.icon-arrow-left2:before {
-	content: "\e627";
-}
-.icon-facebook:before {
-	content: "\e616";
-}
-.icon-facebook2:before {
-	content: "\e617";
+.icon-settings:before {
+	content: "\e638";
 }
 .icon-inviteUsers:before {
 	content: "\e618";
@@ -444,8 +468,17 @@
 .icon-enter2:before {
 	content: "\e623";
 }
+.icon-mobile22:before {
+	content: "\e606";
+}
+.icon-screen2:before {
+	content: "\e607";
+}
 .icon-mail:before {
 	content: "\e603";
+}
+.icon-help:before {
+	content: "\e609";
 }
 .icon-download3:before {
 	content: "\e621";
@@ -453,15 +486,34 @@
 .icon-qrcode2:before {
 	content: "\e622";
 }
+.icon-camera:before {
+	content: "\e639";
+}
+.icon-question-sign:before {
+	content: "\e60a";
+}
+.icon-camera-retro:before {
+	content: "\e63a";
+}
+.icon-cogs:before {
+	content: "\e63b";
+}
 .icon-group:before {
 	content: "\e608";
 }
 .icon-question:before {
 	content: "\e619";
 }
+.icon-eraser2:before {
+	content: "\e62a";
+}
 .icon-android:before {
 	content: "\e620";
 }
+.icon-camera2:before {
+	content: "\e63c";
+}
+
 
 
 .med-icon-effect .med-icon {

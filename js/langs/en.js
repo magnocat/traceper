@@ -111,5 +111,8 @@ LAN_OPERATOR.addIndexes({
 			second:'second',
 			pluralSuffix:'s',
 			ago:'ago',
-			thisPhotoIsUnavailable:'This photo is unavailable unfortunately...'
+			thisPhotoIsUnavailable:'This photo is unavailable unfortunately...',
+			locationInfoSourceUnknown:'Location info source is unknown',
+			thisLocationInfoSentFromWebSite:'This location info sent from web site',
+			thisLocationInfoSentFromMobileDevice:'This location info sent from mobile device'
 	});

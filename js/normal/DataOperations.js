@@ -153,6 +153,7 @@ function processUserPastLocations(MAP, locations, userId){
 		var deviceId = value.deviceId;
 		//var userType = value.userType;
 		var address = value.address;
+		var locationSource = value.locationSource;
 		
 		//alert("key:" + key + " - time:" + value.time);
 
@@ -189,10 +190,34 @@ function processUserPastLocations(MAP, locations, userId){
 			{
 				userWasHereString = timeAgo(timestamp) + ' (' + getLocalDateTime(timestamp) + ') ' + TRACKER.langOperator.wasHere;
 			}
+			
+			var iconLocationSource;
+			var iconTitle;
+			
+			if(-1 == locationSource)
+			{
+				iconLocationSource = 'icon-warning';
+				iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;
+			}
+			else if((0 == locationSource) || (2 == locationSource))
+			{
+				iconLocationSource = 'icon-monitor2';
+				iconTitle = TRACKER.langOperator.thisLocationInfoSentFromWebSite;		
+			}
+			else if(1 == locationSource)
+			{
+				iconLocationSource = 'icon-mobile';
+				iconTitle = TRACKER.langOperator.thisLocationInfoSentFromMobileDevice;		
+			}
+			else
+			{
+				iconLocationSource = 'icon-warning';
+				iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;		
+			}			
 
 			var content = 
 				  '<div style="width:280px; height:180px;">'
-				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font></div>'  
+				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;max-width:240px;word-wrap:break-word;line-height:20px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font> <div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div> </div>'  
 				+ 	'</br></br>'
 				//+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
 				+ 	'<div style="cursor:text;">' + address + '</div>'				
@@ -221,9 +246,33 @@ function processUserPastLocations(MAP, locations, userId){
 }
 
 function getContentFor(userId, imageSrc) {
+	var iconLocationSource;
+	var iconTitle;
+	
+	if(-1 == TRACKER.users[userId].locationSource)
+	{
+		iconLocationSource = 'icon-warning';
+		iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;
+	}
+	else if((0 == TRACKER.users[userId].locationSource) || (2 == TRACKER.users[userId].locationSource))
+	{
+		iconLocationSource = 'icon-monitor2';
+		iconTitle = TRACKER.langOperator.thisLocationInfoSentFromWebSite;		
+	}
+	else if(1 == TRACKER.users[userId].locationSource)
+	{
+		iconLocationSource = 'icon-mobile';
+		iconTitle = TRACKER.langOperator.thisLocationInfoSentFromMobileDevice;		
+	}
+	else
+	{
+		iconLocationSource = 'icon-warning';
+		iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;		
+	}	
+	
 	var content = 
-		  '<div style="width:280px; height:180px;">'
-		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" width="44px" height="48px"/>' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+		  '<div style="width:280px; height:180px;">'		
+		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + '<img src="' + imageSrc + '" width="44px" height="48px"/>' + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;max-width:188px;word-wrap:break-word;line-height:24px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div><div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;" class="vtip" title="' + iconTitle + '"></div></div>'  
 		+ 	'</br>'
 		+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
 		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				
@@ -284,10 +333,35 @@ function getPersonPhotoElement(userId, currentUser)
 	return personPhotoElement;
 }
 
-function getUserContent(userId, personPhotoElement) {	
+function getUserContent(userId, personPhotoElement) 
+{	
+	var iconLocationSource;
+	var iconTitle;
+	
+	if(-1 == TRACKER.users[userId].locationSource)
+	{
+		iconLocationSource = 'icon-warning';
+		iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;
+	}
+	else if((0 == TRACKER.users[userId].locationSource) || (2 == TRACKER.users[userId].locationSource))
+	{
+		iconLocationSource = 'icon-monitor2';
+		iconTitle = TRACKER.langOperator.thisLocationInfoSentFromWebSite;		
+	}
+	else if(1 == TRACKER.users[userId].locationSource)
+	{
+		iconLocationSource = 'icon-mobile';
+		iconTitle = TRACKER.langOperator.thisLocationInfoSentFromMobileDevice;		
+	}
+	else
+	{
+		iconLocationSource = 'icon-warning';
+		iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;		
+	}	
+
 	var content = 
 		  '<div style="width:280px; height:180px;">'
-		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div></div>'  
+		+ 	'<div><div style="display:inline-block;vertical-align:middle;">' + personPhotoElement + '</div><div style="display:inline-block;vertical-align:middle;padding-left:5px;cursor:text;max-width:188px;word-wrap:break-word;line-height:24px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b></div><div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;" class="vtip" title="' + iconTitle + '"></div></div>'  
 		+ 	'</br>'
 		+ 	'<div style="cursor:text;">' + getLocalDateTime(TRACKER.users[userId].locationTimeStamp) + ' (' + timeAgo(TRACKER.users[userId].locationTimeStamp) + ')' + '</div>'				
 		+ 	'<div style="cursor:text;">' + TRACKER.users[userId].address + '</div>'				

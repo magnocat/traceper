@@ -24,16 +24,21 @@ function getFriendPhoto($data, $row, $isFriendList){
 				{
 					if($data['isVisible'] == 1)
 					{
-						$value = CHtml::link('<div class="hi-icon-effect-user hi-icon-effect-usera"><div class="hi-icon-in-list icon-user"></div></div>', '#', array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));
+						//$value = CHtml::link('<div class="hi-icon-effect-user hi-icon-effect-usera"><div class="hi-icon-in-list icon-user"></div></div>', '#', array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));						
+						$value = CHtml::link('<div class="user-view second-effect"><img src="images/UserIcon.png" width="33px" height="36px" /> <div class="mask"><div class="info"></div></div></div>', '#',
+								array('onclick'=>'TRACKER.trackUser('.$data['id'].');', 'title'=>Yii::t('users', 'See your friend\'s position on the map')));						
 					}
 					else
 					{
-						$value = CHtml::label('<div class="hi-icon-in-list icon-user" style="color:#FFDB58"></div>', '#', array('title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));
+						//$value = CHtml::label('<div class="hi-icon-in-list icon-user" style="color:#FFDB58"></div>', '#', array('title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));						
+						$value = CHtml::image('images/UserIcon.png', '#', array('width'=>'33px', 'height'=>'36px', 'title'=>Yii::t('users', 'This user does not share his/her location info at the moment')));
 					}
 				}
 				else
 				{
-					$value = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+					//$value = '<div class="hi-icon-in-list icon-user" style="color:#FFDB58; cursor:default;"></div>';
+					
+					$value = CHtml::image('images/UserIcon.png', '#', array('width'=>'33px', 'height'=>'36px'));
 				}
 			}
 			else
@@ -350,7 +355,7 @@ if ($dataProvider != null) {
 		*/       
 
 		array(            // display 'create_time' using an expression
-				    'name'=>Yii::t('users', 'My Friend @ Where?'),
+				    'name'=>$isFriendList ? Yii::t('users', 'My Friend @ Where?') : Yii::t('common', 'Name'),
 					'type' => 'raw',
 					'sortable'=>$isFriendList ? true : false,
 		            //'value'=> $isFriendList ? '($data["isVisible"] == 1)?(CHtml::link($data["Name"], "#", array("onclick"=>"TRACKER.trackUser(".$data["id"].");", "title"=>Yii::t("users", "See your friend\'s position on the map"))).(($data["address"] != NULL)?(" ".$this->grid->owner->get_timeago(strtotime($data["time"]))." @ "."<div style=\"font-size:10px;\">".$this->grid->owner->getFullAddress($data["address"], $data["country"])."</div>"):"")):CHtml::label($data["Name"], "#", array("title"=>Yii::t("users", "This user does not share his/her location info at the moment")))' : '$data["Name"]',					

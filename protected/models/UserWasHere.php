@@ -14,6 +14,7 @@
  * @property string $dataCalculatedTime
  * @property string $address
  * @property string $country
+ * @property integer $locationSource
  *
  * The followings are the available model relations:
  * @property TraceperUsers $user
@@ -37,6 +38,7 @@ class UserWasHere extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('userId, dataArrivedTime', 'required'),
+			array('locationSource', 'numerical', 'integerOnly'=>true),
 			array('userId, longitude', 'length', 'max'=>11),
 			array('latitude', 'length', 'max'=>10),
 			array('altitude', 'length', 'max'=>15),
@@ -45,7 +47,7 @@ class UserWasHere extends CActiveRecord
 			array('dataCalculatedTime, address', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, deviceId, dataCalculatedTime, address, country', 'safe', 'on'=>'search'),
+			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, deviceId, dataCalculatedTime, address, country, locationSource', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,6 +79,7 @@ class UserWasHere extends CActiveRecord
 			'dataCalculatedTime' => 'Data Calculated Time',
 			'address' => 'Address',
 			'country' => 'Country',
+			'locationSource' => 'Location Source',
 		);
 	}
 
@@ -108,6 +111,7 @@ class UserWasHere extends CActiveRecord
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
 		$criteria->compare('address',$this->address,true);
 		$criteria->compare('country',$this->country,true);
+		$criteria->compare('locationSource',$this->locationSource);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -125,36 +129,51 @@ class UserWasHere extends CActiveRecord
 		return parent::model($className);
 	}
 	
-	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country){
-// 		$sql = sprintf('INSERT INTO '
-// 				. $this->tableName() . '
-// 				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
-// 				VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s", "%s", "%s")
-// 				',
-// 				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country);
-		
+	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, $locationSource){
+		// 		$sql = sprintf('INSERT INTO '
+		// 				. $this->tableName() . '
+		// 				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
+		// 				VALUES(%d,	%f, %f, %f, NOW(), "%s", "%s", "%s", "%s")
+		// 				',
+		// 				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country);
+	
 		$sql = sprintf('INSERT INTO '
 				. $this->tableName() . '
-				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
-				VALUES(%d,	%f, %f, %f, "%s", "%s", "%s", "%s", "%s")
+				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country, locationSource)
+				VALUES(%d,	%f, %f, %f, "%s", "%s", "%s", "%s", "%s", %d)
 				',
-				$userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country);		
-		
+				$userId, $latitude, $longitude, $altitude, $arrivedTime, $deviceId, $calculatedTime, $address, $country, $locationSource);
+	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 	
 		$result = false;
-		
+	
 		if ($effectedRows == 1) {
 			$result = true;
 		}
-		
+	
 		return $result;
+	
+		// 		$userWasHere = new UserWasHere;
+	
+		// 		$userWasHere->userId = $userId;
+		// 		$userWasHere->latitude = $latitude;
+		// 		$userWasHere->longitude = $longitude;
+		// 		$userWasHere->altitude = $altitude;
+		// 		$userWasHere->dataArrivedTime = $arrivedTime;
+		// 		$userWasHere->deviceId = $deviceId;
+		// 		$userWasHere->dataCalculatedTime = $calculatedTime;
+		// 		$userWasHere->address = $address;
+		// 		$userWasHere->country = $country;
+		// 		$userWasHere->locationSource = $locationSource;
+	
+		// 		return $userWasHere->save();
 	}
-		
+	
 	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)
 	{
 		$sql = 'SELECT
-		longitude, latitude, deviceId, address, country,
+		longitude, latitude, deviceId, address, country, locationSource,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 		FROM ' . UserWasHere::model()->tableName() .' u
@@ -169,7 +188,7 @@ class UserWasHere extends CActiveRecord
 		FROM '. UserWasHere::model()->tableName() .'
 		WHERE
 		userId = '. $userId;
-		
+	
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 		$pageNo = $pageNo - 1; //Since CPagination's page index starts from 0

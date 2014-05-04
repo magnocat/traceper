@@ -127,7 +127,7 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog', array(
 
 				$app = Yii::app();
 			
-				echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-plus" style="'.(($app->language == 'en')?'padding-left:28px;padding-right:28px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Create').'</span>'.'</button>', $this->createUrl('groups/createGroup'),
+				echo CHtml::ajaxLink('<button class="btn btn-sliding-green btn-sliding-green-a icon-wand" style="'.(($app->language == 'en')?'padding-left:28px;padding-right:28px;':'padding-left:28px;padding-right:28px;').'">'.'<span style="font-family:Helvetica">'.Yii::t('common', 'Create').'</span>'.'</button>', $this->createUrl('groups/createGroup'),
 						array(
 								'type'=>'POST',
 								'success'=> 'function(result){

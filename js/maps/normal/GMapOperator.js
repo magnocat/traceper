@@ -309,7 +309,7 @@ function MapOperator(lang) {
 
 	MAP_OPERATOR.openInfoWindow = function(mapMarker) 
 	{
-		if(false == mapMarker.infoWindowIsOpened)
+		//if(false == mapMarker.infoWindowIsOpened)
 		{
 			mapMarker.infoWindow.open(MAP_OPERATOR.map, mapMarker.marker);
 			mapMarker.infoWindowIsOpened = true;

@@ -1307,7 +1307,7 @@ else
 						<div id="loginButton" class="upperMenu" style="margin-top:14px;width:140px;padding-left:158px;padding-right:0px;">								
 						<?php
 						//Yii butonları <buton> tag'i ile uretmedigi icin boyle yapildi, bu css'ler Yii'nin urettigi <input> ile calismiyor
-						echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-login1" style="'.(($app->language == 'en')?'padding-left:65px;padding-right:25px;':'padding-left:50px').'">'.Yii::t('site', 'Log in').'</button>', $this->createUrl('site/login'),
+						echo CHtml::ajaxLink('<button class="btn btn-3 btn-3a icon-enter" style="'.(($app->language == 'en')?'padding-left:65px;padding-right:25px;':'padding-left:50px').'">'.Yii::t('site', 'Log in').'</button>', $this->createUrl('site/login'),
 								array(
 										'type'=>'POST',
 										'success'=> 'function(msg){
