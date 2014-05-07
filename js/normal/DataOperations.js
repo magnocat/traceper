@@ -475,38 +475,38 @@ function checkAndUpdateUserInfoWindow(par_timestamp, par_mapMarker, par_userId, 
     }
     else if(timeInSeconds < 24*60*60)
     {
-    	if(par_mapMarker.timeAgoTimerInterval < 60*60*1000) //Dakikadan gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	if(par_mapMarker.timeAgoTimerInterval < 60*60*1000) //Dakikadan gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 saatlik timer kur
     	{
     		par_mapMarker.timeAgoTimerInterval = 60*60*1000;
     	}
-    	else //Sayfa acildiginda saat ise, once bir sonraki saate kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	else //Sayfa acildiginda saat ise, once bir sonraki saate kadar kalan sure kadar timer kur, sonra 1 saatlik timer kur
     	{
     		residualSeconds = timeInSeconds % 60*60;
-    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    		par_mapMarker.timeAgoTimerInterval = (60*60-residualSeconds)*1000;
     	}
     }
     else if(timeInSeconds < 30*24*60*60)
     {
-    	if(par_mapMarker.timeAgoTimerInterval < 24*60*60*1000) //Saatten gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	if(par_mapMarker.timeAgoTimerInterval < 24*60*60*1000) //Saatten gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 gunluk timer kur
     	{
     		par_mapMarker.timeAgoTimerInterval = 24*60*60*1000;
     	}
-    	else //Sayfa acildiginda gun ise, once bir sonraki gune kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	else //Sayfa acildiginda gun ise, once bir sonraki gune kadar kalan sure kadar timer kur, sonra 1 gunluk timer kur
     	{
     		residualSeconds = timeInSeconds % 24*60*60;
-    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    		par_mapMarker.timeAgoTimerInterval = (24*60*60-residualSeconds)*1000;
     	}
     }
     else if(timeInSeconds < 12*30*24*60*60)
     {
-    	if(par_mapMarker.timeAgoTimerInterval < 30*24*60*60*1000) //Gunden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 dk timer kur
+    	if(par_mapMarker.timeAgoTimerInterval < 30*24*60*60*1000) //Gunden gecis yapiliyorsa veya kalan surelik timer kurulduysa, direk 1 aylik timer kur
     	{
     		par_mapMarker.timeAgoTimerInterval = 30*24*60*60*1000;
     	}
-    	else //Sayfa acildiginda ay ise, once bir sonraki aya kadar kalan sure kadar timer kur, sonra 1 dk lık timer kur
+    	else //Sayfa acildiginda ay ise, once bir sonraki aya kadar kalan sure kadar timer kur, sonra 1 aylik timer kur
     	{
     		residualSeconds = timeInSeconds % 30*24*60*60;
-    		par_mapMarker.timeAgoTimerInterval = (60-residualSeconds)*1000;
+    		par_mapMarker.timeAgoTimerInterval = (30*24*60*60-residualSeconds)*1000;
     	}
     }
     else
@@ -514,6 +514,12 @@ function checkAndUpdateUserInfoWindow(par_timestamp, par_mapMarker, par_userId, 
     	par_mapMarker.timeAgoTimerInterval = 12*30*24*60*60*1000;
     }
     
+    //setTimeout() foksiyonunun alabilecegi max. deger 32 bit yani 2147483647. Bundan buyuk degerlerde foksiyonu hemen cagiriyor
+    if(par_mapMarker.timeAgoTimerInterval > 2147483647)
+    {
+    	par_mapMarker.timeAgoTimerInterval = 2147483647;
+    }	
+
 	clearTimeout(par_mapMarker.timeAgoTimer);
 	par_mapMarker.timeAgoTimer = setTimeout(function() {checkAndUpdateUserInfoWindow(par_timestamp, par_mapMarker, par_userId, par_personPhotoElement);}, par_mapMarker.timeAgoTimerInterval);
 }

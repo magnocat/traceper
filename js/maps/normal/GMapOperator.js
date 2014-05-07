@@ -121,9 +121,7 @@ function MapOperator(lang) {
 		    	}
 				catch(error)
 				{
-					alertMsg('Exception in jsonparams: ' + jsonparams + '\n' + 
-						  'Error: ' + error.message + '\n' + 
-						  'JSON obj: ' + JSON.stringify(obj));
+					  alertMsg('Exception in focusOnCountry: \n' + 'Error: ' + error.message);
 					
 					  var data = "r=site/ajaxEmailNotification&title=Focus on Country Exception Occured!&message=" +
 					  
