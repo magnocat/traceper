@@ -129,6 +129,16 @@ class UserWasHere extends CActiveRecord
 		return parent::model($className);
 	}
 	
+	public function scopes()
+	{
+		return array(
+				'last'=>array(
+						'order'=>'Id DESC',
+						'limit'=>1,
+				),
+		);
+	}	
+	
 	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, $locationSource){
 		// 		$sql = sprintf('INSERT INTO '
 		// 				. $this->tableName() . '
@@ -172,22 +182,26 @@ class UserWasHere extends CActiveRecord
 	
 	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)
 	{
+		$lastUserLocation = $this->last()->find('userId=:userId', array(':userId'=>$userId));
+		$lastRecordId = $lastUserLocation->Id; //Son kayit guncel adresle ayni oldugundan alma
+		
+		//Fb::warn("Id:$lastUserLocation->Id", "getPastPointsDataProvider()");
+		
 		$sql = 'SELECT
 		longitude, latitude, deviceId, address, country, locationSource,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 		FROM ' . UserWasHere::model()->tableName() .' u
 		WHERE
-		userId = '. $userId . '
-		ORDER BY
-		Id DESC';
+		(userId = '. $userId . ' AND Id < '.$lastRecordId.') 
+		ORDER BY Id DESC';
 	
 		// subtract 1 to not get the last location into consideration
 		$sqlCount = 'SELECT
 		count(*)
 		FROM '. UserWasHere::model()->tableName() .'
 		WHERE
-		userId = '. $userId;
+		(userId = '. $userId . ' AND Id < '.$lastRecordId.')';
 	
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
