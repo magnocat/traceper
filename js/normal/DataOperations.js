@@ -128,6 +128,8 @@ function getLocalDateTime(unixTimeStamp)
 function processUserPastLocations(MAP, locations, userId){
 	//var pastPoints = []; 
 	var mapMarker = [];
+	var prevDeviceId = TRACKER.users[userId].deviceId; //Ilk deger olarak guncel degeri al
+	var prevLocationSource = TRACKER.users[userId].locationSource; //Ilk deger olarak guncel degeri al
 	
 	if ((typeof TRACKER.users[userId].polyline == "undefined") || (TRACKER.users[userId].polyline == null)) 
 	{
@@ -198,26 +200,44 @@ function processUserPastLocations(MAP, locations, userId){
 			{
 				iconLocationSource = 'icon-warning';
 				iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;
+				
+				iconHtml = '<div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>';
 			}
 			else if((0 == locationSource) || (2 == locationSource))
 			{
 				iconLocationSource = 'icon-monitor2';
-				iconTitle = TRACKER.langOperator.thisLocationInfoSentFromWebSite;		
+				iconTitle = TRACKER.langOperator.thisLocationInfoSentFromWebSite;
+				
+				iconHtml = '<div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>';
 			}
 			else if(1 == locationSource)
 			{
-				iconLocationSource = 'icon-mobile';
-				iconTitle = TRACKER.langOperator.thisLocationInfoSentFromMobileDevice;		
+				if((1 == prevLocationSource) && (prevDeviceId != deviceId))	
+				{
+					iconTitle = TRACKER.langOperator.thisLocationInfoDeviceIsDifferent;
+					
+					iconHtml = '<div class="hi-icon-in-list icon-mobile" style="color:#FF7F00;display:inline-block;position:absolute;left:226px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>' + 
+							   '<div class="lo-icon icon-spam" style="color:#F62217;display:inline-block;position:absolute;left:240px;top:2px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>';
+				}
+				else
+				{
+					iconLocationSource = 'icon-mobile';
+					iconTitle = TRACKER.langOperator.thisLocationInfoSentFromMobileDevice;
+					
+					iconHtml = '<div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>';					
+				}
 			}
 			else
 			{
 				iconLocationSource = 'icon-warning';
-				iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;		
+				iconTitle = TRACKER.langOperator.locationInfoSourceUnknown;	
+				
+				iconHtml = '<div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div>';
 			}			
 
 			var content = 
 				  '<div style="width:280px; height:180px;">'
-				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;max-width:230px;word-wrap:break-word;line-height:20px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font> <div class="hi-icon-in-list ' + iconLocationSource + '" style="color:#FF7F00;display:inline-block;position:absolute;left:230px;top:11px;cursor:default;" class="vtip" title="' + iconTitle + '"></div> </div>'  
+				+ 	'<div style="display:inline-block;vertical-align:middle;cursor:text;max-width:230px;word-wrap:break-word;line-height:20px;"><b><font size="5">' + TRACKER.users[userId].realname + '</font></b>' +  ' ' + '<font size="3">' +  userWasHereString  + ':' + '</font>' + iconHtml + '</div>'  
 				+ 	'</br></br>'
 				//+ 	'<div style="cursor:text;">' + time + ' - (' + latitude + ", " + longitude + ')' + '</div>'
 				+ 	'<div style="cursor:text;">' + address + '</div>'				
@@ -239,6 +259,9 @@ function processUserPastLocations(MAP, locations, userId){
 		});
 
 		mapMarker.push(markerInfoWindow);
+		
+		prevLocationSource = locationSource; //Bir onceki konum gecmeden bilgiyi guncelle
+		prevDeviceId = deviceId; //Bir onceki konum gecmeden bilgiyi guncelle
 	});
 
 	var tmp = TRACKER.users[userId].mapMarker;		
