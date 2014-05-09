@@ -113,5 +113,6 @@ LAN_OPERATOR.addIndexes({
 			thisPhotoIsUnavailable:'Bu fotoğrafa maalesef erişilemiyor...',
 			locationInfoSourceUnknown:'Konum bilgisi kaynağı bilinmiyor',
 			thisLocationInfoSentFromWebSite:'Bu konum bilgisi web sitesinden gönderildi',
-			thisLocationInfoSentFromMobileDevice:'Bu konum bilgisi mobil cihazdan gönderildi'
+			thisLocationInfoSentFromMobileDevice:'Bu konum bilgisi mobil cihazdan gönderildi',
+			thisLocationInfoDeviceIsDifferent:'Bu konum bilgisini gönderen cihaz bir önceki konum bilgisini gönderen cihazdan farklı.\nKullanıcı bu noktada cihaz değiştirmiş veya bu hesapla birden fazla cihazda aynı\nanda oturum açılmış olabilir.'
 		});

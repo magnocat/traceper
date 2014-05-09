@@ -114,5 +114,6 @@ LAN_OPERATOR.addIndexes({
 			thisPhotoIsUnavailable:'This photo is unavailable unfortunately...',
 			locationInfoSourceUnknown:'Location info source is unknown',
 			thisLocationInfoSentFromWebSite:'This location info sent from web site',
-			thisLocationInfoSentFromMobileDevice:'This location info sent from mobile device'
+			thisLocationInfoSentFromMobileDevice:'This location info sent from mobile device',
+			thisLocationInfoDeviceIsDifferent:'The device sent this location info is different from the one that sent previous info.\nThe user may have changed mobile device at this point, or multiple devices may\nhave concurrently been used for login with this account.'
 	});
