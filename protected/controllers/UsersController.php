@@ -150,7 +150,7 @@ class UsersController extends Controller
 	 * this action is used by mobile clients
 	*/
 	public function actionTakeMyLocation()
-	{
+	{		
 		$result = null;
 		$message = null;
 		
@@ -161,7 +161,9 @@ class UsersController extends Controller
 		$country = null;
 		$updateLocationResult = false;
 		$bLogAsPastLocation = false;		
-		$arrivedTime = null;		
+		$arrivedTime = null;
+
+		$app = Yii::app();
 		
 		try
 		{
@@ -181,7 +183,7 @@ class UsersController extends Controller
 					$deviceId = $_REQUEST['deviceId'];
 					$calculatedTime = date('Y-m-d H:i:s', $_REQUEST['time']);
 					$arrivedTime = date('Y-m-d H:i:s');
-					
+
 					if(isset($_REQUEST['accuracy']) && ($_REQUEST['accuracy'] != NULL))
 					{
 						$accuracy = $_REQUEST['accuracy'];
@@ -189,16 +191,45 @@ class UsersController extends Controller
 					
 					//Fb::warn("lat:$latitude, lon:$longitude, al:$altitude, ct:$calculatedTime, at:$arrivedTime", "actionTakeMyLocation()");
 						
-					if (Yii::app()->user->id != false)
+					if ($app->user->id != false)
 					{
 						$lastLatitude = 0;
 						$lastLongitude = 0;
 						$lastAltitude = 0;
 						$lastAddress = null;
 							
-						Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
-						UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress);
-							
+						//Yii::beginProfile('takeMyLocation-2');
+						
+						//Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+						
+						if(isset($app->session['minDistanceInterval']) == true)
+						{
+							$minDistanceInterval = $app->session['minDistanceInterval'];
+						}
+						else
+						{
+							$minDistanceInterval = Users::model()->getMinDistanceInterval($app->user->id);
+							$app->session['minDistanceInterval'] = $minDistanceInterval; 
+						}		
+
+						if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAddress']) == false))
+						{
+							if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress) == true)
+							{
+								$app->session['lastLatitude'] = $lastLatitude;
+								$app->session['lastLongitude'] = $lastLongitude;
+								$app->session['lastAddress'] = $lastAddress;
+							}
+						}
+						else
+						{
+							$lastLatitude = $app->session['lastLatitude'];
+							$lastLongitude = $app->session['lastLongitude'];
+							$lastAddress = $app->session['lastAddress'];
+						}		
+
+						//Yii::endProfile('takeMyLocation-2');
+
 						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 						$distanceInMs = $distanceInKms * 1000;
 
@@ -211,7 +242,7 @@ class UsersController extends Controller
 							//Madem adres alindi, mevcut konum (Users tablosu) adres karsilastirmasi yapilmadan guncellensin
 							
 							//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
-							$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile, $app->user->id);
 							
 							//Address info is also updated with location info if the distance difference is high enough
 							//if ($updatedRowCount > 0)
@@ -222,7 +253,7 @@ class UsersController extends Controller
 							else
 							{
 								//$updatedRowCount = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
-								$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile,  Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, LocationSource::Mobile, $app->user->id);
 								$message = '';
 									
 								//if ($updatedRowCount > 0)
@@ -266,8 +297,12 @@ class UsersController extends Controller
 						{
 							$bLogAsPastLocation = false;
 							
+							//Yii::beginProfile('takeMyLocation-4');
+							
 							//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
-							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+							$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, $app->user->id);
+
+							//Yii::endProfile('takeMyLocation-4');
 							
 							//Only location info (without address info) is updated if the distance difference is smaller than the threshold
 							//if ($updatedRowCount > 0)
@@ -283,7 +318,7 @@ class UsersController extends Controller
 									
 								//Veritabanı ilk seferde guncellenemezse ikinci kez dene
 								//$updatedRowCount = Users::model()->updateLocation($latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
-								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, Yii::app()->user->id);
+								$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, LocationSource::Mobile, $app->user->id);
 								$message = '';
 									
 								//if ($updatedRowCount > 0)
@@ -314,11 +349,15 @@ class UsersController extends Controller
 						{
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 							
-							if(UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, LocationSource::Mobile))
+							if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, LocationSource::Mobile) == true)
 							{
 								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
 							
 								//$result = "1"; //Values updated successfully
+								
+								$app->session['lastLatitude'] = $latitude;
+								$app->session['lastLongitude'] = $longitude;
+								$app->session['lastAddress'] = $address;
 							}
 							else
 							{
@@ -422,13 +461,8 @@ class UsersController extends Controller
 				
 			$this->sendErrorMail('takeMyLocationExceptionOccured', 'Exception occured in actionTakeMyLocation()', $message);
 		}
-		
+
  		$formattedAddress = null;
-		
-// 		if($address != null)
-// 		{
-// 			Users::model()->getUserAddressInfo(Yii::app()->user->id, );
-// 		}
 
 		if(true == $bLogAsPastLocation) //Adres bilgisi degismis ise
 		{
@@ -450,15 +484,17 @@ class UsersController extends Controller
 
 		echo CJSON::encode(
 				$resultArray
-		);		
+		);
 
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
-		Yii::app()->end();
+		$app->end();
 	}
 	
 	public function actionUpdateLocationByGeolocation()
 	{
 		//Fb::warn("actionUpdateLocationByGeolocation() called", "UsersController");
+		
+		$app = Yii::app();
 		
 		//$_POST['altitude'] genelde sifir donuyor, o nedenle NULL kontrolu yapma
 		if (isset($_POST['latitude']) && ($_POST['latitude'] != NULL) && 
@@ -501,9 +537,34 @@ class UsersController extends Controller
 			$updateLocationResult = false;
 			$bLogAsPastLocation = false;
 				
-			Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
-			UserWasHere::model()->getMostRecentLocation(Yii::app()->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress);
-				
+			//Users::model()->getMinimumIntervalValues(Yii::app()->user->id, $minDistanceInterval, $minDataSentInterval);
+			
+			if(isset($app->session['minDistanceInterval']) == true)
+			{
+				$minDistanceInterval = $app->session['minDistanceInterval'];
+			}
+			else
+			{
+				$minDistanceInterval = Users::model()->getMinDistanceInterval($app->user->id);
+				$app->session['minDistanceInterval'] = $minDistanceInterval;
+			}			
+
+			if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAddress']) == false))
+			{
+				if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress) == true)
+				{
+					$app->session['lastLatitude'] = $lastLatitude;
+					$app->session['lastLongitude'] = $lastLongitude;
+					$app->session['lastAddress'] = $lastAddress;
+				}
+			}
+			else
+			{
+				$lastLatitude = $app->session['lastLatitude'];
+				$lastLongitude = $app->session['lastLongitude'];
+				$lastAddress = $app->session['lastAddress'];
+			}			
+			
 			$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 			$distanceInMs = $distanceInKms * 1000;
 			
@@ -511,7 +572,7 @@ class UsersController extends Controller
 			if($distanceInMs > $minDistanceInterval)
 			{
 				$this->getaddress($latitude, $longitude, $address, $country);
-				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  Yii::app()->user->id);
+				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  $app->user->id);
 					
 				//Son gecmis izin adres bilgisi ile anlik adres bilgisi farkli ise yeni bir gecmis iz olarak kaydet
 				if(strncmp($lastAddress, $address, 300) != 0)
@@ -527,14 +588,19 @@ class UsersController extends Controller
 			{
 				$bLogAsPastLocation = false;
 					
-				$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $date, $date, LocationSource::WebGeolocation, Yii::app()->user->id);
+				$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $date, $date, LocationSource::WebGeolocation, $app->user->id);
 					
 			}
 			
 			//Anlık konum kaydi basarili ise gecmis konum olarak da kaydet
 			if((true == $bLogAsPastLocation) && (true == $updateLocationResult))
 			{
-				UserWasHere::model()->logLocation(Yii::app()->user->id, $latitude, $longitude, $altitude, 0/*$deviceId*/, $date, $date, $address, $country, LocationSource::WebGeolocation);
+				if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, 0/*$deviceId*/, $date, $date, $address, $country, LocationSource::WebGeolocation) == true)
+				{
+					$app->session['lastLatitude'] = $latitude;
+					$app->session['lastLongitude'] = $longitude;
+					$app->session['lastAddress'] = $address;					
+				}	
 			}			
 		}		
 	}
@@ -610,11 +676,13 @@ class UsersController extends Controller
 		{			
 			if (Yii::app()->user->id != false)
 			{
-				if(Users::model()->updateProfileItemsNotNull(Yii::app()->user->id, $realname, $password, $gender, $minDataSentInterval, $minDistanceInterval, $autoSend))
+				if(Users::model()->updateProfileItemsNotNull(Yii::app()->user->id, $realname, $password, $gender, $minDataSentInterval, $minDistanceInterval, $autoSend) == true)
 				{
 					$result = "1"; //Not null values saved successfully
 					
 					//Fb::warn("Not null values saved successfully", "UsersController");
+					
+					Yii::app()->session['minDistanceInterval'] = $minDistanceInterval;
 				}
 				else
 				{

@@ -191,6 +191,8 @@ class SiteController extends Controller
 			
 		$processOutput = true;
 		$errorMessage = null;
+		
+		$app = Yii::app();
 
 		// collect user input data
 		if(isset($_REQUEST['LoginForm']))
@@ -202,8 +204,8 @@ class SiteController extends Controller
 			// 				$processOutput = false;
 			// 			}
 			
-			$minDataSentInterval = Yii::app()->params->minDataSentInterval;
-			$minDistanceInterval = Yii::app()->params->minDistanceInterval;	 
+			$minDataSentInterval = $app->params->minDataSentInterval;
+			$minDistanceInterval = $app->params->minDistanceInterval;	 
 			$facebookId = 0; 
 			$autoSend = 0;
 			$latitude = 0;
@@ -267,7 +269,10 @@ class SiteController extends Controller
 				{					
 					if($model->login())
 					{
-						Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource);
+						if(Users::model()->getLoginRequiredValues($app->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource) == true)
+						{
+							$app->session['minDistanceInterval'] = $minDistanceInterval;
+						}	
 						
 						if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 						{
@@ -307,9 +312,7 @@ class SiteController extends Controller
 										$preferredLanguage = $_REQUEST['language'];
 										$isRecordUpdateRequired = true;
 									}
-									
-									$app = Yii::app();
-										
+	
 									if($_REQUEST['language'] == 'tr')
 									{
 										$app->language = 'tr';
@@ -335,12 +338,12 @@ class SiteController extends Controller
 							
 							if($isRecordUpdateRequired == true)
 							{
-								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
+								Users::model()->updateLoginSentItemsNotNull($app->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
 							}
 
 							echo CJSON::encode(array(
 									"result"=> "1",
-									"id"=>Yii::app()->user->id,
+									"id"=>$app->user->id,
 									"realname"=> $model->getName(),
 									"minDataSentInterval"=> $minDataSentInterval,
 									"minDistanceInterval"=> $minDistanceInterval,
@@ -349,7 +352,6 @@ class SiteController extends Controller
 							));
 						}
 						else {
-							$app = Yii::app();
 							$language = 'tr';
 								
 							if (isset($app->session['_lang']))
@@ -360,30 +362,30 @@ class SiteController extends Controller
 							}
 							else
 							{
-								$language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+								$language = substr($app->getRequest()->getPreferredLanguage(), 0, 2);
 							}
 					
 							if(strcmp($preferredLanguage, $language) != 0)
 							{
-								Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
+								Users::model()->updateLoginSentItemsNotNull($app->user->id, null, null, null, $language);
 							}							
 							
 							//Hiç mobil veya HTML5 Geolocation konum bilgisi mevcut degilse, IP location bilgisini rough estimate olarak kullan
 							//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
 							if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 							{
-								if((Yii::app()->session['latitude'] != null) & (Yii::app()->session['longitude'] != null))
+								if(($app->session['latitude'] != null) & ($app->session['longitude'] != null))
 								{
 									$address = null;
 									$country = null;
 										
-									$this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], $address, $country);
-									Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+									$this->getaddress($app->session['latitude'], $app->session['longitude'], $address, $country);
+									Users::model()->updateLocationWithAddress($app->session['latitude'], $app->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, $app->user->id);
 								}								
 							}
 
 							$profilePhotoSource = null;
-							$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
+							$profilePhotoStatus = Users::model()->getProfilePhotoStatus($app->user->id);
 							$profilePhotoStatusTooltipMessage = null;
 							$bothPhotoExists = null;
 							
@@ -391,14 +393,14 @@ class SiteController extends Controller
 							{
 								case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
 									{
-										if(Yii::app()->user->fb_id == 0)
+										if($app->user->fb_id == 0)
 										{
 											$profilePhotoSource = null;
 											$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
 										}
 										else
 										{
-											$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+											$profilePhotoSource = 'https://graph.facebook.com/'.$app->user->fb_id.'/picture?type=square';
 											$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
 										}
 									}
@@ -406,7 +408,7 @@ class SiteController extends Controller
 										
 								case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
 									{
-										$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+										$profilePhotoSource = 'profilePhotos/'.$app->user->id.'.png?random='.time();
 										$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
 							
 										//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
@@ -416,7 +418,7 @@ class SiteController extends Controller
 								case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
 									{
 										$bothPhotoExists = 'useFacebook';
-										$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+										$profilePhotoSource = 'https://graph.facebook.com/'.$app->user->fb_id.'/picture?type=square';
 										//$profilePhotoStatusTooltipMessage = '4';
 									}
 									break;
@@ -424,7 +426,7 @@ class SiteController extends Controller
 								case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
 									{
 										$bothPhotoExists = 'useTraceper';
-										$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+										$profilePhotoSource = 'profilePhotos/'.$app->user->id.'.png?random='.time();
 										//$profilePhotoStatusTooltipMessage = '5';
 									}
 									break;
@@ -433,7 +435,7 @@ class SiteController extends Controller
 							$newRequestsCount = null;
 							$totalRequestsCount = null;
 							
-							Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+							Friends::model()->getFriendRequestsInfo($app->user->id, $newRequestsCount, $totalRequestsCount);
 
 							if($newRequestsCount > 0)
 							{
@@ -452,17 +454,17 @@ class SiteController extends Controller
 							}
 
 							//echo 'Model NOT valid in SiteController';
-							if (Yii::app()->request->isAjaxRequest)
+							if ($app->request->isAjaxRequest)
 							{
 								if (YII_DEBUG)
 								{
-									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+									$app->clientscript->scriptMap['jquery.js'] = false;
+									$app->clientScript->scriptMap['jquery-ui.js'] = false;
 								}
 								else
 								{
-									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+									$app->clientscript->scriptMap['jquery.min.js'] = false;
+									$app->clientScript->scriptMap['jquery-ui.min.js'] = false;
 								}
 							}							
 							
@@ -471,13 +473,13 @@ class SiteController extends Controller
 									"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 									"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 									"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
-									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, $processOutput),
+									"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>$app->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, $processOutput),
 							));							
 								
 							//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);							
 						}
 						
-						Yii::app()->end();						
+						$app->end();						
 					}
 					else
 					{
@@ -491,24 +493,24 @@ class SiteController extends Controller
 						else {
 							//echo 'Model NOT valid in SiteController';
 						
-							if (Yii::app()->request->isAjaxRequest)
+							if ($app->request->isAjaxRequest)
 							{
 								if (YII_DEBUG)
 								{
-									Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+									$app->clientscript->scriptMap['jquery.js'] = false;
+									$app->clientScript->scriptMap['jquery-ui.js'] = false;
 								}
 								else
 								{
-									Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-									Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+									$app->clientscript->scriptMap['jquery.min.js'] = false;
+									$app->clientScript->scriptMap['jquery-ui.min.js'] = false;
 								}
 							}
 								
 							//Complete solution for blinking problem at FireFox
-							if (Yii::app()->request->getIsAjaxRequest()) {
-								Yii::app()->clientScript->scriptMap['*.js'] = false;
-								Yii::app()->clientScript->scriptMap['*.css'] = false;
+							if ($app->request->getIsAjaxRequest()) {
+								$app->clientScript->scriptMap['*.js'] = false;
+								$app->clientScript->scriptMap['*.css'] = false;
 							}
 							
 							//Fb::warn("renderPartial - 1", "SiteController");
@@ -516,7 +518,7 @@ class SiteController extends Controller
 							$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 						}
 						
-						Yii::app()->end();						
+						$app->end();						
 					}	
 				}
 				else
@@ -528,24 +530,24 @@ class SiteController extends Controller
 					}
 					else
 					{
-						if (Yii::app()->request->isAjaxRequest)
+						if ($app->request->isAjaxRequest)
 						{
 							if (YII_DEBUG)
 							{
-								Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-								Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+								$app->clientscript->scriptMap['jquery.js'] = false;
+								$app->clientScript->scriptMap['jquery-ui.js'] = false;
 							}
 							else
 							{
-								Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-								Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+								$app->clientscript->scriptMap['jquery.min.js'] = false;
+								$app->clientScript->scriptMap['jquery-ui.min.js'] = false;
 							}
 						}
 						
 						//Complete solution for blinking problem
-						if (Yii::app()->request->getIsAjaxRequest()) {
-							Yii::app()->clientScript->scriptMap['*.js'] = false;
-							Yii::app()->clientScript->scriptMap['*.css'] = false;
+						if ($app->request->getIsAjaxRequest()) {
+							$app->clientScript->scriptMap['*.js'] = false;
+							$app->clientScript->scriptMap['*.css'] = false;
 						}
 						
 						echo CJSON::encode(array(
@@ -595,24 +597,24 @@ class SiteController extends Controller
 				else {
 					//echo 'Model NOT valid in SiteController';
 
-					if (Yii::app()->request->isAjaxRequest)
+					if ($app->request->isAjaxRequest)
 					{
 						if (YII_DEBUG)
 						{
-							Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+							$app->clientscript->scriptMap['jquery.js'] = false;
+							$app->clientScript->scriptMap['jquery-ui.js'] = false;
 						}
 						else
 						{
-							Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-							Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+							$app->clientscript->scriptMap['jquery.min.js'] = false;
+							$app->clientScript->scriptMap['jquery-ui.min.js'] = false;
 						}
 					}
 					
 					//Complete solution for blinking problem at FireFox
-					if (Yii::app()->request->getIsAjaxRequest()) {
-						Yii::app()->clientScript->scriptMap['*.js'] = false;
-						Yii::app()->clientScript->scriptMap['*.css'] = false;
+					if ($app->request->getIsAjaxRequest()) {
+						$app->clientScript->scriptMap['*.js'] = false;
+						$app()->clientScript->scriptMap['*.css'] = false;
 					}
 
 					//Fb::warn("renderPartial - 2", "SiteController");
@@ -620,7 +622,7 @@ class SiteController extends Controller
 					$this->renderPartial('login',array('model'=>$model), false, $processOutput);
 				}
 
-				Yii::app()->end();
+				$app->end();
 			}
 		}
 		else
@@ -1610,12 +1612,14 @@ class SiteController extends Controller
 	
 	private function commonLogin($email, $password, $language, $directLogin = false, $calledFrom = "unknown")
 	{
+		$app = Yii::app();
+		
 		$model = new LoginForm;			
 		$model->email = $email;
 		$model->password = $password;
 			
-		$minDataSentInterval = Yii::app()->params->minDataSentInterval;
-		$minDistanceInterval = Yii::app()->params->minDistanceInterval;
+		$minDataSentInterval = $app->params->minDataSentInterval;
+		$minDistanceInterval = $app->params->minDistanceInterval;
 		$facebookId = $autoSend = $latitude = $longitude = 0;
 		$locationSource = LocationSource::NoSource;
 		$deviceId = $androidVer = $appVer = $preferredLanguage/*Bunu DB'den alacak*/ = null;
@@ -1635,7 +1639,10 @@ class SiteController extends Controller
 		{
 			//Fb::warn("directLogin() successful", "actionContinueFacebookLogin()");
 		
-			Users::model()->getLoginRequiredValues(Yii::app()->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource);
+			if(Users::model()->getLoginRequiredValues($app->user->id, $minDataSentInterval, $minDistanceInterval, $facebookId, $autoSend, $deviceId, $androidVer, $appVer, $preferredLanguage, $latitude, $longitude, $locationSource) == true)
+			{
+				$app->session['minDistanceInterval'] = $minDistanceInterval;
+			}	
 				
 			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
 			{
@@ -1674,42 +1681,42 @@ class SiteController extends Controller
 					
 				if($isRecordUpdateRequired == true)
 				{
-					Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
+					Users::model()->updateLoginSentItemsNotNull($app->user->id, $deviceId, $androidVer, $appVer, $preferredLanguage);
 				}
 					
 				echo CJSON::encode(array(
 						"result"=> "1", //(Facebook register and )login successful
-						"id"=>Yii::app()->user->id,
+						"id"=>$app->user->id,
 						"realname"=> $model->getName(),
 						"minDataSentInterval"=> $minDataSentInterval,
 						"minDistanceInterval"=> $minDistanceInterval,
 						"facebookId"=> $facebookId,
 						"autoSend"=> $autoSend
 				));
-				Yii::app()->end();
+				$app->end();
 			}
 			else {		
 				if(strcmp($preferredLanguage, $language) != 0)
 				{
-					Users::model()->updateLoginSentItemsNotNull(Yii::app()->user->id, null, null, null, $language);
+					Users::model()->updateLoginSentItemsNotNull($app->user->id, null, null, null, $language);
 				}
 		
 				//Hiç mobil veya HTML5 Geolocation konum bilgisi mevcut degilse, IP location bilgisini rough estimate olarak kullan
 				//Ornegin kisi webden kayit olmus ve login oluyorsa (ve tarayicisi HTML5 geolocation desteklemiyor veya konum izni vermediyse)
 				if(($locationSource == LocationSource::NoSource) || ($locationSource == LocationSource::WebIP))
 				{
-					if((Yii::app()->session['latitude'] != null) & (Yii::app()->session['longitude'] != null))
+					if(($app->session['latitude'] != null) & ($app->session['longitude'] != null))
 					{
 						$address = null;
 						$country = null;
 						
-						$this->getaddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], $address, $country);
-						Users::model()->updateLocationWithAddress(Yii::app()->session['latitude'], Yii::app()->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, Yii::app()->user->id);
+						$this->getaddress($app->session['latitude'], $app->session['longitude'], $address, $country);
+						Users::model()->updateLocationWithAddress($app->session['latitude'], $app->session['longitude'], 0/*altitude*/, 0/*accuracy*/, $address, $country, date('Y-m-d H:i:s'), LocationSource::WebIP, $app->user->id);
 					}
 				}
 					
 				$profilePhotoSource = null;
-				$profilePhotoStatus = Users::model()->getProfilePhotoStatus(Yii::app()->user->id);
+				$profilePhotoStatus = Users::model()->getProfilePhotoStatus($app->user->id);
 				$profilePhotoStatusTooltipMessage = null;
 				$bothPhotoExists = null;
 		
@@ -1717,14 +1724,14 @@ class SiteController extends Controller
 				{
 					case Users::NO_TRACEPER_PROFILE_PHOTO_EXISTS:
 						{
-							if(Yii::app()->user->fb_id == 0)
+							if($app->user->fb_id == 0)
 							{
 								$profilePhotoSource = null;
 								$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload your profile photo');
 							}
 							else
 							{
-								$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+								$profilePhotoSource = 'https://graph.facebook.com/'.$app->user->fb_id.'/picture?type=square';
 								$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to upload and set your profile photo. You will be able to set your profile photo as your Facebook profile photo again.');
 							}
 						}
@@ -1732,7 +1739,7 @@ class SiteController extends Controller
 							
 					case Users::TRACEPER_PROFILE_PHOTO_EXISTS:
 						{
-							$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+							$profilePhotoSource = 'profilePhotos/'.$app->user->id.'.png?random='.time();
 							$profilePhotoStatusTooltipMessage = Yii::t('site', 'Click here to change your profile photo');
 								
 							//Fb::warn($profilePhotoStatusTooltipMessage, "TRACEPER_PROFILE_PHOTO_EXISTS");
@@ -1742,7 +1749,7 @@ class SiteController extends Controller
 					case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_FACEBOOK:
 						{
 							$bothPhotoExists = 'useFacebook';
-							$profilePhotoSource = 'https://graph.facebook.com/'.Yii::app()->user->fb_id.'/picture?type=square';
+							$profilePhotoSource = 'https://graph.facebook.com/'.$app->user->fb_id.'/picture?type=square';
 							//$profilePhotoStatusTooltipMessage = '4';
 						}
 						break;
@@ -1750,7 +1757,7 @@ class SiteController extends Controller
 					case Users::BOTH_PROFILE_PHOTOS_EXISTS_USE_TRACEPER:
 						{
 							$bothPhotoExists = 'useTraceper';
-							$profilePhotoSource = 'profilePhotos/'.Yii::app()->user->id.'.png?random='.time();
+							$profilePhotoSource = 'profilePhotos/'.$app->user->id.'.png?random='.time();
 							//$profilePhotoStatusTooltipMessage = '5';
 						}
 						break;
@@ -1759,7 +1766,7 @@ class SiteController extends Controller
 				$newRequestsCount = null;
 				$totalRequestsCount = null;
 		
-				Friends::model()->getFriendRequestsInfo(Yii::app()->user->id, $newRequestsCount, $totalRequestsCount);
+				Friends::model()->getFriendRequestsInfo($app->user->id, $newRequestsCount, $totalRequestsCount);
 					
 				if($newRequestsCount > 0)
 				{
@@ -1778,17 +1785,17 @@ class SiteController extends Controller
 				}
 					
 				//echo 'Model NOT valid in SiteController';
-				if (Yii::app()->request->isAjaxRequest)
+				if ($app->request->isAjaxRequest)
 				{
 					if (YII_DEBUG)
 					{
-						Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-						Yii::app()->clientScript->scriptMap['jquery-ui.js'] = false;
+						$app->clientscript->scriptMap['jquery.js'] = false;
+						$app->clientScript->scriptMap['jquery-ui.js'] = false;
 					}
 					else
 					{
-						Yii::app()->clientscript->scriptMap['jquery.min.js'] = false;
-						Yii::app()->clientScript->scriptMap['jquery-ui.min.js'] = false;
+						$app->clientscript->scriptMap['jquery.min.js'] = false;
+						$app->clientScript->scriptMap['jquery-ui.min.js'] = false;
 					}
 				}
 		
@@ -1797,14 +1804,14 @@ class SiteController extends Controller
 						"renderedTabView"=>$this->renderPartial('tabView',array(), true/*return instead of being displayed to end users*/, true),
 						"renderedUserAreaView"=>$this->renderPartial('userAreaView',array('profilePhotoSource'=>$profilePhotoSource, 'profilePhotoStatus'=>$profilePhotoStatus, 'profilePhotoStatusTooltipMessage'=>$profilePhotoStatusTooltipMessage, 'bothPhotoExists'=>$bothPhotoExists, 'variablesDefined'=>false), true/*return instead of being displayed to end users*/, true),
 						"renderedFriendshipRequestsView"=>$this->renderPartial('friendshipRequestsView',array('newRequestsCount'=>$newRequestsCount, 'friendReqTooltip'=>$friendReqTooltip), true/*return instead of being displayed to end users*/, true),
-						"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, true),
+						"loginSuccessfulActions"=>$this->renderPartial('loginSuccessful',array('id'=>$app->user->id, 'realname'=>$model->getName(), 'latitude'=>$latitude, 'longitude'=>$longitude), true/*return instead of being displayed to end users*/, true),
 				));
-				Yii::app()->end();
+				$app->end();
 					
 				//$this->renderPartial('loginSuccessful',array('id'=>Yii::app()->user->id, 'realname'=>$model->getName()), false, $processOutput);
 			}
 				
-			Yii::app()->end();
+			$app->end();
 		}
 		else
 		{
@@ -1828,7 +1835,7 @@ class SiteController extends Controller
 			}
 
 			$this->sendErrorMail('commonLoginError', 'Error in commonLogin() called from '.$calledFrom, $errorMessage);			
-			Yii::app()->end();
+			$app->end();
 		}
 	}	
 	
