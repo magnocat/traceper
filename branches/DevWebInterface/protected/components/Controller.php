@@ -161,6 +161,13 @@ class Controller extends CController
 			//Fb::warn($data->results[0]->formatted_address, "formatted_address");
 			//Fb::warn($address, "getaddress()");
 			//Fb::warn("Turkey", "Country");
+
+			if(Yii::app()->language == 'tr')
+			{
+				$address = str_replace("Unnamed Road", "İsimsiz Yol", $address);
+				$address = str_replace("Caddesi", "Cad.", $address);
+				$address = str_replace("Sokak", "Sok.", $address);
+			}			
 				
 			$par_adress = $address;
 			$par_country = $country;

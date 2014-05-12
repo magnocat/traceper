@@ -146,6 +146,23 @@ else
 // 		CClientScript::POS_READY
 // 		);
 
+// if (Yii::app()->user->isGuest == false)
+// {
+// 	//Yii::beginProfile('selecting_last_Id');
+	
+// 	//Authorized profiling
+	
+// 	//Yii::endProfile('selecting_last_Id');
+// }
+// else
+// {
+// 	//Yii::beginProfile('selecting_last_Id');
+	
+// 	//Guest profiling
+	
+// 	//Yii::endProfile('selecting_last_Id');	
+// }
+
 if (Yii::app()->user->isGuest == false)
 {
 	$profilePhotoSource = null;
@@ -359,8 +376,8 @@ if (Yii::app()->user->isGuest == false)
 {
 	Yii::app()->clientScript->registerScript('currentUserIdDeclaration',
 			"currentUserId = ".Yii::app()->user->id.";",
-			CClientScript::POS_HEAD);	
-	
+			CClientScript::POS_HEAD);
+
 	if($profilePhotoStatus <= 1)
 	{
 		//Bu degiskenin diger upload profile photo error tooltip javascript kodlarindan once tanimlanmasi gerekiyor
@@ -1981,7 +1998,7 @@ else
 							));					
 					?>
 					</div>
-								
+							
 					<?php
 					if(Yii::app()->user->id == 160)
 					{

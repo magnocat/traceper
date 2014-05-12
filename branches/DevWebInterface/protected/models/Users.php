@@ -241,37 +241,38 @@ class Users extends CActiveRecord
 	// 		return $effectedRows;
 	// 	}
 	
-	public function updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId){
+	public function updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId)
+	{	
+		$sql = sprintf('UPDATE '
+		. $this->tableName() .'
+					SET
+					latitude = %f , '
+		.'	longitude = %f , '
+		.'	altitude = %f ,	'
+		.'	accuracy = %d ,	'		
+		.'	dataArrivedTime = "%s", '
+		.'  dataCalculatedTime = "%s", '
+		.' 	locationSource = %d '
+		.' WHERE '
+		.' 	Id = %d '
+		.' LIMIT 1;',
+		$latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId);
+
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+		
+		return ($effectedRows > 0);
 	
-		// 		$sql = sprintf('UPDATE '
-		// 		. $this->tableName() .'
-		// 					SET
-		// 					latitude = %f , '
-		// 		.'	longitude = %f , '
-		// 		.'	altitude = %f ,	'
-		// 		.'	dataArrivedTime = "%s", '
-		// 		.'  dataCalculatedTime = "%s", '
-		// 		.' 	locationSource = %d '
-		// 		.' WHERE '
-		// 		.' 	Id = %d '
-		// 		.' LIMIT 1;',
-		// 		$latitude, $longitude, $altitude, $arrivedTime, $calculatedTime, $locationSource, $userId);
+// 		$user = Users::model()->findByPk($userId);
 	
-		// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-		// 		//$effectedRows = 0;
-		// 		return $effectedRows;
+// 		$user->latitude = $latitude;
+// 		$user->longitude = $longitude;
+// 		$user->altitude = $altitude;
+// 		$user->accuracy = $accuracy;
+// 		$user->dataArrivedTime = $arrivedTime;
+// 		$user->dataCalculatedTime = $calculatedTime;
+// 		$user->locationSource = $locationSource;
 	
-		$user = Users::model()->findByPk($userId);
-	
-		$user->latitude = $latitude;
-		$user->longitude = $longitude;
-		$user->altitude = $altitude;
-		$user->accuracy = $accuracy;
-		$user->dataArrivedTime = $arrivedTime;
-		$user->dataCalculatedTime = $calculatedTime;
-		$user->locationSource = $locationSource;
-	
-		return $user->save();
+// 		return $user->save();
 	}
 	
 	// 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId){
@@ -297,64 +298,59 @@ class Users extends CActiveRecord
 	// 		return $effectedRows;
 	// 	}
 	
-	public function updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId){
+	public function updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId)
+	{	
+		$sql = sprintf('UPDATE '
+		. $this->tableName() .'
+					SET
+					latitude = %f , '
+		.'	longitude = %f , '
+		.'	altitude = %f ,	'
+		.'	accuracy = %d ,	'				
+		.'	lastLocationAddress = "%s" , '
+		.'	lastLocationCountry = "%s" , '
+		.'	dataArrivedTime = "%s", '
+		.'  dataCalculatedTime = "%s", '
+		.' 	locationSource = %d '
+		.' WHERE '
+		.' 	Id = %d '
+		.' LIMIT 1;',
+		$latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
+
+		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+
+		return ($effectedRows > 0);
 	
-		// 		$sql = sprintf('UPDATE '
-		// 		. $this->tableName() .'
-		// 					SET
-		// 					latitude = %f , '
-		// 		.'	longitude = %f , '
-		// 		.'	altitude = %f ,	'
-		// 		.'	lastLocationAddress = "%s" , '
-		// 		.'	lastLocationCountry = "%s" , '
-		// 		.'	dataArrivedTime = "%s", '
-		// 		.'  dataCalculatedTime = "%s", '
-		// 		.' 	locationSource = %d '
-		// 		.' WHERE '
-		// 		.' 	Id = %d '
-		// 		.' LIMIT 1;',
-		// 		$latitude, $longitude, $altitude, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
+// 		$user = Users::model()->findByPk($userId);
 	
-		// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-		// 		//$effectedRows = 0;
-		// 		return $effectedRows;
+// 		$user->latitude = $latitude;
+// 		$user->longitude = $longitude;
+// 		$user->altitude = $altitude;
+// 		$user->accuracy = $accuracy;
+// 		$user->lastLocationAddress = $address;
+// 		$user->lastLocationCountry = $country;
+// 		$user->dataArrivedTime = $arrivedTime;
+// 		$user->dataCalculatedTime = $calculatedTime;
+// 		$user->locationSource = $locationSource;
 	
-		$user = Users::model()->findByPk($userId);
-	
-		$user->latitude = $latitude;
-		$user->longitude = $longitude;
-		$user->altitude = $altitude;
-		$user->accuracy = $accuracy;
-		$user->lastLocationAddress = $address;
-		$user->lastLocationCountry = $country;
-		$user->dataArrivedTime = $arrivedTime;
-		$user->dataCalculatedTime = $calculatedTime;
-		$user->locationSource = $locationSource;
-	
-		return $user->save();
+// 		return $user->save();
 	}
 	
-	public function updateLocationTime($userId, $par_time)
+	public function updateLocationTime($par_arrivedTime, $par_calculatedTime, $userId)
 	{
 		$sql = sprintf('UPDATE '
 				. $this->tableName() .'
-				SET
-				dataArrivedTime = NOW(), '
+				   SET
+				   dataArrivedTime = "%s", '
 				.' dataCalculatedTime = "%s" '
 				.' WHERE '
 				.' 	Id = %d '
 				.' LIMIT 1;',
-				$par_time, $userId);
+				$par_arrivedTime, $par_calculatedTime, $userId);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
-	
-		$result = false;
-	
-		if ($effectedRows == 1) {
-			$result = true;
-		}
-	
-		return $result;
+
+		return ($effectedRows > 0);
 	}
 	
 	public function saveUser($email, $password, $realname, $userType, $accountType, $registrationMedium, $preferredLanguage){
@@ -955,6 +951,7 @@ class Users extends CActiveRecord
 	
 	public function getMinimumIntervalValues($userId, &$par_minDistanceInterval, &$par_minDataSentInterval)
 	{
+		//Yii::beginProfile('getMinimumIntervalValues');
 		$user=Users::model()->findByPk($userId);
 		$result = false;
 	
@@ -969,10 +966,20 @@ class Users extends CActiveRecord
 		{
 			$result = false;
 		}
+		//Yii::endProfile('getMinimumIntervalValues');
 	
 		return $result;
 	}
 	
+	public function getMinDistanceInterval($userId)
+	{
+		//Yii::beginProfile('getMinDistanceInterval');
+		$minDistanceInterval = Yii::app()->db->createCommand("SELECT minDistanceInterval FROM ".Users::model()->tableName()." WHERE Id = ".$userId)->queryScalar();
+		//Yii::endProfile('getMinDistanceInterval');
+		
+		return $minDistanceInterval;
+	}	
+
 	public function updateProfileItemsNotNull($userId, $par_realname, $par_password, $par_gender, $par_minDataSentInterval, $par_minDistanceInterval, $par_autoSend)
 	{
 		$user=Users::model()->findByPk($userId);

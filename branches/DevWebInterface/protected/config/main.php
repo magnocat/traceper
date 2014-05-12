@@ -143,28 +143,50 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-			//'enableProfiling'=>true,
-			//'enableParamLogging'=>true,				
+			'enableProfiling'=>true,
+			'enableParamLogging'=>true,				
 			'schemaCachingDuration'=>3600 // turn on schema caching to improve performance											
 		),
+			
+		'session' => array(
+			'class' => 'CCacheHttpSession',
+		),
+
+		'cache' => array(
+			'class' => 'CApcCache',
+		),			
 		
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
             'errorAction'=>'site/error',
         ),
+			
+// 		'log'=>array(
+// 			'class'=>'CLogRouter',
+// 			'routes'=>array(
+// 				array(
+// 					'class'=>'CFileLogRoute',
+// 					'levels'=>'error, warning', //SQL sorgulari icin listeye profile'i da ekle
+// 				),
+// 				// uncomment the following to show log messages on web pages
+// 				/*
+// 				array(
+// 					'class'=>'CWebLogRoute',
+// 				),
+// 				*/
+// 			),
+// 		),
+
 		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
 				array(
-					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning', //SQL sorgulari icin listeye profile'i da ekle
-				),
-				// uncomment the following to show log messages on web pages
-				/*
-				array(
-					'class'=>'CWebLogRoute',
-				),
-				*/
+					'class'=>'CProfileLogRoute',
+					//'report'=>'summary',
+					'enabled'=>YII_DEBUG,
+					'showInFireBug'=>true,
+					//'ignoreAjaxInFireBug'=>false //Sadece webLogRoute'ta kullaniliyormus	
+				)										
 			),
 		),			
 		

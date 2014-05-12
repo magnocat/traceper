@@ -182,10 +182,13 @@ class UserWasHere extends CActiveRecord
 	
 	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)
 	{
-		$lastUserLocation = $this->last()->find('userId=:userId', array(':userId'=>$userId));
-		$lastRecordId = $lastUserLocation->Id; //Son kayit guncel adresle ayni oldugundan alma
+		//Yii::beginProfile('selecting_last_Id');
+		$lastRecordId = Yii::app()->db->createCommand("SELECT Id FROM ".UserWasHere::model()->tableName()." ORDER BY Id DESC LIMIT 1")->queryScalar();
+		//$lastUserLocation = $this->last()->find('userId=:userId', array(':userId'=>$userId));
+		//$lastRecordId = $lastUserLocation->Id; //Son kayit guncel adresle ayni oldugundan alma
+		//Yii::endProfile('selecting_last_Id');
 		
-		//Fb::warn("Id:$lastUserLocation->Id", "getPastPointsDataProvider()");
+		//Fb::warn("Id:$lastRecordId", "getPastPointsDataProvider()");
 		
 		$sql = 'SELECT
 		longitude, latitude, deviceId, address, country, locationSource,
@@ -224,10 +227,12 @@ class UserWasHere extends CActiveRecord
 	
 	public function getMostRecentLocation($userId, &$par_latitude, &$par_longitude, &$par_altitude, &$par_address)
 	{
-		//$sql = 'SELECT latitude, longitude, altitude FROM traceper_user_was_here WHERE userId = '.$userId.' ORDER BY dataArrivedTime DESC LIMIT 1';
+		//Yii::beginProfile('getMostRecentLocation');
+		
+		//$sql = 'SELECT latitude, longitude, altitude, address FROM traceper_user_was_here WHERE userId = '.$userId.' ORDER BY dataArrivedTime DESC LIMIT 1';
 		//$userWasHere = UserWasHere::model()->findBySql($sql);
-	
-		$userWasHere = UserWasHere::model()->find(array('order'=>'dataArrivedTime DESC', 'limit'=>1, 'condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
+		
+		$userWasHere = UserWasHere::model()->find(array('select'=>'latitude, longitude, altitude, address', 'order'=>'dataArrivedTime DESC', 'limit'=>1, 'condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
 	
 		$result = false;
 	
@@ -244,6 +249,8 @@ class UserWasHere extends CActiveRecord
 		{
 			$result = false;
 		}
+		
+		//Yii::endProfile('getMostRecentLocation');
 	
 		return $result;
 	}	
