@@ -143,8 +143,8 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-			'enableProfiling'=>true,
-			'enableParamLogging'=>true,				
+			'enableProfiling'=>(isset($_REQUEST['client']) && ($_REQUEST['client'] == 'mobile'))?false:true,
+			'enableParamLogging'=>(isset($_REQUEST['client']) && ($_REQUEST['client'] == 'mobile'))?false:true,				
 			'schemaCachingDuration'=>3600 // turn on schema caching to improve performance											
 		),
 			
