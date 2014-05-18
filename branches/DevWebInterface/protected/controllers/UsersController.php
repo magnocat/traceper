@@ -196,6 +196,7 @@ class UsersController extends Controller
 						$lastLatitude = 0;
 						$lastLongitude = 0;
 						$lastAltitude = 0;
+						$lastAccuracy = 0;
 						$lastAddress = null;
 							
 						//Yii::beginProfile('takeMyLocation-2');
@@ -212,12 +213,13 @@ class UsersController extends Controller
 							$app->session['minDistanceInterval'] = $minDistanceInterval; 
 						}		
 
-						if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAddress']) == false))
+						if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAccuracy']) == false) || (isset($app->session['lastAddress']) == false))
 						{
-							if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress) == true)
+							if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAccuracy, $lastAddress) == true)
 							{
 								$app->session['lastLatitude'] = $lastLatitude;
 								$app->session['lastLongitude'] = $lastLongitude;
+								$app->session['lastAccuracy'] = $lastAccuracy;
 								$app->session['lastAddress'] = $lastAddress;
 							}
 						}
@@ -225,6 +227,7 @@ class UsersController extends Controller
 						{
 							$lastLatitude = $app->session['lastLatitude'];
 							$lastLongitude = $app->session['lastLongitude'];
+							$lastAccuracy = $app->session['lastAccuracy'];
 							$lastAddress = $app->session['lastAddress'];
 						}		
 
@@ -233,8 +236,8 @@ class UsersController extends Controller
 						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 						$distanceInMs = $distanceInKms * 1000;
 
-						//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
-						if($distanceInMs > $minDistanceInterval)
+						//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
+						if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
 						{								
 							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
@@ -349,7 +352,7 @@ class UsersController extends Controller
 						{
 							//Fb::warn('if($distanceInMs > $minDistanceInterval)', "UsersController");
 							
-							if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, LocationSource::Mobile) == true)
+							if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, $accuracy, $deviceId, $arrivedTime, $calculatedTime, $address, $country, LocationSource::Mobile) == true)
 							{
 								//Fb::warn('UserWasHere::model()->logLocation() successful', "UsersController");
 							
@@ -357,6 +360,7 @@ class UsersController extends Controller
 								
 								$app->session['lastLatitude'] = $latitude;
 								$app->session['lastLongitude'] = $longitude;
+								$app->session['lastAccuracy'] = $accuracy;
 								$app->session['lastAddress'] = $address;
 							}
 							else
@@ -533,6 +537,7 @@ class UsersController extends Controller
 			$lastLatitude = 0;
 			$lastLongitude = 0;
 			$lastAltitude = 0;
+			$lastAccuracy = 0;
 			$lastAddress = null;
 			$updateLocationResult = false;
 			$bLogAsPastLocation = false;
@@ -549,12 +554,13 @@ class UsersController extends Controller
 				$app->session['minDistanceInterval'] = $minDistanceInterval;
 			}			
 
-			if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAddress']) == false))
+			if((isset($app->session['lastLatitude']) == false) || (isset($app->session['lastLongitude']) == false) || (isset($app->session['lastAccuracy']) == false) || (isset($app->session['lastAddress']) == false))
 			{
-				if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAddress) == true)
+				if(UserWasHere::model()->getMostRecentLocation($app->user->id, $lastLatitude, $lastLongitude, $lastAltitude, $lastAccuracy, $lastAddress) == true)
 				{
 					$app->session['lastLatitude'] = $lastLatitude;
 					$app->session['lastLongitude'] = $lastLongitude;
+					$app->session['lastAccuracy'] = $lastAccuracy;
 					$app->session['lastAddress'] = $lastAddress;
 				}
 			}
@@ -562,14 +568,15 @@ class UsersController extends Controller
 			{
 				$lastLatitude = $app->session['lastLatitude'];
 				$lastLongitude = $app->session['lastLongitude'];
+				$lastAccuracy = $app->session['lastAccuracy'];
 				$lastAddress = $app->session['lastAddress'];
 			}			
 			
 			$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 			$distanceInMs = $distanceInKms * 1000;
 			
-			//If the distance difference is greater than minDistanceInterval, add a new record to UserWasHere table
-			if($distanceInMs > $minDistanceInterval)
+			//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
+			if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
 			{
 				$this->getaddress($latitude, $longitude, $address, $country);
 				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  $app->user->id);
@@ -595,10 +602,11 @@ class UsersController extends Controller
 			//Anlık konum kaydi basarili ise gecmis konum olarak da kaydet
 			if((true == $bLogAsPastLocation) && (true == $updateLocationResult))
 			{
-				if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, 0/*$deviceId*/, $date, $date, $address, $country, LocationSource::WebGeolocation) == true)
+				if(UserWasHere::model()->logLocation($app->user->id, $latitude, $longitude, $altitude, $accuracy, 0/*$deviceId*/, $date, $date, $address, $country, LocationSource::WebGeolocation) == true)
 				{
 					$app->session['lastLatitude'] = $latitude;
 					$app->session['lastLongitude'] = $longitude;
+					$app->session['lastAccuracy'] = $accuracy;
 					$app->session['lastAddress'] = $address;					
 				}	
 			}			
@@ -974,7 +982,7 @@ class UsersController extends Controller
 		{
 			$message = $e->getMessage();
 			
-			$this->sendErrorMail('getUserInfoJSONExceptionOccured', 'PHP Exception in actionGetUserListJson()', $message);
+			$this->sendErrorMail('getUserListJsonExceptionOccured', 'PHP Exception in actionGetUserListJson()', $message);
 		}
 		
 		Yii::app()->end();
