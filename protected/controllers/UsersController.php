@@ -237,7 +237,9 @@ class UsersController extends Controller
 						$distanceInMs = $distanceInKms * 1000;
 
 						//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
-						if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
+						//if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
+						if($distanceInMs > $minDistanceInterval)
+						//if($distanceInMs > ($lastAccuracy + $accuracy))
 						{								
 							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
@@ -576,7 +578,9 @@ class UsersController extends Controller
 			$distanceInMs = $distanceInKms * 1000;
 			
 			//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
-			if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
+			//if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
+			//if($distanceInMs > ($lastAccuracy + $accuracy))
+			if($distanceInMs > $minDistanceInterval)
 			{
 				$this->getaddress($latitude, $longitude, $address, $country);
 				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  $app->user->id);
