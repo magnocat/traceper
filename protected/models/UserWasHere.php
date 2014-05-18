@@ -10,6 +10,7 @@
  * @property string $latitude
  * @property string $altitude
  * @property string $longitude
+ * @property integer $accuracy
  * @property string $deviceId
  * @property string $dataCalculatedTime
  * @property string $address
@@ -38,7 +39,7 @@ class UserWasHere extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('userId, dataArrivedTime', 'required'),
-			array('locationSource', 'numerical', 'integerOnly'=>true),
+			array('accuracy, locationSource', 'numerical', 'integerOnly'=>true),
 			array('userId, longitude', 'length', 'max'=>11),
 			array('latitude', 'length', 'max'=>10),
 			array('altitude', 'length', 'max'=>15),
@@ -47,7 +48,7 @@ class UserWasHere extends CActiveRecord
 			array('dataCalculatedTime, address', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, deviceId, dataCalculatedTime, address, country, locationSource', 'safe', 'on'=>'search'),
+			array('Id, userId, dataArrivedTime, latitude, altitude, longitude, accuracy, deviceId, dataCalculatedTime, address, country, locationSource', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -75,6 +76,7 @@ class UserWasHere extends CActiveRecord
 			'latitude' => 'Latitude',
 			'altitude' => 'Altitude',
 			'longitude' => 'Longitude',
+			'accuracy' => 'Accuracy',
 			'deviceId' => 'Device',
 			'dataCalculatedTime' => 'Data Calculated Time',
 			'address' => 'Address',
@@ -107,6 +109,7 @@ class UserWasHere extends CActiveRecord
 		$criteria->compare('latitude',$this->latitude,true);
 		$criteria->compare('altitude',$this->altitude,true);
 		$criteria->compare('longitude',$this->longitude,true);
+		$criteria->compare('accuracy',$this->accuracy);
 		$criteria->compare('deviceId',$this->deviceId,true);
 		$criteria->compare('dataCalculatedTime',$this->dataCalculatedTime,true);
 		$criteria->compare('address',$this->address,true);
@@ -129,17 +132,17 @@ class UserWasHere extends CActiveRecord
 		return parent::model($className);
 	}
 	
-	public function scopes()
-	{
-		return array(
-				'last'=>array(
-						'order'=>'Id DESC',
-						'limit'=>1,
-				),
-		);
-	}	
+	// 	public function scopes()
+	// 	{
+	// 		return array(
+	// 				'last'=>array(
+	// 						'order'=>'Id DESC',
+	// 						'limit'=>1,
+	// 				),
+	// 		);
+	// 	}
 	
-	public function logLocation($userId, $latitude, $longitude, $altitude, $deviceId, $arrivedTime, $calculatedTime, $address, $country, $locationSource){
+	public function logLocation($userId, $latitude, $longitude, $altitude, $accuracy, $deviceId, $arrivedTime, $calculatedTime, $address, $country, $locationSource){
 		// 		$sql = sprintf('INSERT INTO '
 		// 				. $this->tableName() . '
 		// 				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country)
@@ -149,10 +152,10 @@ class UserWasHere extends CActiveRecord
 	
 		$sql = sprintf('INSERT INTO '
 				. $this->tableName() . '
-				(userId, latitude, longitude, altitude, dataArrivedTime, deviceId, dataCalculatedTime, address, country, locationSource)
-				VALUES(%d,	%f, %f, %f, "%s", "%s", "%s", "%s", "%s", %d)
+				(userId, latitude, longitude, altitude, accuracy, dataArrivedTime, deviceId, dataCalculatedTime, address, country, locationSource)
+				VALUES(%d,	%f, %f, %f, %d, "%s", "%s", "%s", "%s", "%s", %d)
 				',
-				$userId, $latitude, $longitude, $altitude, $arrivedTime, $deviceId, $calculatedTime, $address, $country, $locationSource);
+				$userId, $latitude, $longitude, $altitude, $accuracy, $arrivedTime, $deviceId, $calculatedTime, $address, $country, $locationSource);
 	
 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 	
@@ -187,16 +190,16 @@ class UserWasHere extends CActiveRecord
 		//$lastUserLocation = $this->last()->find('userId=:userId', array(':userId'=>$userId));
 		//$lastRecordId = $lastUserLocation->Id; //Son kayit guncel adresle ayni oldugundan alma
 		//Yii::endProfile('selecting_last_Id');
-		
+	
 		//Fb::warn("Id:$lastRecordId", "getPastPointsDataProvider()");
-		
+	
 		$sql = 'SELECT
 		longitude, latitude, deviceId, address, country, locationSource,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 		FROM ' . UserWasHere::model()->tableName() .' u
 		WHERE
-		(userId = '. $userId . ' AND Id < '.$lastRecordId.') 
+		(userId = '. $userId . ' AND Id < '.$lastRecordId.')
 		ORDER BY Id DESC';
 	
 		// subtract 1 to not get the last location into consideration
@@ -225,14 +228,14 @@ class UserWasHere extends CActiveRecord
 		return $dataProvider;
 	}
 	
-	public function getMostRecentLocation($userId, &$par_latitude, &$par_longitude, &$par_altitude, &$par_address)
+	public function getMostRecentLocation($userId, &$par_latitude, &$par_longitude, &$par_altitude, &$par_accuracy, &$par_address)
 	{
 		//Yii::beginProfile('getMostRecentLocation');
-		
+	
 		//$sql = 'SELECT latitude, longitude, altitude, address FROM traceper_user_was_here WHERE userId = '.$userId.' ORDER BY dataArrivedTime DESC LIMIT 1';
 		//$userWasHere = UserWasHere::model()->findBySql($sql);
-		
-		$userWasHere = UserWasHere::model()->find(array('select'=>'latitude, longitude, altitude, address', 'order'=>'dataArrivedTime DESC', 'limit'=>1, 'condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
+	
+		$userWasHere = UserWasHere::model()->find(array('select'=>'latitude, longitude, altitude, accuracy, address', 'order'=>'dataArrivedTime DESC', 'limit'=>1, 'condition'=>'userId=:userId', 'params'=>array(':userId'=>$userId)));
 	
 		$result = false;
 	
@@ -241,6 +244,7 @@ class UserWasHere extends CActiveRecord
 			$par_latitude = $userWasHere->latitude;
 			$par_longitude = $userWasHere->longitude;
 			$par_altitude = $userWasHere->altitude;
+			$par_accuracy = $userWasHere->accuracy;
 			$par_address = $userWasHere->address;
 	
 			$result = true;
@@ -249,7 +253,7 @@ class UserWasHere extends CActiveRecord
 		{
 			$result = false;
 		}
-		
+	
 		//Yii::endProfile('getMostRecentLocation');
 	
 		return $result;
