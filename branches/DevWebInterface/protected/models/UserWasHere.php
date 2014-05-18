@@ -186,12 +186,12 @@ class UserWasHere extends CActiveRecord
 	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)
 	{
 		//Yii::beginProfile('selecting_last_Id');
-		$lastRecordId = Yii::app()->db->createCommand("SELECT Id FROM ".UserWasHere::model()->tableName()." ORDER BY Id DESC LIMIT 1")->queryScalar();
+		$lastRecordId = Yii::app()->db->createCommand("SELECT Id FROM ".UserWasHere::model()->tableName()." WHERE userId = ".$userId." ORDER BY Id DESC LIMIT 1")->queryScalar();
 		//$lastUserLocation = $this->last()->find('userId=:userId', array(':userId'=>$userId));
 		//$lastRecordId = $lastUserLocation->Id; //Son kayit guncel adresle ayni oldugundan alma
 		//Yii::endProfile('selecting_last_Id');
 	
-		//Fb::warn("Id:$lastRecordId", "getPastPointsDataProvider()");
+		//Fb::warn("lastRecordId:$lastRecordId", "getPastPointsDataProvider()");
 	
 		$sql = 'SELECT
 		longitude, latitude, deviceId, address, country, locationSource,
@@ -208,7 +208,7 @@ class UserWasHere extends CActiveRecord
 		FROM '. UserWasHere::model()->tableName() .'
 		WHERE
 		(userId = '. $userId . ' AND Id < '.$lastRecordId.')';
-	
+		
 		$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
 	
 		$pageNo = $pageNo - 1; //Since CPagination's page index starts from 0
