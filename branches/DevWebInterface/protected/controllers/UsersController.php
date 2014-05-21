@@ -41,7 +41,7 @@ class UsersController extends Controller
 				array('deny',
 						//'deniedCallback' => array($this, 'deniedAction'),
 						'actions'=>array('addAsFriend', 'deleteFriendShip','getFriendRequestList', 'getFriendList',
-								'getUserPastPointsJSON', 'search', 'searchJSON',
+								'getUserPastPointsJSON', 'search', 'searchJSON', 'addAsFriendIfAlreadyMember',
 								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
 								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
 								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile'),
@@ -235,11 +235,22 @@ class UsersController extends Controller
 
 						$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 						$distanceInMs = $distanceInKms * 1000;
+						
+						$comparisonValue = 0;
+						
+						if(($lastAccuracy + $accuracy) < 400)
+						{
+							$comparisonValue = $lastAccuracy + $accuracy;
+						}
+						else
+						{
+							$comparisonValue = 400;
+						}		
 
 						//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
 						//if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
-						if($distanceInMs > $minDistanceInterval)
-						//if($distanceInMs > ($lastAccuracy + $accuracy))
+						//if($distanceInMs > $minDistanceInterval)
+						if($distanceInMs > $comparisonValue)
 						{								
 							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
@@ -577,10 +588,21 @@ class UsersController extends Controller
 			$distanceInKms = $this->calculateDistance($lastLatitude, $lastLongitude, $latitude, $longitude);
 			$distanceInMs = $distanceInKms * 1000;
 			
+			$comparisonValue = 0;
+			
+			if(($lastAccuracy + $accuracy) < 400)
+			{
+				$comparisonValue = $lastAccuracy + $accuracy;
+			}
+			else
+			{
+				$comparisonValue = 400;
+			}			
+			
 			//If the distance difference is greater than sum of accuracies and minDistanceInterval, add a new record to UserWasHere table
 			//if($distanceInMs > ($lastAccuracy + $accuracy + $minDistanceInterval))
-			//if($distanceInMs > ($lastAccuracy + $accuracy))
-			if($distanceInMs > $minDistanceInterval)
+			//if($distanceInMs > $minDistanceInterval)
+			if($distanceInMs > $comparisonValue)
 			{
 				$this->getaddress($latitude, $longitude, $address, $country);
 				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  $app->user->id);
