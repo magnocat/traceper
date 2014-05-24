@@ -405,5 +405,44 @@ class Friends extends CActiveRecord
 		}
 	
 		return $result;
+	}
+
+	public function getMyFriendshipStatusForThisUser($par_traceperId) 
+	{
+		$result = "-1"; //There is no friendship
+		
+		$myId = Yii::app()->user->id;
+		
+		$friendship = $this->find('(friend1=:friend1 AND friend2=:friend2) OR (friend1=:friend2 AND friend2=:friend1)', array(':friend1'=>$myId, ':friend2'=>$par_traceperId));
+		$result = false;
+	
+		if (null == $friendship)
+		{
+			$result = "-1"; //There is no friendship
+		}
+		else
+		{
+			if(0 == $friendship->status)
+			{
+				if($friendship->friend1 == $myId)
+				{
+					$result = "0"; //You have added this friend and waiting for response
+				}
+				else
+				{
+					$result = "1"; //Your friend has added you and waiting for your response
+				}		
+			}
+			else if(1 == $friendship->status)
+			{
+				$result = "2"; //You are already friends
+			}
+			else
+			{
+				$result = "-1"; //There is no friendship
+			}				
+		}	
+	
+		return $result;		
 	}	
 }

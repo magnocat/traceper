@@ -596,6 +596,8 @@ class SiteController extends Controller
 				}
 				else {
 					//echo 'Model NOT valid in SiteController';
+					
+					//Fb::warn("non-mobile", "actionLogin()");
 
 					if ($app->request->isAjaxRequest)
 					{
@@ -614,7 +616,7 @@ class SiteController extends Controller
 					//Complete solution for blinking problem at FireFox
 					if ($app->request->getIsAjaxRequest()) {
 						$app->clientScript->scriptMap['*.js'] = false;
-						$app()->clientScript->scriptMap['*.css'] = false;
+						$app->clientScript->scriptMap['*.css'] = false;
 					}
 
 					//Fb::warn("renderPartial - 2", "SiteController");
@@ -2174,19 +2176,25 @@ class SiteController extends Controller
 						Yii::app()->clientScript->scriptMap['*.css'] = false;
 					}					
 					
-					echo CJSON::encode(array("result"=>"1",
-											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
-					));				
+// 					echo CJSON::encode(array("result"=>"1",
+// 											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
+// 					));
+					
+					//resetPaswordView'i gonderice hata oluyor
+
+					echo CJSON::encode(array("result"=>"1"));					
 				}
 				else
 				{				
 					//Fb::warn("An error occured while changing your password!", "SiteController - actionResetPassword()");
 
-					//echo CJSON::encode(array("result"=>"0"));
+// 					echo CJSON::encode(array("result"=>"0",
+// 											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
+// 					));
+
+					//resetPaswordView'i gonderice hata oluyor
 					
-					echo CJSON::encode(array("result"=>"0",
-											 "resetPaswordView"=>$this->renderPartial('resetPassword',array('model'=>$model, 'token'=>$token), true/*return instead of being displayed to end users*/, $processOutput)
-					));
+					echo CJSON::encode(array("result"=>"0"));
 
 					$errorMessage = "Password cannot be reset!";
 					$this->sendErrorMail('resetPasswordCannotBeReset', 'Error in actionResetPassword()', $errorMessage);					

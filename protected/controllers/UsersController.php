@@ -44,7 +44,7 @@ class UsersController extends Controller
 								'getUserPastPointsJSON', 'search', 'searchJSON', 'addAsFriendIfAlreadyMember',
 								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
 								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
-								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile'),
+								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile', 'getTraceperIdOfFacebookUser'),
 						'users'=>array('?'),
 				)
 		);
@@ -1828,7 +1828,87 @@ class UsersController extends Controller
 // 		$str = '{"userlist": ['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
 	
 // 		return $str;
-// 	}	
+// 	}
+
+// 	//Bu fonksiyonu mobil uygulama kullanıyor
+// 	public function actionGetFacebookUserStatus()
+// 	{	
+// 		$userStatus = "-1"; //Not a Traceper user
+		
+// 		if (isset($_REQUEST['facebookId']) && ($_REQUEST['facebookId'] != NULL))
+// 		{
+// 			$facebookId = $_REQUEST['facebookId'];
+// 			$traceperId = 0;
+			
+// 			if (Users::model()->isFacebookUserRegistered($facebookId, $traceperId) == true)
+// 			{
+// 				if(Friends::model()->isMyFriend($traceperId) == true)
+// 				{
+// 					$userStatus = "1"; //My friend
+// 				}
+// 				else
+// 				{
+// 					$userStatus = "0"; //Traceper user, but not my friend
+// 				}	
+// 			}
+// 			else
+// 			{
+// 				$userStatus = "-1"; //Not a Traceper user
+// 			}	
+// 		}
+// 		else
+// 		{
+// 			$message = "Missing Parameter: 'facebookId' is missing!";
+// 			$this->sendErrorMail('getFacebookUserStatus', 'Error in actionGetFacebookUserStatus()', $message);
+// 		}
+	
+// 		echo $userStatus;
+// 	}
+
+	//Bu fonksiyonu mobil uygulama kullanıyor
+	public function actionGetTraceperIdOfFacebookUser()
+	{
+		$result = "0";
+		$friendshipStatus = "-1";
+	
+		if (isset($_REQUEST['facebookId']) && ($_REQUEST['facebookId'] != NULL))
+		{
+			$facebookId = $_REQUEST['facebookId'];
+			$traceperId = 0;
+				
+			if (Users::model()->getTraceperIdFacebookUser($facebookId, $traceperId) == true)
+			{
+				$result = "1";
+				$friendshipStatus = Friends::model()->getMyFriendshipStatusForThisUser($traceperId);
+			}
+			else
+			{
+				$result = "0";
+				$friendshipStatus = "-1";
+			}						
+		}
+		else
+		{
+			$result = "-1";
+			$message = "Missing Parameter: 'facebookId' is missing!";
+			$this->sendErrorMail('getTraceperIdOfFacebookUser', 'Error in actionGetTraceperIdOfFacebookUser()', $message);
+		}
+
+		if("1" == $result)
+		{
+			echo CJSON::encode(array(
+					"result"=>$result,
+					"traceperId"=>$traceperId,
+					"friendshipStatus"=>$friendshipStatus
+			));
+		}
+		else
+		{
+			echo CJSON::encode(array(
+					"result"=>$result
+			));
+		}		
+	}	
 		
 	
 	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
