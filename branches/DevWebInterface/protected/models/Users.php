@@ -377,6 +377,19 @@ class Users extends CActiveRecord
 		return $result;
 	}
 	
+	public function getTraceperIdFacebookUser($par_facebookId, &$par_traceperId) {
+		$user = Users::model()->find('fb_id=:facebookId', array(':facebookId'=>$par_facebookId));
+		$result = false;
+		
+		if ($user != null) 
+		{
+			$par_traceperId = $user->Id;
+			$result = true;
+		}
+		
+		return $result;
+	}	
+	
 	public function isUserRegistered($email) {
 		$user = Users::model()->find('email=:email', array(':email'=>$email));
 		$result = false;
