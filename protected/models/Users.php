@@ -451,7 +451,7 @@ class Users extends CActiveRecord
 			$user->password = $password;
 			$user->realname = $name;
 			$user->fb_id = $fb_id;
-			$user->account_type = 1;
+			$user->account_type = AccountType::FacebookUser;
 			$user->preferredLanguage = $preferredLanguage;
 	
 			$result = $user->save();
@@ -1159,7 +1159,7 @@ class Users extends CActiveRecord
 	
 		if($user != null)
 		{
-			if ($user->fb_id != 0) {
+			if (AccountType::FacebookUser == $user->account_type) {
 				$result = true;
 				$par_appVersion = $user->appVer;
 			}
