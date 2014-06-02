@@ -993,9 +993,9 @@ class Users extends CActiveRecord
 		return $minDistanceInterval;
 	}	
 
-	public function updateProfileItemsNotNull($userId, $par_realname, $par_password, $par_gender, $par_minDataSentInterval, $par_minDistanceInterval, $par_autoSend)
+	public function updateProfileItemsNotNull($userId, $par_realname, $par_password, $par_gender, $par_minDataSentInterval, $par_minDistanceInterval, $par_autoSend, $par_facebookId)
 	{
-		$user=Users::model()->findByPk($userId);
+		$user = Users::model()->findByPk($userId);
 	
 		// 		$result = false;
 		// 		$paramsArray = array();
@@ -1041,6 +1041,13 @@ class Users extends CActiveRecord
 	
 			$user->autoSend = $par_autoSend;
 		}
+		
+		if($par_facebookId != null)
+		{
+			//$paramsArray = array_merge($paramsArray, array("autoSend"=>$par_autoSend));
+		
+			$user->fb_id = $par_facebookId;
+		}		
 	
 		// 		if(Users::model()->updateByPk($userId, $paramsArray)) {
 		// 			$result = true;

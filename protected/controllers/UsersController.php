@@ -667,6 +667,7 @@ class UsersController extends Controller
 		$minDataSentInterval = null;
 		$minDistanceInterval = null;
 		$autoSend = null;
+		$facebookId = null;
 
 		$atLeastOneItemExists = false;
 		
@@ -704,13 +705,19 @@ class UsersController extends Controller
 		{
 			$autoSend = $_REQUEST['autoSend'];
 			$atLeastOneItemExists = true;
-		}	
+		}
+
+		if (isset($_REQUEST['facebookId']) && $_REQUEST['facebookId'] != NULL)
+		{
+			$facebookId = $_REQUEST['facebookId'];
+			$atLeastOneItemExists = true;
+		}		
 
 		if(true == $atLeastOneItemExists)
 		{			
 			if (Yii::app()->user->id != false)
 			{
-				if(Users::model()->updateProfileItemsNotNull(Yii::app()->user->id, $realname, $password, $gender, $minDataSentInterval, $minDistanceInterval, $autoSend) == true)
+				if(Users::model()->updateProfileItemsNotNull(Yii::app()->user->id, $realname, $password, $gender, $minDataSentInterval, $minDistanceInterval, $autoSend, $facebookId) == true)
 				{
 					$result = "1"; //Not null values saved successfully
 					
@@ -1870,12 +1877,12 @@ class UsersController extends Controller
 	{
 		$result = "0";
 		$friendshipStatus = "-1";
+		$traceperId = 0;
 	
 		if (isset($_REQUEST['facebookId']) && ($_REQUEST['facebookId'] != NULL))
 		{
 			$facebookId = $_REQUEST['facebookId'];
-			$traceperId = 0;
-				
+	
 			if (Users::model()->getTraceperIdFacebookUser($facebookId, $traceperId) == true)
 			{
 				$result = "1";
