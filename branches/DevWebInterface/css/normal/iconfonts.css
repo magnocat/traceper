@@ -1,12 +1,21 @@
 @font-face {
+/* 	font-family: 'icomoon'; */
+/* 	src:url('../fonts/icomoon.eot'); */
+/* 	src:url('../fonts/icomoon.eot?#iefix') format('embedded-opentype'), */
+/* 		url('../fonts/icomoon.ttf') format('truetype'), */
+/* 		url('../fonts/icomoon.woff') format('woff'), */
+/* 		url('../fonts/icomoon.svg#icomoon') format('svg'); */
+/* 	font-weight: normal; */
+/* 	font-style: normal; */
+	
 	font-family: 'icomoon';
-	src:url('../fonts/icomoon.eot');
-	src:url('../fonts/icomoon.eot?#iefix') format('embedded-opentype'),
-		url('../fonts/icomoon.ttf') format('truetype'),
-		url('../fonts/icomoon.woff') format('woff'),
-		url('../fonts/icomoon.svg#icomoon') format('svg');
+	src:url('../fonts/icomoon.eot?3c9hn6');
+	src:url('../fonts/icomoon.eot?#iefix3c9hn6') format('embedded-opentype'),
+		url('../fonts/icomoon.woff?3c9hn6') format('woff'),
+		url('../fonts/icomoon.ttf?3c9hn6') format('truetype'),
+		url('../fonts/icomoon.svg?3c9hn6#icomoon') format('svg');
 	font-weight: normal;
-	font-style: normal;
+	font-style: normal;	
 }
 
 .hi-icon {
@@ -429,6 +438,9 @@
 .icon-zoomMax5:before {
 	content: "\e62e";
 }
+.icon-inviteUsers2:before {
+	content: "\e634";
+}
 .icon-envelope:before {
 	content: "\e61a";
 }
@@ -449,6 +461,9 @@
 }
 .icon-lock:before {
 	content: "\e633";
+}
+.icon-inviteUsers3:before {
+	content: "\e640";
 }
 .icon-clipboard:before {
 	content: "\e635";
@@ -509,6 +524,9 @@
 }
 .icon-android:before {
 	content: "\e620";
+}
+.icon-inviteUsers4:before {
+	content: "\e641";
 }
 .icon-camera2:before {
 	content: "\e63c";
