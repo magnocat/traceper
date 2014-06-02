@@ -49,6 +49,13 @@ class LocationSource
 	const WebGeolocation = 2;
 }
 
+class AccountType
+{
+	const TraceperUser = 0;
+	const FacebookUser = 1;
+	const GoogleUser   = 2;
+}
+
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
