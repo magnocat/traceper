@@ -695,6 +695,32 @@ class Users extends CActiveRecord
 		return $dataProvider;
 	}
 	
+	public function getListDataProviderForFacebookConnectJson($IdList, $totalItemCount = null)
+	{
+		$sqlCount = 'SELECT count(*) FROM ' . Users::model()->tableName() . ' u WHERE Id in ('. $IdList.')';
+
+		$sql = 'SELECT u.realname as Name, u.fb_id FROM '.  Users::model()->tableName() . ' u
+		LEFT JOIN ' . Friends::model()->tableName() . ' f ON (f.friend1 = '. Yii::app()->user->id .' AND f.friend2 = u.Id)  OR
+		(f.friend1 = u.Id AND f.friend2 = '. Yii::app()->user->id .') WHERE u.Id in ('. $IdList.')';
+	
+		$count = $totalItemCount;
+	
+		if ($count == null) {
+			$count=Yii::app()->db->createCommand($sqlCount)->queryScalar();
+		}
+	
+		$dataProvider = new CSqlDataProvider($sql, array(
+				'totalItemCount'=>$count,
+				'sort'=>array(
+						'attributes'=>array(
+								'id', 'Name',
+						),
+				)
+		));
+	
+		return $dataProvider;
+	}	
+	
 	
 	public function getSearchUserDataProvider($IdList, $text, $searchIndex)
 	{
