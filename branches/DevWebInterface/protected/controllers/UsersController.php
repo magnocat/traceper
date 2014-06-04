@@ -44,7 +44,8 @@ class UsersController extends Controller
 								'getUserPastPointsJSON', 'search', 'searchJSON', 'addAsFriendIfAlreadyMember',
 								'takeMyLocation', 'getUserInfoJSON', 'getFriendRequestListJson',
 								'getUserListJson', 'upload', 'updateLocationByGeolocation', 'useTraceperProfilePhoto', 
-								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile', 'getTraceperIdOfFacebookUser'),
+								'useFacebookProfilePhoto', 'viewProfilePhoto', 'updateProfile', 'getTraceperIdOfFacebookUser', 
+								'getFriendListForFacebookConnectJson'),
 						'users'=>array('?'),
 				)
 		);
@@ -897,7 +898,7 @@ class UsersController extends Controller
 		Yii::app()->end();
 	}
 	/**
-	 * this is intented to be used by mobile app
+	 * this is intented to be used by mobile app and the javascript part of web app
 	 * Enter description here ...
 	 */
 	public function actionGetUserListJson()
@@ -1020,6 +1021,75 @@ class UsersController extends Controller
 		
 		Yii::app()->end();
 	}
+	
+	/**
+	 * this is intented to be used by mobile app
+	 * Mobilde Facebook arkadaslarindan hangilerinin Traceper kullandigini gormek icin
+	 */
+	public function actionGetFriendListForFacebookConnectJson()
+	{
+		//Fb::warn("actionGetFriendListForFacebookJson() called", "UsersController");
+	
+		try
+		{	
+			$allFriendCount = $this->getFriendCount(false/*$par_onlyVisible*/);
+			$friendIdList = $this->getFriendIdList(false/*$par_onlyVisible*/);
+	
+			if (isset($_REQUEST['client']) && $_REQUEST['client']=='mobile')
+			{
+				//Do not add user himself for mobile
+			}
+			else //For web
+			{
+				if ($friendIdList != -1) {
+					$friendIdList .= ',' . Yii::app()->user->id;
+				}
+				else {
+					$friendIdList = Yii::app()->user->id;
+				}
+				
+				$allFriendCount = $allFriendCount + 1; // +1 is for herself
+			}
+				
+			$dataProvider = Users::model()->getListDataProviderForFacebookConnectJson($friendIdList, $allFriendCount);
+			
+			$rows = $dataProvider->getData(true);
+			$itemCount = count($rows);
+			$userlistStr = '';
+			
+			for ($i = 0; $i < $itemCount; $i++) 
+			{
+				$rows[$i]['realname'] = isset($rows[$i]['Name']) ? $rows[$i]['Name'] : "";
+				$rows[$i]['fb_id'] = isset($rows[$i]['fb_id']) ? $rows[$i]['fb_id'] : "";
+
+				$bsk = CJSON::encode(array(
+						'realname'=>$rows[$i]['realname'],
+						'fb_id'=>$rows[$i]['fb_id']
+				));
+
+				$userlistStr .= $bsk;
+
+				if(($i + 1) < $itemCount) //Son eleman degilse aralara "," koy
+				{
+					$userlistStr .= ",";
+				}
+			}			
+			
+			$out = '{"userlist": ['.$userlistStr.']}';
+			
+			//Fb::warn($out, "Json()");
+
+			echo $out;
+		}
+		catch(Exception $e)
+		{
+			$message = $e->getMessage();
+				
+			$this->sendErrorMail('getFriendListForFacebookConnectJsonExceptionOccured', 'PHP Exception in actionGetFriendListForFacebookConnectJson()', $message);
+		}
+	
+		Yii::app()->end();
+	}	
 
 	public function actionGetUserPastPointsJSON(){
 
