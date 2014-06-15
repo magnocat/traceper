@@ -1986,7 +1986,62 @@ class UsersController extends Controller
 			));
 		}		
 	}	
+
+	//Bu fonksiyonu mobil uygulama kullanıyor
+	public function actionSaveMobileCrashInfo()
+	{
+		//Fb::warn("actionSaveMobileCrashInfo() called", "UsersController");
 		
+// 		if(Yii::app()->request->isPostRequest)
+// 		{
+// 			$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'actionSaveMobileCrashInfo() - POST', 'actionSaveMobileCrashInfo() called', false);
+// 		}
+// 		else
+// 		{
+// 			$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'actionSaveMobileCrashInfo() - GET', 'actionSaveMobileCrashInfo() called', false);
+// 		}		
+
+		if ((isset($_REQUEST['stackTrace']) && ($_REQUEST['stackTrace'] != NULL)) &&
+			(isset($_REQUEST['deviceInfo']) && ($_REQUEST['deviceInfo'] != NULL)) &&
+			(isset($_REQUEST['firmware']) && ($_REQUEST['firmware'] != NULL)))
+		{
+			$stackTrace = $_REQUEST['stackTrace'];
+			$deviceInfo = $_REQUEST['deviceInfo'];
+			$firmware = $_REQUEST['firmware'];
+		
+			$crashLog = '';
+				
+			if (Yii::app()->user->isGuest == false)
+			{
+				$name = null;
+				$email = null;
+			
+				Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+			
+				$crashLog .= "*************************************** USER INFO *************************************"."\n";
+				$crashLog .= 'Id: '.Yii::app()->user->id."\n";
+				$crashLog .= 'Name: '.$name."\n";
+				$crashLog .= 'E-mail: '.$email."\n";
+			} 			
+			
+			$crashLog .= "************************************** STACK TRACE ************************************"."\n";
+			$crashLog .= $stackTrace; //Stack trace'in sonunda zaten satir basi geliyor
+			
+			$crashLog .= "************************************** DEVICE INFO ************************************"."\n";
+			$crashLog .= $deviceInfo."\n";
+		
+			$crashLog .= "*************************************** FIRMWARE **************************************"."\n";
+			$crashLog .= $deviceInfo."\n";
+			
+			$crashLog .= "***************************************************************************************"."\n\n";
+									
+			file_put_contents("logs/crashLog", $crashLog . "\n", FILE_APPEND);
+			
+			//Fb::warn("After file_put_contents()", "actionSaveMobileCrashInfo()");
+			
+			//$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'actionSaveMobileCrashInfo()', $stackTrace, false);
+		}
+	}
 	
 	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
 		
