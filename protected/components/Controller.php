@@ -60,7 +60,7 @@ class Controller extends CController
 		{
 			$status = $data->status;
 			
-			Fb::warn("status:".$status, "Controller - getaddress()");
+			//Fb::warn("status:".$status, "Controller - getaddress()");
 		}
 		else
 		{
