@@ -3311,53 +3311,55 @@ class SiteController extends Controller
 	
 	/**
 	 * Returns the HTML formatted Terms of Use for mobile
+	 * Bu fonksiyon mobilde normal Http requestleri uzerinden degil WebView uzerinde cagirildigindan gonderilen
+	 * langugae degiskenine gore dili ayarla.
 	 */
 	public function actionGetTermsOfUse()
 	{
 		//Fb::warn("actionGetTermsOfUse() called", "SiteController");
 		
 		$mobileLang = null;
-// 		$isTranslationRequired = false;
+		$isTranslationRequired = false;
 		
-// 		if(isset($_REQUEST['language']))
-// 		{
-// 			$mobileLang = $_REQUEST['language'];
-// 		}
+		if(isset($_REQUEST['language']))
+		{
+			$mobileLang = $_REQUEST['language'];
+		}
 
-// 		if($mobileLang == 'tr')
-// 		{
-// 			if(Yii::app()->language == 'tr')
-// 			{
-// 				$isTranslationRequired = false;
-// 			}
-// 			else
-// 			{
-// 				$isTranslationRequired = true;
-// 			}
-// 		}
-// 		else
-// 		{
-// 			if(Yii::app()->language == 'tr')
-// 			{
-// 				$isTranslationRequired = true;
-// 			}
-// 			else
-// 			{
-// 				$isTranslationRequired = false;
-// 			}
-// 		}
+		if($mobileLang == 'tr')
+		{
+			if(Yii::app()->language == 'tr')
+			{
+				$isTranslationRequired = false;
+			}
+			else
+			{
+				$isTranslationRequired = true;
+			}
+		}
+		else
+		{
+			if(Yii::app()->language == 'tr')
+			{
+				$isTranslationRequired = true;
+			}
+			else
+			{
+				$isTranslationRequired = false;
+			}
+		}
 		
-// 		if($isTranslationRequired == true)
-// 		{
-// 			if($mobileLang == 'tr')
-// 			{
-// 				Yii::app()->language = 'tr';
-// 			}
-// 			else
-// 			{
-// 				Yii::app()->language = 'en';
-// 			}
-// 		}
+		if($isTranslationRequired == true)
+		{
+			if($mobileLang == 'tr')
+			{
+				Yii::app()->language = 'tr';
+			}
+			else
+			{
+				Yii::app()->language = 'en';
+			}
+		}
 
 		$htmlStr = "<html>\n\t<head>\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n\t</head>\n\t<body>\n\t".Yii::t('layout', 'Traceper Terms')."\n\t</body>\n</html>";
 		
