@@ -253,7 +253,14 @@ class UsersController extends Controller
 						//if($distanceInMs > $minDistanceInterval)
 						if($distanceInMs > $comparisonValue)
 						{								
-							$this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country);
+							if($this->getaddress($_REQUEST['latitude'], $_REQUEST['longitude'], $address, $country) == false)
+							{
+								$address = null;
+							}
+						}
+
+						if($address != null)
+						{
 							//Fb::warn($address.' '.Yii::t('countries', $country), "actionTakeMyLocation()");
 							
 							//Madem adres alindi, mevcut konum (Users tablosu) adres karsilastirmasi yapilmadan guncellensin
@@ -511,7 +518,7 @@ class UsersController extends Controller
 				$resultArray
 		);
 		
-		Fb::warn(CJSON::encode($resultArray), "takeMyLoc");
+		//Fb::warn(CJSON::encode($resultArray), "takeMyLoc");
 
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		$app->end();
@@ -614,7 +621,14 @@ class UsersController extends Controller
 			//if($distanceInMs > $minDistanceInterval)
 			if($distanceInMs > $comparisonValue)
 			{
-				$this->getaddress($latitude, $longitude, $address, $country);
+				if($this->getaddress($latitude, $longitude, $address, $country) == false)
+				{
+					$address = null;
+				}
+			}	
+
+			if($address != null)
+			{
 				$updateLocationResult = Users::model()->updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $date, $date, LocationSource::WebGeolocation,  $app->user->id);
 					
 				//Son gecmis izin adres bilgisi ile anlik adres bilgisi farkli ise yeni bir gecmis iz olarak kaydet
@@ -631,8 +645,7 @@ class UsersController extends Controller
 			{
 				$bLogAsPastLocation = false;
 					
-				$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $date, $date, LocationSource::WebGeolocation, $app->user->id);
-					
+				$updateLocationResult = Users::model()->updateLocation($latitude, $longitude, $altitude, $accuracy, $date, $date, LocationSource::WebGeolocation, $app->user->id);					
 			}
 			
 			//Anlık konum kaydi basarili ise gecmis konum olarak da kaydet

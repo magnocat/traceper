@@ -55,8 +55,39 @@ class Controller extends CController
 		curl_close($ch);
 	
 		$data = json_decode($response);
-		$status = $data->status;
-	
+			
+		if((is_object($data) == true) && (property_exists($data, 'status') == true))
+		{
+			$status = $data->status;
+			
+			Fb::warn("status:".$status, "Controller - getaddress()");
+		}
+		else
+		{
+			usleep(500000); //Yarım saniye bekle ve sonra bir daha dene
+			
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url); //The URL to fetch. This can also be set when initializing a session with curl_init().
+			curl_setopt($ch, CURLOPT_HEADER, 0); // Removes the headers from the output
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly.
+			curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5); //The number of seconds to wait while trying to connect.
+			curl_setopt($ch, CURLOPT_FAILONERROR, TRUE); //To fail silently if the HTTP code returned is greater than or equal to 400.
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10); //The maximum number of seconds to allow cURL functions to execute.
+			$response = curl_exec($ch);
+			curl_close($ch);
+			
+			$data = json_decode($response);	
+
+			if((is_object($data) == true) && (property_exists($data, 'status') == true))
+			{
+				$status = $data->status;
+			}
+			else
+			{
+				$status = "FAILED";
+			}				
+		}		
+		
 		$bSuccess = false;
 
 		if($status=="OK")
