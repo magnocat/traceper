@@ -187,7 +187,7 @@ class UsersController extends Controller
 
 					if(isset($_REQUEST['accuracy']) && ($_REQUEST['accuracy'] != NULL))
 					{
-						$accuracy = $_REQUEST['accuracy'];
+						$accuracy = (int) $_REQUEST['accuracy'];
 					}
 					
 					//Fb::warn("lat:$latitude, lon:$longitude, al:$altitude, ct:$calculatedTime, at:$arrivedTime", "actionTakeMyLocation()");
@@ -286,13 +286,15 @@ class UsersController extends Controller
 								}
 									
 								$message .= '<br/><br/>';
-								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
+								$message .= 'accuracy:'.$accuracy.'<br/>';
 								$message .= 'adress:'.$address.'<br/>';
 								$message .= 'country:'.$country.'<br/>';
+								$message .= 'arrivedTime:'.$arrivedTime.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$message .= 'locationSource:'.LocationSource::Mobile.'<br/>';
 								$this->sendErrorMail('takeMyLocationNotUpdatedWithAddress', 'Error (Users-updateLocationWithAddress) in actionTakeMyLocation()', $message);
 							}							
 							
@@ -351,12 +353,14 @@ class UsersController extends Controller
 								}
 									
 								$message .= '<br/><br/>';
-								$message .= 'Updated row count:'.$updatedRowCount.'<br/>';
 								$message .= 'latitude:'.$latitude.'<br/>';
 								$message .= 'longitude:'.$longitude.'<br/>';
 								$message .= 'altitude:'.$altitude.'<br/>';
 								$message .= 'accuracy:'.$accuracy.'<br/>';
+								$message .= 'arrivedTime:'.$arrivedTime.'<br/>';
 								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$message .= 'locationSource:'.LocationSource::Mobile.'<br/>';								
+								
 								$this->sendErrorMail('takeMyLocationNotUpdatedWithoutAddress', 'Error (Users-updateLocation) in actionTakeMyLocation()', $message);
 							}							
 						}
@@ -391,9 +395,12 @@ class UsersController extends Controller
 								$message .= 'altitude:'.$altitude.'<br/>';
 								$message .= 'accuracy:'.$accuracy.'<br/>';
 								$message .= 'deviceId:'.$deviceId.'<br/>';
-								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
 								$message .= 'address:'.$address.'<br/>';
 								$message .= 'country:'.$country.'<br/>';
+								$message .= 'arrivedTime:'.$arrivedTime.'<br/>';
+								$message .= 'calculatedTime:'.$calculatedTime.'<br/>';
+								$message .= 'locationSource:'.LocationSource::Mobile.'<br/>';								
+								
 								$this->sendErrorMail('userWasHereLogLocationError', 'Error (UserWasHere-logLocation) in actionTakeMyLocation()', $message);
 							}							
 						}
@@ -503,6 +510,8 @@ class UsersController extends Controller
 		echo CJSON::encode(
 				$resultArray
 		);
+		
+		Fb::warn(CJSON::encode($resultArray), "takeMyLoc");
 
 		//$this->redirect(array('geofence/checkGeofenceBoundaries', 'friendId' => Yii::app()->user->id, 'friendLatitude' => $latitude, 'friendLongitude' => $longitude));
 		$app->end();
@@ -2042,6 +2051,19 @@ class UsersController extends Controller
 			//$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'actionSaveMobileCrashInfo()', $stackTrace, false);
 		}
 	}
+	
+	//Bu fonksiyonu mobil uygulama kullanıyor
+	public function actionSendHttpError()
+	{
+		//Fb::warn("actionSaveMobileCrashInfo() called", "UsersController");
+	
+		if (isset($_REQUEST['error']) && ($_REQUEST['error'] != NULL))
+		{
+			$error = $_REQUEST['error'];
+	
+			$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'Mobile Http Error', $error, false);
+		}
+	}	
 	
 	private function prepareJson($dataProvider, $par_updateType = null){ //Multisent prepareJson()
 		

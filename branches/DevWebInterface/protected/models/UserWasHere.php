@@ -150,37 +150,38 @@ class UserWasHere extends CActiveRecord
 		// 				',
 		// 				$userId, $latitude, $longitude, $altitude, $deviceId, $calculatedTime, $address, $country);
 	
-		$sql = sprintf('INSERT INTO '
-				. $this->tableName() . '
-				(userId, latitude, longitude, altitude, accuracy, dataArrivedTime, deviceId, dataCalculatedTime, address, country, locationSource)
-				VALUES(%d,	%f, %f, %f, %d, "%s", "%s", "%s", "%s", "%s", %d)
-				',
-				$userId, $latitude, $longitude, $altitude, $accuracy, $arrivedTime, $deviceId, $calculatedTime, $address, $country, $locationSource);
+// 		$sql = sprintf('INSERT INTO '
+// 				. $this->tableName() . '
+// 				(userId, latitude, longitude, altitude, accuracy, dataArrivedTime, deviceId, dataCalculatedTime, address, country, locationSource)
+// 				VALUES(%d,	%f, %f, %f, %d, "%s", "%s", "%s", "%s", "%s", %d)
+// 				',
+// 				$userId, $latitude, $longitude, $altitude, $accuracy, $arrivedTime, $deviceId, $calculatedTime, $address, $country, $locationSource);
 	
-		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 	
-		$result = false;
+// 		$result = false;
 	
-		if ($effectedRows == 1) {
-			$result = true;
-		}
+// 		if ($effectedRows == 1) {
+// 			$result = true;
+// 		}
 	
-		return $result;
+// 		return $result;
 	
-		// 		$userWasHere = new UserWasHere;
-	
-		// 		$userWasHere->userId = $userId;
-		// 		$userWasHere->latitude = $latitude;
-		// 		$userWasHere->longitude = $longitude;
-		// 		$userWasHere->altitude = $altitude;
-		// 		$userWasHere->dataArrivedTime = $arrivedTime;
-		// 		$userWasHere->deviceId = $deviceId;
-		// 		$userWasHere->dataCalculatedTime = $calculatedTime;
-		// 		$userWasHere->address = $address;
-		// 		$userWasHere->country = $country;
-		// 		$userWasHere->locationSource = $locationSource;
-	
-		// 		return $userWasHere->save();
+		$userWasHere = new UserWasHere;
+
+		$userWasHere->userId = $userId;
+		$userWasHere->latitude = $latitude;
+		$userWasHere->longitude = $longitude;
+		$userWasHere->altitude = $altitude;
+		$userWasHere->accuracy = $accuracy;
+		$userWasHere->dataArrivedTime = $arrivedTime;
+		$userWasHere->deviceId = $deviceId;
+		$userWasHere->dataCalculatedTime = $calculatedTime;
+		$userWasHere->address = $address;
+		$userWasHere->country = $country;
+		$userWasHere->locationSource = $locationSource;
+
+		return $userWasHere->save();
 	}
 	
 	public function getPastPointsDataProvider($userId, $pageNo, $itemCount)

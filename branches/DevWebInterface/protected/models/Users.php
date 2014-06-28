@@ -243,36 +243,36 @@ class Users extends CActiveRecord
 	
 	public function updateLocation($latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId)
 	{	
-		$sql = sprintf('UPDATE '
-		. $this->tableName() .'
-					SET
-					latitude = %f , '
-		.'	longitude = %f , '
-		.'	altitude = %f ,	'
-		.'	accuracy = %d ,	'		
-		.'	dataArrivedTime = "%s", '
-		.'  dataCalculatedTime = "%s", '
-		.' 	locationSource = %d '
-		.' WHERE '
-		.' 	Id = %d '
-		.' LIMIT 1;',
-		$latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId);
+// 		$sql = sprintf('UPDATE '
+// 		. $this->tableName() .'
+// 					SET
+// 					latitude = %f , '
+// 		.'	longitude = %f , '
+// 		.'	altitude = %f ,	'
+// 		.'	accuracy = %d ,	'		
+// 		.'	dataArrivedTime = "%s", '
+// 		.'  dataCalculatedTime = "%s", '
+// 		.' 	locationSource = %d '
+// 		.' WHERE '
+// 		.' 	Id = %d '
+// 		.' LIMIT 1;',
+// 		$latitude, $longitude, $altitude, $accuracy, $arrivedTime, $calculatedTime, $locationSource, $userId);
 
-		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 		
-		return ($effectedRows > 0);
+// 		return ($effectedRows > 0);
 	
-// 		$user = Users::model()->findByPk($userId);
+		$user = Users::model()->findByPk($userId);
 	
-// 		$user->latitude = $latitude;
-// 		$user->longitude = $longitude;
-// 		$user->altitude = $altitude;
-// 		$user->accuracy = $accuracy;
-// 		$user->dataArrivedTime = $arrivedTime;
-// 		$user->dataCalculatedTime = $calculatedTime;
-// 		$user->locationSource = $locationSource;
+		$user->latitude = $latitude;
+		$user->longitude = $longitude;
+		$user->altitude = $altitude;
+		$user->accuracy = $accuracy;
+		$user->dataArrivedTime = $arrivedTime;
+		$user->dataCalculatedTime = $calculatedTime;
+		$user->locationSource = $locationSource;
 	
-// 		return $user->save();
+		return $user->save();
 	}
 	
 	// 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $address, $country, $calculatedTime, $locationSource, $userId){
@@ -300,40 +300,40 @@ class Users extends CActiveRecord
 	
 	public function updateLocationWithAddress($latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId)
 	{	
-		$sql = sprintf('UPDATE '
-		. $this->tableName() .'
-					SET
-					latitude = %f , '
-		.'	longitude = %f , '
-		.'	altitude = %f ,	'
-		.'	accuracy = %d ,	'				
-		.'	lastLocationAddress = "%s" , '
-		.'	lastLocationCountry = "%s" , '
-		.'	dataArrivedTime = "%s", '
-		.'  dataCalculatedTime = "%s", '
-		.' 	locationSource = %d '
-		.' WHERE '
-		.' 	Id = %d '
-		.' LIMIT 1;',
-		$latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
+// 		$sql = sprintf('UPDATE '
+// 		. $this->tableName() .'
+// 					SET
+// 					latitude = %f , '
+// 		.'	longitude = %f , '
+// 		.'	altitude = %f ,	'
+// 		.'	accuracy = %d ,	'				
+// 		.'	lastLocationAddress = "%s" , '
+// 		.'	lastLocationCountry = "%s" , '
+// 		.'	dataArrivedTime = "%s", '
+// 		.'  dataCalculatedTime = "%s", '
+// 		.' 	locationSource = %d '
+// 		.' WHERE '
+// 		.' 	Id = %d '
+// 		.' LIMIT 1;',
+// 		$latitude, $longitude, $altitude, $accuracy, $address, $country, $arrivedTime, $calculatedTime, $locationSource, $userId);
 
-		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
+// 		$effectedRows = Yii::app()->db->createCommand($sql)->execute();
 
-		return ($effectedRows > 0);
+// 		return ($effectedRows > 0);
 	
-// 		$user = Users::model()->findByPk($userId);
+		$user = Users::model()->findByPk($userId);
 	
-// 		$user->latitude = $latitude;
-// 		$user->longitude = $longitude;
-// 		$user->altitude = $altitude;
-// 		$user->accuracy = $accuracy;
-// 		$user->lastLocationAddress = $address;
-// 		$user->lastLocationCountry = $country;
-// 		$user->dataArrivedTime = $arrivedTime;
-// 		$user->dataCalculatedTime = $calculatedTime;
-// 		$user->locationSource = $locationSource;
+		$user->latitude = $latitude;
+		$user->longitude = $longitude;
+		$user->altitude = $altitude;
+		$user->accuracy = $accuracy;
+		$user->lastLocationAddress = $address;
+		$user->lastLocationCountry = $country;
+		$user->dataArrivedTime = $arrivedTime;
+		$user->dataCalculatedTime = $calculatedTime;
+		$user->locationSource = $locationSource;
 	
-// 		return $user->save();
+		return $user->save();
 	}
 	
 	public function updateLocationTime($par_arrivedTime, $par_calculatedTime, $userId)
