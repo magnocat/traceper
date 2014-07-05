@@ -2025,40 +2025,77 @@ class UsersController extends Controller
 
 		if ((isset($_REQUEST['stackTrace']) && ($_REQUEST['stackTrace'] != NULL)) &&
 			(isset($_REQUEST['deviceInfo']) && ($_REQUEST['deviceInfo'] != NULL)) &&
-			(isset($_REQUEST['firmware']) && ($_REQUEST['firmware'] != NULL)))
+			(isset($_REQUEST['firmware']) && ($_REQUEST['firmware'] != NULL)) &&
+			(isset($_REQUEST['appMode']) && ($_REQUEST['appMode'] != NULL)) &&
+			(isset($_REQUEST['title']) && ($_REQUEST['title'] != NULL)))
 		{
 			$stackTrace = $_REQUEST['stackTrace'];
 			$deviceInfo = $_REQUEST['deviceInfo'];
 			$firmware = $_REQUEST['firmware'];
+			$appMode = $_REQUEST['appMode'];
+			$title = $_REQUEST['title'];
 		
 			$crashLog = '';
-				
-			if (Yii::app()->user->isGuest == false)
+					
+			if($appMode == "DEVELOPMENT")
 			{
-				$name = null;
-				$email = null;
-			
-				Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
-			
-				$crashLog .= "*************************************** USER INFO *************************************"."\n";
-				$crashLog .= 'Id: '.Yii::app()->user->id."\n";
-				$crashLog .= 'Name: '.$name."\n";
-				$crashLog .= 'E-mail: '.$email."\n";
-			} 			
-			
-			$crashLog .= "************************************** STACK TRACE ************************************"."\n";
-			$crashLog .= $stackTrace; //Stack trace'in sonunda zaten satir basi geliyor
-			
-			$crashLog .= "************************************** DEVICE INFO ************************************"."\n";
-			$crashLog .= $deviceInfo."\n";
-		
-			$crashLog .= "*************************************** FIRMWARE **************************************"."\n";
-			$crashLog .= $deviceInfo."\n";
-			
-			$crashLog .= "***************************************************************************************"."\n\n";
-									
-			file_put_contents("logs/crashLog", $crashLog . "\n", FILE_APPEND);
-			
+				if (Yii::app()->user->isGuest == false)
+				{
+					$name = null;
+					$email = null;
+						
+					Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+						
+					$crashLog .= "*************************************** USER INFO *************************************".'<br/><br/>';
+					$crashLog .= 'Id: '.Yii::app()->user->id.'<br/>';
+					$crashLog .= 'Name: '.$name.'<br/>';
+					$crashLog .= 'E-mail: '.$email.'<br/><br/>';
+				}
+					
+				$crashLog .= "************************************** STACK TRACE ************************************".'<br/><br/>';
+				$crashLog .= $title.'<br/><br/>';
+				$crashLog .= $stackTrace.'<br/><br/>'; //Stack trace'in sonunda zaten satir basi geliyor
+					
+				$crashLog .= "************************************** DEVICE INFO ************************************".'<br/><br/>';
+				$crashLog .= $deviceInfo.'<br/><br/>';
+				
+				$crashLog .= "*************************************** FIRMWARE **************************************".'<br/><br/>';
+				$crashLog .= $firmware.'<br/><br/>';
+					
+				$crashLog .= "***************************************************************************************".'<br/><br/>';				
+				
+				$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', $title, $crashLog, false);
+			}
+			else //DEPLOYMENT
+			{
+				if (Yii::app()->user->isGuest == false)
+				{
+					$name = null;
+					$email = null;
+						
+					Users::model()->getUserInfo(Yii::app()->user->id, $name, $email);
+						
+					$crashLog .= "*************************************** USER INFO *************************************"."\n";
+					$crashLog .= 'Id: '.Yii::app()->user->id."\n";
+					$crashLog .= 'Name: '.$name."\n";
+					$crashLog .= 'E-mail: '.$email."\n";
+				}
+					
+				$crashLog .= "************************************** STACK TRACE ************************************"."\n";
+				$crashLog .= $title."\n";
+				$crashLog .= $stackTrace; //Stack trace'in sonunda zaten satir basi geliyor
+					
+				$crashLog .= "************************************** DEVICE INFO ************************************"."\n";
+				$crashLog .= $deviceInfo."\n";
+				
+				$crashLog .= "*************************************** FIRMWARE **************************************"."\n";
+				$crashLog .= $deviceInfo."\n";
+					
+				$crashLog .= "***************************************************************************************"."\n\n";				
+				
+				file_put_contents("logs/crashLog", $crashLog . "\n", FILE_APPEND);
+			}		
+
 			//Fb::warn("After file_put_contents()", "actionSaveMobileCrashInfo()");
 			
 			//$this->SMTP_UTF8_mail('contact@traceper.com', 'Adnan Kalay', 'adnankalay@gmail.com', 'Traceper', 'actionSaveMobileCrashInfo()', $stackTrace, false);
@@ -2275,6 +2312,7 @@ class UsersController extends Controller
 			$rows[$i]['latitude'] = isset($rows[$i]['latitude']) ? $rows[$i]['latitude'] : null;
 			$rows[$i]['longitude'] = isset($rows[$i]['longitude']) ? $rows[$i]['longitude'] : null;
 			$rows[$i]['altitude'] = isset($rows[$i]['altitude']) ? $rows[$i]['altitude'] : null;
+			$rows[$i]['accuracy'] = isset($rows[$i]['accuracy']) ? $rows[$i]['accuracy'] : null;
 			$rows[$i]['dataArrivedTime'] = isset($rows[$i]['dataArrivedTime']) ? $rows[$i]['dataArrivedTime'] : null;
 			$rows[$i]['deviceId'] = isset($rows[$i]['deviceId']) ? $rows[$i]['deviceId'] : null;
 			$rows[$i]['dataCalculatedTime'] = isset($rows[$i]['dataCalculatedTime']) ? $rows[$i]['dataCalculatedTime'] : null;
@@ -2299,6 +2337,7 @@ class UsersController extends Controller
 						'latitude'=>$rows[$i]['latitude'],
 						'longitude'=>$rows[$i]['longitude'],
 						'altitude'=>$rows[$i]['altitude'],
+						'accuracy'=>$rows[$i]['accuracy'],
 						'calculatedTime'=>$rows[$i]['dataCalculatedTime'],
 					    'locationSource'=>$rows[$i]['locationSource'],
 						'time'=>$dataArrivedTimestamp,
@@ -2312,8 +2351,8 @@ class UsersController extends Controller
 		$pagination = $dataProvider->getPagination();
 		$currentPage = $pagination->currentPage + 1;
 		$str='{"userwashere":['.$str.'], "pageNo":"'.$currentPage .'", "pageCount":"'.$pagination->pageCount.'"}';
-		return $str;
 		
+		return $str;		
 	}
 
 	private function getUserJsonItem($row) {
