@@ -195,7 +195,7 @@ class UserWasHere extends CActiveRecord
 		//Fb::warn("lastRecordId:$lastRecordId", "getPastPointsDataProvider()");
 	
 		$sql = 'SELECT
-		longitude, latitude, deviceId, address, country, locationSource,
+		longitude, latitude, altitude, accuracy, deviceId, address, country, locationSource,
 		date_format(u.dataArrivedTime,"%d %b %Y %T") as dataArrivedTime,
 		date_format(u.dataCalculatedTime,"%d %b %Y %T") as dataCalculatedTime
 		FROM ' . UserWasHere::model()->tableName() .' u
