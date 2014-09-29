@@ -80,7 +80,7 @@ Web uygulaması bir http sunucusunda ve android istemcisi bir emulatorde veya ce
  [http://www.flickr.com/photos/38235533@N05/4332662150/ http://farm3.static.flickr.com/2719/4332662150_cb63f1ba40_m.jpg]
 
 === Demo ===
-Martin Lundstrom'a <a href="http://traceper.netmate.biz">traceper web uygulamasının demosunu</a> sağladığı için teşekkür ederiz.
+
 
 
 === Destek ===
@@ -96,5 +96,3 @@ Bu yazılım hiç bir şeyi garanti etmez, yazılımı kendi riskinizle kullanı
 Herhangi bir durumda sorumluluk kabul edilmez.
 
 === Proje Takımı === 
-Ozan Koroglu - <a href='mailto:koroglu.ozan@gmail.com'>koroglu.ozan@gmail.com</a> <br/>
-Ahmet Oguz Mermerkaya (mekya) - <a href='mailto:ahmetmermerkaya@gmail.com'>ahmetmermerkaya@gmail.com</a>
