@@ -79,7 +79,7 @@ After web application runs on a http server and traceper android client runs on 
  [http://www.flickr.com/photos/38235533@N05/4332662150/ http://farm3.static.flickr.com/2719/4332662150_cb63f1ba40_m.jpg]
 
 === Demo ===
-Thanks to Martin Lundstrom for providing <a href="http://traceper.netmate.biz">the demo site of traceper web interface</a>
+
 
 
 === Support ===
@@ -96,5 +96,3 @@ This software guarantees nothing, use it with your own risk.
 No responsilibity is taken for any situation.
 
 === Project Team === 
-Ozan Koroglu - <a href='mailto:koroglu.ozan@gmail.com'>koroglu.ozan@gmail.com</a> <br/>
-Ahmet Oguz Mermerkaya (mekya) - <a href='mailto:ahmetmermerkaya@gmail.com'>ahmetmermerkaya@gmail.com</a>
